@@ -1,5 +1,7 @@
 # Ab3d.DXEngine.Wpf.Samples
 
+![Ab3d.DXEngine engine image](https://www.ab4d.com/images/DXEngine/DXEngine-car_engine-500.png)
+
 [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) is a DirectX 11 rendering engine for Desktop .Net applications. Ab3d.DXEngine is built for advanced business and scientific 3D visualization.
 
 Ab3d.DXEngine uses **super fast rendering** techniques that can fully utilize graphics cards and provide the **ultimate performance**. It also supports **top quality visuals** with PBR materials and shadows.
