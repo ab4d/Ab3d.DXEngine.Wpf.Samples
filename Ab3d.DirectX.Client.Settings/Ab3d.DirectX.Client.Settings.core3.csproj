@@ -28,18 +28,8 @@
 
   <ItemGroup>
     <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.2.7227-rc" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="SharpDX">
-      <HintPath>..\lib\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\lib\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-      <HintPath>..\lib\SharpDX.DXGI.dll</HintPath>
-    </Reference>
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>  
 
 </Project>
