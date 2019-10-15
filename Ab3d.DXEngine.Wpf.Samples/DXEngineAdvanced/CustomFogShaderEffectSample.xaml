@@ -1,0 +1,131 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced.CustomFogShaderEffectSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      Title="StandardXaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+    <Page.Resources>
+        <DiffuseMaterial x:Key="BlueMaterial" Brush="#247589"/>
+        <DiffuseMaterial x:Key="YellowMaterial" Brush="#D0B915"/>
+        <DiffuseMaterial x:Key="GreenMaterial" Brush="#2ABE65"/>
+    </Page.Resources>
+
+    <Grid Name="RootGrid">
+        <Border Name="ViewportBorder" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage">
+
+                <Viewport3D Name="MainViewport">
+                    <visuals:BoxVisual3D x:Name="BaseBoxVisual3D" CenterPosition="15 -2 0" Size="130 4 100" Material="Silver"/>
+
+                    <visuals:BoxVisual3D CenterPosition="60 10 -30" Size="20 20 20" Material="{StaticResource BlueMaterial}" />
+                    <visuals:CylinderVisual3D BottomCenterPosition="30 0 -30" Radius="10" Height="20" Material="{StaticResource BlueMaterial}" />
+                    <visuals:SphereVisual3D CenterPosition="0 10 -30" Radius="10" Material="{StaticResource BlueMaterial}" />
+                    <visuals:PyramidVisual3D BottomCenterPosition="-30 0 -30" Size="20 20 20" Material="{StaticResource BlueMaterial}" />
+
+                    <visuals:BoxVisual3D CenterPosition="60 10 0" Size="20 20 20" Material="{StaticResource YellowMaterial}" />
+                    <visuals:CylinderVisual3D BottomCenterPosition="30 0 0" Radius="10" Height="20" Material="{StaticResource YellowMaterial}" />
+                    <visuals:SphereVisual3D CenterPosition="0 10 0" Radius="10" Material="{StaticResource YellowMaterial}" />
+                    <visuals:PyramidVisual3D BottomCenterPosition="-30 0 0" Size="20 20 20" Material="{StaticResource YellowMaterial}" />
+
+                    <visuals:BoxVisual3D CenterPosition="60 10 30" Size="20 20 20" Material="{StaticResource GreenMaterial}" />
+                    <visuals:CylinderVisual3D BottomCenterPosition="30 0 30" Radius="10" Height="20" Material="{StaticResource GreenMaterial}" />
+                    <visuals:SphereVisual3D CenterPosition="0 10 30" Radius="10" Material="{StaticResource GreenMaterial}" />
+                    <visuals:PyramidVisual3D BottomCenterPosition="-30 0 30" Size="20 20 20" Material="{StaticResource GreenMaterial}" />
+                    
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <AmbientLight Color="#333333"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                    TargetPosition="0 0 0" 
+                                    Heading="60" Attitude="-20" Bank="0" 
+                                    Distance="250" 
+                                    Offset="0 20 30"
+                                    ShowCameraLight="Always"
+                                    TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                RotateCameraConditions="LeftMouseButtonPressed"
+                                MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo" 
+                                    ShowRotateInfo="True" ShowMoveInfo="True"
+                                    MouseCameraController="{Binding ElementName=MouseCameraController1}" 
+                                    Foreground="DimGray" FontSize="15" FontWeight="Bold"
+                                    Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+
+
+        <Border BorderBrush="Black" BorderThickness="2" Background="#88FFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
+            <StackPanel Orientation="Vertical" Margin="10" MinWidth="170">
+
+                <TextBlock Text="Fog settings:" FontWeight="Bold" FontSize="16" TextDecorations="Underline" Margin="0 0 0 5" />
+
+
+                <TextBlock Name="FogStartTextBlock" Margin="0 5 0 0">
+                    <Run Text="Fog start distance:" FontWeight="Bold" />
+                    <Run Text="{Binding ElementName=FogStartSlider, Path=Value, StringFormat={}{0:0}}" />
+                </TextBlock>
+
+                <Slider Name="FogStartSlider" Minimum="0" Maximum="500" Value="200" TickFrequency="50" TickPlacement="BottomRight"
+                        ValueChanged="OnFogSettingsChanged" />
+
+
+                <TextBlock Name="FullFogTextBlock" Margin="0 10 0 0">
+                    <Run Text="Full fog distance:" FontWeight="Bold" />
+                    <Run Name="FullFogValueRun" />
+                </TextBlock>
+                <Slider Name="FullFogSlider" Minimum="0" Maximum="500" Value="80" TickFrequency="50" TickPlacement="BottomRight"
+                        ValueChanged="OnFogSettingsChanged" />
+
+
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <TextBlock Text="Fog color:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
+                    <ComboBox Name="ColorCombobox" SelectedIndex="0" SelectionChanged="OnFogSettingsChanged">
+                        <ComboBoxItem Background="White">White</ComboBoxItem>
+                        <ComboBoxItem Background="LightGray">LightGray</ComboBoxItem>
+                        <ComboBoxItem Background="LightCyan">LightCyan</ComboBoxItem>
+                        <ComboBoxItem Background="Black" Foreground="White">Black</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+
+                <TextBlock Text="FogEffect usage:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 20 0 5" />
+                
+                <RadioButton Name="StandardEffectRadioButton" Content="FogEffect as StandardEffect" IsChecked="True" Checked="OnFogUsageChanged" 
+                             ToolTip="FogEffect is set as StandardEffect on EffectsManager - it will be used to render standard WPF materials (diffuse, specular, emissive).&#x0a;See comments in UpdateFogUsage method for more info."/>
+
+                <RadioButton Name="NoFogEffectRadioButton" Content="No FogEffect" Checked="OnFogUsageChanged" 
+                             ToolTip="FogEffect is not used."/>
+
+                <RadioButton Name="RootBoxRadioButton" Content="FogEffect on root box" Checked="OnFogUsageChanged" 
+                             ToolTip="Set MaterialEffect on SceneNode that is created for root BoxVisual3D - this will force using FogEffect when rendering root BoxVisual3D.&#x0a;See comments in UpdateFogUsage method for more info."/>
+                
+                <RadioButton Name="ReplaceRadioButton" Content="Replace yellow with FogEffect" Checked="OnFogUsageChanged" 
+                             ToolTip="Set MaterialEffect on SceneNodes that are created from all SphereVisual3D objects - this will force using FogEffect when rendering spheres.&#x0a;See comments in UpdateFogUsage method for more info."/>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="10" TextWrapping="Wrap"
+                   VerticalAlignment="Top" HorizontalAlignment="Left"
+                   Text="Using fog shader from hlsl file created with Ab3d.DirectX.ShaderFactory project"/>
+
+    </Grid>
+</Page>
+

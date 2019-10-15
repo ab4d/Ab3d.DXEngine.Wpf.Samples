@@ -1,0 +1,64 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance.PixelRenderingOptionsSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"   
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      Title="InstancedMeshGeometry3DTest"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+    <Grid>
+
+        <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="White">
+            <Viewport3D Name="MainViewport">
+                <visuals:BoxVisual3D CenterPosition="50 -5 -30" Size="300 10 600" Material="Silver" />
+                
+                <visuals:TextBlockVisual3D Position="70 1 -200" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel color" />
+
+                <visuals:TextBlockVisual3D Position="70 1 -100" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel color&#x0d;&#x0a;with color mask&#x0d;&#x0a;(0 255 0)" />
+
+                <visuals:TextBlockVisual3D Position="70 1 0" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel size" />
+
+                <visuals:TextBlockVisual3D Position="70 1 100" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel size&#x0d;&#x0a;with scale factor 3" />
+
+                <visuals:TextBlockVisual3D Position="70 1 200" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel&#x0d;&#x0a;color and size" />
+
+            </Viewport3D>
+        </dxControls:DXViewportView>
+
+        <cameras:TargetPositionCamera Name="Camera1"
+                                      Heading="-20" Attitude="-40" Bank="0" Distance="800" 
+                                      TargetPosition="10 -75 -20"
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <!-- EventsSourceElement is set to MainGrid - this means that the MainGrid's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=MainDXViewportView}"
+                                    ZoomMode="MousePosition"
+                                    TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <ab3d:MouseCameraControllerInfo HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        MouseCameraController="{Binding ElementName=MouseCameraController1}" />
+
+        <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap"
+                   HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Text="PixelsVisual3D with per pixel colors and per pixel sizes"/>
+
+    </Grid>
+</Page>

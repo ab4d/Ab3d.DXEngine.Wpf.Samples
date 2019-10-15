@@ -1,0 +1,37 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance.DXEnginePerformanceIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="900">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Extreme performance samples</controls:TextBlockEx>
+
+                <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    Samples in this section show how to use Ab3d.DXEngine to render incredible amount of 3D objects, triangles, 3D lines and pixels.\n
+                    \n
+                    This extreme GPU performance is possible with highly optimized rendering code and with algorithms and tools that can prepare the scene data in such a way that GPU can render the scene in the most efficient way.\n
+                    \n
+                    Usually the standard way to represent 3D object with using Visual3D objects provides sufficient performance. But when the same mesh is rendered in many different ways, then the performance can be greatly improved with using instancing.\n
+                    \n
+                    To see how to improve performance of objects initialization and changing the objects see also samples in the "Advanced DXEngine usage".\n
+                    \n
+                    \n
+                    To get an insight into the performance of your application, it is highly recommended to use the \!DXEngineSnoop\! tool that is installed into the Tools folder. It can connect to your application and provide real time performance statistics in the same way as what is shown when you click on "Diagnostics" button in this sample application.
+                </controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -1,0 +1,426 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
+    <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;CORE3</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="ab4d.ico" />
+    <None Remove="Resources\Ab3dPowerToysSamples.png" />
+    <None Remove="Resources\ab4d-logo-220x220.DDS" />
+    <None Remove="Resources\ab4d-logo-220x220.png" />
+    <None Remove="Resources\ab4d-logo.png" />
+    <None Remove="Resources\BricksMaps\bricks.png" />
+    <None Remove="Resources\BricksMaps\bricks_ao.png" />
+    <None Remove="Resources\BricksMaps\bricks_normal.png" />
+    <None Remove="Resources\BricksMaps\bricks_specular.png" />
+    <None Remove="Resources\BricksMaps\readme.txt" />
+    <None Remove="Resources\Diagnostics-gray.png" />
+    <None Remove="Resources\Diagnostics.png" />
+    <None Remove="Resources\DXEngine-car_engine.png" />
+    <None Remove="Resources\DXEngine-OculusWrap-590.jpg" />
+    <None Remove="Resources\DXEngineWinForms.png" />
+    <None Remove="Resources\GrassTexture.jpg" />
+    <None Remove="Resources\HeightMaps\europe.png" />
+    <None Remove="Resources\HeightMaps\europe_height.png" />
+    <None Remove="Resources\HeightMaps\readme.txt" />
+    <None Remove="Resources\HeightMaps\simpleHeightMap.png" />
+    <None Remove="Resources\HeightMaps\srtm_ramp2.world.500x250.png" />
+    <None Remove="Resources\HeightMaps\world.topo.200407.3x500x250.png" />
+    <None Remove="Resources\info_icon.png" />
+    <None Remove="Resources\Models\bun_zipper_res3.obj" />
+    <None Remove="Resources\Models\bun_zipper_res3.obj.mtl" />
+    <None Remove="Resources\Models\bun_zipper_res3_readme.txt" />
+    <None Remove="Resources\Models\dragon_vrip_res3.obj" />
+    <None Remove="Resources\Models\dragon_vrip_res3.obj.mtl" />
+    <None Remove="Resources\Models\dragon_vrip_res3_readme.txt" />
+    <None Remove="Resources\Models\duck.dae" />
+    <None Remove="Resources\Models\duckCM.png" />
+    <None Remove="Resources\Models\robotarm-upper-part.3DS" />
+    <None Remove="Resources\Models\ship_boat.mtl" />
+    <None Remove="Resources\Models\ship_boat.obj" />
+    <None Remove="Resources\Models\ship_boat_readme.txt" />
+    <None Remove="Resources\Models\Teapot with material.obj" />
+    <None Remove="Resources\Models\teapot-green-texture.png" />
+    <None Remove="Resources\Models\teapot-hires.obj" />
+    <None Remove="Resources\Models\teapot-reflection.png" />
+    <None Remove="Resources\Models\Teapot.mtl" />
+    <None Remove="Resources\Models\Teapot.obj" />
+    <None Remove="Resources\new_icon.png" />
+    <None Remove="Resources\PowerToysTexture.png" />
+    <None Remove="Resources\RobotModel\get 4k textures.txt" />
+    <None Remove="Resources\RobotModel\License and credits.txt" />
+    <None Remove="Resources\RobotModel\Robot_Claw.FBX" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_AmbientOcclusion.png" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_BaseColor.png" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Height.png" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Metallic.png" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Normal.png" />
+    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Roughness.png" />
+    <None Remove="Resources\RobotModel\Robot_Main.FBX" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_AmbientOcclusion.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_BaseColor.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Emissive.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Height.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Metallic.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Normal.png" />
+    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Roughness.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel.FBX" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_AmbientOcclusion.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_BaseColor.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Emissive.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Height.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Metallic.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Normal.png" />
+    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Roughness.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw.FBX" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_AmbientOcclusion.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_BaseColor.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Height.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Metallic.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Normal.png" />
+    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png" />
+    <None Remove="Resources\Settings.png" />
+    <None Remove="Resources\ShaderFactoryScreenshot.PNG" />
+    <None Remove="Resources\Shaders\FogShader.ps" />
+    <None Remove="Resources\Shaders\FogShader.vs" />
+    <None Remove="Resources\Shaders\MeshNormalShader.ps" />
+    <None Remove="Resources\Shaders\MeshNormalShader.vs" />
+    <None Remove="Resources\Shaders\MiniCube.ps" />
+    <None Remove="Resources\Shaders\MiniCube.vs" />
+    <None Remove="Resources\Shaders\ShadedPointCloud.gs" />
+    <None Remove="Resources\Shaders\ShadedPointCloud.ps" />
+    <None Remove="Resources\Shaders\ShadedPointCloud.vs" />
+    <None Remove="Resources\Shaders\ShadedPointCloudPerPointColor.vs" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysBack512.png" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysDown512.png" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysFront512.png" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysLeft512.png" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysRight512.png" />
+    <None Remove="Resources\SkyboxTextures\CloudyLightRaysUp512.png" />
+    <None Remove="Resources\SkyboxTextures\readme.txt" />
+    <None Remove="Resources\updated_icon.png" />
+    <None Remove="Resources\warningIcon.png" />
+    <None Remove="Samples.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\lib\Assimp32.dll" Link="Assimp32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\lib\Assimp64.dll" Link="Assimp64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ab4d-logo-220x220.DDS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ab4d-logo-220x220.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\BricksMaps\bricks.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\BricksMaps\bricks_ao.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\BricksMaps\bricks_normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\BricksMaps\bricks_specular.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\BricksMaps\readme.txt" />
+    <Content Include="Resources\HeightMaps\europe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HeightMaps\europe_height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HeightMaps\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HeightMaps\simpleHeightMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HeightMaps\srtm_ramp2.world.500x250.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HeightMaps\world.topo.200407.3x500x250.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\bun_zipper_res3.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\bun_zipper_res3.obj.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\bun_zipper_res3_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\dragon_vrip_res3.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\dragon_vrip_res3.obj.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\dragon_vrip_res3_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\duck.dae">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\duckCM.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\robotarm-upper-part.3DS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\ship_boat.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\ship_boat.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\ship_boat_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Teapot with material.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\teapot-green-texture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\teapot-hires.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\teapot-reflection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Teapot.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Teapot.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\get 4k textures.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\License and credits.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw.FBX">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_AmbientOcclusion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_BaseColor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Metallic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Roughness.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main.FBX">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_AmbientOcclusion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_BaseColor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Emissive.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Metallic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Roughness.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel.FBX">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_AmbientOcclusion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_BaseColor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Emissive.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Metallic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Roughness.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw.FBX">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_AmbientOcclusion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_BaseColor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Metallic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\FogShader.ps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\FogShader.vs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\MeshNormalShader.ps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\MeshNormalShader.vs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\MiniCube.ps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Shaders\MiniCube.vs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysBack512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysDown512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysFront512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysLeft512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysRight512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\CloudyLightRaysUp512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SkyboxTextures\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Shaders\ShadedPointCloud.gs" />
+    <EmbeddedResource Include="Resources\Shaders\ShadedPointCloud.ps" />
+    <EmbeddedResource Include="Resources\Shaders\ShadedPointCloud.vs" />
+    <EmbeddedResource Include="Resources\Shaders\ShadedPointCloudPerPointColor.vs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.2.7227-rc" />
+    <PackageReference Include="Ab3d.PowerToys" Version="9.0.7222-rc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.core3.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.core3.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>    
+    <Reference Include="Ab3d.PowerToys.Assimp">
+      <HintPath>..\lib\Ab3d.PowerToys.Assimp.dll</HintPath>
+    </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\lib\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\lib\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\lib\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\lib\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Mathematics">
+      <HintPath>..\lib\SharpDX.Mathematics.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ab4d.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Ab3dPowerToysSamples.png" />
+    <Resource Include="Resources\ab4d-logo.png" />
+    <Resource Include="Resources\Diagnostics-gray.png" />
+    <Resource Include="Resources\Diagnostics.png" />
+    <Resource Include="Resources\DXEngine-car_engine.png" />
+    <Resource Include="Resources\DXEngine-OculusWrap-590.jpg" />
+    <Resource Include="Resources\DXEngineWinForms.png" />
+    <Resource Include="Resources\GrassTexture.jpg" />
+    <Resource Include="Resources\info_icon.png" />
+    <Resource Include="Resources\new_icon.png" />
+    <Resource Include="Resources\PowerToysTexture.png" />
+    <Resource Include="Resources\Settings.png" />
+    <Resource Include="Resources\ShaderFactoryScreenshot.PNG" />
+    <Resource Include="Resources\updated_icon.png" />
+    <Resource Include="Resources\warningIcon.png" />
+    <Resource Include="Samples.xml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>

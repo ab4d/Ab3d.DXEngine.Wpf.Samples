@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="Ab3d.DirectX.Client.Settings.DXEngineSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Width="330">
+    <Grid IsSharedSizeScope="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition SharedSizeGroup="KeyColumn" Width="110" />
+            <ColumnDefinition SharedSizeGroup="ValueColumn" Width="220"/>
+        </Grid.ColumnDefinitions>     
+        <Grid.RowDefinitions>
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+             <RowDefinition Height="Auto" />            
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="Rendering adapters:" Margin="0 2 5 5" VerticalAlignment="Center" />
+        <StackPanel Name="AdapterStackPanel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Vertical" Visibility="Collapsed"/>
+
+        <TextBlock Name="QualityTextBlock" Grid.Column="0" Grid.Row="3" Text="Render quality:" Margin="0 15 5 10" VerticalAlignment="Center" />
+        <ComboBox Name="QualityComboBox" Grid.Column="1" Grid.Row="3" Margin="0 15 0 10" SelectionChanged="QualityComboBox_OnSelectionChanged" />
+
+        <Grid Name="CustomSettingsGrid" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition SharedSizeGroup="KeyColumn" Width="Auto" />
+                <ColumnDefinition SharedSizeGroup="ValueColumn" Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Anti-aliasing:" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="AntialiasingComboBox" Grid.Column="1" Grid.Row="0" Margin="0 2 0 2" SelectionChanged="AntialiasingComboBox_OnSelectionChanged"/>
+        
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Shaders quality:" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="ShaderQualityComboBox" Grid.Column="1" Grid.Row="1" Margin="0 2 0 2" SelectionChanged="ShaderQualityComboBox_OnSelectionChanged"/>
+        
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Texture filtering:" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="TextureFilteringComboBox" Grid.Column="1" Grid.Row="2" Margin="0 2 0 2" SelectionChanged="TextureFilteringComboBox_OnSelectionChanged"/>
+
+            <!--<TextBlock Grid.Column="0" Grid.Row="3" Text="Shadows quality:" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="ShadowsComboBox" Grid.Column="1" Grid.Row="3" Margin="0 2 0 2" SelectionChanged="ShadowsComboBox_OnSelectionChanged">
+                <ComboBoxItem>None</ComboBoxItem>
+                <ComboBoxItem>Low</ComboBoxItem>
+                <ComboBoxItem>High</ComboBoxItem>
+            </ComboBox>-->
+        </Grid>
+
+        <TextBlock Name="DpiTitleTextBlock" Grid.Column="0" Grid.Row="5" Text="DPI:" Margin="0 10 5 2" VerticalAlignment="Center" />
+        <ComboBox Name="DpiComboBox" Grid.Column="1" Grid.Row="5" Margin="0 10 0 2" SelectionChanged="DpiComboBox_OnSelectionChanged"/>
+
+        <TextBlock Name="MaxThreadsTextBlock" Grid.Column="0" Grid.Row="6" Text="Max BG threads:" Margin="0 10 5 2" VerticalAlignment="Center" />
+
+        <Grid Grid.Column="1" Grid.Row="6" Margin="0 10 0 2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Slider Name="MaxThreadsSlider" Grid.Column="0" Minimum="0" Maximum="8" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="MaxThreadsSlider_OnValueChanged" />
+            <TextBlock Name="MaxThreadsValueTextBlock" Grid.Column="1" Text="{Binding ElementName=MaxThreadsSlider, Path=Value, StringFormat=F0}" Margin="6 0 0 0" MinWidth="15" />
+        </Grid>
+
+        <TextBlock Name="ErrorTextBlock" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" Margin="0 15 5 2" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed" />
+    </Grid>
+</UserControl>

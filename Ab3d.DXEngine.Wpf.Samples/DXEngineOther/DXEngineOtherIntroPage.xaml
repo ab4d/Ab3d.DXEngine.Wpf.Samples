@@ -1,0 +1,32 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineOther.DXEngineOtherIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="900">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Other Ab3d.DXEngine samples</controls:TextBlockEx>
+
+                <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    Samples in this section show some other benefits of using DXEngine.\n
+                    \n
+                    They show how to load DDS textures, render 3D scene to bitmap, use frustum culling, define objects in background thread and even have full background rendering solution.\n
+                    \n
+                    The last sample "Standard XAML and C#" can be used as a standard XAML template for your project. To use it, first create a new Window, User Control or Page in your project. Then delete all the XAML except the first line. Then go to the "Standard XAML and C#" sample and click on "Copy XAML to clipboard". Now go to your project and paste the XAML into the second row. Now only adjust the XAML and you are ready to use Ab3d.DXEngine and Ab3d.PowerToys. There are also some interesting code snippets in C#.
+                </controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

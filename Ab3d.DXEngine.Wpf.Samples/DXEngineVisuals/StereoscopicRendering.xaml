@@ -1,0 +1,170 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.StereoscopicRendering"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+    xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+    xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+    xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+    xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+    Title="AllModelsSample"
+    MinHeight="300"      
+    MinWidth="600"
+    mc:Ignorable="d" 
+    d:DesignHeight="400" d:DesignWidth="1000">
+    <Page.Resources>
+        <DiffuseMaterial x:Key="ObjectsMaterial" Brush="Silver"/>
+    </Page.Resources>
+    <Grid Name="MainGrid">
+        
+        <Border Name="ViewportBorder" Background="Black">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+
+                <Viewport3D Name="MainViewport">
+                    <!-- 3D scene is defined in code -->
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" Heading="25" Attitude="-20" Bank="0" Distance="1500" TargetPosition="0 0 0"
+                                      ShowCameraLight="Always" FieldOfView="50"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <!-- EventsSourceElement is set to MainGrid - this means that the MainGrid's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <Border Name="OptionsBorder" BorderThickness="2" BorderBrush="#444" Background="#AAFFFFFF" VerticalAlignment="Bottom" Margin="5 5 0 5">
+            <Grid>
+                <Grid Name="SettingsGrid" Margin="10 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="VR Provider:" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
+                        <ComboBox Name="ProviderComboBox" SelectedIndex="2" Width="115" Margin="5 0 0 0" SelectionChanged="ProviderComboBox_OnSelectionChanged">
+                            <ComboBoxItem Name="NoProvider" Content="None" />
+                            <ComboBoxItem Name="AnaglyphProvider" Content="Anaglyph" />
+                            <ComboBoxItem Name="SplitScreenProvider" Content="Split Screen" />
+                        </ComboBox>
+                        <Image Name="VRProviderInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
+                                   ToolTipService.ShowDuration="30000" /> <!-- ToolTip is set in code to add line breaks -->
+                    </StackPanel>
+
+                    <TextBlock Name="ProviderSettingsTextBlock" Grid.Column="0" Grid.Row="1" Text="Anaglyph type:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 3 0 0"/>
+                    <ComboBox Name="ProviderSettingsComboBox" Grid.Column="1" Grid.Row="1" Width="140" HorizontalAlignment="Left" Margin="5 3 0 0"
+                              SelectionChanged="ProviderSettingsComboBox_OnSelectionChanged"/>
+
+                    
+                    <StackPanel Name="SeparationDistancePanel" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Visibility="Collapsed" Orientation="Vertical" Margin="10 0 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Separation" FontWeight="Bold"/>
+                            <Image Name="SeparationDistanceInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
+                                   ToolTipService.ShowDuration="30000" >
+                                <Image.ToolTip>
+                                    <controls:TextBlockEx FontFamily="Verdana" MaxWidth="600" FontSize="12" Foreground="#333" TextWrapping="Wrap" LineHeight="16">
+                                        When Split-screen stereoscopic rendering is used to render the 3D scene on a 3D TV, it may be necessary to
+adjust the image separation distance before a good 3D effect can be achieved.\n
+\n
+Please use the following steps to calibrate the settings for 3D TV:\n
+\* When using HDMI cable to connect computer and TV, make sure that the computer screeen is not cropped or too small (with black border on TV). You might need to adjust graphics card settings to achive the full computer screen is visible from one edge of the TV to the other.\n
+\* Set EyeSeparation, Parallax angle and Separation distance to 0. This removes the 3D effect and produces the same images for left and right eye.\n
+\* On the TV, turn the 3D mode on (use Side-by-side or Top-and-bottom mode).\n
+\* Without wearing the 3D glasses the TV should be showing one clear image (because images for left and right eye are the same). If you see blurry left and right images that are shown one near another, then you need to adjust the image separation distance by clicking on '+' and '-' buttons. With clicking on the buttons, you need to bring the separate left and right images closer together and finnally the two images should combine into one clear image. For example some Samsung TVs work best with separation distance set to 42 for side-by-side and 22 for top-and-bottom.\n
+\* When you see one clear image, then you can put the 3D glasses on (turn them on if you have active glasses; this is not needed for passive glasses).\n
+\* Now you can increase the EyeSeparation and Parallax angle. Note that for stronger 3D effect you can increase parallax angle - this also requires increased eye separation.
+
+                                    </controls:TextBlockEx>
+                                </Image.ToolTip>
+                            </Image>
+                        </StackPanel>
+                        <TextBlock Name="SeparationDistanceTextBlock" Text="distance: 0" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Name="SeparationDecreaseButton" Content="-" Padding="15 2" Margin="0 0 5 0" Click="SeparationDecreaseButton_OnClick"/>
+                            <Button Name="SeparationIncreaseButton" Content="+" Padding="15 2" Click="SeparationIncreaseButton_OnClick" />
+                        </StackPanel>
+                    </StackPanel>
+
+
+                    <TextBlock Grid.Column="3" Grid.Row="0" Text="Eye separation:" FontWeight="Bold" Margin="10 0 0 0" VerticalAlignment="Center" />
+
+                    <Slider Name="EyeSeparationSlider" Grid.Column="4" Grid.Row="0" Minimum="0" Maximum="200" Value="70" TickFrequency="10"
+                            Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 3 0 0"
+                            ValueChanged="EyeSeparationSlider_OnValueChanged"/>
+
+                    <StackPanel Grid.Column="5" Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ElementName=EyeSeparationSlider, Path=Value, StringFormat={}{0:0} mm}" VerticalAlignment="Center"/>
+                        <Image Name="EyeSeparationInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
+                                   ToolTipService.ShowDuration="30000" />
+                        <!-- ToolTip is set in code to add line breaks -->
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="3" Grid.Row="1" Text="Parallax angle:" FontWeight="Bold" Margin="10 0 0 0" VerticalAlignment="Center" />
+                    <Slider Name="ParallaxSlider" Grid.Column="4" Grid.Row="1" Minimum="0" Maximum="1.5" Value="0.6"
+                            IsSnapToTickEnabled="True" TickFrequency="0.01" 
+                            Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 3 0 0"
+                            ValueChanged="ParallaxSlider_OnValueChanged"/>
+
+                    <StackPanel Grid.Column="5" Grid.Row="1" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ElementName=ParallaxSlider, Path=Value, StringFormat={}{0:0.00}°}" Margin="0 0 0 0" VerticalAlignment="Center"/>
+
+                        <Image Name="ParallaxInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
+                               ToolTipService.ShowDuration="30000" /> <!-- ToolTip is set in code to add line breaks -->
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="6" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" Margin="10 0 0 0">
+                        <CheckBox Name="AnaglyphEnabledCheckBox" Content="Is enabled" IsChecked="True"
+                                  Checked="AnaglyphEnabledCheckBoxCheckedChanged" Unchecked="AnaglyphEnabledCheckBoxCheckedChanged" />
+
+                        <CheckBox Name="InvertViewsCheckBox" Content="Invert left / right view" IsChecked="False"
+                                  Checked="InvertViewsCheckBoxCheckedChanged" Unchecked="InvertViewsCheckBoxCheckedChanged" />
+                
+                        <Button Name="FullScreenButton" Content="Toggle Full screen" Click="FullScreenButton_OnClick" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="7" Grid.Row="0" Text="Scene models:" FontWeight="Bold" VerticalAlignment="Bottom" Margin="20 0 0 0"/>
+                    <ComboBox Name="SceneComboBox" Grid.Column="7" Grid.Row="1" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20 0 0 0"
+                              SelectionChanged="SceneComboBox_OnSelectionChanged">
+                        <ComboBoxItem Name="GeneratedSceneComboBoxItem" Content="Generated 3D scene" />
+                        <ComboBoxItem Name="DragonSceneComboBoxItem" Content="3D Dragon model" />
+                        <ComboBoxItem Name="CustomSceneComboBoxItem" Content="Dragged .obj file" />
+                    </ComboBox>
+                </Grid>
+                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 -2 3 0">
+                    <Hyperlink Name="HideHyperlink" Click="HideHyperlink_OnClick" TextDecorations="Underline">hide options</Hyperlink>
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <TextBlock Name="ShowLinkTextBlock" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 5 3" Visibility="Collapsed">
+                    <Hyperlink Name="ShowHyperlink" Click="ShowHyperlink_OnClick" TextDecorations="Underline">show options</Hyperlink>
+        </TextBlock>
+
+        <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="20" Foreground="Silver" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="Anaglyph stereoscopic rendering for red and cyan glasses"/>
+
+        <TextBlock Name="Wpf3DRenderingWarningTextBlock" Text="Cannot show Stereoscopic rendering in WPF 3D rendering mode" 
+                   FontWeight="Bold" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed"/>
+    </Grid>
+</Page>

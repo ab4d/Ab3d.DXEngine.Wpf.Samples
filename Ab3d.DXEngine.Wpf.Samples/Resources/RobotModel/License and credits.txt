@@ -1,0 +1,18 @@
+Sugarbricks Studio
+Brankova 21 Belgrade
+https://www.facebook.com/Sugarbricks/
+https://www.upwork.com/agencies/~01369bbf16f9f63f1c
+
+Design/3d modeling by:
+Grgur Stojanovic
+Tundenizer@gmail.com
+
+Texturing by:
+Miljan Jelic
+miljanjelic0@gmail.com
+
+
+The robot model may be used only as part of the demonstration for Ab3d.PowerToys or Ab3d.DXEngine libraries
+and must not be used for any other commercial or non-commercial purpose!
+
+Copyright (c) 2018 by AB4D d.o.o.

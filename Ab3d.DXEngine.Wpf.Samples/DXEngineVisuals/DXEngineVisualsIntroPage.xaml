@@ -1,0 +1,34 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.DXEngineVisualsIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="900">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Improved visual and rendering quality</controls:TextBlockEx>
+
+                <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    Samples in this section show that Ab3d.DXEngine can be used to provide state of the art rendering quality.\n
+                    \n
+                    For the best possible results it provides PBR (Physically Based Rendering) materials that can render real-life object with their physically based properties.\n
+                    \n
+                    It is also possible to render advanced effects like environment and normal mapping with using standard materials.\n
+                    \n
+                    All the lighting calculations are by default done with per-pixel accuracy. For even better precision it is possible to enable super-sampling.
+                </controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

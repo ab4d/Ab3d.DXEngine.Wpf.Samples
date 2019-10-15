@@ -1,0 +1,48 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.Other.IntroductionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:common="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"      
+      Title="Lines3DIntroPage">
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20 16 20 0">
+            <common:TextBlockEx Style="{StaticResource InfoTitle}" Margin="0 0 0 15">Welcome to the \!Ab3d.DXEngine\!</common:TextBlockEx>
+            <common:TextBlockEx x:Name="VirtualMachineWarningTextBlock" Style="{StaticResource InfoContent}" Visibility="Collapsed"
+                                Foreground="Red" Margin="0 0 0 15">
+                This application is running in Virtual Machine!\n
+                Because Virtual Machines have only limited support for graphics cards, the Ab3d.DXEngine may be running in low quality software rendering mode.\n
+                To see the real power of the Ab3d.DXEngine, please run this application in non-virtual environment.
+            </common:TextBlockEx>
+            <common:TextBlockEx Style="{StaticResource InfoContent}">
+                Ab3d.DXEngine is a \!super fast DirectX 11 rendering engine\! for desktop .Net applications.\n
+                \n
+                It provides the easiest access to the \!extreme GPU performance\! and \!great visual quality\!.
+            </common:TextBlockEx>
+        </StackPanel>
+        
+        <Image Name="CarEngineImage" Grid.Row="1" Source="/Resources/DXEngine-car_engine.png" HorizontalAlignment="Left" Margin="60 0 0 0" />
+
+        <common:TextBlockEx Grid.Row="2" Margin="20 0 20 10" Style="{StaticResource InfoContent}">
+            This sample project demonstrate many features of the Ab3d.DXEngine.\n
+            \n
+            More information about the engine usage can be found in the "\!Ab3d.DXEngine Help.chm\!" help file (installed into the root DXEngine directory). Help file also contains a \!Quick start\! and many other guides.\n
+            \n
+            Most of the samples in this project use many helper objects from Ab3d.PowerToys library. To get more information on how to use that library make sure to \!check the Abd3.PowerToys samples project\!.
+        </common:TextBlockEx>
+    </Grid>
+</Page>

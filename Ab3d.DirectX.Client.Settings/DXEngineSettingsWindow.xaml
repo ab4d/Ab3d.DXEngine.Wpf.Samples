@@ -1,0 +1,25 @@
+﻿<Window x:Class="Ab3d.DirectX.Client.Settings.DXEngineSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:settings="clr-namespace:Ab3d.DirectX.Client.Settings"
+
+        Title="DXEngine Settings" 
+        WindowStartupLocation="CenterOwner"
+        MinWidth="200" MinHeight="200" SizeToContent="WidthAndHeight">
+    <Grid Margin="20 10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Graphics Settings" FontSize="18"></TextBlock>
+        <settings:DXEngineSettingsPanel x:Name="DxEngineSettingsPanel1" Grid.Row="1" ShowDpiSetting="True" Margin="0 10" />
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Height="25">
+            <Button Name="CancelButton" IsCancel="True" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
+            <Button Name="OkButton" IsDefault="True" Content="OK" Margin="10 0 0 0" Width="80" Click="OkButton_OnClick" />
+        </StackPanel>
+    </Grid>
+</Window>

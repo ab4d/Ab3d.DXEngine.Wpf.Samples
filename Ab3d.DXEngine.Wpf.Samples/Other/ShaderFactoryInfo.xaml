@@ -1,0 +1,27 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.Other.ShaderFactoryInfo"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Other"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="600"
+      Title="ShaderFactoryInto">
+
+    <StackPanel Margin="20 20 20 0" Orientation="Vertical">
+
+        <controls:TextBlockEx  Style="{StaticResource InfoContent}">
+            \!Ab3d.DXEngine.ShaderFactory\! solution is a \!HLSL shader editor tool\! that can be used to see how to program in HLSL and to create your own shaders for DXEngine. This application \!dynamically compiles shaders\! so that each change in HLSL code is immediately shown in the rendered 3D scene.\n
+            \n
+            If you are new to HLSL, you will be able to quickly see how shaders work because the application starts with a very simple shader that is then improved in small steps to show how to add additional functionality to the shaders.
+        </controls:TextBlockEx>
+
+        <TextBlock Name="OpenSolutionTextBlock" Margin="0 12 0 0" Visibility="Collapsed" FontSize="16">
+            <Hyperlink Name="OpenSolutionHyperlink" Click="Hyperlink_OnClick">Click here to open Ab3d.PowerToys main samples project</Hyperlink>
+        </TextBlock>
+
+        <Image Name="SampleImage" Source="/Resources/ShaderFactoryScreenshot.PNG"
+               Stretch="Uniform" StretchDirection="DownOnly" Margin="0 20 0 0" HorizontalAlignment="Left" />        
+    </StackPanel>
+</Page>

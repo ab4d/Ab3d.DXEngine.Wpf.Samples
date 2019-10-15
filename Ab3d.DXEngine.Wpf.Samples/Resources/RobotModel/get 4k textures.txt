@@ -1,0 +1,4 @@
+﻿The textures from this folder are scaled down to reduce the size of the installer.
+
+To check the robot model with full resulution when using 4k textures download the full detailed model from:
+https://www.ab4d.com/GetFile.ashx?fileName=RobotModel-4k.zip

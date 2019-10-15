@@ -1,0 +1,102 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.LandscapeGeneratorSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="VertexColorHeightMapSample"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+
+    <Grid Name="RootGrid">
+        <Border Name="ViewportBorder" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage">
+
+                <Viewport3D Name="MainViewport">
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <AmbientLight Color="#333333"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                      TargetPosition="0 100 0" 
+                                      Heading="30" Attitude="-20" Bank="0" 
+                                      Distance="500" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <!-- To use OrthographicCamera: -->
+        <!--<cameras:TargetPositionCamera Name="Camera1" 
+                                      TargetPosition="0 0 0" 
+                                      Heading="30" Attitude="-20" Bank="0" 
+                                      CameraWidth="300"
+                                      ShowCameraLight="Always"
+                                      CameraType="OrthographicCamera"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>-->
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"    
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Vertical" Margin="5">
+
+            
+            <Border BorderBrush="Gray" BorderThickness="2" Margin="5" Background="#88FFFFFF" SnapsToDevicePixels="True">
+        
+                <StackPanel Name="SettingsPanel" Orientation="Vertical" Margin="5">
+                    <CheckBox Name="AnimateLandscapeGenerationCheckBox" Content="Animate landscape generation" IsChecked="False" FontWeight="Bold" Margin="0 0 0 5"
+                              ToolTip="When checked the animation shows in slow motion how the landscape algorithm recursively improves the quality of landscape"
+                              Checked="AnimateLandscapeGenerationCheckBox_OnChecked"
+                              Unchecked="AnimateLandscapeGenerationCheckBox_OnUnchecked"/>
+                    
+                    <CheckBox Name="AutoChangeLandscapeCheckBox" Content="Automatically change lanscape" IsChecked="True" FontWeight="Bold" Margin="0 0 0 10"
+                              Checked="AutoChangeLandscapeCheckBox_OnChecked"/>
+            
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+                        <TextBlock Text="Random seed:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                        <TextBox Name="RandomSeedTextBox" Width="40" Text="1234" TextChanged="RandomSeedTextBox_OnTextChanged"/>
+                        <Button Name="NextSeedButton" Content="NEXT" Margin="3 0 5 0" Click="NextSeedButton_OnClick" />
+                        <controls:InfoControl ToolTip="Random seed is used to initialize the random generator that is used to generate the landspace.&#x0a;The same seed will always generate the same landscapes. If this field is empty,&#x0a;then random number is generated without specified seed."/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 5 0">
+                        <TextBlock Text="Current landscape size:" VerticalAlignment="Center" Margin="0 0 0 5"/>
+                        <controls:InfoControl ToolTip="The Diamond-square_algorithm requires that the size of the data is of the form (2 ^ n) + 1"/>
+                    </StackPanel>
+                    <StackPanel Name="SizeRadioBoxesPanel" Orientation="Vertical" Margin="0 0 0 10"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                        <TextBlock Text="Max landscape size:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                        <ComboBox Name="MaxSizeComboBox" SelectedIndex="3" Width="100" SelectionChanged="MaxSizeComboBox_OnSelectionChanged"/>
+                    </StackPanel>
+                </StackPanel>
+            
+            </Border>
+            
+        </StackPanel>
+        
+        <StackPanel Name="BottomRightPanel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
+            <ab3d:CameraAxisPanel Name="CameraAxisPanel1" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+
+        </StackPanel>
+        
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"
+                   Text="Landscape generation with custom vertex color height map"/>
+
+    </Grid>
+</Page>

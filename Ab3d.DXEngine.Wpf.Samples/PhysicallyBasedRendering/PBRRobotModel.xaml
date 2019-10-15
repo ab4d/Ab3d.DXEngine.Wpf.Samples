@@ -1,0 +1,130 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering.PBRRobotModel"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      Title="Ab3d.DXEngine PBR Rendering"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="900" >
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
+
+    <Grid Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="250" />
+        </Grid.ColumnDefinitions>
+
+        <Border Name="ViewportBorder" Grid.Column="0" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="DimGray">
+
+                <Viewport3D Name="MainViewport">
+
+                    <ModelVisual3D x:Name="ModelPlaceholder" />
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup x:Name="LightsModel3DGroup">
+                                <DirectionalLight x:Name="TopDirectionalLight" Direction="0 -1 0" Color="White" />
+                                <DirectionalLight x:Name="FrontDirectionalLight" Direction="0 0 -1" Color="White" />
+                                <!--<DirectionalLight Direction="1 0 0" Color="White" />-->
+                                <AmbientLight x:Name="AmbientLight1" Color="#555555"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0"
+                                      TargetPosition="0 0 0" 
+                                      Heading="55" Attitude="-10" Bank="0" 
+                                      Distance="150" 
+                                      ShowCameraLight="Never"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Column="0"
+                                    ShowRotationCenterMarker="True"
+                                    ZoomMode="MousePosition" 
+                                    RotateAroundMousePosition="True"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:CameraAxisPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Name="OptionsPanel" Grid.Row="0" Margin="10" Orientation="Vertical">
+
+                <TextBlock Text="Tool controls:" FontWeight="Bold" Margin="0 10 0 5"/>
+
+                <RadioButton Name="ClawsRadioButton" Content="Claws" IsChecked="True" GroupName="ToolName" Checked="ToolNameRadioButtonCheckedChanged" />
+                <StackPanel Name="ClawsControlPanel" Margin="20 0 0 10" Orientation="Vertical" Visibility="{Binding ElementName=ClawsRadioButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Slider Name="ClawsSlider" Minimum="0" Maximum="100" Value="0" ValueChanged="ClawsSlider_OnValueChanged" />
+                </StackPanel>
+
+                <RadioButton Name="SawRadioButton" Content="Saw" GroupName="ToolName" Checked="ToolNameRadioButtonCheckedChanged" />
+                <StackPanel Name="SawControlPanel" Margin="20 0 0 10" Orientation="Vertical" Visibility="{Binding ElementName=SawRadioButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Slider Name="SawSlider" Minimum="0" Maximum="720" Value="0" ValueChanged="SawSlider_OnValueChanged" />
+                </StackPanel>
+
+                <RadioButton Name="ShowPanelRadioButton" Content="Panel" GroupName="ToolName" Checked="ToolNameRadioButtonCheckedChanged" />
+                <StackPanel Name="ShowPanelControlPanel" Margin="20 0 0 10" Orientation="Vertical" Visibility="{Binding ElementName=ShowPanelRadioButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <CheckBox Name="ShowPanelLogoCheckBox" Content="Show AB4D logo" IsChecked="False" Checked="OnShowPanelLogoCheckBoxCheckedChanged" Unchecked="OnShowPanelLogoCheckBoxCheckedChanged"/>
+                </StackPanel>
+
+
+                <TextBlock Text="Robot arms controls:" FontWeight="Bold" Margin="0 20 0 0"/>
+
+                <TextBlock Name="BaseRotationTextBlock" Text="Base:" Margin="0 10 0 0"/>
+                <Slider Name="BaseRotationSlider" Minimum="-180" Maximum="180" Value="0" ValueChanged="BaseRotationSlider_OnValueChanged" />
+
+                <TextBlock Name="Arm1RotationTextBlock" Text="Arm 1:" Margin="0 10 0 0"/>
+                <Slider Name="Arm1RotationSlider" Minimum="-120" Maximum="60" Value="20" ValueChanged="Arm1RotationSlider_OnValueChanged" />
+                
+                <TextBlock Name="Arm2RotationTextBlock" Text="Arm 2:" Margin="0 10 0 0"/>
+                <Slider Name="Arm2RotationSlider" Minimum="-90" Maximum="30" Value="-20" ValueChanged="Arm2RotationSlider_OnValueChanged" />
+
+                <TextBlock Name="Arm3RotationTextBlock" Text="Arm 3:" Margin="0 10 0 0"/>
+                <Slider Name="Arm3RotationSlider" Minimum="-180" Maximum="180" Value="30" ValueChanged="Arm3RotationSlider_OnValueChanged" />
+
+                <TextBlock Name="ToolRotationTextBlock" Text="Tool:" Margin="0 10 0 0"/>
+                <Slider Name="ToolRotationSlider" Minimum="-180" Maximum="180" Value="90" ValueChanged="ToolRotationSlider_OnValueChanged" />
+
+
+                
+
+                <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 20 0 5"/>
+
+                <CheckBox Name="AmbientLightCheckBox" Content="Ambient light (#555555)" IsChecked="False" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                <CheckBox Name="TopLightCheckBox" Content="From top light (direction: 0, -1, 0)" IsChecked="True" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                <CheckBox Name="FrontLightCheckBox" Content="From front light (direction: 0, 0, -1)" IsChecked="True" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                <CheckBox Name="CameraLightCheckBox" Content="Camera light" IsChecked="True" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+
+            </StackPanel>
+
+            <TextBox Name="InfoTextBlock" Grid.Row="1" FontSize="10" FontFamily="Consolas" Margin="10 10 10 0"
+                     HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+
+        </Grid>
+
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="2" Background="Gray" />
+    </Grid>
+</Page>

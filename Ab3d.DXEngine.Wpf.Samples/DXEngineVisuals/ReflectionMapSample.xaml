@@ -1,0 +1,78 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.ReflectionMapSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      Title="ReflectionMapSample"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+
+    <Grid Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Border Name="ViewportBorder" Grid.Column="0" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage">
+
+                <Viewport3D Name="MainViewport">
+
+                    <visuals:ObjModelVisual3D x:Name="TeapotVisual3D" Source="/Resources/Models/Teapot with material.obj" SizeX="80" 
+                                              Position="0 0 0" PositionType="Center"/>
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <AmbientLight Color="#333333"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" 
+                                      TargetPosition="0 0 0" 
+                                      Heading="30" Attitude="-15" Bank="0" 
+                                      Distance="120" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Column="0"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:CameraAxisPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+
+        <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#55FFFFFF" BorderBrush="Black" BorderThickness="2">
+            <StackPanel Orientation="Vertical" Margin="10">
+
+                <TextBlock Text="ReflectionTexture:" FontWeight="Bold"/>
+                <TextBlock Text="white areas are fully reflective" FontSize="9"/>
+                <TextBlock Text="black areas are not reflective" FontSize="9"/>
+                
+                <Border BorderBrush="Black" BorderThickness="1" SnapsToDevicePixels="True">
+                    <Image Source="/Resources/Models/teapot-reflection.png" Width="140"/>
+                </Border>
+
+                <TextBlock Text="DiffuseTexture:" FontWeight="Bold" Margin="0 10 0 0"/>
+                <Border BorderBrush="Black" BorderThickness="1" SnapsToDevicePixels="True">
+                    <Image Source="/Resources/Models/teapot-green-texture.png" Width="140" />
+                </Border>
+                
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" FontSize="20" Foreground="#444" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Text="Using ReflectionMap to specify reflection factors on per pixel level"/>
+    </Grid>
+</Page>

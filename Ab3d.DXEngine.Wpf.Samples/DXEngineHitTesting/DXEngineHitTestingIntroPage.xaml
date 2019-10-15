@@ -1,0 +1,55 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting.DXEngineHitTestingIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="900">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Ab3d.DXEngine hit testing samples</controls:TextBlockEx>
+
+                <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    Hit testing is one of the essential processes in an application because it allows users interaction with the shown objects.\n
+                    \n
+                    WPF 3D, Ab3d.PowerToys and Ab3d.DXEngine provide many ways to do hit testing with 3D objects.\n
+                    \n
+                    WPF 3D provides the most basic method. There you can use the \!VisualTreeHelper.HitTest\! method that returns the first 3D object that was hit by the 3D ray created from a mouse position.  The method can also be used with a callback method that can filter or continue hit testing to get multiple hit objects. (note: when used in Ab3d.DXEngine please check that the hit Visual3D has its IsVisible property set to true - DXEngine optimizes the processing of IsVisible property and do not change the objects tree when an object is set to be hidden. This is automatically handled by other hit testing methods that are described below, but not when the VisualTreeHelper.HitTest is used).\n
+                    \n
+                    A more advanced and user-friendly way of hit testing is provided by the \!EventManager3D\! class from the \!Ab3d.PowerToys\! library. This class allows using standard mouse events on 3D objects - MouseEnter, MouseLeave, MouseMove, MouseDown, MouseClick, etc.\n
+                    \n
+                    Those two methods are very easy to use, but when a complex 3D scene is shown, they can be quite slow. Also, when Ab3d.DXEngine is used they cannot detect a hit test on a  low-level SceneNode object that is not created from WPF object - for example, a MeshObjectNode (see Advanced usage for more info). What is more, when using object instancing to show many 3D objects in the most efficient way, using WPF 3D hit testing or EventManager3D required to set the IsWpfHitTestVisible to true. This can significantly increase the initialization time because behind the scenes WPF 3D objects need to be created for each instance.\n
+                    \n
+                    To solve those problems, the Ab3d.DXEngine provides its methods for hit testing.\n
+                    \n
+                    \!Advantages of Ab3d.DXEngine hit testing are:\!\n
+                    \*support hit testing on SceneNode objects that are not created from WPF objects,\n
+                    \*do not require the generation of WPF 3D objects to hit test instanced objects,\n
+                    \*works much faster then WPF 3D hit testing,\n
+                    \*can use OctTree structure to enormously improve the performance of hit testing on 3D meshes with many triangles.\n
+                    \n
+                    The samples in this section demonstrate various ways on how to use hit testing from Ab3d.DXEngine library.\n
+                    \n
+                    As shown in the samples in this section, you have the following options to use hit testing from Ab3d.DXEngine library:\n
+                    \*Use \!GetClosestHitObject\! and \!GetAllHitObjects methods\! on DXViewportView or DXScene. Those two methods provide basic hit testing capabilities and are also used by other methods.\n
+                    \*Use \!DXEventManager3DWrapper\! - this class can be used as the standard EventManager3D from Ab3d.PowerToys library but internally it used DXEngine's hit testing.\n
+                    \*Use \!DXEventManager3D\! - this class can be used in a similar way as the standard EventManager3D from Ab3d.PowerToys library but it provides its own classes for hit results.\n
+                    \n
+                    \n
+                    \n
+                    Final note:\n
+                    If you are showing only a simple 3D scene and do not use any advanced objects from Ab3d.DXEngine, then you can still use the simple WPF 3D hit testing or EventManager3D from Ab3d.PowerToys. The hit testing from Ab3d.DXEngine is meant to provide improved performance in very complex scenes or scenarios that use advanced methods to provide the extreme performance of the hardware.\n</controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

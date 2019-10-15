@@ -1,0 +1,65 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting.HitTestingSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+    xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+    xmlns:cameraContoller="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"
+    xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+    MinHeight="300" MinWidth="500"
+    Title="EventManagerDragSample">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="250" />
+        </Grid.ColumnDefinitions>
+
+        <Border Name="ViewportBorder" Grid.Column="0" Background="Transparent">
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+
+                <Viewport3D Name="MainViewport3D">
+                </Viewport3D>
+                
+            </dxControls:DXViewportView>
+        </Border>
+
+        <Ellipse Name="OverlayEllipse" Grid.Column="0" Width="10" Height="10" Stroke="Blue" StrokeThickness="1" 
+                 HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-5 -5 0 0" IsHitTestVisible="False" />
+
+        <TextBlock Grid.Column="0" FontWeight="Bold" FontSize="20" Foreground="Gray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="Using hit testing from Ab3d.DXEngine"/>
+
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" 
+                                      TargetPosition="0 0 0" 
+                                      Heading="-40" Attitude="-5" 
+                                      Distance="500" 
+                                      TargetViewport3D="{Binding ElementName=Viewport3D1}"/>
+
+        <cameraContoller:MouseCameraController x:Name="MouseCameraController1" Grid.Column="0"
+                                               RotateCameraConditions="LeftMouseButtonPressed"
+                                               MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                               TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
+
+        <cameraContoller:MouseCameraControllerInfo Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                                                   MouseCameraController="{Binding ElementName=MouseCameraController1}" />
+
+        
+        <Grid Grid.Column="1" Margin="3 0 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0" Orientation="Vertical">
+                <Button Name="GetAllHitObjectsButton" Content="Get all hit objects" IsDefault="True" Click="GetAllHitObjectsButton_OnClick" Margin="0 5" Padding="0 5" />
+                <Button Name="GetClosestObjectButton" Content="Get closes hit object" Click="GetClosestObjectButton_OnClick" Padding="0 5"/>
+
+                <CheckBox Name="OnlyFrontTrianglesCheckBox" Content="GetOnlyFrontFacingTriangles" IsChecked="False" Margin="0 15 0 0" 
+                          ToolTip="When GetOnlyFrontFacingTriangles is true, then only triangles that are facing the camera will be hit."/>
+            </StackPanel>
+            
+            <TextBox Name="ResultTextBox" Grid.Row="1" Margin="0 15 0 0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+        </Grid>
+        
+        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="LightGray" SnapsToDevicePixels="True" />
+    </Grid>
+</Page>

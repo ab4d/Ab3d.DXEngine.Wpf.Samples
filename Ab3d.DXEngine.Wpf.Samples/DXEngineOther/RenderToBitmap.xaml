@@ -1,0 +1,35 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineOther.RenderToBitmap"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      Title="RenderToBitmap"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>    
+        
+        <TextBlock Grid.Row="0" Text="Rendering to texture sample (click RENDER button to see the rendered bitmap)" FontSize="16" FontWeight="Bold" Foreground="#555" />
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 20 0 10">
+            <TextBlock Text="Camera heading:" />
+            <Slider Name="HeadingSlider" Minimum="0" Maximum="360" Value="30" Width="150" IsSnapToTickEnabled="True" AutoToolTipPrecision="0" AutoToolTipPlacement="BottomRight" TickFrequency="10" />
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Name="RenderButton" Content="RENDER" Padding="30 5" Click="RenderButton_OnClick"></Button>
+        </StackPanel>
+        
+        <Border Name="ImageBorder" Grid.Row="3" Margin="0 10" BorderThickness="2" BorderBrush="Gray" SnapsToDevicePixels="True">
+          <Image Name="RenderedImage" />
+        </Border>
+      
+        <TextBlock Name="InfoTextBlock" Grid.Row="4" Margin="0 10" />
+    </Grid>
+</Page>

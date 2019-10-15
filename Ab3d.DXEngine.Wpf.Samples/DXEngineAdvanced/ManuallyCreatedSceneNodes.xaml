@@ -1,0 +1,62 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced.ManuallyCreatedSceneNodes"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      Title="StandardXaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+
+    <Grid Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="200" />
+        </Grid.RowDefinitions>
+        
+        <Border Name="ViewportBorder" Grid.Row="0" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage">
+                <Viewport3D Name="MainViewport" />
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Row="0"
+                                      TargetPosition="0 20 0" 
+                                      Heading="50" Attitude="-20" Bank="0" 
+                                      Distance="600" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Row="0"
+                                    RotateAroundMousePosition="{Binding ElementName=RotateAroundMouseCheckBox, Path=IsChecked}"
+                                    ShowRotationCenterMarker="True"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    MoveOnlyHorizontally="True" 
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:CameraAxisPanel TargetCamera="{Binding ElementName=Camera1}" VerticalAlignment="Bottom" HorizontalAlignment="Left" />
+
+        <TextBox Name="SceneNodesTextBox" Grid.Row="1" Margin="5 5 5 0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas" FontSize="10"/>
+
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="3" Background="LightGray" />
+
+        <TextBlock FontWeight="Bold" Grid.Row="0" FontSize="20" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Text="Manually created SceneNodes (see code for more info)"/>
+
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
+            <CheckBox Name="RotateAroundMouseCheckBox" Content="RotateAroundMousePosition" IsChecked="True" VerticalAlignment="Center" />
+
+            <Button Name="ResetCameraButton" Content="Reset camera" VerticalAlignment="Center" Margin="20 0 0 0" Padding="20 3" Click="ResetCameraButton_OnClick" />
+
+            <Button Name="FitIntoViewButton" Content="FitIntoView" VerticalAlignment="Center" Margin="10 0 0 0" Padding="20 3" Click="FitIntoViewButton_OnClick" />
+        </StackPanel>
+        
+    </Grid>
+</Page>

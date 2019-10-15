@@ -1,0 +1,31 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.PowerToysOther.PowerToysOtherIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1000">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Other Ab3d.PowerToys samples</controls:TextBlockEx>
+                <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    The samples in the Other Ab3d.PowerToys section show samples that use components from Ab3d.PowerToys library that \!need some additional code customizations to be used with Ab3d.DXEngine\!.\n
+                    \n
+                    See comments in the code behind for more information.\n
+                    \n
+                    The last two samples ("VisualBrush Test" and "Viewport2DVisual3D Test") show some limitations of using Ab3d.DXEngine with WPF 3D objects.
+                </controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

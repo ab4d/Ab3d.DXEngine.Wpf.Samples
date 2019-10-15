@@ -1,0 +1,38 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced.DXEngineAdvancedIntroPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="Lines3DIntroPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="900">
+
+    <Page.Background>
+        <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+    </Page.Background>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Advanced Ab3d.DXEngine usage</controls:TextBlockEx>
+
+                <controls:TextBlockEx  Style="{StaticResource InfoContent}" Margin="20 16 20 10">
+                    The most common way to define 3D objects in Ab3d.DXEngine is to use 3D objects from Ab3d.PowerToys library or WPF object model - for example SphereVisual3D, LineVisual3D, ModelVisual3D, etc.\n
+                    \n
+                    An advantage of defining the 3D scene in this way is that such objects are very easy to create and update.\n
+                    \n
+                    But when the scene becomes more complex with many WPF 3D objects or have huge MeshGeometry3D objects, then the initialization time and time to update the DXEngine objects can become significant.\n
+                    \n
+                    In this case it is worth checking on how to create low-level DXEngine's SceneNodes and DirectX resource (vertex buffers, textures, etc.). The samples in this section shows some of the possibilities.\n
+                    \n
+                    \n
+                    Note:\n
+                    To get insight on how the 3D scene is defined in DXEngine, use "Dump SceneNodes" and other commands in the DXEngineSnoop tool or in the window that is opened when you click on "Diagnostics" button in this sample application.
+                </controls:TextBlockEx>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>    
