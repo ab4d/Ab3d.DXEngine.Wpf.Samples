@@ -818,7 +818,9 @@
     <Content Include="Resources\RobotModel\Robot_Saw.FBX">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\Shaders\ShadedPointCloud.gs.txt" />
     <None Include="Resources\Shaders\ShadedPointCloud.ps.txt" />
     <None Include="Resources\Shaders\ShadedPointCloud.vs.txt" />
