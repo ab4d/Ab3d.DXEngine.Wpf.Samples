@@ -874,7 +874,6 @@
     <Content Include="Resources\Models\teapot-reflection.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\new_icon.gif" />
     <None Include="Resources\Shaders\CompileShadedPointCloudShader.bat" />
     <None Include="Resources\Shaders\MeshNormalShader.bat" />
     <None Include="Resources\Shaders\FogShader.hlsl">
