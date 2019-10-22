@@ -740,6 +740,7 @@
     <Content Include="Resources\Models\teapot-hires.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\new_icon.png" />
     <Content Include="Resources\RobotModel\License and credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
