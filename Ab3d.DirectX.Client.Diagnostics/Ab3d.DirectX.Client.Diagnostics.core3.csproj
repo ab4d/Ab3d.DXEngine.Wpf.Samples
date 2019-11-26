@@ -21,6 +21,11 @@
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="ab4d.ico" />
+    <None Remove="warningIcon.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -30,6 +35,11 @@
     <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.2.7227-rc" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ab4d.ico" />
+    <Resource Include="warningIcon.png" />
   </ItemGroup>  
 
 </Project>
