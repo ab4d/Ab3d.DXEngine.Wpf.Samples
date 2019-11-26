@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -26,7 +27,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
         private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/ab4d/Ab3d.OculusWrap/tree/master/Ab3d.OculusWrap");
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            //Process.Start("https://github.com/ab4d/Ab3d.OculusWrap/tree/master/Ab3d.OculusWrap");
+            System.Diagnostics.Process.Start(new ProcessStartInfo("https://github.com/ab4d/Ab3d.OculusWrap/tree/master/Ab3d.OculusWrap") { UseShellExecute = true });
         }
     }
 }

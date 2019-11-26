@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -1386,8 +1387,7 @@ StateChangesCount: {15:#,##0}{16}{17}",
         private void ShowInfoText(string infoText)
         {
             System.IO.File.WriteAllText(DumpFileName, infoText);
-
-            System.Diagnostics.Process.Start(DumpFileName);
+            StartProcess(DumpFileName);
         }
 
         private DXViewportView GetDXViewportView()
@@ -1769,7 +1769,7 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
                 try
                 {
-                    Process.Start(saveFileDialog.FileName);
+                    StartProcess(saveFileDialog.FileName);
                 }
                 catch
                 { }
@@ -1940,7 +1940,15 @@ StateChangesCount: {15:#,##0}{16}{17}",
                 AppendDumpText("Error writing scene dump:", ex.Message);
             }
 
-            System.Diagnostics.Process.Start(DumpFileName);
+            StartProcess(DumpFileName);
+        }
+
+        private static void StartProcess(string fileName)
+        {
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            //System.Diagnostics.Process.Start(fileName);
+            System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
 
         private void OnLogAction(DXDiagnostics.LogLevels logLevel, string logMessage)

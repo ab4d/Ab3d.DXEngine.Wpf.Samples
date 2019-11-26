@@ -29,7 +29,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 
             try
             {
-                System.Diagnostics.Process.Start(_sampleSolutionPath);
+                // For CORE3 project we need to set UseShellExecute to true,
+                // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+                //Process.Start(_sampleSolutionPath);
+                System.Diagnostics.Process.Start(new ProcessStartInfo(_sampleSolutionPath) { UseShellExecute = true });
             }
             catch (Exception ex)
             {

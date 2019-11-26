@@ -501,7 +501,10 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
         private void LogoImage_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("https://www.ab4d.com");
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            //Process.Start("https://www.ab4d.com");
+            System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
         private void ContentFrame_OnNavigated(object sender, NavigationEventArgs e)

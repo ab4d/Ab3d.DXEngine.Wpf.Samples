@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -74,7 +75,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                 url += "&Message=I_feel_sad_because";
 
 
-            System.Diagnostics.Process.Start(url);
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            //System.Diagnostics.Process.Start(url);
+            System.Diagnostics.Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
     }
 }
