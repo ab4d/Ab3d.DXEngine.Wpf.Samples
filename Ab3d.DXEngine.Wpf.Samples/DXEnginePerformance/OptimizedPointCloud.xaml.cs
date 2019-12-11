@@ -63,6 +63,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private int _lastRenderedPositionsCount;
         private int _lastTotalPositionsCount;
+        private WireCrossVisual3D _wireCrossVisual3D;
 
         public OptimizedPointCloud()
         {
@@ -83,7 +84,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             };
             SceneTypeComboBox.SelectedIndex = 1;
 
-
             _modelDisposables = new DisposeList();
 
 
@@ -98,6 +98,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             {
                 UpdateStatistics();
             };
+
+            // Setup keyboard support
+            this.Focusable      =  true;             // by default Page is not focusable and therefore does not receive keyDown event
+            this.PreviewKeyDown += OnPreviewKeyDown; // Use PreviewKeyDown to get arrow keys also (KeyDown event does not get them)
+            this.Focus();
 
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
@@ -243,7 +248,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             _pixelMaterial = new PixelMaterial()
             {
                 PixelColor = pixelColor,
-                PixelSize = pixelSize
+                PixelSize = pixelSize,
+
+                // By default graphics card renders objects that are closer to the camera over the objects that are farther away from the camera.
+                // This means that positions that are closer to the camera will be rendered over the positions that are farther away.
+                // This may distort the shown colors.
+                // Therefore when using pixel colors it is better to disable depth buffer checking and render all the pixels.
+                // This is done with setting ReadZBuffer and WriteZBuffer to false.
+                ReadZBuffer = false,
+                WriteZBuffer = false
             };
 
 
@@ -355,6 +368,86 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             _lastRenderedPositionsCount = currentRenderedPositionsCount;
             _lastTotalPositionsCount = currentTotalPositionsCount;
+        }
+
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var mousePosition = Mouse.GetPosition(MainDXViewportView);
+                var mouseRay = MainDXViewportView.DXScene.GetRayFromCamera((int)mousePosition.X, (int)mousePosition.Y);
+
+                if (_optimizedPointMesh != null)
+                {
+                    //// Uncomment the following code to test the GetPositionIndexesAroundRay method
+                    //var positionIndexes = _optimizedPointMesh.GetPositionIndexesAroundRay(mouseRay, 
+                    //                                                                      maxDistance: 0.1f, 
+                    //                                                                      orderByDistanceToRayPosition: true, 
+                    //                                                                      maxResultsCount: 0);
+
+                    //for (var i = 0; i < positionIndexes.Count; i++)
+                    //{
+                    //    var wireCrossVisual3D = new WireCrossVisual3D()
+                    //    {
+                    //        LineColor = Colors.Yellow,
+                    //        LineThickness = 1,
+                    //        LinesLength = 10,
+                    //        Position = _optimizedPointMesh.PositionsArray[positionIndexes[i]].ToWpfPoint3D()
+                    //    };
+
+                    //    MainViewport.Children.Add(wireCrossVisual3D);
+                    //}
+
+                    //_pixelMaterial.ReadZBuffer = true;
+                    //_customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+
+                    //return;
+
+                    float positionDistance;
+                    var   closestPositionIndex = _optimizedPointMesh.GetClosestPositionIndex(mouseRay, out positionDistance);
+
+                    if (closestPositionIndex != -1)
+                    {
+                        var position = _optimizedPointMesh.PositionsArray[closestPositionIndex];
+
+                        if (_wireCrossVisual3D == null)
+                        {
+                            _wireCrossVisual3D = new WireCrossVisual3D()
+                            {
+                                LineColor     = Colors.Blue,
+                                LineThickness = 2,
+                                LinesLength   = 2
+                            };
+
+                            MainViewport.Children.Add(_wireCrossVisual3D);
+                        }
+                        else
+                        {
+                            _wireCrossVisual3D.IsVisible = true;
+                        }
+
+                        _wireCrossVisual3D.Position = position.ToWpfPoint3D();
+
+                        // In this sample the Point cloud is rendered without reading and writing to depth buffer (see ShowPositionsArray method).
+                        // This means that all the points will be rendered regardless of other 3D objects in the scene.
+                        // To correctly show other 3D object (in our case WireCrossVisual3D), we need to enable reading depth buffer.
+                        // This will prevent rendering points where some other object is closer to the camera.
+                        _pixelMaterial.ReadZBuffer = true;
+
+                        // SceneNode objects do not get automatic notifications when some properties are changed.
+                        // We need to do that manually:
+                        _customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+                    }
+                    else
+                    {
+                        MessageBox.Show("No closest position found");
+                        _wireCrossVisual3D.IsVisible = false;
+
+                        _pixelMaterial.ReadZBuffer = false;
+                        _customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+                    }
+                }
+            }
         }
     }
 }

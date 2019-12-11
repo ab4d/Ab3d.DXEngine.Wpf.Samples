@@ -77,7 +77,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
             // For CORE3 project we need to set UseShellExecute to true,
             // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
-            //System.Diagnostics.Process.Start(url);
             System.Diagnostics.Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
     }

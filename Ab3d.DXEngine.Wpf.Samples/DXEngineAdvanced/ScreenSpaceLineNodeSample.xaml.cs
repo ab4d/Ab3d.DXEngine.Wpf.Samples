@@ -95,6 +95,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private ScreenSpaceLineNode CreateLinesWithLineMesh(Vector3[] linePositions, bool isLineStrip, bool isLineClosed, Color lineColor, float xOffset, out ScreenSpaceLineMesh screenSpaceLineMesh)
         {
+            if (linePositions == null || linePositions.Length < 2)
+            {
+                screenSpaceLineMesh = null;
+                return null;
+            }
+
+            // If line is closed but the first position is not the same as the last position, then add the first position as the last one
+            if (isLineClosed && linePositions[0] != linePositions[linePositions.Length - 1])
+            {
+                Array.Resize(ref linePositions, linePositions.Length + 1);
+                linePositions[linePositions.Length - 1] = linePositions[0];
+            }
+
+
             // If we can easily calculate the bounding box from line positions
             // it is recommended to specify it in the ScreenSpaceLineMesh constructor.
             // If boundingBox is not specified, it will be calculated in the ScreenSpaceLineMesh constructor with checking all the positions.

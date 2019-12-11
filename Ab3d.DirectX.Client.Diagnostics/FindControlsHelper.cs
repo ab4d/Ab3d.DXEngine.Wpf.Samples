@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Ab3d.Common
 {
@@ -127,6 +128,25 @@ namespace Ab3d.Common
                 foundElement = Ab3d.PowerToys.Common.DXEngineHelper.GetViewport3DFromDXViewport3D(element as UIElement) as T;
             }
 #endif
+            else if (element is Control)
+            {
+                var control = element as Control;
+                if (control.Template != null)
+                {
+                    int childrenCount = VisualTreeHelper.GetChildrenCount(control);
+                    for (int i = 0; i < childrenCount; i++)
+                    {
+                        var oneChild = VisualTreeHelper.GetChild(control, i);
+
+                        if (oneChild != null)
+                        {
+                            foundElement = FindElement<T>(oneChild);
+                            if (foundElement != null)
+                                break;
+                        }
+                    }
+                }
+            }
 
             return foundElement;
         }
@@ -365,6 +385,25 @@ namespace Ab3d.Common
 
                         if (foundElement != null)
                             break;
+                    }
+                }
+                else if (currentElement is Control)
+                {
+                    var control = currentElement as Control;
+                    if (control.Template != null)
+                    {
+                        int childrenCount = VisualTreeHelper.GetChildrenCount(control);
+                        for (int i = 0; i < childrenCount; i++)
+                        {
+                            var oneChild = VisualTreeHelper.GetChild(control, i) as FrameworkElement;
+
+                            if (oneChild != null)
+                            {
+                                foundElement = FindElementByName<T>(oneChild, nameToFind, downLevels - 1);
+                                if (foundElement != null)
+                                    break;
+                            }
+                        }
                     }
                 }
             }

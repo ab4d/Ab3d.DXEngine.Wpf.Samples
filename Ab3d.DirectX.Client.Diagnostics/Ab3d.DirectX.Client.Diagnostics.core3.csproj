@@ -1,21 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DirectX.Client.Diagnostics</AssemblyName>
     <RootNamespace>Ab3d.DirectX.Client.Diagnostics</RootNamespace>
-    <Version>3.2.7213</Version>
-    <AssemblyVersion>3.2.7213.2300</AssemblyVersion>
-    <FileVersion>3.2.7213.2300</FileVersion>
+    <Version>3.3.7279</Version>
+    <AssemblyVersion>3.3.7279.2300</AssemblyVersion>
+    <FileVersion>3.3.7279.2300</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG; CORE3</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE; CORE3</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>
@@ -32,7 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.2.7227-rc" />
+    <PackageReference Include="Ab3d.DXEngine" Version="3.3.7279" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.3.7279" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>

@@ -39,11 +39,13 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=3.2.7227.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.3.2.7227-rc\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=3.3.7279.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.3.3.7279\lib\net45\Ab3d.DXEngine.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.2.7227.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.3.2.7227-rc\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.3.7279.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.3.3.7279\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
@@ -109,16 +111,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DXEngine.Wpf\Ab3d.DXEngine.Wpf.csproj">
-      <Project>{758cb167-3dc6-449b-a4f4-a5e00078017d}</Project>
-      <Name>Ab3d.DXEngine.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ab3d.DXEngine\Ab3d.DXEngine.csproj">
-      <Project>{a60492c4-3b14-4d27-a2ae-fcbe34791b13}</Project>
-      <Name>Ab3d.DXEngine</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="warningIcon.png" />

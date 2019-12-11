@@ -229,7 +229,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                this.Text = string.Format(_dxEngineDisplayFormatString, 0, 0, 0);
+                this.Text = "DXFpsMeter";
                 return;
             }
 

@@ -19,8 +19,13 @@
         </Grid.RowDefinitions>
 
 
-        <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap"
-                   Text="Rendering Shaded Point Cloud (full HLSL and Effect source code is provided)"/>
+        <TextBlock Grid.Row="0" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap">
+            <Run FontSize="18" FontWeight="Bold">Rendering Shaded Point Cloud</Run>
+            <LineBreak />
+            <Run FontSize="14">There each point in the point cloud is shaded based on the point's normal value and the light direction.</Run>
+            <LineBreak />
+            <Run FontSize="14">This sample is provided with full HLSL and Effect source code.</Run>
+        </TextBlock>
 
         <Rectangle Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
 
@@ -78,7 +83,7 @@
 
             <TextBlock Name="PointsCountTextBlock" Text="Points count:" FontWeight="Bold" VerticalAlignment="Bottom" Margin="10 0 3 5" />
             <ComboBox Name="ModelsCountComboBox" ItemStringFormat="{}{0}" Width="50" SelectedIndex="0" VerticalAlignment="Bottom" Margin="0 0 0 3" SelectionChanged="PointsCountComboBox_OnSelectionChanged" />
-            <TextBlock Text="x" VerticalAlignment="Center" FontWeight="Bold" Margin="3 0" />
+            <TextBlock Text="x" VerticalAlignment="Center" FontWeight="Bold" Margin="3 0 3 6" />
             <ComboBox Name="PointsCountComboBox" ItemStringFormat="{}{0:#,###}" Width="90" SelectedIndex="0" VerticalAlignment="Bottom" Margin="0 0 0 3" SelectionChanged="PointsCountComboBox_OnSelectionChanged" />
 
             <TextBlock Text="Point size:" FontWeight="Bold" VerticalAlignment="Bottom" Margin="25 0 3 5" />
@@ -96,7 +101,6 @@
             <CheckBox Name="ShowSegmentsCheckBox" Content="Show segments" IsChecked="False" Margin="15 0 0 5" VerticalAlignment="Bottom"
                       Checked="OnShowSegmentsCheckBoxChanged" Unchecked="OnShowSegmentsCheckBoxChanged" />
 
-            <Button Name="AddButton" Content="ADD" VerticalAlignment="Bottom" Margin="10 0 0 5" Click="AddButtonClicked" />
             <Button Name="StartStopCameraButton" Content="Start camera rotation" VerticalAlignment="Center" Margin="10 0 0 5" Click="StartStopCameraButton_OnClick"  />
             
             <TextBlock Name="InfoTextBlock" Margin="10 0 0 0" VerticalAlignment="Center"/>

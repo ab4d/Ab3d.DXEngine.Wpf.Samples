@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Diagnostics;
 using Ab3d.DirectX.Client.Settings;
@@ -27,7 +28,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        private string _startupPage = null;//"DXEngineAdvanced/AdvancedInstanceRendering.xaml";
+        private string _startupPage = null; //"DXEngineVisuals/PlanarShadows.xaml";
 
         private DXViewportView _lastShownDXViewportView;
 
@@ -66,14 +67,22 @@ namespace Ab3d.DXEngine.Wpf.Samples
                         fullSystemInfo = null;
                     }
 
-                    // Report exception with full system info
+                    // Here we just show a MessageBox with some exception info.
+                    // In a real application it is recommended to report or store full exception and system info (fullSystemInfo)
+                    MessageBox.Show(string.Format("Unhandled {0} occured while running the sample:\r\n{1}\r\n\r\nIf this is not expected, please report that to support@ab4d.com.", 
+                        e.ExceptionObject.GetType().Name,
+                        ((Exception) e.ExceptionObject).Message),
+                        "Ab3d.DXEngine exception", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             };
 
-            // To activate the commercial license uncomment and fill the following line of code (see your User Account web page for more info):
+
+            // When using the DXEngine from NuGet and when you have purchase a commercial version,
+            // then uncomment the following line to activate the license uncomment (see your User Account web page for more info):
             //Ab3d.Licensing.DXEngine.LicenseHelper.SetLicense(licenseOwner: "[CompanyName]", 
             //                                                 licenseType: "[LicenseType]", 
             //                                                 license: "[LicenseText]");
+
 
             // Initialize the DXEngineSettings helper class
             // First create DXEngineSettingsStorage that is used to read and save user settings and can read overridden settings from application config file
@@ -386,8 +395,14 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
         private void SelectItem(string pageName)
         {
+            if (string.IsNullOrEmpty(pageName))
+            {
+                SampleList.SelectedItem = null;
+                return;
+            }
+
             var supportPageElement = SampleList.Items.OfType<System.Xml.XmlElement>()
-                .First(x => x.Attributes["Page"] != null && x.Attributes["Page"].Value == pageName);
+                                                     .First(x => x.Attributes["Page"] != null && x.Attributes["Page"].Value == pageName);
 
             SampleList.SelectedItem = supportPageElement;
 
@@ -503,7 +518,6 @@ namespace Ab3d.DXEngine.Wpf.Samples
         {
             // For CORE3 project we need to set UseShellExecute to true,
             // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
-            //Process.Start("https://www.ab4d.com");
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
@@ -512,6 +526,18 @@ namespace Ab3d.DXEngine.Wpf.Samples
             // Prevent navigation (for example clicking back button) because our ListBox is not updated when this navigation occurs
             // We prevent navigation with clearing the navigation history each time navigation item changes
             ContentFrame.NavigationService.RemoveBackEntry();
+        }
+
+        public void ReloadCurrentSample()
+        {
+            var savedItem = SampleList.SelectedItem;
+
+            SampleList.SelectedItem = null;
+
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(delegate
+            {
+                SampleList.SelectedItem = savedItem;
+            }));
         }
 
         public void ShowFullScreen()

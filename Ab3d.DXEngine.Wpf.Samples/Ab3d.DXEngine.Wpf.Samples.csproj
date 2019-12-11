@@ -44,14 +44,17 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=3.2.7227.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.3.2.7227-rc\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=3.3.7279.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.3.3.7279\lib\net45\Ab3d.DXEngine.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.2.7227.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.3.2.7227-rc\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.3.7279.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.3.3.7279\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=9.0.7222.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.9.0.7222-rc\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=9.1.7279.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.9.1.7279\lib\net45\Ab3d.PowerToys.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -143,6 +146,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DXEngineOther\DeviceRemovedHandlerSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineOther\DXEngineOtherIntroPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -160,6 +167,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineHitTesting\DXEventManager3DSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEnginePerformance\ColoredPointCloud.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -211,9 +222,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEnginePerformance\MouseControllerForPointCloud.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEnginePerformance\MultiThreadingSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\ColoredPolyLinesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineVisuals\LinesWithPatternSample.xaml">
       <SubType>Designer</SubType>
@@ -234,6 +253,18 @@
     <Page Include="DXEngineAdvanced\OutlinesSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\PlanarShadows.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\PlanarShadowsCustomization.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Other\OnlineHelp.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="PhysicallyBasedRendering\TextureMapSelectionControl.xaml">
       <SubType>Designer</SubType>
@@ -394,6 +425,9 @@
     <Compile Include="DXEngineHitTesting\DXEngineHitTestingIntroPage.xaml.cs">
       <DependentUpon>DXEngineHitTestingIntroPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineOther\DeviceRemovedHandlerSample.xaml.cs">
+      <DependentUpon>DeviceRemovedHandlerSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineOther\DXEngineOtherIntroPage.xaml.cs">
       <DependentUpon>DXEngineOtherIntroPage.xaml</DependentUpon>
     </Compile>
@@ -408,6 +442,9 @@
     </Compile>
     <Compile Include="DXEngineHitTesting\DXEventManager3DSample.xaml.cs">
       <DependentUpon>DXEventManager3DSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEnginePerformance\ColoredPointCloud.xaml.cs">
+      <DependentUpon>ColoredPointCloud.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEnginePerformance\DXEnginePerformanceIntroPage.xaml.cs">
       <DependentUpon>DXEnginePerformanceIntroPage.xaml</DependentUpon>
@@ -450,11 +487,26 @@
     <Compile Include="DXEngineAdvanced\OptimizedTubePathSample.xaml.cs">
       <DependentUpon>OptimizedTubePathSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEnginePerformance\MouseControllerForPointCloud.xaml.cs">
+      <DependentUpon>MouseControllerForPointCloud.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEnginePerformance\MultiThreadingSample.xaml.cs">
       <DependentUpon>MultiThreadingSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineAdvanced\OutlinesSample.xaml.cs">
       <DependentUpon>OutlinesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\ColoredPolyLinesSample.xaml.cs">
+      <DependentUpon>ColoredPolyLinesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\PlanarShadows.xaml.cs">
+      <DependentUpon>PlanarShadows.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\PlanarShadowsCustomization.xaml.cs">
+      <DependentUpon>PlanarShadowsCustomization.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Other\OnlineHelp.xaml.cs">
+      <DependentUpon>OnlineHelp.xaml</DependentUpon>
     </Compile>
     <Compile Include="PhysicallyBasedRendering\KnownTextureFiles.cs" />
     <Compile Include="DXEngineVisuals\LinesWithPatternSample.xaml.cs">
@@ -600,6 +652,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PowerToys\AssimpWpfImporterSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PowerToys\DucksLakeDemo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PowerToys\Lines3DSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -633,6 +693,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PowerToys\SphereVisual3DSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PowerToys\StandardTransform3DEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -679,6 +743,12 @@
     <Compile Include="PowerToysOther\EventManagerDragSample.xaml.cs">
       <DependentUpon>EventManagerDragSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PowerToys\AssimpWpfImporterSample.xaml.cs">
+      <DependentUpon>AssimpWpfImporterSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PowerToys\DucksLakeDemo.xaml.cs">
+      <DependentUpon>DucksLakeDemo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PowerToys\Lines3DSample.xaml.cs">
       <DependentUpon>Lines3DSample.xaml</DependentUpon>
     </Compile>
@@ -705,6 +775,9 @@
     </Compile>
     <Compile Include="PowerToys\SphereVisual3DSample.xaml.cs">
       <DependentUpon>SphereVisual3DSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PowerToys\StandardTransform3DEditor.xaml.cs">
+      <DependentUpon>StandardTransform3DEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToys\TextBlockVisual3DSample.xaml.cs">
       <DependentUpon>TextBlockVisual3DSample.xaml</DependentUpon>
@@ -734,7 +807,15 @@
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\10x10-texture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\BricksMaps\bricks_ao.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\DXEngineReferenceHelp.png" />
+    <Resource Include="Resources\DXEngineUsersGuide.png" />
+    <Content Include="Resources\Models\duckCM.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Models\teapot-hires.obj">
@@ -822,6 +903,12 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Resources\Models\duck.dae">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\robotarm-upper-part.3DS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\Shaders\ShadedPointCloud.gs.txt" />
     <None Include="Resources\Shaders\ShadedPointCloud.ps.txt" />
     <None Include="Resources\Shaders\ShadedPointCloud.vs.txt" />
@@ -856,7 +943,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\DXEngine-car_engine.png" />
-    <Resource Include="Resources\GrassTexture.jpg" />
+    <Content Include="Resources\GrassTexture.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Diagnostics.png" />
     <Resource Include="Resources\Diagnostics-gray.png" />
     <Content Include="Resources\BricksMaps\bricks.png">

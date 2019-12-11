@@ -73,6 +73,20 @@
             <param name="value">WPF Vector3D</param>
             <returns>Assimp Vector3D</returns>
         </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.Dump(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Dumps the detailed information about Assimp Scene into the Visual Studio Output window
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+        </member>
         <member name="T:Ab3d.Assimp.AssimpWpfExporter">
             <summary>
             AssimpWpfExporter class can be used to export the WPF 3D scene to many different file formats.
@@ -272,6 +286,40 @@
             <param name="polygonIndices">indexes of positions that define the positions that will be used in this method</param>
             <returns>List of 2D Positions</returns>
         </member>
+        <member name="T:Ab3d.Assimp.AssimpDumper">
+            <summary>
+            Dumper class is a helper class that contains method that can show detailed information about Assimp Scene.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpDumper.Dump(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Dumps the detailed information about Assimp Scene into the Visual Studio Output window
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpDumper.GetDumpString(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Gets a string with detailed information about Assimp Scene.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+            <returns>string with detailed information about Assimp Scene</returns>
+        </member>
         <member name="T:Ab3d.Assimp.AssimpWpfConverter">
             <summary>
             AssimpWpfConverter can convert Assimp Scene object to WPF Model3D object.
@@ -461,6 +509,11 @@
         <member name="F:Ab3d.Assimp.AssimpWpfImporter.Assimp64FileName">
             <summary>
             File name of the 64-bit assimp library
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpVersion">
+            <summary>
+            Gets the version of the native Assimp library.
             </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpPostProcessSteps">

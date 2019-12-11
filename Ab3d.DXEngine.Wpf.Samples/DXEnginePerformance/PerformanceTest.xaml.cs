@@ -41,6 +41,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private int _framesCount;
 
         private PerformanceAnalyzer _performanceAnalyzer;
+        private string _savedWindowTitle;
 
         public PerformanceTest()
         {
@@ -69,12 +70,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
 
             // FPS will be displayed in Window Title - save the title so we can restore it later
-            string savedWindowTitle = Application.Current.MainWindow.Title;
+            _savedWindowTitle = Application.Current.MainWindow.Title;
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
             {
-                Application.Current.MainWindow.Title = savedWindowTitle;
-
                 StopTest(showResults: false);
 
                 MainDXViewportView.Dispose();
@@ -137,6 +136,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             if (_stopwatch != null)
                 _stopwatch.Stop();
+
+            Application.Current.MainWindow.Title = _savedWindowTitle;
 
             if (_performanceAnalyzer == null)
                 return;

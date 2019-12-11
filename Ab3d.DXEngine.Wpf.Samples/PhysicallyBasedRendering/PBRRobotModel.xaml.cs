@@ -229,19 +229,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 {
                     model3DGroup = namedObjects["Helper_Base"] as Model3DGroup;
                     _baseRotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(0, 0, 1), BaseRotationSlider.Value);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_baseRotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_baseRotation));
 
                     model3DGroup  = namedObjects["Helper_Arm1"] as Model3DGroup;
                     _arm1Rotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(1, 0, 0), Arm1RotationSlider.Value);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_arm1Rotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_arm1Rotation));
 
                     model3DGroup  = namedObjects["Helper_Arm2"] as Model3DGroup;
                     _arm2Rotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(1, 0, 0), Arm2RotationSlider.Value);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_arm2Rotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_arm2Rotation));
 
                     model3DGroup  = namedObjects["Helper_Arm3"] as Model3DGroup;
                     _arm3Rotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(1, 0, 0), Arm3RotationSlider.Value);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_arm3Rotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_arm3Rotation));
 
 
                     // The robot tools are added to the "Helper_Extras" Model3DGroup.
@@ -265,28 +265,30 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                     _toolRotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(0, 0, 1), ToolRotationSlider.Value);
                     transform3DGroup.Children.Add(new RotateTransform3D(_toolRotation));
 
-                    model3DGroup.Transform = transform3DGroup;
+                    InsertTransformation(model3DGroup, transform3DGroup);
                 }
                 else if (robotPart == RobotParts.Claw)
                 {
                     model3DGroup = namedObjects["Helper_Claw_Left"] as Model3DGroup;
                     _clawLeftRotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(0, 1, 0), 0);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_clawLeftRotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_clawLeftRotation));
 
                     model3DGroup = namedObjects["Helper_Claw_Right"] as Model3DGroup;
                     _clawRightRotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(0, -1, 0), 0);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_clawRightRotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_clawRightRotation));
                 }
                 else if (robotPart == RobotParts.Saw)
                 {
                     model3DGroup = namedObjects["Helper_SawBlade"] as Model3DGroup;
                     _sawRotation = new AxisAngleRotation3D(new System.Windows.Media.Media3D.Vector3D(1, 0, 0), 0);
-                    Ab3d.Utilities.TransformationsHelper.AddTransformation(model3DGroup, new RotateTransform3D(_sawRotation));
+                    InsertTransformation(model3DGroup, new RotateTransform3D(_sawRotation));
                 }
                 else if (robotPart == RobotParts.Panel)
                 {
                     _shownPanelGeometryModel3D = namedObjects["Robot_Panel_Screen"] as GeometryModel3D;
-                    _shownPanelGeometryModel3D.Material = new DiffuseMaterial(Brushes.Black);
+
+                    if (_shownPanelGeometryModel3D != null)
+                        _shownPanelGeometryModel3D.Material = new DiffuseMaterial(Brushes.Black);
                 }
             }
             catch (Exception ex)
@@ -609,7 +611,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 return;
 
             _baseRotation.Angle = BaseRotationSlider.Value;
-            BaseRotationTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Base: {0:0}°", BaseRotationSlider.Value);
         }
 
         private void Arm1RotationSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -618,7 +619,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 return;
 
             _arm1Rotation.Angle = Arm1RotationSlider.Value;
-            Arm1RotationTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Arm 1: {0:0}°", Arm1RotationSlider.Value);
         }
 
         private void Arm2RotationSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -627,7 +627,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 return;
 
             _arm2Rotation.Angle = Arm2RotationSlider.Value;
-            Arm2RotationTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Arm 2: {0:0}°", Arm2RotationSlider.Value);
         }
 
         private void Arm3RotationSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -636,7 +635,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 return;
 
             _arm3Rotation.Angle = Arm3RotationSlider.Value;
-            Arm3RotationTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Arm 3: {0:0}°", Arm3RotationSlider.Value);
         }
 
         private void ToolRotationSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -645,7 +643,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 return;
 
             _toolRotation.Angle = ToolRotationSlider.Value;
-            ToolRotationTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Tool: {0:0}°", ToolRotationSlider.Value);
         }
 
         private void ClawsSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -684,6 +681,38 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             else
             {
                 _shownPanelGeometryModel3D.Material = new DiffuseMaterial(Brushes.Black);
+            }
+        }
+
+
+        // Insert the specified transform3D before any already specified transformation in model3D
+        public static void InsertTransformation(Model3D model3D, Transform3D transform3D)
+        {
+            if (transform3D == null)
+                return;
+
+            if (model3D == null)
+                throw new ArgumentNullException("model3D");
+
+            var currentTransform = model3D.Transform;
+            if (currentTransform == null)
+            {
+                // No Transform yet => just add the new transform3D
+                model3D.Transform = transform3D;
+            }
+            else
+            {
+                // We will add the transform3D to existing or new Transform3DGroup
+                var transform3DGroup = currentTransform as Transform3DGroup;
+                if (transform3DGroup == null)
+                {
+                    transform3DGroup = new Transform3DGroup();
+                    transform3DGroup.Children.Add(currentTransform); // Add existing Transform to new Transform3DGroup
+
+                    model3D.Transform = transform3DGroup;
+                }
+
+                transform3DGroup.Children.Insert(0, transform3D);
             }
         }
     }

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Enumeration;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -1341,7 +1340,9 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
                 foreach (var propertyInfo in allProperties)
                 {
-                    if (propertyInfo.PropertyType.IsValueType || propertyInfo.PropertyType == typeof(string))
+                    if (propertyInfo.PropertyType.IsValueType || 
+                        propertyInfo.PropertyType == typeof(string) ||
+                        (propertyInfo.DeclaringType != null && propertyInfo.DeclaringType.Assembly.FullName.StartsWith("Ab3d."))) // Only show referenced objects for types that are declared in this class
                     {
                         string valueText;
 
@@ -1387,12 +1388,20 @@ StateChangesCount: {15:#,##0}{16}{17}",
         private void ShowInfoText(string infoText)
         {
             System.IO.File.WriteAllText(DumpFileName, infoText);
+
             StartProcess(DumpFileName);
         }
 
         private DXViewportView GetDXViewportView()
         {
             return DXView as DXViewportView;
+        }
+
+        private static void StartProcess(string fileName)
+        {
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
 
         private void UpdateWpfPreviewWindowContent()
@@ -1941,14 +1950,6 @@ StateChangesCount: {15:#,##0}{16}{17}",
             }
 
             StartProcess(DumpFileName);
-        }
-
-        private static void StartProcess(string fileName)
-        {
-            // For CORE3 project we need to set UseShellExecute to true,
-            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
-            //System.Diagnostics.Process.Start(fileName);
-            System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
 
         private void OnLogAction(DXDiagnostics.LogLevels logLevel, string logMessage)

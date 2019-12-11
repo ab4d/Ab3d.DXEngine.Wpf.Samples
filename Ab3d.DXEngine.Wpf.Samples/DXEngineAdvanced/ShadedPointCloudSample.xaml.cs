@@ -47,7 +47,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         // Then each line represents one point with 6 float values (in Invariant culture - dot is decimal sign) separated with tab '\t'
         // The first three values represents x,y and z value of the point 's position, the next 3 values represent the point's normal.
 
-        //private const string SampleDataFile = @"C:\Users\Andrej\Downloads\20f6330d5996730c259d365ff953e799e46be225\abnahmewerkzeug.normal-tab.csv";
+        //private const string SampleDataFile = @"C:\...\abnahmewerkzeug.normal-tab.csv";
         private const string SampleDataFile = null; // When null, sample cylinder is created
 
 
@@ -123,8 +123,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
 
 
-            ModelsCountComboBox.ItemsSource = new int[] { 1, 2, 5, 10, 20, 50, 60, 100, 200, 500 };
-            ModelsCountComboBox.SelectedIndex = 0;
+            ModelsCountComboBox.ItemsSource = new int[] { 1, 2, 3, 4, 5, 10, 20, 50, 60, 100, 200, 500 };
+            ModelsCountComboBox.SelectedIndex = 2;
 
             PointsCountComboBox.ItemsSource = new int[] {100000, 500000, 1000000, 2000000, 5000000, 10000000, 20000000, 30000000, 40000000, 50000000, 60000000};
             PointsCountComboBox.SelectedIndex = 2;
@@ -415,20 +415,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             MainDXViewportView.Refresh(); // Render the scene again
         }
-
-        private void AddButtonClicked(object sender, RoutedEventArgs e)
-        {
-            if (!this.IsLoaded)
-                return;
-
-            var transform = new TranslateTransform3D(PointCloudRootVisual3D.Children.Count * 100, 0, 0);
-            AddPointCloudNode(transform);
-
-            System.Diagnostics.Debug.WriteLine("Added " + PointCloudRootVisual3D.Children.Count);
-
-            MainDXViewportView.Refresh(); // Render the scene again
-        }
-
+        
         private void StartStopCameraButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (Camera1.IsRotating)
@@ -516,7 +503,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             int overallPointCount = (int)PointsCountComboBox.SelectedItem;
             //int overallPointCount = 100000;
-            int sliceCount = 10000;
+            int sliceCount = 500; // 500 points in one horizontal circle
 
             if ((long)overallPointCount * (long)PositionNormal.SizeInBytes > (long)Int32.MaxValue)
                 throw new Exception("shadedPoints array too big. Split data into multiple arrays.");

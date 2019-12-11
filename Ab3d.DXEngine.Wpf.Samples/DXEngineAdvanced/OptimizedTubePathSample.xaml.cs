@@ -26,21 +26,24 @@ using Point = System.Windows.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
-    // Tube path object can be used instead of 3D lines.
+    // 3D tube path object can be used instead of 3D lines.
     // An advantage of tube path objects is that they do not require geometry shader to generate the
-    // line mesh geometry from line positions. This needs to be created on each frame.
-    // With tube path objects, the mesh geometry is generated at initialization time
-    // and therefore do not require any geometry shader code to be executed when rendering.
+    // line mesh geometry from line positions. 
+    // With tube path objects, the mesh geometry is generated at initialization time.
     //
-    // The standard way to do that is to use TubePathVisual3D.
+    // The standard way to do that is to use TubePathVisual3D from Ab3d.PowerToys library.
+    // But when we want to generate a lot of tube paths,
+    // this approach takes a lot of time because first all WPF 3D objects need to be generated and 
+    // then those objects need to be converted into DXEngine objects.
+    //
     // This sample provides alternative ways to show many tube path objects.
-    // The problem with this is that the initialization time is very long because first all WPF 3D objects need to be generated and 
-    // then those objects need to be transformed into DXEngine objects.
     //
-    // Therefore it is much faster to generate DXEngine objects directly.
+    // Therefore it is much faster to generate DXEngine's SceneNode objects without any WPF object.
+    // This is much faster.
     //
     // The sample also provides code that shows how to use instancing to show tube paths.
-    // But here this is a slower solution then to use fixed geometry.
+    // But here this is a slower solution then to use a fixed geometry.
+    // To see this option uncomment call to the AddInstancedSpirals method (in constructor).
     //
     //
     // Results on i7 6700 (4 cores with hyper-threading):

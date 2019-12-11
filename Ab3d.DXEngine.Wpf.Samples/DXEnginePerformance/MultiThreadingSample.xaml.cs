@@ -87,7 +87,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             // Create DXViewportView in code behind because we need to support changing PresentationType and
             // this requires that the DXViewportView is recreated from scratch.
-            CreateDXViewportView(isDirectXOverlay: true);
+            CreateDXViewportView(isDirectXOverlay: PresentationTypeComboBox.SelectedIndex == 0);
 
             int maxBackgroundThreadsCount = Environment.ProcessorCount - 1;
             ThreadsCountSlider.Maximum = maxBackgroundThreadsCount; 
@@ -201,7 +201,8 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             var maxBackgroundThreadsCount = (int)ThreadsCountSlider.Value;
             _mainDXViewportView.DXSceneDeviceCreated += delegate(object sender, EventArgs args)
             {
-                _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = maxBackgroundThreadsCount;
+                if (_mainDXViewportView.DXScene != null)
+                    _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = maxBackgroundThreadsCount;
             };
 
             _mainDXViewportView.SceneRendered += MainDxViewportViewOnSceneRendered;

@@ -436,7 +436,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 Margin = new Thickness(5, 5, 5, 5)
             };
 
-            gradientColorLegend.GradientBrushBrush = linearGradientBrush;
+            gradientColorLegend.GradientBrush = linearGradientBrush;
 
             gradientColorLegend.LegendLabels.Add(new GradientColorLegend.LegendLabel(0, "0"));
             gradientColorLegend.LegendLabels.Add(new GradientColorLegend.LegendLabel(0.2, "200"));

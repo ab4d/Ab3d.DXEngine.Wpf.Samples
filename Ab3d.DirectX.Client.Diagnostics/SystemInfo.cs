@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text;
 using Microsoft.Win32;
 using SharpDX.Direct3D;
@@ -17,28 +20,60 @@ namespace Ab3d.DirectX.Client.Diagnostics
         {
             var sb = new StringBuilder();
 
-            var entryAssemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName();
+            var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+
+            string entryAssemblyName, entryAssemblyTargetFramework;
+            Version entryAssemblyVersion;
+
+            if (entryAssembly != null)
+            {
+                entryAssemblyName = entryAssembly.GetName().Name;
+                entryAssemblyVersion = entryAssembly.GetName().Version;
+                entryAssemblyTargetFramework = "";
+
+                // NOTE: .Net 4.0 does not have entryAssembly.GetCustomAttribute<TargetFrameworkAttribute>() method
+                var customAttributes = entryAssembly.GetCustomAttributes(true);
+                if (customAttributes != null)
+                {
+                    for (int i = 0; i < customAttributes.Length; i++)
+                    {
+                        var targetFrameworkAttribute = customAttributes[i] as TargetFrameworkAttribute;
+                        if (targetFrameworkAttribute != null)
+                        {
+                            entryAssemblyTargetFramework = targetFrameworkAttribute.FrameworkName;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                entryAssemblyName = "(no EntryAssembly)";
+                entryAssemblyVersion = new Version();
+                entryAssemblyTargetFramework = "";
+            }
 
             // Do not use strng type reference for DXDevice, so that this class can be used without DXEngine assembly (for example in SystemInfo console application)
-            string dxEngineVerson;
+            string dxEngineVersion;
 
             try
             {
                 var dxDeviceType = Type.GetType("Ab3d.DirectX.DXDevice, Ab3d.DXEngine", throwOnError: false);
                 if (dxDeviceType != null)
-                    dxEngineVerson = dxDeviceType.Assembly.GetName().Version.ToString();
+                    dxEngineVersion = dxDeviceType.Assembly.GetName().Version.ToString();
                 else
-                    dxEngineVerson = "";
+                    dxEngineVersion = "";
             }
             catch
             {
-                dxEngineVerson = "";
+                dxEngineVersion = "";
             }
 
-            sb.AppendFormat("<SystemInfo ApplicationName=\"{0}\" ApplicationVersion=\"{1}\" DXEngineVersion=\"{2}\" Date=\"{3:yyyy-MM-dd}\" />\r\n",
-                entryAssemblyName.Name,
-                entryAssemblyName.Version,
-                dxEngineVerson,
+            sb.AppendFormat("<SystemInfo ApplicationName=\"{0}\" ApplicationVersion=\"{1}\" TargetFramework=\"{2}\" DXEngineVersion=\"{3}\" Date=\"{4:yyyy-MM-dd}\" />\r\n",
+                entryAssemblyName,
+                entryAssemblyVersion,
+                entryAssemblyTargetFramework,
+                dxEngineVersion,
                 DateTime.Now);
 
 

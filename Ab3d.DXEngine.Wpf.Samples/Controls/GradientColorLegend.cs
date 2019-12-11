@@ -78,7 +78,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
             get { return _legendLabels; }
         }
 
-        public LinearGradientBrush GradientBrushBrush
+        public LinearGradientBrush GradientBrush
         {
             get { return _gradientBrush; }
             set
@@ -115,16 +115,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
             this.Loaded += delegate(object sender, RoutedEventArgs args)
             {
-                UpdateLagendLabels();
+                UpdateLegendLabels();
             };
 
             this.SizeChanged += delegate(object sender, SizeChangedEventArgs args)
             {
-                UpdateLagendLabels();
+                UpdateLegendLabels();
             };
         }
 
-        public void UpdateLagendLabels()
+        public void UpdateLegendLabels()
         {
             _labelsCanvas.Children.Clear();
 

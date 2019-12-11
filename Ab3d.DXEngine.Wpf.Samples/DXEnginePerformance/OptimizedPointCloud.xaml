@@ -40,7 +40,7 @@
                                       CameraType="PerspectiveCamera"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
-        <!-- EventsSourceElement is set to MainGrid - this means that the MainGrid's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <!-- EventsSourceElement is set to MainDXViewportView - this means that the MainDXViewportView's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
         <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Row="1"
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
@@ -56,6 +56,11 @@
 
                 <TextBlock Text="Pixel size:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
                 <ComboBox Name="PixelSizeComboBox" Margin="0 0 15 0" Width="50" SelectionChanged="OnPixelSizeChanged" />
+
+                <TextBlock VerticalAlignment="Center" Margin="30 0 0 0" >
+                    <Run FontWeight="Bold">[ENTER]</Run>
+                    <Run> - show closest position</Run>
+                </TextBlock>
             </StackPanel>
             
             <controls:SimpleGrid ColumnsCount="2" ColumnSpacing="5" RowSpacing="3" Margin="0 10 0 0">

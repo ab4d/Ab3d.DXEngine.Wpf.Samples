@@ -1,0 +1,59 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance.MouseControllerForPointCloud"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"   
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      xmlns:dxEnginePerformance="clr-namespace:Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance"
+      Title="InstancedMeshGeometry3DTest"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap"
+                   Text="Using MouseCameraController with Point Cloud (rotate around mouse position, zoom to mouse and movement sped)"/>
+
+        <Rectangle Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
+
+        <!-- This sample is using PresentationType set to DirectXOverlay. 
+             This can greatly improve performance of rendering because graphic card can render in the background. 
+             With DirectXImage, the CPU needs to wait until graphics card finishes rendering and then can send the rendered image to the WPF composition engine. 
+             A drawback of DirectXOverlay is that no WPF object can be drawn over 3D scene. -->
+        <dxControls:DXViewportView Name="MainDXViewportView" Grid.Row="1" PresentationType="DirectXImage" BackgroundColor="White">
+            <Viewport3D Name="MainViewport">
+            </Viewport3D>
+        </dxControls:DXViewportView>
+
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Row="1"
+                                      Heading="11"
+                                      Attitude="-15"
+                                      Distance="90"
+                                      TargetPosition="0 0 0"
+                                      ShowCameraLight="Always"
+                                      CameraType="PerspectiveCamera"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <dxEnginePerformance:PointCloudMouseCameraController x:Name="PointCloudMouseCameraController1" Grid.Row="1"
+                                                             RotateAroundMousePosition="True"
+                                                             ZoomMode="MousePosition"
+                                                             ShowRotationCenterMarker="True"
+                                                             RotateCameraConditions="RightMouseButtonPressed"
+                                                             MoveCameraConditions="LeftMouseButtonPressed"
+                                                             QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
+                                                             EventsSourceElement="{Binding ElementName=MainDXViewportView}"
+                                                             TargetCamera="{Binding ElementName=Camera1}"/>
+
+       <ab3d:MouseCameraControllerInfo Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                                       FontSize="18" FontWeight="Bold"
+                                       ShowQuickZoomInfo="True"
+                                       MouseCameraController="{Binding ElementName=PointCloudMouseCameraController1}" />
+    </Grid>
+</Page>

@@ -288,21 +288,27 @@ namespace Ab3d.DirectX.Client.Diagnostics
             {
                 var results = CalculateResults();
 
-                int maxLength = results.Max(r => r.Key.Length);
-
-                sb.AppendLine();
-                sb.AppendFormat("Rendering statistics for {0} frames:\r\n", _totalSamplesCount);
-                sb.Append("Statistics".PadRight(maxLength + 1));
-                sb.AppendLine("\t avrg    stdev     min        q1       q2       q3      c90      c95      max   (all values in ms)");
-
-                foreach (var keyValuePair in results)
+                if (results == null || results.Count == 0)
                 {
-                    sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
-                        "{0}\t{1,5:0.00}    {2,5:0.00}    {3,5:0.00}    {4,5:0.00}    {5,5:0.00}    {6,5:0.00}    {7,5:0.00}    {8,5:0.00}    {9,5:0.00}\r\n",
-                        keyValuePair.Key.PadRight(maxLength + 1), keyValuePair.Value["average"], keyValuePair.Value["stdev"], keyValuePair.Value["min"],
-                        keyValuePair.Value["q1"], keyValuePair.Value["q2"], keyValuePair.Value["q3"], keyValuePair.Value["c90"], keyValuePair.Value["c95"], keyValuePair.Value["max"]);
+                    sb.Append("\r\nNo frames rendered");
                 }
+                else
+                {
+                    int maxLength = results.Max(r => r.Key.Length);
 
+                    sb.AppendLine();
+                    sb.AppendFormat("Rendering statistics for {0} frames:\r\n", _totalSamplesCount);
+                    sb.Append("Statistics".PadRight(maxLength + 1));
+                    sb.AppendLine("\t avrg    stdev     min        q1       q2       q3      c90      c95      max   (all values in ms)");
+
+                    foreach (var keyValuePair in results)
+                    {
+                        sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
+                            "{0}\t{1,5:0.00}    {2,5:0.00}    {3,5:0.00}    {4,5:0.00}    {5,5:0.00}    {6,5:0.00}    {7,5:0.00}    {8,5:0.00}    {9,5:0.00}\r\n",
+                            keyValuePair.Key.PadRight(maxLength + 1), keyValuePair.Value["average"], keyValuePair.Value["stdev"], keyValuePair.Value["min"],
+                            keyValuePair.Value["q1"], keyValuePair.Value["q2"], keyValuePair.Value["q3"], keyValuePair.Value["c90"], keyValuePair.Value["c95"], keyValuePair.Value["max"]);
+                    }
+                }
 
                 sb.AppendLine();
                 sb.AppendLine();

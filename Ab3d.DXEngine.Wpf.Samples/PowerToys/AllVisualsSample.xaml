@@ -63,7 +63,7 @@
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
-        <!-- EventsSourceElement is set to MainGrid - this means that the MainGrid's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <!-- EventsSourceElement is set to ViewportBorder - this means that the ViewportBorder's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
         <ab3d:MouseCameraController Name="MouseCameraController1"
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"

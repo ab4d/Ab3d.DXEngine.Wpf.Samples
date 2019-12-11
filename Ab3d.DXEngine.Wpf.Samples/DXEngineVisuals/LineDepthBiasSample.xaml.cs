@@ -404,7 +404,7 @@ This shows that different object sizes require different bias values.";
         // This method can be used to change the depth bias value after the Visual3D (line visual or WireframeVisual3D) has already been rendered by DXEngine (or at least the DXEngine has already initialized the 3D SceneNodes).
         // To set initial line depth bias value, it is much easier to use the the following (see also the CreateScene method above):
         // _multiLineVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, depthBias);
-        private void SetDepthBias(DXViewportView parentDXViewportView, BaseVisual3D lineVisual3D, double depthBiasValue)
+        public static void SetDepthBias(DXViewportView parentDXViewportView, BaseVisual3D lineVisual3D, double depthBiasValue)
         {
             var lineSceneNode = parentDXViewportView.GetSceneNodeForWpfObject(lineVisual3D);
 

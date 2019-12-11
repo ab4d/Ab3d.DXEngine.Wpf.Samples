@@ -80,7 +80,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // The VarianceShadowRenderingProvider controls the rendering of shadows.
                 //
                 // Variance shadow rendering technique can produce nice shadows with soft edges and without the artifacts that are common for some other shadow rendering (Peter panning or Self shadowing).
-                // More info can be read in the GPU Gems3 "Chapter 8. Summed-Area Variance Shadow Maps" (http://http.developer.nvidia.com/GPUGems3/gpugems3_ch08.html)
+                // More info can be read in the GPU Gems3 "Chapter 8. Summed-Area Variance Shadow Maps" (https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch08.html)
                 _varianceShadowRenderingProvider = new VarianceShadowRenderingProvider();
 
 
@@ -97,7 +97,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 // ShadowTreshold is a float value that helps prevent light bleeding (having areas that should be in shadow fully illuminated) for variance shadow mapping.
                 // The value is used to map all shadow values from 0 ... ShadowTreshold to 0 and then linearly rescale the values from ShadowTreshold to 1 into 0 to 1.
-                // For more info see "Shadow bleeding" in "Chapter 8. Summed-Area Variance Shadow Maps" (http://http.developer.nvidia.com/GPUGems3/gpugems3_ch08.html)
+                // For more info see "Shadow bleeding" in "Chapter 8. Summed-Area Variance Shadow Maps" (https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch08.html)
                 _varianceShadowRenderingProvider.ShadowTreshold = _shadowTreshold;
 
 
@@ -115,6 +115,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 //_varianceShadowRenderingProvider.RenderShadowDepthRenderingStep.FilterObjectsFunction = FilterNonTeapotObjectsFunction;
                 //_varianceShadowRenderingProvider.RenderNonShadowObjectsRenderingStep.FilterObjectsFunction = FilterTeapotObjectsFunction;
                 //MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterObjectsFunction = FilterNonTeapotObjectsFunction;
+
+                // IMPORTANT:
+                // Af least one light need to set to cast shadow. This can be done with the following code:
+                //_directionalLight.SetDXAttribute(DXAttributeType.IsCastingShadow, true);
             };
 
 
@@ -187,7 +191,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
 
             var imageBrush = new ImageBrush();
-            imageBrush.ImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/GrassTexture.jpg"));
+            imageBrush.ImageSource = new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/GrassTexture.jpg")));
             var grassMaterial = new DiffuseMaterial(imageBrush);
 
             _greenBox3D = new BoxVisual3D();
@@ -314,12 +318,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private Point3D CalculateLightPosition()
         {
-            float xRad = MathUtil.DegreesToRadians(_lightHorizontalAngle);
-            float yRad = MathUtil.DegreesToRadians(_lightVerticalAngle);
+            double xRad = _lightHorizontalAngle * Math.PI / 180.0;
+            double yRad = _lightVerticalAngle * Math.PI / 180.0;
 
-            float x = (float)Math.Sin(xRad) * _lightDistance;
-            float y = (float)Math.Sin(yRad) * _lightDistance;
-            float z = (float)(Math.Cos(xRad) * Math.Cos(yRad)) * _lightDistance;
+            double x = (Math.Sin(xRad) * Math.Cos(yRad)) * _lightDistance;
+            double y = Math.Sin(yRad) * _lightDistance;
+            double z = (Math.Cos(xRad) * Math.Cos(yRad)) * _lightDistance;
 
             return new Point3D(x, y, z);
         }

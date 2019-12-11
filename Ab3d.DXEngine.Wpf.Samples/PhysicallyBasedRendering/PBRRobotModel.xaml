@@ -92,19 +92,19 @@
 
                 <TextBlock Text="Robot arms controls:" FontWeight="Bold" Margin="0 20 0 0"/>
 
-                <TextBlock Name="BaseRotationTextBlock" Text="Base:" Margin="0 10 0 0"/>
+                <TextBlock Name="BaseRotationTextBlock" Text="{Binding ElementName=BaseRotationSlider, Path=Value, StringFormat={}Base: {0:0}°}" Margin="0 10 0 0"/>
                 <Slider Name="BaseRotationSlider" Minimum="-180" Maximum="180" Value="0" ValueChanged="BaseRotationSlider_OnValueChanged" />
 
-                <TextBlock Name="Arm1RotationTextBlock" Text="Arm 1:" Margin="0 10 0 0"/>
+                <TextBlock Name="Arm1RotationTextBlock" Text="{Binding ElementName=Arm1RotationSlider, Path=Value, StringFormat={}Arm 1: {0:0}°}" Margin="0 10 0 0"/>
                 <Slider Name="Arm1RotationSlider" Minimum="-120" Maximum="60" Value="20" ValueChanged="Arm1RotationSlider_OnValueChanged" />
-                
-                <TextBlock Name="Arm2RotationTextBlock" Text="Arm 2:" Margin="0 10 0 0"/>
+
+                <TextBlock Name="Arm2RotationTextBlock" Text="{Binding ElementName=Arm2RotationSlider, Path=Value, StringFormat={}Arm 2: {0:0}°}" Margin="0 10 0 0"/>
                 <Slider Name="Arm2RotationSlider" Minimum="-90" Maximum="30" Value="-20" ValueChanged="Arm2RotationSlider_OnValueChanged" />
 
-                <TextBlock Name="Arm3RotationTextBlock" Text="Arm 3:" Margin="0 10 0 0"/>
+                <TextBlock Name="Arm3RotationTextBlock" Text="{Binding ElementName=Arm3RotationSlider, Path=Value, StringFormat={}Arm 3: {0:0}°}" Margin="0 10 0 0"/>
                 <Slider Name="Arm3RotationSlider" Minimum="-180" Maximum="180" Value="30" ValueChanged="Arm3RotationSlider_OnValueChanged" />
 
-                <TextBlock Name="ToolRotationTextBlock" Text="Tool:" Margin="0 10 0 0"/>
+                <TextBlock Name="ToolRotationTextBlock" Text="{Binding ElementName=ToolRotationSlider, Path=Value, StringFormat={}Tool: {0:0}°}" Margin="0 10 0 0"/>
                 <Slider Name="ToolRotationSlider" Minimum="-180" Maximum="180" Value="90" ValueChanged="ToolRotationSlider_OnValueChanged" />
 
 

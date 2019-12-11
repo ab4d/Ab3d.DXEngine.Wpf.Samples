@@ -2,10 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
+    <ApplicationIcon>ab4d.ico</ApplicationIcon>
+    <Version>3.3.7279</Version>
+    <AssemblyVersion>3.3.7279.2300</AssemblyVersion>
+    <FileVersion>3.3.7279.2300</FileVersion>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,6 +28,7 @@
   
   <ItemGroup>
     <None Remove="ab4d.ico" />
+    <None Remove="Resources\10x10-texture.png" />
     <None Remove="Resources\Ab3dPowerToysSamples.png" />
     <None Remove="Resources\ab4d-logo-220x220.DDS" />
     <None Remove="Resources\ab4d-logo-220x220.png" />
@@ -37,6 +42,8 @@
     <None Remove="Resources\Diagnostics.png" />
     <None Remove="Resources\DXEngine-car_engine.png" />
     <None Remove="Resources\DXEngine-OculusWrap-590.jpg" />
+    <None Remove="Resources\DXEngineReferenceHelp.png" />
+    <None Remove="Resources\DXEngineUsersGuide.png" />
     <None Remove="Resources\DXEngineWinForms.png" />
     <None Remove="Resources\GrassTexture.jpg" />
     <None Remove="Resources\HeightMaps\europe.png" />
@@ -131,6 +138,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\lib\Assimp64.dll" Link="Assimp64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ab4d-logo-220x220.DDS">
@@ -369,8 +379,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.2.7234" />
-    <PackageReference Include="Ab3d.PowerToys" Version="9.0.7234" />
+    <PackageReference Include="Ab3d.DXEngine" Version="3.3.7279" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.3.7279" />
+    <PackageReference Include="Ab3d.PowerToys" Version="9.1.7279" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>
@@ -399,8 +410,12 @@
     <Resource Include="Resources\Diagnostics.png" />
     <Resource Include="Resources\DXEngine-car_engine.png" />
     <Resource Include="Resources\DXEngine-OculusWrap-590.jpg" />
+    <Resource Include="Resources\DXEngineReferenceHelp.png" />
+    <Resource Include="Resources\DXEngineUsersGuide.png" />
     <Resource Include="Resources\DXEngineWinForms.png" />
-    <Resource Include="Resources\GrassTexture.jpg" />
+    <Content Include="Resources\GrassTexture.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\info_icon.png" />
     <Resource Include="Resources\new_icon.png" />
     <Resource Include="Resources\PowerToysTexture.png" />

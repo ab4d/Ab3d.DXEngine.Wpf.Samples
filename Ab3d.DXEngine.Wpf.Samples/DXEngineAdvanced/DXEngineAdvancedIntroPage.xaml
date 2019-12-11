@@ -29,6 +29,9 @@
                     In this case it is worth checking on how to create low-level DXEngine's SceneNodes and DirectX resource (vertex buffers, textures, etc.). The samples in this section shows some of the possibilities.\n
                     \n
                     \n
+                    To get a detailed knowledge about how DXEngine works under the hood, it is highly recommended to check the \@Ab3d.DXEngine DeepDive web page:https://www.ab4d.com/DirectX/3D/DXEngineDeepDive.aspx|.\n
+                    \n
+                    \n
                     Note:\n
                     To get insight on how the 3D scene is defined in DXEngine, use "Dump SceneNodes" and other commands in the DXEngineSnoop tool or in the window that is opened when you click on "Diagnostics" button in this sample application.
                 </controls:TextBlockEx>

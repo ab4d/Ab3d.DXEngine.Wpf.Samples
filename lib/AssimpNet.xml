@@ -5521,6 +5521,11 @@
             is a three-character lower-case hint like "dds", "jpg", "png".
             </summary>
         </member>
+        <member name="P:Assimp.EmbeddedTexture.FileName">
+            <summary>
+            Texture original filename
+            </summary>
+        </member>
         <member name="M:Assimp.EmbeddedTexture.#ctor">
             <summary>
             Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture"/> class. Should use only if
