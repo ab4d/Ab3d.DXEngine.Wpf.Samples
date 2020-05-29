@@ -44,9 +44,9 @@ using Point = System.Windows.Point;
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
     /// <summary>
-    /// Interaction logic for OctTreeSample.xaml
+    /// Interaction logic for MeshOctTreeSample.xaml
     /// </summary>
-    public partial class OctTreeSample : Page
+    public partial class MeshOctTreeSample : Page
     {
         private const int MaxNodeLevels = 4; // This should be determined by the number of triangles (more triangles bigger max level)
 
@@ -55,11 +55,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private DXMeshGeometry3D _dxMesh;
 
-        private DirectX.OctTree _octTree;
+        private DirectX.MeshOctTree _meshOctTree;
 
         private GeometryModel3D _readModel3D;
 
-        public OctTreeSample()
+        public MeshOctTreeSample()
         {
             InitializeComponent();
 
@@ -104,6 +104,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
                 MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
                 {
+                    if (MainDXViewportView.DXScene == null)
+                        return; // WPF 3D rendering
+                    
                     _dxMesh = new DXMeshGeometry3D(meshGeometry3D);
                     _dxMesh.InitializeResources(MainDXViewportView.DXScene.DXDevice);
 
@@ -119,14 +122,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private void RecreateOctTree()
         {
+            if (_dxMesh == null)
+                return;
+
             float expandChildBoundingBoxes = (ExpandBoundingBoxesCheckBox.IsChecked ?? false) ? 0.2f : 0f;
 
-            _octTree = _dxMesh.CreateOctTree(MaxNodeLevels, expandChildBoundingBoxes);
+            _meshOctTree = _dxMesh.CreateOctTree(MaxNodeLevels, expandChildBoundingBoxes);
 
             ShowBoundingBoxes();
 
-            var nodeStatistics = _octTree.GetNodeStatistics();
-            AddMessage("OctTree nodes statistics:\r\n" + nodeStatistics);
+            var nodeStatistics = _meshOctTree.GetNodeStatistics();
+            AddMessage("MeshOctTree nodes statistics:\r\n" + nodeStatistics);
         }
 
         private void ShowBoundingBoxes()
@@ -140,7 +146,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             int startNodeLevel = 2;
             for (int i = startNodeLevel; i <= MaxNodeLevels; i++)
             {
-                var boundingBoxs = _octTree.CollectBoundingBoxesInLevel(i, showActualBoundingBox);
+                var boundingBoxs = _meshOctTree.CollectBoundingBoxesInLevel(i, showActualBoundingBox);
 
                 foreach (var boundingBox in boundingBoxs)
                 {
@@ -175,18 +181,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             var pickRay              = dxScene.GetRayFromCamera((int)positionInViewport3D.X, (int)positionInViewport3D.Y);
 
             var hitTestContext = new DXHitTestContext(dxScene);
-            var octTreeHitResult = _octTree.HitTest(ref pickRay, hitTestContext);
+            var octTreeHitResult = _meshOctTree.HitTest(ref pickRay, hitTestContext);
 
 
             _hitLinesModelVisual3D.Children.Clear();
 
             if (octTreeHitResult == null)
             {
-                AddMessage("OctTree hit test result: no object hit\r\n");
+                AddMessage("MeshOctTree hit test result: no object hit\r\n");
             }
             else
             {
-                AddMessage(string.Format("OctTree hit test result (Ray.Start: {0:0.0}; Ray.Direction: {1:0.00}):\r\n  PointHit: {2:0.0};   (distance: {3:0})\r\n",
+                AddMessage(string.Format("MeshOctTree hit test result (Ray.Start: {0:0.0}; Ray.Direction: {1:0.00}):\r\n  PointHit: {2:0.0};   (distance: {3:0})\r\n",
                     pickRay.Position,
                     pickRay.Direction,
                     octTreeHitResult.HitPosition,

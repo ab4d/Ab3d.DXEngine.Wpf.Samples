@@ -20,6 +20,7 @@ using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
+using Microsoft.Win32.SafeHandles;
 using SharpDX;
 using SharpDX.Direct3D11;
 
@@ -164,18 +165,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             UpdateLights();
         }
 
-        private ShaderResourceView GetBaseColorShaderResourceView()
+        private ShaderResourceView GetBaseColorShaderResourceView(string textureFileName, out bool hasTransparency, out BlendState recommendedBlendState)
         {
             ShaderResourceView shaderResourceView;
 
             if (BaseColorTextureCheckBox.IsChecked ?? false)
             {
-                shaderResourceView = TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, _texturesFolder + "bricks.png");
+                TextureInfo textureInfo;
+                shaderResourceView = TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, _texturesFolder + textureFileName, out textureInfo);
                 _disposables.Add(shaderResourceView);
+
+                hasTransparency = textureInfo.HasTransparency;
+                recommendedBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
             }
             else
             {
                 shaderResourceView = null;
+                hasTransparency = false;
+                recommendedBlendState = null;
             }
 
             return shaderResourceView;
@@ -245,7 +252,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             {
                 // IMPORTANT:
                 // When using TextureLoader.LoadShaderResourceView to load ambient occlusion texture, we need to set convertTo32bppPRGBA to false to prevent conversion of the texture
-                loadShaderResourceView = TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, _texturesFolder + "bricks_ao.png", loadDdsIfPresent: false, convertTo32bppPRGBA: false);
+                loadShaderResourceView = TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.Device, _texturesFolder + "bricks_ao.png", loadDdsIfPresent: false, convertTo32bppPRGBA: false);
                 _disposables.Add(loadShaderResourceView);
             }
             else
@@ -271,7 +278,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void MetalnessSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             UpdateMetalness();
@@ -280,7 +287,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void RoughnessSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             UpdateRoughness();
@@ -289,7 +296,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void BaseColorTextureCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             UpdateBaseColor();
@@ -300,7 +307,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void AmbientOcclusionCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             var shaderResourceView = AmbientOcclusionShaderResourceView();
@@ -315,7 +322,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void NormalMapCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
 
@@ -331,7 +338,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void EnvironmentMapCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             UpdateEnvironmentMap();
@@ -357,15 +364,26 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void UpdateBaseColor()
         {
-            var baseColorShaderResourceView = GetBaseColorShaderResourceView();
+            string textureFileName = "bricks.png";
+
+            bool hasTransparency;
+            BlendState recommendedBlendState;
+            var baseColorShaderResourceView = GetBaseColorShaderResourceView(textureFileName, out hasTransparency, out recommendedBlendState);
+
             if (baseColorShaderResourceView != null)
             {
-                _physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorShaderResourceView, "bricks.png");
+                _physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorShaderResourceView, textureFileName);
+                _physicallyBasedMaterial.BlendState = recommendedBlendState;
+                _physicallyBasedMaterial.HasTransparency = hasTransparency;
+
                 _physicallyBasedMaterial.BaseColor = Color4.White; // No color filter
             }
             else
             {
                 _physicallyBasedMaterial.RemoveTextureMap(TextureMapTypes.BaseColor);
+                _physicallyBasedMaterial.BlendState = null;
+                _physicallyBasedMaterial.HasTransparency = false;
+
                 _physicallyBasedMaterial.BaseColor = System.Windows.Media.Color.FromRgb(33, 148, 206).ToColor4(); // #2194ce
             }
         }

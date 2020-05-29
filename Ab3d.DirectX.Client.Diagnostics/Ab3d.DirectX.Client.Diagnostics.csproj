@@ -89,6 +89,12 @@
     </Compile>
     <Compile Include="PerformanceAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderingFilterWindow.xaml.cs">
+      <DependentUpon>RenderingFilterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsEditorWindow.xaml.cs">
+      <DependentUpon>SettingsEditorWindow.xaml</DependentUpon>
+    </Compile>      
     <Compile Include="SystemInfo.cs" />
     <Compile Include="WpfPreviewWindow.xaml.cs">
       <DependentUpon>WpfPreviewWindow.xaml</DependentUpon>
@@ -103,6 +109,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="RenderingFilterWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SettingsEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>       
     <Page Include="LogMessagesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

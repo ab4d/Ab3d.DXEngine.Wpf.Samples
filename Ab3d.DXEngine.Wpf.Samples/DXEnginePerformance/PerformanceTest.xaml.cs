@@ -27,10 +27,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     /// </summary>
     public partial class PerformanceTest : Page
     {
-        private const bool OptimizeReadModel = true;
+        private const bool OptimizeReadModel = false;
 
         // Change this value to set for how much the Camera's Heading is changed after each rendered frame
-        private const double HeadingIncreaseOnEachFrame = 0.5;
+        private const double HeadingIncreaseOnEachFrame = 1.0;
 
         private readonly string StartupFileName = @"Resources\Models\ship_boat.obj";
 
@@ -39,9 +39,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private int _lastSecond;
 
         private int _framesCount;
+        private int _lastShownFramesCount;
 
         private PerformanceAnalyzer _performanceAnalyzer;
         private string _savedWindowTitle;
+        private Window _parentWindow;
+
+        private bool _isTitleUpdated;
 
         public PerformanceTest()
         {
@@ -69,6 +73,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             this.Loaded += OnLoaded;
 
 
+            //this.Focusable = true; // by default Page is not focusable and therefore does not receive keyDown event
+            //this.PreviewKeyDown += OnPreviewKeyDown;
+
+
             // FPS will be displayed in Window Title - save the title so we can restore it later
             _savedWindowTitle = Application.Current.MainWindow.Title;
 
@@ -77,6 +85,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 StopTest(showResults: false);
 
                 MainDXViewportView.Dispose();
+
+                if (_parentWindow != null)
+                    _parentWindow.PreviewKeyDown -= OnPreviewKeyDown;
             };
         }
 
@@ -92,6 +103,40 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             LoadObjFile(startupFileName);
 
             StartRenderingAsCrazy();
+
+
+            _parentWindow = Window.GetWindow(this);
+
+            if (_parentWindow != null)
+                _parentWindow.PreviewKeyDown += OnPreviewKeyDown;
+        }
+
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                if (MainDXViewportView.DXScene != null)
+                    MainDXViewportView.DXScene.IsCachingCommandLists = !MainDXViewportView.DXScene.IsCachingCommandLists;
+
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Down)
+            {
+                if (MainDXViewportView.DXScene != null && MainDXViewportView.DXScene.MaxBackgroundThreadsCount > 0)
+                    MainDXViewportView.DXScene.MaxBackgroundThreadsCount--;
+
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (MainDXViewportView.DXScene != null)
+                    MainDXViewportView.DXScene.MaxBackgroundThreadsCount++;
+
+                e.Handled = true;
+            }
+
+            if (e.Handled)
+                UpdateFps();
         }
 
         private void StartRenderingAsCrazy()
@@ -117,7 +162,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             if (_stopwatch.Elapsed.Seconds != _lastSecond)
             {
-                UpdateFps();
+                UpdateFps(_framesCount);
 
                 _lastSecond = _stopwatch.Elapsed.Seconds;
                 _framesCount = 0;
@@ -125,6 +170,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             else
             {
                 _framesCount++;
+            }
+
+            if (!_isTitleUpdated && MainDXViewportView.DXScene != null && MainDXViewportView.DXScene.Statistics != null)
+            {
+                InfoTextBlock.Text = InfoTextBlock.Text.Replace("Performance test:", string.Format("Performance test (rendered objects count: {0})", MainDXViewportView.DXScene.Statistics.DrawCallsCount));
+                _isTitleUpdated = true;
             }
         }
 
@@ -137,7 +188,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             if (_stopwatch != null)
                 _stopwatch.Stop();
 
-            Application.Current.MainWindow.Title = _savedWindowTitle;
+            if (Application.Current.MainWindow != null)
+                Application.Current.MainWindow.Title = _savedWindowTitle;
 
             if (_performanceAnalyzer == null)
                 return;
@@ -156,12 +208,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             }
         }
 
-        private void UpdateFps()
+        private void UpdateFps(int framesCount = 0)
         {
+            if (Application.Current.MainWindow == null || MainDXViewportView.DXScene == null)
+                return;
+
+            if (framesCount == 0)
+                framesCount = _lastShownFramesCount;
+
             // While the performance test is running WPF is not able to always update its controls
             // Therefore we cannot display the FPS in WPF's TextBlock but need to show that in Window Title
+            Application.Current.MainWindow.Title = string.Format("FPS: {0}; IsCachingCommandLists [Enter]: {1}; ThreadsCount [↑↓]: {2}",
+                                                        framesCount,
+                                                        MainDXViewportView.DXScene.IsCachingCommandLists.ToString(),
+                                                        MainDXViewportView.DXScene.MaxBackgroundThreadsCount + 1);
 
-            Application.Current.MainWindow.Title = "FPS: " + _framesCount.ToString();
+            _lastShownFramesCount = framesCount;
         }
 
         private void LoadObjFile(string fileName)
@@ -197,7 +259,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             StopTest(showResults: true);
 
-            StopButton.IsEnabled = false;
+            StopTestButton.IsEnabled = false;
+        }
+
+        private void RestartTestButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            _performanceAnalyzer.StopCollectingStatistics();
+            _performanceAnalyzer.StartCollectingStatistics();
         }
     }
 }

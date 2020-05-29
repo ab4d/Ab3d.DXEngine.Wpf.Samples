@@ -92,7 +92,7 @@
                         <ComboBoxItem>512 x 512</ComboBoxItem>
                         <ComboBoxItem>1024 x 1024</ComboBoxItem>
                     </ComboBox>
-                    <controls:InfoControl Grid.Column="2" Grid.Row="0" InfoWidth="400" InfoText="Size of a shadow depth map texture that is used to store depth information. Bigger texture will produce more detailed shadows but will be slower to render." />
+                    <controls:InfoControl Grid.Column="2" Grid.Row="0" InfoWidth="400" Margin="5 0 0 0" InfoText="Size of a shadow depth map texture that is used to store depth information. Bigger texture will produce more detailed shadows but will be slower to render." />
 
                     <TextBlock Text="Blur amount:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0 3 0 0"/>
                     <ComboBox Name="BlurAmountComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="2" Width="100" Margin="5 3 0 0" SelectionChanged="OnShadowSettingsSelectedValueChanged">
@@ -104,10 +104,10 @@
                         <ComboBoxItem>10</ComboBoxItem>
                         <ComboBoxItem>16</ComboBoxItem>
                     </ComboBox>
-                    <controls:InfoControl Grid.Column="2" Grid.Row="1" InfoWidth="400" InfoText="Blur amout that is applied on the shadow depth map and produce shadows with nice soft edges." />
+                    <controls:InfoControl Grid.Column="2" Grid.Row="1" InfoWidth="400" Margin="5 0 0 0" InfoText="Blur amount that is applied on the shadow depth map and produce shadows with nice soft edges." />
                     
-                    <TextBlock Text="Shadow treshold:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0 3 0 0"/>
-                    <ComboBox Name="ShadowTresholdComboBox" Grid.Column="1" Grid.Row="2" SelectedIndex="1" Width="100" Margin="5 3 0 0" SelectionChanged="OnShadowSettingsSelectedValueChanged">
+                    <TextBlock Text="Shadow threshold:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0 3 0 0"/>
+                    <ComboBox Name="ShadowThresholdComboBox" Grid.Column="1" Grid.Row="2" SelectedIndex="1" Width="100" Margin="5 3 0 0" SelectionChanged="OnShadowSettingsSelectedValueChanged">
                         <ComboBoxItem>0.0</ComboBoxItem>
                         <ComboBoxItem>0.2 (default)</ComboBoxItem>
                         <ComboBoxItem>0.4</ComboBoxItem>
@@ -115,7 +115,7 @@
                         <ComboBoxItem>0.8</ComboBoxItem>
                         <ComboBoxItem>0.9</ComboBoxItem>
                     </ComboBox>
-                    <controls:InfoControl Grid.Column="2" Grid.Row="2" InfoWidth="400" InfoText="Treshold value that can prevent helps prevent light bleeding (having areas that should be in shadow fully illuminated). See remarks in the Ab3d.DXEngine help file for VarianceShadowRenderingProvider.ShadowTreshold for more info." />
+                    <controls:InfoControl Grid.Column="2" Grid.Row="2" Margin="5 0 0 0" InfoWidth="400" InfoText="Threshold value that can prevent helps prevent light bleeding (having areas that should be in shadow fully illuminated). See remarks in the Ab3d.DXEngine help file for VarianceShadowRenderingProvider.ShadowThreshold for more info." />
                 </Grid>
 
 

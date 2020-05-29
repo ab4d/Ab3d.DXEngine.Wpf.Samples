@@ -118,6 +118,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 
                 // Show the model
                 ShowModel(readModel3D, updateCamera: isNewFile); // If we just reloaded the previous file, we preserve the current camera TargetPosition and Distance
+
+
+                // Force garbage collection to clear the previously loaded objects from memory.
+                // Note that sometimes when a lot of objects are created in large objects heap,
+                // it may take two garbage collections to release the memory
+                // (e.g. - after reading one large file, you will need to read two smaller files to clean the memory taken by the large file).
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
             }
             finally
             {

@@ -92,11 +92,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void MainDXViewportViewOnDXSceneDeviceCreated(object sender, EventArgs e)
         {
-            var instancedData = InstancedMeshGeometry3DTest.CreateInstancesData(center: new Point3D(0, 0, 0), 
-                                                                                size: new Size3D(4 * XInstancesCount, 4 * YInstancesCount, 4 * ZInstancesCount),
-                                                                                modelScaleFactor: 1, 
-                                                                                xCount: XInstancesCount, yCount: YInstancesCount, zCount: ZInstancesCount,
-                                                                                useTransparency: false);
+            var instancedData = CreateInstancesData(center: new Point3D(0, 0, 0), 
+                                                    size: new Size3D(4 * XInstancesCount, 4 * YInstancesCount, 4 * ZInstancesCount),
+                                                    modelScaleFactor: 1, 
+                                                    xCount: XInstancesCount, yCount: YInstancesCount, zCount: ZInstancesCount,
+                                                    useTransparency: false);
 
             // Update colors
             int dataCount = instancedData.Length;
@@ -160,8 +160,70 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             MainViewport.Children.Add(sceneNodeVisual3D);
         }
 
+        public static InstanceData[] CreateInstancesData(Point3D center, Size3D size, float modelScaleFactor, int xCount, int yCount, int zCount, bool useTransparency)
+        {
+            var instancedData = new InstanceData[xCount * yCount * zCount];
+
+            float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
+            float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
+            float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
+
+            int i = 0;
+
+
+            for (int z = 0; z < zCount; z++)
+            {
+                float zPos = (float)(center.Z - (size.Z / 2.0) + (z * zStep));
+
+                for (int y = 0; y < yCount; y++)
+                {
+                    float yPos     = (float)(center.Y - (size.Y / 2.0) + (y * yStep));
+                    float yPercent = (float)y / (float)yCount;
+
+                    for (int x = 0; x < xCount; x++)
+                    {
+                        float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
+
+                        instancedData[i].World = new SharpDX.Matrix(modelScaleFactor, 0, 0, 0,
+                                                                    0, modelScaleFactor, 0, 0,
+                                                                    0, 0, modelScaleFactor, 0,
+                                                                    xPos, yPos, zPos, 1);
+
+                        if (useTransparency)
+                        {
+                            // When we use transparency, we set alpha color to 0.2 (we also need to set InstancedMeshGeometryVisual3D.UseAlphaBlend to true)
+                            instancedData[i].DiffuseColor = new SharpDX.Color4(1.0f, 1.0f, 1.0f, 1.0f - yPercent); // White with variable transparency - top objects fully transparent, bottom objects solid
+                        }
+                        else
+                        {
+                            // Start with yellow and move to white (multiplied by 1.4 so that white color appear before the top)
+                            instancedData[i].DiffuseColor = new SharpDX.Color4(red: 1.0f,
+                                                                               green: 1.0f,
+                                                                               blue: yPercent * 1.4f,
+                                                                               alpha: 1.0f);
+
+                            //instancedData[i].DiffuseColor = new SharpDX.Color4(red: 0.3f + ((float)x / (float)xCount) * 0.7f, 
+                            //                                                   green: 0.3f + yPercent * 0.7f, 
+                            //                                                   blue: 0.3f + yPercent * 0.7f, 
+                            //                                                   alpha: 1.0f);
+
+                            // Use WPF's Orange color:
+                            //instancedData[i].Color = Colors.Orange.ToColor4();
+                        }
+
+                        i++;
+                    }
+                }
+            }
+
+            return instancedData;
+        }
+
         private void UpdateHiddenInstancesPositions()
         {
+            if (_instancedMeshGeometry3DNode1 == null)
+                return;
+
             var instancesData = _instancedMeshGeometry3DNode1.GetInstanceData();
             int instancesDataLength = instancesData.Length;
 

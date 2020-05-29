@@ -34,7 +34,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private SharpDX.Point _lastMousePosition;
         private int _lastSelectedSphereIndex;
-        private OctTree _octTree;
+        private MeshOctTree _octTree;
 
         public ObjectSelectionWithSubMeshes()
         {
@@ -101,9 +101,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             _disposables.Add(_multiMaterialMesh);
 
-            // Create OctTree from vertexBuffer.
+            // Create MeshOctTree from vertexBuffer.
             // This will significantly improve hit testing performance (check this with uncommenting the dxScene.GetClosestHitObject call in OnMouseMouse method).
-            _octTree = new OctTree(vertexBuffer, indexBuffer);
+            _octTree = new MeshOctTree(vertexBuffer, indexBuffer);
 
 
             var materials = new Ab3d.DirectX.Material[]

@@ -341,7 +341,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             }
         }
 
-        // Fill _positionColorsArray with the specifed colro
+        // Fill _positionColorsArray with the specified color
         private void FillPositionColorsArray(Color4 color)
         {
             for (var i = 0; i < _positionColorsArray.Length; i++)

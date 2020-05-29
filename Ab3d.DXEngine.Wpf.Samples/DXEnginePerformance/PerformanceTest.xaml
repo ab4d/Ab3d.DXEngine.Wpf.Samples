@@ -18,10 +18,12 @@
         </Grid.RowDefinitions>
         
         <TextBlock Name="InfoTextBlock" Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold"
-                   Text="Performance test:&#x0a;The camera heading is changed by {0:0.0} degrees after each rendered frame.&#x0a;FPS value is shown in Window title." />
+                   Text="Performance test:&#x0a;The camera heading is changed by {0:0.0} degrees after each rendered frame. FPS value is shown in Window title.&#x0a;KEYS: [Enter] IsCachingCommandLists;  [↑↓] - Change threads count" />
 
-        <Button Name="StopButton" Grid.Row="1" Content="STOP test" HorizontalAlignment="Left" Padding="20 5" Margin="0 5" Click="StopButton_OnClick" />
-
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Button Name="RestartTestButton" Content="Restart test" Padding="20 2" Margin="0 5 0 5" Click="RestartTestButton_OnClick" />
+            <Button Name="StopTestButton" Content="STOP test" Padding="20 2" Margin="15 5 0 5" Click="StopButton_OnClick" />
+        </StackPanel>
         <dxControls:DXViewportView Name="MainDXViewportView" Grid.Row="2" BackgroundColor="White">
             <Viewport3D Name="MainViewport" >
                 <visuals:LightingRigVisual3D />

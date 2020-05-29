@@ -51,8 +51,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             CreateSceneObjects();
             GeneratedSceneComboBoxItem.IsSelected = true;
 
-            // Start with SplitScreenVirtualRealityProvide - for 3D TV
-            InitializeSplitScreenVirtualRealityProvider();
+            // Start with AnaglyphVirtualRealityProvider - for colored glasses
+            InitializeAnaglyphVirtualRealityProvider();
             
 
             // Wait until DXScene is initialized and then we can initialize virtual reality rendering mode with AnaglyphVirtualRealityProvider
@@ -60,7 +60,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 if (MainDXViewportView.UsedGraphicsProfile.DriverType != GraphicsProfile.DriverTypes.Wpf3D && MainDXViewportView.DXScene != null)
                 {
-                    //MainDXViewportView.DXScene.InitializeVirtualRealityRendering(_anaglyphVirtualRealityProvider);
                     MainDXViewportView.DXScene.InitializeVirtualRealityRendering(_currentVirtualRealityProvider);
                 }
                 else

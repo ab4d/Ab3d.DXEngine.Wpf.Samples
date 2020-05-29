@@ -78,68 +78,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 return; // In this case we could use simple InstancedGeometryVisual3D
 
             var instancedModelGroupVisual3D = new InstancedModelGroupVisual3D(model3DGroup);
-            instancedModelGroupVisual3D.InstancesData = CreateInstancesData(center: new Point3D(0, 200, 0),
-                                                                            size: new Size3D(4000, 100, 6500),
-                                                                            modelScaleFactor: _modelScaleFactor,
-                                                                            xCount: 80,
-                                                                            yCount: 1,
-                                                                            zCount: 100);
+            instancedModelGroupVisual3D.InstancesData = DXEnginePerformance.InstancedMeshGeometry3DTest.CreateInstancesData(center: new Point3D(0, 200, 0),
+                                                                                                                            size: new Size3D(4000, 100, 6500),
+                                                                                                                            modelScaleFactor: _modelScaleFactor,
+                                                                                                                            xCount: 80,
+                                                                                                                            yCount: 1,
+                                                                                                                            zCount: 100,
+                                                                                                                            useTransparency: false);
 
             // To allow hit testing (for example with EventManager3D), you need to manually enable it with the following:
             //instancedModelGroupVisual3D.IsWpfHitTestVisible = true;
 
             ObjectsPlaceholder.Children.Add(instancedModelGroupVisual3D);
-        }
-
-        private InstanceData[] CreateInstancesData(Point3D center, Size3D size, float modelScaleFactor, int xCount, int yCount, int zCount)
-        {
-            var instancedData = new InstanceData[xCount * yCount * zCount];
-
-            float xStep = (float)(size.X / xCount);
-            float yStep = (float)(size.Y / yCount);
-            float zStep = (float)(size.Z / zCount);
-
-            int i = 0;
-            for (int z = 0; z < zCount; z++)
-            {
-                float zPos = (float)(center.Z - (size.Z / 2.0) + (z * zStep));
-
-                for (int y = 0; y < yCount; y++)
-                {
-                    float yPos = (float)(center.Y - (size.Y / 2.0) + (y * yStep));
-
-                    float yPercent = (float)y / (float)yCount;
-
-                    for (int x = 0; x < xCount; x++)
-                    {
-                        float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
-
-                        instancedData[i].World = new SharpDX.Matrix(modelScaleFactor, 0, 0, 0,
-                                                                    0, modelScaleFactor, 0, 0,
-                                                                    0, 0, modelScaleFactor, 0,
-                                                                    xPos, yPos, zPos, 1);
-
-
-                        // Start with yellow and move to white (multiplied by 1.4 so that white color appear before the top)
-                        instancedData[i].DiffuseColor = new SharpDX.Color4(red: 1.0f,
-                                                                           green: 1.0f,
-                                                                           blue: yPercent * 1.4f,
-                                                                           alpha: 1.0f);
-
-                        //instancedData[i].DiffuseColor = new SharpDX.Color4(red: 0.3f + ((float)x / (float)xCount) * 0.7f, 
-                        //                                                   green: 0.3f + yPercent * 0.7f, 
-                        //                                                   blue: 0.3f + yPercent * 0.7f, 
-                        //                                                   alpha: 1.0f);
-
-                        // Use WPF's Orange color:
-                        //instancedData[i].Color = Colors.Orange.ToColor4();
-
-                        i++;
-                    }
-                }
-            }
-
-            return instancedData;
         }
 
         private Model3D LoadObjFile(string fileName)

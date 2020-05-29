@@ -45,7 +45,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private int _shadowMapSize;
         private int _shadowDepthBluringSize;
-        private float _shadowTreshold;
+        private float _shadowThreshold;
         private BoxVisual3D _greenBox3D;
         private Model3D _teapotModel;
         private WpfGeometryModel3DNode _teapotSceneNode;
@@ -57,7 +57,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // Default values can be get before Loaded event
             _shadowMapSize = 512;
             _shadowDepthBluringSize = 4;
-            _shadowTreshold = 0.2f;
+            _shadowThreshold = 0.2f;
 
 
             CreateCustomScene();
@@ -95,10 +95,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // Default value is 4.
                 _varianceShadowRenderingProvider.ShadowDepthBluringSize = _shadowDepthBluringSize;
 
-                // ShadowTreshold is a float value that helps prevent light bleeding (having areas that should be in shadow fully illuminated) for variance shadow mapping.
-                // The value is used to map all shadow values from 0 ... ShadowTreshold to 0 and then linearly rescale the values from ShadowTreshold to 1 into 0 to 1.
+                // ShadowThreshold is a float value that helps prevent light bleeding (having areas that should be in shadow fully illuminated) for variance shadow mapping.
+                // The value is used to map all shadow values from 0 ... ShadowThreshold to 0 and then linearly rescale the values from ShadowThreshold to 1 into 0 to 1.
                 // For more info see "Shadow bleeding" in "Chapter 8. Summed-Area Variance Shadow Maps" (https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch08.html)
-                _varianceShadowRenderingProvider.ShadowTreshold = _shadowTreshold;
+                _varianceShadowRenderingProvider.ShadowThreshold = _shadowThreshold;
 
 
                 // Initialize shadow rendering
@@ -341,8 +341,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _shadowDepthBluringSize = Int32.Parse(blurText);
 
 
-            string shadowTresholdText = GetSelectedText(ShadowTresholdComboBox);
-            _shadowTreshold = Single.Parse(shadowTresholdText.Substring(0, 3), NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+            string shadowThresholdText = GetSelectedText(ShadowThresholdComboBox);
+            _shadowThreshold = Single.Parse(shadowThresholdText.Substring(0, 3), NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
 
             UpdateShadowSettings();
         }
@@ -376,15 +376,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 {
                     ShadowMapSize = _shadowMapSize,
                     ShadowDepthBluringSize = _shadowDepthBluringSize,
-                    ShadowTreshold = _shadowTreshold
+                    ShadowThreshold = _shadowThreshold
                 };
 
                 MainDXViewportView.DXScene.InitializeShadowRendering(_varianceShadowRenderingProvider);
             }
             else
             {
-                // ShadowTreshold can be changed without reinitializing the shadow rendering
-                _varianceShadowRenderingProvider.ShadowTreshold = _shadowTreshold;
+                // ShadowThreshold can be changed without reinitializing the shadow rendering
+                _varianceShadowRenderingProvider.ShadowThreshold = _shadowThreshold;
             }
 
             UpdateCastingShadowLight();

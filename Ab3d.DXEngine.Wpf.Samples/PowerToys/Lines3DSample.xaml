@@ -83,6 +83,8 @@
 
                     <visuals:WireBoxVisual3D CenterPosition="0 0 -260" Size="100 30 60" LineColor="Silver" LineThickness="2"/>
 
+                    <visuals:TextVisual3D x:Name="TextVisual1" Position="-90 55 -260" Text="TextVisual3D" FontSize="30" LineThickness="2" TextColor="Silver" />
+
 
                     <!-- CornerWireBoxVisual3D is similar to WireBoxVisual3D but it shows the lines only in the corners -->
                     <visuals:CornerWireBoxVisual3D CenterPosition="-200 0 -200" Size="40 40 60" IsLineLengthPercent="True" LineLength="0.25" LineColor="Silver" LineThickness="2"/>

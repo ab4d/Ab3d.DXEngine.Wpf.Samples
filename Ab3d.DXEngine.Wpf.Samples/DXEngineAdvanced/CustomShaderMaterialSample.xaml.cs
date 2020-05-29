@@ -73,9 +73,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             {
                 var dxScene = MainDXViewportView.DXScene;
 
-                if (dxScene == null) // If true, then we are probably using WPF 3D rendering
-                    return;
-
                 // DirectoryShaderBytecodeProvider will provide easy access to shaders that are stored in a local folder.
                 // In case the shaders are stored in assembly as EmbeddedResources, you can also use AssemblyShaderBytecodeProvider (another option is to use DictionaryShaderBytecodeProvider)
                 string shadersFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Shaders");

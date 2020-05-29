@@ -44,9 +44,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             {
                 var dxScene = MainDXViewportView.DXScene;
 
-                if (dxScene == null) // Probably using WPF 3D rendering
-                    return;
-
                 // Create a new instance of FogEffect
                 _fogEffect = new FogEffect();
 

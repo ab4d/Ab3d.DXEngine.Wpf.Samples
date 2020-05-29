@@ -17,6 +17,8 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
 using Ab3d.Visuals;
+using SharpDX;
+using Color = System.Windows.Media.Color;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -30,6 +32,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private HiddenLineMaterial _hiddenLineMaterial;
 
         private Dictionary<object, SceneNode> _sceneNodesDictionary;
+        private ScreenSpaceLineNode _screenSpaceLineNode;
 
         public SpecialLineRendering()
         {
@@ -40,14 +43,26 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _hiddenLineMaterial = new HiddenLineMaterial()
             {
                 LineColor = Colors.Yellow.ToColor4(),
-                LineThickness = 1f, // Use very small line thickness (smaller than 1)
+                LineThickness = 1f,
                 LinePattern = 0x1111,
+            };
+
+            // Also create a DXEngine's LineMaterial (it will be used by the ScreenSpaceLineNode and to render wireframe object) 
+            _dxLineMaterial = new LineMaterial()
+            {
+                LineThickness = 1,
+                LineColor     = Colors.Yellow.ToColor4(),
+                DepthBias     = 0.1f
+                // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
             };
 
             CreateTest3DObjects();
 
             MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
             {
+                if (MainDXViewportView.DXScene == null)
+                    return; // Probably WPF 3D rendering
+
                 CreateSceneNodesDictionary();
 
                 // After the DXScene was initialized and the DXEngine's SceneNodes objects are created, 
@@ -79,7 +94,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void LineTypesRadioButtonChanged(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             // First recreate all 3D objects to reset their attributes and settings
@@ -114,6 +129,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // once with standard settings to shew visible part of the one,
             // once with using HiddenLineMaterial to show the hidden part of the line.
 
+
             // Now we will clone the existing 3D lines
             var existingLineVisuals = TestObjectsModelVisual3D.Children.OfType<BaseLineVisual3D>().ToList();
 
@@ -122,22 +138,49 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 var clonedLineVisual = CloneLineVisuals(lineVisual3D);
 
+                // To correctly show hidden lines, then need to be rendered after the objects in front of the lines
+                // (they are rendered only in case when there are already some objects in front of them - line's depth is bigger then current depth value).
+                // In case you want to show the hidden lines behind semi-transparent objects, you need to make sure that
+                // the lines are put into the OverlayRenderingQueue.
+                // This is needed because TransparentRenderingQueue is defined after LineGeometryRenderingQueue
+                // and therefore all transparent objects are rendered after all 3D lines (this is needed so the lines are visible through transparent objects).
+                // This can be done with using the SetDXAttribute method and setting the CustomRenderingQueue value.
+                // Note that this value need to be set before the line is initialized by the DXEngine - so before the MainDXViewportView.Update call a few lines below.
+                // (in case of using ScreenSpaceLineNode, you can set its CustomRenderingQueue).
+                //clonedLineVisual.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
+
                 TestObjectsModelVisual3D.Children.Add(clonedLineVisual);
                 newLineVisuals.Add(clonedLineVisual);
             }
 
             // After adding new WPF objects to the scene, we need to manually call Update to create DXEngine's SceneNode objects that will be needed later
             MainDXViewportView.Update();
-
             
             // We need to update the _sceneNodesDictionary because we have changed the scene
             CreateSceneNodesDictionary();
 
-
-
             // Now change the materials of the clones lines to hiddenLineMaterial
             foreach (var newLineVisual3D in newLineVisuals)
-                ChangeLineMaterial(newLineVisual3D, _hiddenLineMaterial);
+            {
+                // Now we can change the material to _hiddenLineMaterial.
+                //
+                // We also need to put the hidden line to the OverlayRenderingQueue.
+                // This is needed because to correctly show hidden lines, they need to be rendered after the objects in front of the lines
+                // (they are rendered only in case when there are already some objects in front of them - line's depth is bigger then current depth value).
+                // In case you want to show the hidden lines behind semi-transparent objects, you need to make sure that
+                // the lines are put into the OverlayRenderingQueue.
+                // This is needed because TransparentRenderingQueue is defined after LineGeometryRenderingQueue
+                // and therefore all transparent objects are rendered after all 3D lines (this is needed so the lines are visible through transparent objects).
+                //
+                // Here this is done with setting the CustomRenderingQueue on the ScreenSpaceLineNode (see ChangeLineMaterial method).
+
+                ChangeLineMaterial(newLineVisual3D, _hiddenLineMaterial, MainDXViewportView.DXScene.OverlayRenderingQueue);
+
+                // We could also call SetDXAttribute and set the CustomRenderingQueue to OverlayRenderingQueue.
+                // This can be done with uncommenting the following line
+                // (but this is less efficient than setting the CustomRenderingQueue on the ScreenSpaceLineNode as done in the ChangeLineMaterial):
+                //newLineVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
+            }
 
 
             if (_wireframeGeometryModel3D != null)
@@ -155,12 +198,28 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 TestObjectsModelVisual3D.Children.Add(modelVisual3D);
             }
+
+
+            // Create a new ScreenSpaceLineNode from the data for _screenSpaceLineNode
+            // Set its material to _hiddenLineMaterial and move it to the OverlayRenderingQueue:
+            var hiddenScreenSpaceLineNode = new ScreenSpaceLineNode(_screenSpaceLineNode.Positions, _screenSpaceLineNode.IsLineStrip, _screenSpaceLineNode.IsLineClosed, _hiddenLineMaterial);
+            hiddenScreenSpaceLineNode.CustomRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
+
+            var sceneNodeVisual3D = new SceneNodeVisual3D(hiddenScreenSpaceLineNode);
+            TestObjectsModelVisual3D.Children.Add(sceneNodeVisual3D);
         }
 
         private void ShowOnlyHiddenLines()
         {
-            foreach (var lineVisual3D in TestObjectsModelVisual3D.Children.OfType<BaseLineVisual3D>())
-                ChangeLineMaterial(lineVisual3D, _hiddenLineMaterial);
+            var allTestLines = TestObjectsModelVisual3D.Children.OfType<BaseLineVisual3D>().ToList();
+            foreach (var lineVisual3D in allTestLines)
+            {
+                // Use _hiddenLineMaterial and put line into OverlayRenderingQueue (see comments in ShowVisibleAndHiddenLines for more info)
+                ChangeLineMaterial(lineVisual3D, _hiddenLineMaterial, MainDXViewportView.DXScene.OverlayRenderingQueue);
+
+                // We could also call SetDXAttribute and set the CustomRenderingQueue to OverlayRenderingQueue.
+                //lineVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
+            }
 
 
             if (_wireframeGeometryModel3D != null)
@@ -169,7 +228,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 newWpfWireframeMaterial.SetUsedDXMaterial(_hiddenLineMaterial);
 
                 _wireframeGeometryModel3D.Material = newWpfWireframeMaterial;
+                _wireframeGeometryModel3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
             }
+
+
+            // Change LineMaterial to _hiddenLineMaterial and move it to the OverlayRenderingQueue
+            _screenSpaceLineNode.LineMaterial = _hiddenLineMaterial;
+            _screenSpaceLineNode.CustomRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
+
+            _screenSpaceLineNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged | SceneNode.SceneNodeDirtyFlags.RenderingQueueChanged);
         }
 
         private void ShowAlwaysVisibleLinesWithDXAttribute()
@@ -233,6 +300,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private SceneNode GetSceneNodeForWpfObject(object wpfObject)
         {
+            if (wpfObject == null)
+                return null;
+
             SceneNode sceneNode = null;
 
             // Use _sceneNodesDictionary if possible
@@ -278,7 +348,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             TestObjectsModelVisual3D.Children.Clear();
 
+
+            // Reset ReadZBuffer to its default value
+            _dxLineMaterial.ReadZBuffer = true;
+
             var objectMaterial = new DiffuseMaterial(Brushes.Silver);
+
+            // Uncomment the following line to test drawing hidden lines behind transparent objects:
+            //objectMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(230, 100, 100, 100)));
 
 
             CreateCylinderWithCircles(new Point3D(0, 0, -5), 10, 30, objectMaterial);
@@ -286,6 +363,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             CreateBoxWithEdgeLines(new Point3D(0, 10, 40), new Size3D(20, 20, 20), objectMaterial);
 
             CreateTeapotWireframeModel(new Point3D(0, 10, -50), new Size3D(50, 50, 50), objectMaterial);
+
+
+            // The following code shows how to create a DXEngine's ScreenSpaceLineNode directly (see DXEngineAdvanced/ScreenSpaceLineNodeSample for more info):
+            var positions = new Vector3[2];
+            positions[0] = new Vector3(-70, -3, 60);
+            positions[1] = new Vector3( 70, -3, 60);
+
+            _screenSpaceLineNode = new ScreenSpaceLineNode(positions, isLineStrip: false, isLineClosed: false, lineMaterial: _dxLineMaterial);
+
+            // To add ScreenSpaceLineNode into WPF's objects hierarchy we use SceneNodeVisual3D
+            var sceneNodeVisual3D = new SceneNodeVisual3D(_screenSpaceLineNode);
+            TestObjectsModelVisual3D.Children.Add(sceneNodeVisual3D);
         }
 
         private void CreateCylinderWithCircles(Point3D bottomCenterPosition, double radius, double height, DiffuseMaterial material)
@@ -416,24 +505,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             TestObjectsModelVisual3D.Children.Add(modelVisual3D);
 
 
-            // To render wireframe object, we first create a DXEngine material that is used to rendered lines or wireframe
-            if (_dxLineMaterial == null)
-            {
-                _dxLineMaterial = new LineMaterial()
-                {
-                    LineThickness = 1,
-                    LineColor = Colors.Yellow.ToColor4(),
-                    DepthBias = 0.1f
-                    // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
-                };
-            }
-            else
-            {
-                _dxLineMaterial.ReadZBuffer = true;
-            }
-
+            // To render wireframe object, we use a DXEngine material that is used to rendered lines or wireframe.
             // Now create standard WPF material and assign DXEngine's LineMaterial to it.
-            // This will use the dxLineMaterial when the wpfLineMaterial will be rendered in DXEngine
+            // This will use the dxLineMaterial when the wpfLineMaterial will be rendered by the DXEngine.
             var wpfWireframeMaterial = new DiffuseMaterial(Brushes.Red);
             wpfWireframeMaterial.SetUsedDXMaterial(_dxLineMaterial);
 
@@ -454,10 +528,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         #region Helper methods
 
-        // This method supports only cloning LineArcVisual3D
         private BaseLineVisual3D CloneLineVisuals(BaseLineVisual3D lineVisual)
         {
             BaseLineVisual3D clonedLineVisual = null;
+
+            // NOTE:
+            // This method supports only cloning LineArcVisual3D and WireBoxVisual3D
 
             var lineArcVisual3D = lineVisual as LineArcVisual3D;
             if (lineArcVisual3D != null)
@@ -555,7 +631,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             }
         }
 
-        private void ChangeLineMaterial(BaseLineVisual3D visual3D, Ab3d.DirectX.Materials.ILineMaterial newDXMaterial)
+        private void ChangeLineMaterial(BaseLineVisual3D visual3D, ILineMaterial newDXMaterial, RenderingQueue customRenderingQueue = null)
         {
             // First get the DXEngine's SceneNode that was created from WPF's Visual3D
             var sceneNode = GetSceneNodeForWpfObject(visual3D);
@@ -581,6 +657,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // we also need to notify the changed SceneNode about the change.
                 // Without this the DXEngine will not re-render the scene because it will think that there is no change.
                 screenSpaceLineNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+
+
+                if (customRenderingQueue != null)
+                {
+                    screenSpaceLineNode.CustomRenderingQueue = customRenderingQueue;
+                    screenSpaceLineNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.RenderingQueueChanged);
+                }
             }
         }
 

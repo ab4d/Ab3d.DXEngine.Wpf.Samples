@@ -35,6 +35,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private ExpandPostProcess _expandHorizontalPostProcess;
         private ExpandPostProcess _expandVerticalPostProcess;
         private SoberEdgeDetectionPostProcess _edgeDetectionPostProcess;
+        private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
 
         public PostProcessingTest()
         {
@@ -70,8 +71,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void UpdatePostProcesses()
         {
-            if (MainDXViewportView.DXScene == null) // If not yet initialized or if using WPF 3D
-                return;
+            if (MainDXViewportView.DXScene == null)
+                return; // Probably WPF 3D rendering
 
             // Because we have created the PostProcess objects here, we also need to dipose them
             DisposeCreatedPostProcesses();
@@ -163,6 +164,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 MainDXViewportView.DXScene.PostProcesses.Add(_edgeDetectionPostProcess);
                 _createdPostProcesses.Add(_edgeDetectionPostProcess);
             }
+            
+            if (GammaCorrectionCheckBox.IsChecked ?? false)
+            {
+                _gammaCorrectionPostProcess = new Ab3d.DirectX.PostProcessing.GammaCorrectionPostProcess();
+
+                _gammaCorrectionPostProcess.Gamma = GetSelectedComboBoxFloatValue(GammaCorrectionComboBox);
+
+                MainDXViewportView.DXScene.PostProcesses.Add(_gammaCorrectionPostProcess);
+                _createdPostProcesses.Add(_gammaCorrectionPostProcess);
+            }
         }
 
         private void DisposeCreatedPostProcesses()
@@ -178,14 +189,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             if (_edgeDetectionPostProcess == null)
                 return;
 
-            var comboBoxItem = EdgeThresholdComboBox.SelectedItem as ComboBoxItem;
-            if (comboBoxItem != null)
-            {
-                float edgeTreshold;
-                if (float.TryParse((string)comboBoxItem.Content, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out edgeTreshold))
-                    _edgeDetectionPostProcess.EdgeThreshold = edgeTreshold;
-            }
-
+            _edgeDetectionPostProcess.EdgeThreshold = GetSelectedComboBoxFloatValue(EdgeThresholdComboBox);
             _edgeDetectionPostProcess.MultiplyWithCurrentColor = MultiplyWithCurrentColorCheckBox.IsChecked ?? false;
         }
 
@@ -196,6 +200,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             _gaussianHorizontalBlurPostProcess.BlurStandardDeviation = (float)StandardDeviationSlider.Value;
             _gaussianVerticalBlurPostProcess.BlurStandardDeviation = (float)StandardDeviationSlider.Value;
+        }
+
+        private float GetSelectedComboBoxFloatValue(ComboBox comboBox)
+        {
+            float selectedValue;
+
+            var comboBoxItem = comboBox.SelectedItem as ComboBoxItem;
+            if (comboBoxItem != null && comboBoxItem.Content != null)
+            {
+                string selectedText = comboBoxItem.Content.ToString();
+                if (!float.TryParse(selectedText, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out selectedValue))
+                    selectedValue = float.NaN;
+            }
+            else
+            {
+                selectedValue = float.NaN;
+            }
+
+            return selectedValue;
         }
 
         private void UpdateSimpleBlurParameters()
@@ -254,6 +277,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 return;
 
             UpdateExpandParameters();
+
+            MainDXViewportView.Refresh(); // Render the scene again
+        }
+
+        private void GammaCorrectionComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded && _gammaCorrectionPostProcess == null)
+                return;
+
+            _gammaCorrectionPostProcess.Gamma = GetSelectedComboBoxFloatValue(GammaCorrectionComboBox);
 
             MainDXViewportView.Refresh(); // Render the scene again
         }

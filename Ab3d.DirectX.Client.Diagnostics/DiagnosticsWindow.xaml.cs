@@ -25,9 +25,13 @@ using System.Xml;
 using Ab3d.Common;
 using Ab3d.DirectX.Cameras;
 using Ab3d.DirectX.Controls;
+using Ab3d.DirectX.Effects;
+using Ab3d.DirectX.Lights;
 using Ab3d.DirectX.Models;
 using Microsoft.Win32;
+using SharpDX;
 using SharpDX.Direct3D11;
+using Color = System.Windows.Media.Color;
 using Exception = System.Exception;
 
 namespace Ab3d.DirectX.Client.Diagnostics
@@ -50,7 +54,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
             }
         }
 
-        public const double InitialWindowWidth = 300;
+        public const double InitialWindowWidth = 310;
 
         public bool IsDXEngineDebugBuild { get; private set; }
 
@@ -68,6 +72,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
         private DateTime _lastStatisticsUpdate;
         private DateTime _lastPerfCountersReadTime;
 
+        private bool _hasHitTestingTime;
+
         private bool _showRenderingStatistics = true;
 
         private Queue<double> _fpsQueue;
@@ -80,11 +86,17 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private LogMessagesWindow _logMessagesWindow;
 
+        private SettingsEditorWindow _settingsEditorWindow;
+        private RenderingFilterWindow _renderingFilterWindow;
+
         private PerformanceAnalyzer _performanceAnalyzer;
         private bool _isOnSceneRenderedSubscribed;
 
         private PerformanceCounter _cpuCounter;
         private PerformanceCounter _processorFrequencyCounter;
+
+        private SolidColorEffect _solidColorEffect;
+        private CustomActionRenderingStep _objectIdRenderingStep;
 
         private float _lastCpuUsage;
 
@@ -360,7 +372,46 @@ namespace Ab3d.DirectX.Client.Diagnostics
             _dxView = null;
 
             if (_wpfPreviewWindow != null)
-                _wpfPreviewWindow.Close();
+            {
+                try
+                {
+                    _wpfPreviewWindow.Close();
+                }
+                catch
+                {
+                    // Maybe the window was already closed
+                }
+
+                _wpfPreviewWindow = null;
+            }
+
+            if (_settingsEditorWindow != null)
+            {
+                try
+                {
+                    _settingsEditorWindow.Close();
+                }
+                catch
+                {
+                    // Maybe the window was already closed
+                }
+
+                _settingsEditorWindow = null;
+            }
+            
+            if (_renderingFilterWindow != null)
+            {
+                try
+                {
+                    _renderingFilterWindow.Close();
+                }
+                catch
+                {
+                    // Maybe the window was already closed
+                }
+
+                _renderingFilterWindow = null;
+            }
 
             DeviceInfoControl.DXView = null;
 
@@ -655,10 +706,25 @@ namespace Ab3d.DirectX.Client.Diagnostics
         {
             DumpDXEngineSettings();
         }
+        
+        private void EditDXEngineSettingsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            EditDXEngineSettings();
+        }
 
         private void DumpCurrentSceneMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ShowFullSceneDump();
+        }
+        
+        private void RenderObjectIdMenuItemMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            RenderObjectIdBitmap();
+        }
+        
+        private void RenderingFilterMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowRenderingFilterWindow();
         }
 
         private void CaptureFrameMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -903,6 +969,19 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 usedBackgroundThreadsCount = "";
             }
 
+
+            string cachedCommandListsStatistics;
+            try
+            {
+                cachedCommandListsStatistics = GetCachedCommandListsStatistics(renderingStatistics);
+            }
+            catch (MissingMethodException)
+            {
+                // In case of an old DXEngine that do not yet have the CreatedCommandListsCount and CachedCommandListsCount properties
+                cachedCommandListsStatistics = "";
+            }
+
+
             if (fpsText == null)
                 fpsText = "";
 
@@ -917,13 +996,13 @@ UpdateTime: {3:0.00} ms
 PrepareRenderTime: {4:0.00} ms
 DrawRenderTime: {5:0.00} ms
 {6}CompleteRenderTime: {7:0.00} ms
-{8}DrawCallsCount: {9:#,##0}
-DrawnIndicesCount: {10:#,##0}
-ShaderChangesCount: {11:#,##0}
-VertexBuffersChangesCount: {12:#,##0}
-IndexBuffersChangesCount: {13:#,##0}
-ConstantBufferChangesCount: {14:#,##0}
-StateChangesCount: {15:#,##0}{16}{17}",
+{8}{9}DrawCallsCount: {10:#,##0}
+DrawnIndicesCount: {11:#,##0}
+ShaderChangesCount: {12:#,##0}
+VertexBuffersChangesCount: {13:#,##0}
+IndexBuffersChangesCount: {14:#,##0}
+ConstantBufferChangesCount: {15:#,##0}
+StateChangesCount: {16:#,##0}{17}{18}",
                 renderingStatistics.FrameNumber,
                 renderingStatistics.UpdateTimeMs + renderingStatistics.TotalRenderTimeMs,
                 fpsText,
@@ -933,6 +1012,7 @@ StateChangesCount: {15:#,##0}{16}{17}",
                 shadowMappingStatistics,
                 renderingStatistics.CompleteRenderTimeMs,
                 postProcessingTimeText,
+                hitTestingTimeText,
                 renderingStatistics.DrawCallsCount,
                 renderingStatistics.DrawnIndicesCount,
                 renderingStatistics.ShaderChangesCount,
@@ -940,7 +1020,7 @@ StateChangesCount: {15:#,##0}{16}{17}",
                 renderingStatistics.IndexBuffersChangesCount,
                 renderingStatistics.ConstantBufferChangesCount,
                 renderingStatistics.StateChangesCount,
-                hitTestingTimeText,
+                cachedCommandListsStatistics,
                 usedBackgroundThreadsCount
                 );
 
@@ -950,22 +1030,44 @@ StateChangesCount: {15:#,##0}{16}{17}",
         // Read HitTestingTimeMs in a separate method so in case Diagnostics window is opened with and older version of DXEngine (for example from DXEngineSnoop) 
         // that does not yet define this property, we can catch this as MissingMethodException (the exception is thrown when entering the method that is using this property).
         [MethodImpl(MethodImplOptions.NoInlining)] // Do not inline so we get MissingMethodException when calling this method and not the calling method
-        private string GetHitTestingTime(RenderingStatistics renderingStatistics)
+        private string GetCachedCommandListsStatistics(RenderingStatistics renderingStatistics)
         {
-            string hitTestingTimeText;
-            if (renderingStatistics.HitTestingTimeMs > 0)
+            string cachedCommandListsStatistics;
+            if (renderingStatistics.CachedCommandListsCount > 0)
             {
-                hitTestingTimeText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "\r\nHitTestingTime: {0:0.00} ms", renderingStatistics.HitTestingTimeMs);
-
-                // We need to manually reset the time to zero. See remarks in HitTestingTimeMs for more info.
-                renderingStatistics.HitTestingTimeMs = 0;
+                cachedCommandListsStatistics = string.Format("\r\nCachedCommandLists: {0} / {1}\r\nCachedRenderedObjects: {2:#,##0}",
+                    renderingStatistics.CachedCommandListsCount, renderingStatistics.CreatedCommandListsCount + renderingStatistics.CachedCommandListsCount,
+                    renderingStatistics.CachedRenderedObjectsCount);
             }
             else
             {
-                hitTestingTimeText = "";
+                cachedCommandListsStatistics = "";
             }
 
-            return hitTestingTimeText;
+            return cachedCommandListsStatistics;
+        }
+
+
+        // Read HitTestingTimeMs in a separate method so in case Diagnostics window is opened with and older version of DXEngine (for example from DXEngineSnoop) 
+        // that does not yet define this property, we can catch this as MissingMethodException (the exception is thrown when entering the method that is using this property).
+        [MethodImpl(MethodImplOptions.NoInlining)] // Do not inline so we get MissingMethodException when calling this method and not the calling method
+        private string GetHitTestingTime(RenderingStatistics renderingStatistics)
+        {
+            double hitTestingTime = renderingStatistics.HitTestingTimeMs;
+
+            if (hitTestingTime > 0)
+            {
+                // We need to manually reset the time to zero. See remarks in HitTestingTimeMs for more info.
+                renderingStatistics.HitTestingTimeMs = 0;
+                _hasHitTestingTime = true;
+            }
+
+            // We do not show HitTestingTime until there is actually one valid hit testing time bugger then 0
+            // After the we show the time (even if it is zero) to avoid "flickering".
+            if (hitTestingTime <= 0 && !_hasHitTestingTime)
+                return "";
+
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "HitTestingTime: {0:0.##} ms\r\n", hitTestingTime);
         }
 
         // Read UsedBackgroundThreadsCount in a separate method so in case Diagnostics window is opened with and older version of DXEngine (for example from DXEngineSnoop) 
@@ -1141,8 +1243,15 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
             dumpText += "\r\n\r\nLights:\r\n";
 
-            foreach (Ab3d.DirectX.Lights.ILight light in _dxView.DXScene.Lights)
-                dumpText += "  " + light.ToString() + Environment.NewLine;
+            foreach (var light in _dxView.DXScene.Lights)
+            {
+                dumpText += "  " + light.ToString();
+                var shadowCastingLight = light as IShadowCastingLight;
+                if (shadowCastingLight != null && shadowCastingLight.IsCastingShadow)
+                    dumpText += " IsCastingShadow: True";
+
+                dumpText += Environment.NewLine;
+            }
 
             ShowInfoText(dumpText);
         }
@@ -1172,7 +1281,7 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
         private string GetRenderingQueuesDumpString(DXScene dxScene)
         {
-            return dxScene.GetRenderingQueuesDumpString(dumpEmptyRenderingQueues: true);
+            return dxScene.GetRenderingQueuesDumpString(dumpEmptyRenderingQueues: false);
         }
 
         private void DumpResources()
@@ -1274,6 +1383,90 @@ StateChangesCount: {15:#,##0}{16}{17}",
         {
             var dxEngineSettingsDump = GetDXEngineSettingsDump();
             ShowInfoText(dxEngineSettingsDump);
+        }
+        
+        private void EditDXEngineSettings()
+        {
+            if (DXView == null || DXView.DXScene == null)
+                return;
+
+            if (_settingsEditorWindow != null)
+            {
+                if (_settingsEditorWindow.CurrentDXScene == DXView.DXScene)
+                {
+                    _settingsEditorWindow.Focus();
+                    return;
+                }
+
+                // DXScene changed - close opened window
+                try
+                {
+                    _settingsEditorWindow.Close();
+                }
+                catch
+                {
+                    // Maybe the window was already closed
+                }
+            }
+
+            _settingsEditorWindow = new SettingsEditorWindow(DXView.DXScene);
+            _settingsEditorWindow.Owner = this;
+            _settingsEditorWindow.Left = this.Left;
+            _settingsEditorWindow.Top = this.Top + 80;
+
+            _settingsEditorWindow.ValueChanged += delegate(object sender, EventArgs args)
+            {
+                DXView.Refresh(); // Render the scene again
+            };
+
+            _settingsEditorWindow.Closing += delegate(object sender, CancelEventArgs args)
+            {
+                _settingsEditorWindow = null;
+            };
+
+            _settingsEditorWindow.Show();
+        }
+        
+        private void ShowRenderingFilterWindow()
+        {
+            if (DXView == null || DXView.DXScene == null)
+                return;
+
+            if (_renderingFilterWindow != null)
+            {
+                if (_renderingFilterWindow.CurrentDXScene == DXView.DXScene)
+                {
+                    _renderingFilterWindow.Focus();
+                    return;
+                }
+
+                // DXScene changed - close opened window
+                try
+                {
+                    _renderingFilterWindow.Close();
+                }
+                catch
+                {
+                    // Maybe the window was already closed
+                }
+            }
+
+            _renderingFilterWindow = new RenderingFilterWindow(DXView.DXScene);
+            _renderingFilterWindow.Owner = this;
+            _renderingFilterWindow.Left = this.Left;
+            _renderingFilterWindow.Top = this.Top + 80;
+
+            _renderingFilterWindow.ValueChanged += delegate(object sender, EventArgs args)
+            {
+                DXView.Refresh(); // Render the scene again
+            };
+
+            _renderingFilterWindow.Closing += delegate(object sender, CancelEventArgs args)
+            {
+                _renderingFilterWindow = null;
+            };
+
+            _renderingFilterWindow.Show();
         }
 
         private string GetDXEngineSettingsDump()
@@ -1742,11 +1935,11 @@ StateChangesCount: {15:#,##0}{16}{17}",
             return renderedBitmap;
         }
 
-        private void SaveRenderedBitmap(BitmapSource renderedBitmap)
+        private void SaveRenderedBitmap(BitmapSource renderedBitmap, bool openSavedImage = true, string initialFileName = null, string dialogTitle = null)
         {
             if (renderedBitmap == null)
             {
-                MessageBox.Show("No renderer image");
+                MessageBox.Show("No rendered image");
                 return;
             }
 
@@ -1758,27 +1951,28 @@ StateChangesCount: {15:#,##0}{16}{17}",
                 OverwritePrompt = true,
                 ValidateNames = false,
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = "DXEngineRender.png",
+                FileName = initialFileName ?? "DXEngineRender.png",
                 DefaultExt = "txt",
                 Filter = "png Image (*.png)|*.png",
-                Title = "Select file name to store the rendered image"
+                Title = dialogTitle ?? "Select file name to store the rendered image"
             };
 
             if (saveFileDialog.ShowDialog() ?? false)
             {
                 // write the bitmap to a file
-                using (FileStream imageStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                using (var imageStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
                 {
                     //JpegBitmapEncoder enc = new JpegBitmapEncoder();
-                    PngBitmapEncoder enc = new PngBitmapEncoder();
-                    BitmapFrame bitmapImage = BitmapFrame.Create(renderedBitmap);
+                    var enc = new PngBitmapEncoder();
+                    var bitmapImage = BitmapFrame.Create(renderedBitmap);
                     enc.Frames.Add(bitmapImage);
                     enc.Save(imageStream);
                 }
 
                 try
                 {
-                    StartProcess(saveFileDialog.FileName);
+                    if (openSavedImage)
+                        StartProcess(saveFileDialog.FileName);
                 }
                 catch
                 { }
@@ -1951,6 +2145,133 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
             StartProcess(DumpFileName);
         }
+
+        private void RenderObjectIdBitmap()
+        {
+            try
+            {
+                SetupObjectIdRendering();
+
+                var renderToBitmap = DXView.RenderToBitmap(DXView.DXScene.Width, DXView.DXScene.Height, preferedMultisampling: 0);
+
+                SaveRenderedBitmap(renderToBitmap, openSavedImage: true, initialFileName: "ObjectIds.png");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error rendering ObjectId bitmap:\r\n" + ex.Message);
+            }
+            finally
+            {
+                DisposeObjectIdRendering();
+            }
+        }
+        
+        private void DisposeObjectIdRendering()
+        {
+            if (_objectIdRenderingStep != null)
+            {
+                DXView.DXScene.RenderingSteps.Remove(_objectIdRenderingStep);
+
+                _objectIdRenderingStep.Dispose();
+                _objectIdRenderingStep = null;
+            }
+
+            if (_solidColorEffect != null)
+            {
+                _solidColorEffect.Dispose();
+                _solidColorEffect = null;
+            }
+
+            DXView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = true;
+        }
+
+        private void SetupObjectIdRendering()
+        {
+            if (DXView.DXScene == null)
+                return; // WPF 3d rendering
+
+
+            // Create a SolidColorEffect that will be used to render each objects with a color from object's id
+            _solidColorEffect = new SolidColorEffect();
+            _solidColorEffect.OverrideModelColor = true; // We will overwrite the object's color with color specified in SolidColorEffect.Color
+
+            DXView.DXScene.DXDevice.EffectsManager.RegisterEffect(_solidColorEffect);
+
+
+            // Create a custom rendering step that will be used instead of standard rendering step
+            _objectIdRenderingStep = new CustomActionRenderingStep("ObjectIdRenderingStep")
+            {
+                CustomAction = ObjectIdRenderingAction,
+            };
+
+            DXView.DXScene.RenderingSteps.AddAfter(DXView.DXScene.DefaultRenderObjectsRenderingStep, _objectIdRenderingStep);
+
+            DXView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = false;
+        }
+
+        private void ObjectIdRenderingAction(RenderingContext renderingContext)
+        {
+            var dxScene = renderingContext.DXScene;
+
+            // Apply per frame settings
+            _solidColorEffect.ApplyPerFrameSettings(renderingContext.UsedCamera, dxScene.Lights, renderingContext);
+
+            // Go through each rendering queue ...
+            var renderingQueues = dxScene.RenderingQueues;
+            for (var i = 0; i < renderingQueues.Count; i++)
+            {
+                var oneRenderingQueue = renderingQueues[i];
+                int objectsCount = oneRenderingQueue.Count;
+
+                // ... and each object in rendering queue.
+                for (int j = 0; j < objectsCount; j++)
+                {
+                    var oneRenderableObject = oneRenderingQueue[j];
+
+                    _solidColorEffect.Color = GetObjectIdColor4(i, j); // because _solidColorEffect.OverrideModelColor is true, the object will be rendered with color specified here and not with actual models color (set in material)
+
+                    // To get renderingQueueIndex and objectIndex back from color use:
+                    //GetObjectId(_solidColorEffect.Color, out renderingQueueIndex, out renderingQueueIndex);
+
+                    // Setup constant buffers and prepare shaders
+                    _solidColorEffect.ApplyMaterial(oneRenderableObject.Material, oneRenderableObject);
+
+                    // Draw the object
+                    oneRenderableObject.RenderGeometry(renderingContext);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Color4 GetObjectIdColor4(int renderingQueueIndex, int objectIndex)
+        {
+            // Encode renderingQueueIndex and objectIndex into 3 colors (rendering is done in 32 bits, so each color have 8 bits; but the Color4 requires float values for color (this is also what the shader gets as parameter)
+            // renderingQueueIndex is written to the 4 highest bits of the red color
+            // objectIndex is written to lower 4 bit in red and 8 bits in green and blue (max written index is 1.048.575).
+            // Note that in the current version of DXEngine we cannot use alpha color because
+            // if it is less than 1, the alpha blending is used (and also the color is premultiplied with alpha).
+            // In the next version, it will be possible to use all 4 color attributes and prevent alpha blending.
+            //
+            // If you already need more ids, then you may increase the available objects ids to 16.777.215 with using all 3 colors for objectIndex and not writing renderingQueueIndex (for example for rendering only objects in dxScene.StandardGeometryRenderingQueue)
+
+            float red = (float)((renderingQueueIndex << 4) + ((objectIndex >> 16) & 0x0F)) / 255f;
+            float green = (float)((objectIndex >> 8) & 0xFF) / 255f;
+            float blue = (float)(objectIndex & 0xFF) / 255f;
+
+            return new Color4(red, green, blue, 1f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetObjectId(Color4 idColor, out int renderingQueueIndex, out int objectIndex)
+        {
+            byte red = (byte)(idColor.Red * 255);
+            byte green = (byte)(idColor.Green * 255);
+            byte blue = (byte)(idColor.Blue * 255);
+
+            renderingQueueIndex = red >> 4;
+            objectIndex = ((red & 0x0F) << 16) + (green << 8) + blue;
+        }
+
 
         private void OnLogAction(DXDiagnostics.LogLevels logLevel, string logMessage)
         {
@@ -2224,44 +2545,48 @@ StateChangesCount: {15:#,##0}{16}{17}",
                 return;
 
 
-            string positionFormatString = "{0}: {1:0.#}\r\n";
-            string directionFormatString = "{0}: {1:0.##}\r\n";
+            string singleDigitFormatString = "{0}: {1:0.#}\r\n";
 
             var powerToysCamera = GetPowerToysCamera();
 
             if (powerToysCamera != null)
             {
-                AppendCameraPropertyValue(powerToysCamera, "Heading", sb, positionFormatString);
-                AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, positionFormatString);
+                AppendCameraPropertyValue(powerToysCamera, "Heading", sb, singleDigitFormatString);
+                AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, singleDigitFormatString);
 
-                string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, positionFormatString);
+                string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, singleDigitFormatString);
                 if (bankText != null && bankText != "0")
-                    AppendCameraPropertyValue(powerToysCamera, "Bank", sb, positionFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "Bank", sb, singleDigitFormatString);
 
-                string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, positionFormatString);
+                string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, singleDigitFormatString);
                 if (cameraType == "OrthographicCamera")
                 {
                     sb.Append("\r\nCameraType: OrthographicCamera\r\n");
-                    AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, positionFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, singleDigitFormatString);
                 }
                 else
                 {
-                    AppendCameraPropertyValue(powerToysCamera, "Distance", sb, positionFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "Distance", sb, singleDigitFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, singleDigitFormatString);
                 }
 
                 sb.AppendLine();
 
-                AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, positionFormatString);
-                AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, positionFormatString);
-                AppendCameraPropertyValue(powerToysCamera, "Offset", sb, positionFormatString);
+                AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, singleDigitFormatString);
+                AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, singleDigitFormatString);
+
+
+                string offsetText = AppendCameraPropertyValue(powerToysCamera, "Offset", null, singleDigitFormatString);
+                if (offsetText != "0, 0, 0")
+                    AppendCameraPropertyValue(powerToysCamera, "Offset", sb, singleDigitFormatString);
             }
 
             if (viewport3DCamera != null)
             {
                 sb.AppendLine();
 
-                AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, "{0}:      {1:0.#}\r\n");
-                AppendCameraPropertyValue(viewport3DCamera, "LookDirection", sb, directionFormatString);
+                AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, "CameraPosition: {1:0.#}\r\n");
+                AppendCameraPropertyValue(viewport3DCamera, "LookDirection", sb, "LookDirection:  {1:0.##}\r\n");
                 //AppendCameraPropertyValue(viewport3DCamera, "UpDirection", sb, directionFormatString);
             }
 
@@ -2353,6 +2678,12 @@ StateChangesCount: {15:#,##0}{16}{17}",
 
         private void SetSharpDXObjectTracking(bool newValue)
         {
+            // In SharpDX v3.0+ the call stack is get with throwing an exception and then getting the CallStack from it
+            // The reason for this is that this is the only way to get call stack in PCL.
+            // This kill performance totally (displaying exceptions in VS output) and can also break you into VS when break on exceptions is enabled.
+            // Usually we do not need to store stack trace so we just override the StackTraceProvider to always return empty string.
+            SharpDX.Diagnostics.ObjectTracker.StackTraceProvider = new Func<string>(() => "");
+
             SharpDX.Configuration.EnableObjectTracking = newValue;
         }
 
@@ -2371,8 +2702,15 @@ StateChangesCount: {15:#,##0}{16}{17}",
             {
                 var propertyValueString = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}", propertyValue);
 
+                propertyValueString = propertyValueString.Replace(",", ", "); // Add space after comma
+
                 if (sb != null)
-                    sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, formatString, propertyName, propertyValue);
+                {
+                    string finalString = string.Format(System.Globalization.CultureInfo.InvariantCulture, formatString, propertyName, propertyValue);
+                    finalString = finalString.Replace(",", ", "); // Add space after comma
+
+                    sb.AppendFormat(finalString);
+                }
 
                 return propertyValueString;
             }

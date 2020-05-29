@@ -38,6 +38,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private ModelVisual3D _rootModelVisual3D;
         private ModelVisual3D _hitLinesModelVisual3D;
+        private SphereVisual3D _sphereVisual3D;
+        private ModelVisual3D _teapotModelVisual3D;
+        private MeshObjectNode _pyramidMeshObjectNode;
+        private InstancedMeshGeometryVisual3D _instancedMeshGeometryVisual3D;
 
         public HitTestingSample()
         {
@@ -263,16 +267,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
 
             // SphereVisual3D
-            var sphereVisual3D = new Ab3d.Visuals.SphereVisual3D()
+            _sphereVisual3D = new Ab3d.Visuals.SphereVisual3D()
             {
                 CenterPosition = new Point3D(-50, 0, -50),
-                Radius = 30,
-                Material = new DiffuseMaterial(Brushes.Silver)
+                Radius         = 30,
+                Material       = new DiffuseMaterial(Brushes.Silver)
             };
 
-            sphereVisual3D.SetName("SphereVisual3D");
+            _sphereVisual3D.SetName("SphereVisual3D");
 
-            _rootModelVisual3D.Children.Add(sphereVisual3D);
+            _rootModelVisual3D.Children.Add(_sphereVisual3D);
 
 
             var readerObj = new ReaderObj();
@@ -280,15 +284,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             
             Ab3d.Utilities.ModelUtils.CenterAndScaleModel3D(teapotModel, centerPosition: new Point3D(50, 0, -50), finalSize: new Size3D(80, 80, 80), preserveAspectRatio: true);
 
-            var modelVisual3D = new ModelVisual3D()
+            _teapotModelVisual3D = new ModelVisual3D()
             {
                 Content = teapotModel
             };
 
             teapotModel.SetName("teapot Model3D");
-            modelVisual3D.SetName("teapot ModelVisual3D");
+            _teapotModelVisual3D.SetName("teapot ModelVisual3D");
 
-            _rootModelVisual3D.Children.Add(modelVisual3D);
+            _rootModelVisual3D.Children.Add(_teapotModelVisual3D);
 
 
             // InstancedMeshGeometryVisual3D
@@ -302,11 +306,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                                                                                                                zCount: 5, 
                                                                                                                useTransparency: false);
 
-            var instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(boxMesh3D.Geometry);
-            instancedMeshGeometryVisual3D.InstancesData = instancedData;
+            _instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(boxMesh3D.Geometry);
+            _instancedMeshGeometryVisual3D.InstancesData = instancedData;
 
-            instancedMeshGeometryVisual3D.SetName("InstancedMeshGeometryVisual3D");
-            _rootModelVisual3D.Children.Add(instancedMeshGeometryVisual3D);
+            _instancedMeshGeometryVisual3D.SetName("InstancedMeshGeometryVisual3D");
+            _rootModelVisual3D.Children.Add(_instancedMeshGeometryVisual3D);
 
 
 
@@ -319,12 +323,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 DiffuseColor = Colors.Gold.ToColor3()
             };
 
-            var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(dxMeshGeometry3D, standardMaterial);
+            _pyramidMeshObjectNode = new Ab3d.DirectX.MeshObjectNode(dxMeshGeometry3D, standardMaterial);
 
             _disposables.Add(dxMeshGeometry3D);
-            _disposables.Add(meshObjectNode);
+            _disposables.Add(_pyramidMeshObjectNode);
 
-            var sceneNodeVisual3D = new SceneNodeVisual3D(meshObjectNode);
+            var sceneNodeVisual3D = new SceneNodeVisual3D(_pyramidMeshObjectNode);
             sceneNodeVisual3D.SetName("SceneNodeVisual3D");
             _rootModelVisual3D.Children.Add(sceneNodeVisual3D);
         }
@@ -392,6 +396,51 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         private void GetAllHitObjectsButton_OnClick(object sender, RoutedEventArgs e)
         {
             GetAllHitTestObjects();
+        }
+
+        private void OnSphereIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            bool isHitTestVisible = SphereIsHitTestVisibleCheckBox.IsChecked ?? false;
+            SetIsHitTestVisible(_sphereVisual3D, isHitTestVisible);
+        }
+        
+        private void OnTeapotIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            bool isHitTestVisible = TeapotIsHitTestVisibleCheckBox.IsChecked ?? false;
+            SetIsHitTestVisible(_teapotModelVisual3D, isHitTestVisible);
+        }
+        
+        private void OnPyramidIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            _pyramidMeshObjectNode.IsHitTestVisible = PyramidIsHitTestVisibleCheckBox.IsChecked ?? false;
+        }
+        
+        private void OnBoxesIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            bool isHitTestVisible = BoxesIsHitTestVisibleCheckBox.IsChecked ?? false;
+            SetIsHitTestVisible(_instancedMeshGeometryVisual3D, isHitTestVisible);
+        }
+
+        private void SetIsHitTestVisible(ModelVisual3D modelVisual3D, bool isHitTestVisible)
+        {
+            var sceneNode = MainDXViewportView.GetSceneNodeForWpfObject(modelVisual3D);
+
+            if (sceneNode == null)
+                return;
+
+            sceneNode.IsHitTestVisible = isHitTestVisible;
         }
     }
 }

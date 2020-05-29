@@ -311,18 +311,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         {
             var instancedData = new InstanceData[xCount * yCount * zCount];
 
-            float xStep = (float)(size.X / xCount);
-            float yStep = (float)(size.Y / yCount);
-            float zStep = (float)(size.Z / zCount);
+            float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
+            float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
+            float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
 
             int i = 0;
-            for (int z = 0; z < zCount; z++)
+            for (int y = 0; y < yCount; y++)
             {
-                float zPos = (float)(center.Z - (size.Z / 2.0) + (z * zStep));
+                float yPos = (float)(center.Y - (size.Y / 2.0) + (y * yStep));
 
-                for (int y = 0; y < yCount; y++)
+                for (int z = 0; z < zCount; z++)
                 {
-                    float yPos = (float)(center.Y - (size.Y / 2.0) + (y * yStep));
+                    float zPos = (float)(center.Z - (size.Z / 2.0) + (z * zStep));
 
                     for (int x = 0; x < xCount; x++)
                     {

@@ -31,7 +31,7 @@
 
         </Border>
 
-        <cameras:TargetPositionCamera Name="Camera1" Heading="60" Attitude="-20" Bank="0" Distance="240" TargetPosition="15 10 0"
+        <cameras:TargetPositionCamera Name="Camera1" Heading="60" Attitude="-20" Bank="0" Distance="260" TargetPosition="15 10 0"
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 

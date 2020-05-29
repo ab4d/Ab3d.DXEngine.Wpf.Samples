@@ -96,7 +96,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             MainDXViewportView.SceneRendered += delegate(object sender, EventArgs args)
             {
-                _totalRenderingTime = MainDXViewportView.DXScene.Statistics.TotalRenderTimeMs;
+                if (MainDXViewportView.DXScene != null)
+                    _totalRenderingTime = MainDXViewportView.DXScene.Statistics.TotalRenderTimeMs;
+
                 _renderingTimeSamplesCount++;
             };
 

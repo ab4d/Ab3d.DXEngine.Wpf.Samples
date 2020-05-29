@@ -25,6 +25,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     /// </summary>
     public partial class InstancedMeshGeometry3DTest : Page
     {
+        private int _hiddenInstancesStartIndex;
+        private int _hiddenInstancesCount;
+
+        private InstancedMeshGeometryVisual3D _instancedMeshGeometryVisual3D;
+
         public InstancedMeshGeometry3DTest()
         {
             InitializeComponent();
@@ -56,7 +61,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             if (MeshTypeComboBox.SelectedIndex == 2) // Bunnies
             {
-                // Load standard Standfor Bunny model (res3) with 11533 position
+                // Load standard Stanford Bunny model (res3) with 11533 position
                 meshGeometry3D = LoadMeshFromObjFile("bun_zipper_res3.obj");
 
                 var bounds = meshGeometry3D.Bounds;
@@ -81,25 +86,30 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
 
             bool useTransparency = UseTransparencyCheckBox.IsChecked ?? false;
-            float alphaColor = useTransparency ? 0.3f : 1.0f; // When we use transparency, we set alpha color to 0.3 (we also need to set UseAlphaBlend to true - see below)
 
             // The following method prepare InstanceData array with data for each instance (WorldMatrix and Color)
             InstanceData[] instancedData = CreateInstancesData(new Point3D(0, 200, 0), new Size3D(400, 400, 400), (float)modelScaleFactor, 20, selectedInstancesYCount, 20, useTransparency);
 
+            if (_hiddenInstancesCount > 0)
+            {
+                _hiddenInstancesCount = 0;
+                ShowHideInstancesButton.Content = "Hide some instances";
+            }
+
 
             // Create InstancedGeometryVisual3D with selected meshGeometry and InstancesData
-            var instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(meshGeometry3D);
-            instancedMeshGeometryVisual3D.InstancesData = instancedData;
+            _instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(meshGeometry3D);
+            _instancedMeshGeometryVisual3D.InstancesData = instancedData;
 
             // When we use transparency, we also need to set UseAlphaBlend to true
-            instancedMeshGeometryVisual3D.UseAlphaBlend = useTransparency;
+            _instancedMeshGeometryVisual3D.UseAlphaBlend = useTransparency;
 
             // If we would only change the InstancedData we would need to call Update method (but here this is not needed because we have set the data for the first time)
             //_instancedGeometryVisual3D.Update();
 
 
             ObjectsPlaceholder.Children.Clear();
-            ObjectsPlaceholder.Children.Add(instancedMeshGeometryVisual3D);
+            ObjectsPlaceholder.Children.Add(_instancedMeshGeometryVisual3D);
 
 
             // Update statistics:
@@ -146,9 +156,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             var instancedData = new InstanceData[xCount * yCount * zCount];
 
-            float xStep = (float)(size.X / xCount);
-            float yStep = (float)(size.Y / yCount);
-            float zStep = (float)(size.Z / zCount);
+            float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
+            float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
+            float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
 
             int i = 0;
             for (int z = 0; z < zCount; z++)
@@ -229,6 +239,50 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 return;
 
             CreateInstances();
+        }
+        
+        private void ShowHideInstancesButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_hiddenInstancesCount > 0)
+            {
+                // Show hidden instances
+                ChangeAlphaColor(_hiddenInstancesStartIndex, _hiddenInstancesCount, newAlpha: 1);
+
+                _hiddenInstancesCount = 0;
+                ShowHideInstancesButton.Content = "Hide some instances";
+            }
+            else
+            {
+                // Hide instances
+                // To quickly discard some instances set their color's alpha value to 0.
+                // Then call _instancedMeshGeometryVisual3D.Update method.
+                
+                int instancesCount = _instancedMeshGeometryVisual3D.InstancesData.Length;
+
+                _hiddenInstancesCount = (int)(instancesCount * 0.25); // Hide 1/4 of instances
+
+                var rnd = new Random();
+                _hiddenInstancesStartIndex = rnd.Next(instancesCount - _hiddenInstancesCount - 1);
+
+                ChangeAlphaColor(_hiddenInstancesStartIndex, _hiddenInstancesCount, newAlpha: 0);
+
+                ShowHideInstancesButton.Content = "Show hidden instances";
+            }
+        }
+
+        private void ChangeAlphaColor(int startIndex, int count, float newAlpha)
+        {
+            var instancedData = _instancedMeshGeometryVisual3D.InstancesData;
+
+            int endIndex = startIndex + count;
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                var color = instancedData[i].DiffuseColor;
+                instancedData[i].DiffuseColor = new Color4(color.Red, color.Green, color.Blue, newAlpha);
+            }
+
+            // When only some instances data are changed, then provide startIndex and count to Update method.
+            _instancedMeshGeometryVisual3D.Update(startIndex, count, updateBounds: false); // If actual bounds are slightly smaller, then this is not a problem, so preserve the bounds
         }
     }
 }

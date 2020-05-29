@@ -145,6 +145,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             Camera1.CameraChanged += delegate (object sender, CameraChangedRoutedEventArgs args)
             {
+                if (MainDXViewportView.DXScene == null)
+                    return;
+
                 MainDXViewportView.DXScene.Camera.Update();
                 double pixelSize = OptimizedPointMesh<PositionNormal>.GetPixel3DSize(MainDXViewportView.DXScene.Camera, MainDXViewportView.DXScene.Width, new Vector3(0, 0, 0));
 

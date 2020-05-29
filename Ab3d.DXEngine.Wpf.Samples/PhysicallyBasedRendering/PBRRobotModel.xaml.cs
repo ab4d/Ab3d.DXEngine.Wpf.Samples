@@ -547,13 +547,32 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
                         if (!_texturesCache.TryGetValue(oneFileName, out shaderResourceView))
                         {
-                            var convertTo32bppPRGBA = (textureType == TextureMapTypes.BaseColor ||
-                                                       textureType == TextureMapTypes.Albedo ||
-                                                       textureType == TextureMapTypes.DiffuseColor);
+                            var isBaseColor = (textureType == TextureMapTypes.BaseColor ||
+                                               textureType == TextureMapTypes.Albedo ||
+                                               textureType == TextureMapTypes.DiffuseColor);
 
-                            shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, oneFileName, loadDdsIfPresent: false, convertTo32bppPRGBA: convertTo32bppPRGBA);
-                            
+                            // To load a texture from file, you can use the TextureLoader.LoadShaderResourceView (this supports loading standard image files and also loading dds files).
+                            // This method returns a ShaderResourceView and it can also set a textureInfo parameter that defines some of the properties of the loaded texture (bitmap size, dpi, format, hasTransparency).
+                            TextureInfo textureInfo;
+                            shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.Device,
+                                                                                                   oneFileName,
+                                                                                                   loadDdsIfPresent: true,
+                                                                                                   convertTo32bppPRGBA: isBaseColor,
+                                                                                                   generateMipMaps: true,
+                                                                                                   textureInfo: out textureInfo);
+
                             physicallyBasedMaterial.TextureMaps.Add(new TextureMapInfo((Ab3d.DirectX.Materials.TextureMapTypes)textureType, shaderResourceView, null, oneFileName));
+
+                            if (isBaseColor)
+                            {
+                                // Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+                                // Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+                                var recommendedBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
+                                
+                                physicallyBasedMaterial.BlendState      = recommendedBlendState;
+                                physicallyBasedMaterial.HasTransparency = textureInfo.HasTransparency;
+                            }
+
 
                             _texturesCache.Add(oneFileName, shaderResourceView);
                         }

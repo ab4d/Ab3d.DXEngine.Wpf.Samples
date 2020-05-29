@@ -62,12 +62,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 if (MainDXViewportView.DXScene != null)
                 {
-                    // Load texture file into ShaderResourceView (in our case we load dds file; but we could also load png file)
                     string textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/10x10-texture.png");
-                    var loadedShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, textureFileName);
+
+                    // To load a texture from file, you can use the TextureLoader.LoadShaderResourceView (this supports loading standard image files and also loading dds files).
+                    // This method returns a ShaderResourceView and it can also set a textureInfo parameter that defines some of the properties of the loaded texture (bitmap size, dpi, format, hasTransparency).
+                    TextureInfo textureInfo;
+                    var loadedShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.Device, textureFileName, out textureInfo);
 
                     _disposables.Add(loadedShaderResourceView);
 
+
+                    // Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+                    // Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+                    var recommendedBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
 
                     _planarShadowRenderingProvider = new PlanarShadowRenderingProvider()
                     {
@@ -79,7 +86,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                         ShadowPlaneMaterial = new StandardMaterial()
                         {
                             DiffuseColor = Color3.White, // When DiffuseTextures are set, then DiffuseColor is used as a color filter (White means no filter)
-                            DiffuseTextures = new ShaderResourceView[] { loadedShaderResourceView }
+                            DiffuseTextures = new ShaderResourceView[] { loadedShaderResourceView },
+                            TextureBlendState = recommendedBlendState,
+                            HasTransparency = textureInfo.HasTransparency
                         },
 
                         ShadowPlaneBackMaterial = new StandardMaterial()

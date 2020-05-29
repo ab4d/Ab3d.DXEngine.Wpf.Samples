@@ -245,7 +245,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 textureMapSelectionControl.LayoutTransform = new ScaleTransform(0.75, 0.75);
 
                 if (MainDXViewportView.DXScene != null)
-                    textureMapSelectionControl.Device = MainDXViewportView.DXScene.Device;
+                    textureMapSelectionControl.DXDevice = MainDXViewportView.DXScene.DXDevice;
 
                 //TextureMapsPanel.Children.Add(textureMapSelectionControl);
                 stackPanel.Children.Add(textureMapSelectionControl);
@@ -511,29 +511,32 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
                         if (!_texturesCache.TryGetValue(oneFileName, out shaderResourceView))
                         {
-                            var convertTo32bppPRGBA = (textureType == TextureMapTypes.BaseColor ||
-                                                       textureType == TextureMapTypes.Albedo ||
-                                                       textureType == TextureMapTypes.DiffuseColor);
+                            var isBaseColor = (textureType == TextureMapTypes.BaseColor ||
+                                               textureType == TextureMapTypes.Albedo ||
+                                               textureType == TextureMapTypes.DiffuseColor);
 
-                            //if (convertTo32bppPRGBA)
-                            //{
-                            //    //shaderResourceView = Ab3d.DirectX.TextureLoader.CreateOnePixelTexture(MainDXViewportView.DXScene.DXDevice.Device, Color4.White);
-                            //    if (_uvCheckerShaderResourceView == null)
-                            //    {
-                            //        _uvCheckerShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, _texturesFolder + "uvchecker.png");
-                            //        _disposables.Add(_uvCheckerShaderResourceView);
-                            //    }
-
-                            //    shaderResourceView = _uvCheckerShaderResourceView;
-                            //}
-                            //else
-                            {
-                                shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, oneFileName, loadDdsIfPresent: false, convertTo32bppPRGBA: convertTo32bppPRGBA);
-                            }
-                            //var shaderResourceView = new ShaderResourceView(IntPtr.Zero);
-
+                            // To load a texture from file, you can use the TextureLoader.LoadShaderResourceView (this supports loading standard image files and also loading dds files).
+                            // This method returns a ShaderResourceView and it can also set a textureInfo parameter that defines some of the properties of the loaded texture (bitmap size, dpi, format, hasTransparency).
+                            TextureInfo textureInfo;
+                            shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.Device, 
+                                                                                                   oneFileName,
+                                                                                                   loadDdsIfPresent: true,
+                                                                                                   convertTo32bppPRGBA: isBaseColor,
+                                                                                                   generateMipMaps: true,
+                                                                                                   textureInfo: out textureInfo);
 
                             physicallyBasedMaterial.TextureMaps.Add(new TextureMapInfo((Ab3d.DirectX.Materials.TextureMapTypes) textureType, shaderResourceView, null, oneFileName));
+
+                            if (isBaseColor)
+                            {
+                                // Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+                                // Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+                                var recommendedBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
+
+                                physicallyBasedMaterial.BlendState      = recommendedBlendState;
+                                physicallyBasedMaterial.HasTransparency = textureInfo.HasTransparency;
+                            }
+
 
                             _texturesCache.Add(oneFileName, shaderResourceView);
                         }
@@ -584,7 +587,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void EnvironmentMapCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
             UpdateEnvironmentMap();

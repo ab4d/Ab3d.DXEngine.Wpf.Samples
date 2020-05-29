@@ -12,7 +12,7 @@ namespace Ab3d.DirectX.Client.Settings
     /// </summary>
     public partial class DXEngineSettingsPanel : UserControl
     {
-        private readonly int[] _possibleDpiValues = new[] {96, 120, 144, 192};
+        private readonly int[] _possibleDpiValues = new[] {96, 120, 144, 168, 192, 288};
 
         private bool _isInternalChange;
 
@@ -177,25 +177,31 @@ namespace Ab3d.DirectX.Client.Settings
         {
             if (_selectedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D)
             {
-                CustomSettingsGrid.Visibility = Visibility.Collapsed;
+                QualityTextBlock.Visibility = Visibility.Collapsed;
+                QualityComboBox.Visibility  = Visibility.Collapsed;
                 QualityComboBox.IsEnabled = false;
-
+                
                 DpiTitleTextBlock.Visibility = Visibility.Collapsed;
                 DpiComboBox.Visibility = Visibility.Collapsed;
 
-                QualityTextBlock.Visibility = Visibility.Collapsed;
-                QualityComboBox.Visibility = Visibility.Collapsed;
+                CustomSettingsGrid.Visibility = Visibility.Collapsed;
+
+                MaxThreadsTextBlock.Visibility = Visibility.Collapsed;
+                MaxThreadsGrid.Visibility = Visibility.Collapsed;
             }
             else
             {
                 QualityTextBlock.Visibility = Visibility.Visible;
                 QualityComboBox.Visibility = Visibility.Visible;
+                QualityComboBox.IsEnabled = true;
 
                 DpiTitleTextBlock.Visibility = Visibility.Visible;
                 DpiComboBox.Visibility = Visibility.Visible;
 
                 CustomSettingsGrid.Visibility = Visibility.Visible;
-                QualityComboBox.IsEnabled = true;
+                
+                MaxThreadsTextBlock.Visibility = Visibility.Visible;
+                MaxThreadsGrid.Visibility = Visibility.Visible;
 
                 _isInternalChange = true;
 
@@ -385,7 +391,10 @@ namespace Ab3d.DirectX.Client.Settings
             // First entry is "System default"
             var systemDefaultComboBoxItem = new ComboBoxItem()
             {
-                Content = string.Format("System default - {0:0} DPI (scale: {1:0.0})", 96.0 * systemDpiScale, systemDpiScale),
+                Content = string.Format(System.Globalization.CultureInfo.InvariantCulture, 
+                                        "System default - {0:0} DPI (scale: {1:0.0#})", 
+                                        96.0 * systemDpiScale, systemDpiScale),
+
                 Tag = double.NaN // Tag = DpiScale (NaN = system default)
             };
 
@@ -400,7 +409,10 @@ namespace Ab3d.DirectX.Client.Settings
 
                 var comboBoxItem = new ComboBoxItem()
                 {
-                    Content = string.Format("{0:0} DPI (scale: {1:0.0})", possibleDpiValue, scale),
+                    Content = string.Format(System.Globalization.CultureInfo.InvariantCulture, 
+                                            "{0:0} DPI (scale: {1:0.0#})", 
+                                            possibleDpiValue, scale),
+
                     Tag = scale // Tag = DpiScale 
                 };
 

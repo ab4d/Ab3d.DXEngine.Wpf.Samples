@@ -187,7 +187,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 catch
                 { }
 
-                if (_dxScene.DXDevice.Adapter != null)
+                if (_dxScene.DXDevice.Adapter != null && !_dxScene.DXDevice.Adapter.IsDisposed)
                 {
                     string adapterDescription = _dxScene.DXDevice.Adapter.Description1.Description.Trim();
 
@@ -214,8 +214,10 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 sb.AppendLine();
 
 
-                sb.AppendFormat("DXScene size: {0} x {1}\r\n", _dxScene.Width, _dxScene.Height);
-                sb.AppendFormat("IsDebugDevice: {0}\r\n",      _dxScene.DXDevice.IsDebugDevice);
+                sb.AppendFormat("DXScene size: {0} x {1}\r\n",        _dxScene.Width, _dxScene.Height);
+                sb.AppendFormat("IsDebugDevice: {0}\r\n",             _dxScene.DXDevice.IsDebugDevice);
+                sb.AppendFormat("MaxBackgroundThreadsCount: {0}\r\n", _dxScene.MaxBackgroundThreadsCount);
+                sb.AppendFormat("IsCachingCommandLists: {0}\r\n",     _dxScene.IsCachingCommandLists);
 
                 if (_dxView.UsedGraphicsProfile != null)
                     sb.AppendFormat("UsedGraphicsProfile: {0}\r\n", _dxView.UsedGraphicsProfile.DisplayName);

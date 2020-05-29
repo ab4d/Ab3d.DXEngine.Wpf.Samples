@@ -50,19 +50,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void OnDXSceneDeviceCreated(object sender, EventArgs eventArgs)
         {
-            if (MainDXViewportView.DXScene == null)
-                return;
-
-            var device = MainDXViewportView.DXScene.DXDevice.Device;
+            var d3dDevice = MainDXViewportView.DXScene.Device;
 
             string textureBaseFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BricksMaps\");
-            string diffuseTextureFilePath = textureBaseFolder + "bricks.png";
-            string normalTextureFilePath = textureBaseFolder + "bricks_normal.png";
+            string diffuseTextureFilePath  = textureBaseFolder + "bricks.png";
+            string normalTextureFilePath   = textureBaseFolder + "bricks_normal.png";
             string specularTextureFilePath = textureBaseFolder + "bricks_specular.png";
 
-            _diffuseShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(device, diffuseTextureFilePath);
-            _normalShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(device, normalTextureFilePath, loadDdsIfPresent: false, convertTo32bppPRGBA: false);
-            _specularShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(device, specularTextureFilePath, loadDdsIfPresent: false, convertTo32bppPRGBA: false);
+            TextureInfo textureInfo;
+            _diffuseShaderResourceView  = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(d3dDevice, diffuseTextureFilePath, out textureInfo);
+            _normalShaderResourceView   = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(d3dDevice, normalTextureFilePath, loadDdsIfPresent: false, convertTo32bppPRGBA: false);
+            _specularShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(d3dDevice, specularTextureFilePath, loadDdsIfPresent: false, convertTo32bppPRGBA: false);
 
             _disposables.Add(_diffuseShaderResourceView);
             _disposables.Add(_normalShaderResourceView);
@@ -80,10 +78,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _multiMapMaterial.SpecularPower = 64;
             _multiMapMaterial.SpecularColor = Colors.White.ToColor3();
 
+            _multiMapMaterial.HasTransparency = textureInfo.HasTransparency;
+
+            // Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+            // Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+            _multiMapMaterial.BlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
+
             // We could manually set texture maps, but this will be done in the UpdateSelectedMaps method that is called below
             //_multiMapMaterial.TextureMaps.Add(new TextureMapInfo(TextureMapTypes.DiffuseColor, _diffuseShaderResourceView, null, diffuseTextureFilePath));
             //_multiMapMaterial.TextureMaps.Add(new TextureMapInfo(TextureMapTypes.NormalMap, _normalShaderResourceView, null, normalTextureFilePath));
             //_multiMapMaterial.TextureMaps.Add(new TextureMapInfo(TextureMapTypes.SpecularColor, _specularShaderResourceView, null, specularTextureFilePath));
+
 
             UpdateSelectedMaps();
 
@@ -177,12 +182,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             bool isChanged = false;
 
-            for (var i = multiMapMaterial.TextureMaps.Count - 1; i >= 0; i--)
+            if (multiMapMaterial != null)
             {
-                if (multiMapMaterial.TextureMaps[i].MapType == mapType)
+                for (var i = multiMapMaterial.TextureMaps.Count - 1; i >= 0; i--)
                 {
-                    multiMapMaterial.TextureMaps.RemoveAt(i);
-                    isChanged = true;
+                    if (multiMapMaterial.TextureMaps[i].MapType == mapType)
+                    {
+                        multiMapMaterial.TextureMaps.RemoveAt(i);
+                        isChanged = true;
+                    }
                 }
             }
 
@@ -193,7 +201,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             bool isChanged = false;
 
-            if (multiMapMaterial.TextureMaps.All(m => m.MapType != mapType)) // If this map type is not yet added, then add it now
+            if (multiMapMaterial != null && multiMapMaterial.TextureMaps.All(m => m.MapType != mapType)) // If this map type is not yet added, then add it now
             {
                 multiMapMaterial.TextureMaps.Add(new TextureMapInfo(mapType, shaderResourceView));
                 isChanged = true;

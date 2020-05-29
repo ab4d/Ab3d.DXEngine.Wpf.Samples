@@ -29,6 +29,9 @@ using Color = SharpDX.Color;
 // This sample shows many 3D boxes that are defined by MeshObjectNode objects.
 // A much more optimal way to show that many 3D boxes is to use object instancing with InstancedMeshGeometryVisual3D,
 // but in this sample we need to simulate rendering of a very complex scene with many different SceneNodes objects (each with its own MeshGeometry3D).
+//
+// The sample can also show many instances of ScreenSpaceLineNode to simulate showing many different 3D lines.
+// It would be much better to use a single ScreenSpaceLineNode and set all line positions to that object.
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -48,11 +51,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private List<double> _completeRenderTimes;
         private List<double> _totalRenderTimes;
 
+        private DisposeList _disposables;
+
         private int _lastSceneGenerationTimeInTicks;
 
         private SceneNodeVisual3D _sceneNodeVisual3D;
 
         private PerformanceAnalyzer _performanceAnalyzer;
+
+        public enum ObjectsTypes
+        {
+            None = 0,
+            SingleColorBoxes,
+            MultiColorBoxes,
+            SingleColorLines,
+            MultiColorLines,
+            MultiColorBoxesAndLines
+        }
 
         public enum LightingMode
         {
@@ -64,6 +79,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         }
 
         private LightingMode _currentLightingMode;
+        private ObjectsTypes _currentObjectsType;
+
         private Window _parentWindow;
         private int _objectsCount;
         private double _lastTotalRenderTime;
@@ -83,7 +100,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             InitializeComponent();
 
+            IsCachingCommandListsInfoControl.InfoText =
+@"When checked then Ab3d.DXEngine records all DirectX commands into DirectX CommandLists and
+reuses the command lists on next frame if only camera and light properties have changed.
+
+In this case only the new camera data is loaded into the graphics card and then all the previously rendered
+CommandLists are replayed. This way the rendering performance is greatly improved because the render time is almost zero 
+(this is the time to prepare and process the DirectX commands by the Ab3d.DXEngine and by the DirectX and drives).
+
+Note that command list caching works only for non-transparent standard geometry objects with WpfMaterial or StandardMaterial.
+
+In this sample you can see command list caching in action with observing the DrawRenderTime.
+When command list caching is used, then this time is very small because there is no need to set all DirectX
+rendering states and invoke DirectX draw calls. The time for that can be observed when caching is disabled.";
+
             _currentLightingMode = LightingMode.DirectionalLight;
+            _currentObjectsType = ObjectsTypes.MultiColorBoxes;
 
             // Create DXViewportView in code behind because we need to support changing PresentationType and
             // this requires that the DXViewportView is recreated from scratch.
@@ -93,17 +125,30 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             ThreadsCountSlider.Maximum = maxBackgroundThreadsCount; 
             ThreadsCountSlider.Value = maxBackgroundThreadsCount;
 
+            ObjectsTypeComboBox.ItemsSource = Enum.GetNames(typeof(ObjectsTypes));
+            ObjectsTypeComboBox.SelectedValue = _currentObjectsType.ToString();
+
             var possibleObjectCounts = new int[] {100, 200, 500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 160000, 320000};
             ObjectsCountComboBox.ItemsSource = possibleObjectCounts;
             ObjectsCountComboBox.SelectedIndex = Array.IndexOf(possibleObjectCounts, 20000);
 
-            CreateTestScene(possibleObjectCounts[ObjectsCountComboBox.SelectedIndex]);
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                CreateTestScene(possibleObjectCounts[ObjectsCountComboBox.SelectedIndex]);
+
+                _camera1.StartRotation(45, 0);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
 
             _drawRenderTimes     = new List<double>();
             _completeRenderTimes = new List<double>();
             _totalRenderTimes    = new List<double>();
 
-
+            
             // Enable collecting statistics
             DXDiagnostics.IsCollectingStatistics = true;
 
@@ -117,7 +162,6 @@ TotalTimeTextBlock: shows time that is spend in DXEngine to render one frame. Ba
 WPF FPS: shows number of frames per second in this WPF application (WPF has a cap on 60 frames per second).";
 
 
-
             this.Loaded += delegate(object sender, RoutedEventArgs args)
             {
                 _parentWindow = Window.GetWindow(this);
@@ -128,6 +172,12 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
             {
+                if (_disposables != null)
+                {
+                    _disposables.Dispose();
+                    _disposables = null;
+                }
+
                 if (_parentWindow != null)
                     _parentWindow.PreviewKeyDown -= ParentWindowOnPreviewKeyDown;
 
@@ -201,15 +251,15 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             var maxBackgroundThreadsCount = (int)ThreadsCountSlider.Value;
             _mainDXViewportView.DXSceneDeviceCreated += delegate(object sender, EventArgs args)
             {
-                if (_mainDXViewportView.DXScene != null)
-                    _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = maxBackgroundThreadsCount;
+                _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = maxBackgroundThreadsCount;
+                _mainDXViewportView.DXScene.IsCachingCommandLists = IsCachingCommandListsCheckBox.IsChecked ?? false;
             };
 
             _mainDXViewportView.SceneRendered += MainDxViewportViewOnSceneRendered;
 
             ViewportBorder.Child = _mainDXViewportView;
 
-            _camera1.StartRotation(40, 0);
+            //_camera1.StartRotation(40, 0);
 
 
             // Notify MainWindow about a new MainDXViewportView - so we can open DiagnosticsWindow
@@ -227,7 +277,12 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             if (_mainDXViewportView.DXScene == null)
                 return;
 
-            if (args.Key == Key.Down)
+            if (args.Key == Key.Return || args.Key == Key.Enter)
+            {
+                IsCachingCommandListsCheckBox.IsChecked = !(IsCachingCommandListsCheckBox.IsChecked ?? false);
+                args.Handled = true;
+            }
+            else if (args.Key == Key.Down)
             {
                 if (ThreadsCountSlider.Value > 0)
                     ThreadsCountSlider.Value --; // The MainDXViewportView.DXScene.MaxBackgroundThreadsCount will be updated in the ValueChanged handler
@@ -280,21 +335,55 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
             try
             {
+                if (_disposables != null)
+                    _disposables.Dispose();
+
                 if (_sceneNodeVisual3D != null)
                 {
                     _mainViewport3D.Children.Remove(_sceneNodeVisual3D);
+
                     _sceneNodeVisual3D.SceneNode.Dispose();
+                    _sceneNodeVisual3D = null;
                 }
 
+
+                _disposables = new DisposeList();
 
                 var boxMesh = new BoxMesh3D(new Point3D(0, 0, 0), new Size3D(1, 1, 1), 1, 1, 1).Geometry;
 
                 int modelsXZCount = totalModelsCount < 2500 ? 10 : 50;
                 int modelsYCount = totalModelsCount / (modelsXZCount * modelsXZCount);
 
-                var sceneNode = CreateSceneNodes(boxMesh, new Point3D(0, 0, 0), new Size3D(500, modelsYCount * 10, 500), 5, modelsXZCount, modelsYCount, modelsXZCount);
+                bool useSingleColor = _currentObjectsType == ObjectsTypes.SingleColorBoxes || _currentObjectsType == ObjectsTypes.SingleColorLines;
 
-                _objectsCount = sceneNode.ChildNodesCount;
+                SceneNode sceneNode;
+
+                if (_currentObjectsType == ObjectsTypes.MultiColorBoxes || _currentObjectsType == ObjectsTypes.SingleColorBoxes)
+                {
+                    sceneNode = CreateBoxSceneNodes(boxMesh, new Point3D(0, 0, 0), new Size3D(500, modelsYCount * 10, 500), 5, useSingleColor, modelsXZCount, modelsYCount, modelsXZCount);
+                }
+                else if (_currentObjectsType == ObjectsTypes.MultiColorLines || _currentObjectsType == ObjectsTypes.SingleColorLines)
+                {
+                    sceneNode = CreateLineSceneNodes(new Point3D(0, 0, 0), new Size3D(500, modelsYCount * 10, 500), useSingleColor, modelsXZCount, modelsYCount, modelsXZCount, _disposables);
+                }
+                else if (_currentObjectsType == ObjectsTypes.MultiColorBoxesAndLines)
+                {
+                    sceneNode = new SceneNode();
+                    var sceneNode1 = CreateBoxSceneNodes(boxMesh, new Point3D(0, -modelsYCount * 2.5 - 10, 0), new Size3D(500, modelsYCount * 5, 500), 5, useSingleColor, modelsXZCount, modelsYCount / 2, modelsXZCount);
+                    var sceneNode2 = CreateLineSceneNodes(        new Point3D(0,  modelsYCount * 2.5 + 10, 0), new Size3D(500, modelsYCount * 5, 500),    useSingleColor, modelsXZCount, modelsYCount / 2, modelsXZCount, _disposables);
+
+                    sceneNode.AddChild(sceneNode1);
+                    sceneNode.AddChild(sceneNode2);
+                }
+                else
+                {
+                    sceneNode = null;
+                }
+
+                if (sceneNode == null)
+                    return;
+
+                _objectsCount = totalModelsCount;
 
                 _sceneNodeVisual3D = new SceneNodeVisual3D(sceneNode);
                 _mainViewport3D.Children.Add(_sceneNodeVisual3D);
@@ -415,7 +504,7 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             _lightsGroup.Children.Add(ambientLight);
         }
 
-        public static SceneNode CreateSceneNodes(MeshGeometry3D mesh, Point3D center, Size3D size, float modelScaleFactor, int xCount, int yCount, int zCount)
+        public static SceneNode CreateBoxSceneNodes(MeshGeometry3D mesh, Point3D center, Size3D size, float modelScaleFactor, bool useSingleColor, int xCount, int yCount, int zCount)
         {
             var rootSceneNode = new SceneNode();
 
@@ -424,6 +513,11 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             float xStep = (float)(size.X / xCount);
             float yStep = (float)(size.Y / yCount);
             float zStep = (float)(size.Z / zCount);
+
+            var singleColorStandardMaterial = new StandardMaterial()
+            {
+                DiffuseColor = Colors.Orange.ToColor3()
+            };
 
             for (int z = 0; z < zCount; z++)
             {
@@ -444,15 +538,113 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
                                                         0, 0, modelScaleFactor, 0,
                                                         xPos, yPos, zPos, 1);
 
-                        var standardMaterial = new StandardMaterial()
-                        {
-                            DiffuseColor = new Color3((float)x / (float)xCount, yPercent, zPercent)
-                        };
+                        StandardMaterial usedMaterial;
 
-                        var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(dxMeshGeometry3D, standardMaterial);
+                        if (useSingleColor)
+                        {
+                            // Using single color does not improve performance because for each rendered box we need to
+                            // update constant buffer with different transformation matrix. 
+                            // However, the performance would be improved by almost 30% if all the boxes would have the
+                            // same color and transformation. But then we would need to provide many different meshes
+                            // and this would greatly decrease initialization time and also slightly decrease performance.
+                            // See CreateLineSceneNodes for sample with lines when single color improves performance.
+                            usedMaterial = singleColorStandardMaterial;
+                        }
+                        else
+                        {
+                            usedMaterial = new StandardMaterial()
+                            {
+                                DiffuseColor = new Color3((float) x / (float) xCount, yPercent, zPercent)
+                            };
+                        }
+
+                        // NOTE:
+                        // This sample shows many 3D boxes that are defined by MeshObjectNode objects.
+                        // A much more optimal way to show that many 3D boxes is to use object instancing with InstancedMeshGeometryVisual3D,
+                        // but in this sample we need to simulate rendering of a very complex scene with many different SceneNodes objects (each with its own MeshGeometry3D).
+
+                        var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(dxMeshGeometry3D, usedMaterial);
                         meshObjectNode.Transform = new Transformation(matrix);
 
                         rootSceneNode.AddChild(meshObjectNode);
+                    }
+                }
+            }
+
+            return rootSceneNode;
+        }
+
+        public static SceneNode CreateLineSceneNodes(Point3D center, Size3D size, bool useSingleColor, int xCount, int yCount, int zCount, DisposeList disposables)
+        {
+            var rootSceneNode = new SceneNode();
+
+            float xStep = (float)(size.X / xCount);
+            float yStep = (float)(size.Y / yCount);
+            float zStep = (float)(size.Z / zCount);
+
+            float xHalfLineSize = xStep * 0.3f;
+            //float yHalfLineSize = xStep * 0.3f;
+            float zHalfLineSize = xStep * 0.3f;
+
+            var singleColorLineMaterial = new LineMaterial()
+            {
+                LineColor = Colors.Orange.ToColor4(),
+                LineThickness = 2
+            };
+
+            if (disposables != null)
+                disposables.Add(singleColorLineMaterial);
+
+
+
+            for (int z = 0; z < zCount; z++)
+            {
+                float zPos = (float)(center.Z - (size.Z / 2.0) + (z * zStep));
+                float zPercent = (float)z / (float)zCount;
+
+                for (int y = 0; y < yCount; y++)
+                {
+                    float yPos = (float)(center.Y - (size.Y / 2.0) + (y * yStep));
+                    float yPercent = (float)y / (float)yCount;
+
+                    for (int x = 0; x < xCount; x++)
+                    {
+                        float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
+
+                        var linePositions = new Vector3[]
+                        {
+                            new Vector3(xPos - xHalfLineSize, yPos, zPos - zHalfLineSize),
+                            new Vector3(xPos + xHalfLineSize, yPos, zPos + zHalfLineSize),
+                            new Vector3(xPos - xHalfLineSize, yPos, zPos + zHalfLineSize),
+                            new Vector3(xPos + xHalfLineSize, yPos, zPos - zHalfLineSize),
+                        };
+
+                        LineMaterial usedLineMaterial;
+
+                        if (useSingleColor)
+                        {
+                            // Using single color improved performance by 30% because we do not need to update per-object constant buffer for each line.
+                            usedLineMaterial = singleColorLineMaterial;
+                        }
+                        else
+                        {
+                            usedLineMaterial = new LineMaterial()
+                            {
+                                LineColor     = new Color4((float) x / (float) xCount, yPercent, zPercent, 1),
+                                LineThickness = 2
+                            };
+
+                            if (disposables != null)
+                                disposables.Add(usedLineMaterial);
+                        }
+
+                        // NOTE:
+                        // The sample can also show many instances of ScreenSpaceLineNode to simulate showing many different 3D lines.
+                        // It would be much better to use a single ScreenSpaceLineNode and set all line positions to that object.
+
+                        var screenSpaceLineNode = new ScreenSpaceLineNode(linePositions, isLineStrip: false, isLineClosed: false, lineMaterial: usedLineMaterial);
+
+                        rootSceneNode.AddChild(screenSpaceLineNode);
                     }
                 }
             }
@@ -505,10 +697,20 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
         private void ThreadsCountSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!this.IsLoaded)
-                return;
+            if (_mainDXViewportView != null && _mainDXViewportView.DXScene != null)
+            {
+                _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = (int) ThreadsCountSlider.Value;
+                _mainDXViewportView.Refresh();
+            }
+        }
 
-            _mainDXViewportView.DXScene.MaxBackgroundThreadsCount = (int) ThreadsCountSlider.Value;
+        private void OnIsCachingCommandListsCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (_mainDXViewportView != null && _mainDXViewportView.DXScene != null)
+            {
+                _mainDXViewportView.DXScene.IsCachingCommandLists = IsCachingCommandListsCheckBox.IsChecked ?? false;
+                _mainDXViewportView.Refresh();
+            }
         }
 
         private void ObjectsCountComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -518,6 +720,18 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
             int modelsCount = (int) ObjectsCountComboBox.SelectedItem;
             CreateTestScene(modelsCount);
+        }
+
+
+        private void ObjectsTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            string selectedObjectTypesText = (string)ObjectsTypeComboBox.SelectedValue;
+            _currentObjectsType = (ObjectsTypes)Enum.Parse(typeof(ObjectsTypes), selectedObjectTypesText);
+
+            CreateTestScene(_objectsCount);
         }
 
         private void PresentationTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -568,6 +782,9 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
         private void StartBenchmark()
         {
+            if (_mainDXViewportView.DXScene == null)
+                return; // Probably WPF 3D rendering
+
             StartStopTestButton.Content = "Abort benchmark";
 
             OptionsGrid.Visibility   = Visibility.Collapsed;
@@ -704,6 +921,20 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
         {
             InfoTextBlock.Text += text + Environment.NewLine;
             InfoTextBlock.ScrollToEnd();
+        }
+
+        private void StartStopCameraRotationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_camera1.IsRotating)
+            {
+                _camera1.StopRotation();
+                StartStopCameraRotationButton.Content = "Start camera rotation";
+            }
+            else
+            {
+                _camera1.StartRotation(45, 0);
+                StartStopCameraRotationButton.Content = "Stop camera rotation";
+            }
         }
     }
 }

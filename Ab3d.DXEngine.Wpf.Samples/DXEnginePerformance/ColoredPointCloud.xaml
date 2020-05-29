@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap"
-                   Text="Optimized point cloud rendering with pixel number reduction"/>
+                   Text="Optimized colored point cloud rendering with pixel number reduction"/>
 
         <Rectangle Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
 

@@ -61,6 +61,10 @@
                     <Run FontWeight="Bold">[ENTER]</Run>
                     <Run> - show closest position</Run>
                 </TextBlock>
+
+                <Button Name="ChangeColorButton" Content="Change Color" Margin="30 0 0 0" Padding="5 0" Click="ChangeColorButton_OnClick" />
+                <Button Name="ChangeTransformButton" Content="Change Transform" Margin="5 0 0 0" Padding="5 0" Click="ChangeTransformButton_OnClick" />
+
             </StackPanel>
             
             <controls:SimpleGrid ColumnsCount="2" ColumnSpacing="5" RowSpacing="3" Margin="0 10 0 0">

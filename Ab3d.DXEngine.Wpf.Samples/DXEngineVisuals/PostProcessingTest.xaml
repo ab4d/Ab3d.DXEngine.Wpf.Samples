@@ -92,7 +92,7 @@
 
                 <CheckBox Name="EdgeDetectionCheckBox" Content="Edge detection" FontWeight="Bold" IsChecked="True" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
-                    <TextBlock Text="Edge treshold:" />
+                    <TextBlock Text="Edge threshold:" />
                     <ComboBox Name="EdgeThresholdComboBox" Margin="5 0 0 0" Width="75" SelectedIndex="3" SelectionChanged="EdgeThresholdComboBox_OnSelectionChanged">
                         <ComboBoxItem Content="0.01" />
                         <ComboBoxItem Content="0.02" />
@@ -107,6 +107,23 @@
                     </ComboBox>
                 </StackPanel>
                 <CheckBox Name="MultiplyWithCurrentColorCheckBox" Content="Multiply with current color" Margin="20 0 0 0" IsChecked="True" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged" />
+
+                <CheckBox Name="GammaCorrectionCheckBox" Content="Gamma correction" FontWeight="Bold" IsChecked="False" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
+                <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+                    <TextBlock Text="Gamma value:" />
+                    <ComboBox Name="GammaCorrectionComboBox" Margin="5 0 0 0" Width="75" SelectedIndex="1" SelectionChanged="GammaCorrectionComboBox_OnSelectionChanged">
+                        <ComboBoxItem Content="0.25" />
+                        <ComboBoxItem Content="0.5" />
+                        <ComboBoxItem Content="0.8" />
+                        <ComboBoxItem Content="0.9" />
+                        <ComboBoxItem Content="1.0" />
+                        <ComboBoxItem Content="1.1" />
+                        <ComboBoxItem Content="1.2" />
+                        <ComboBoxItem Content="1.2" />
+                        <ComboBoxItem Content="2.0" />
+                        <ComboBoxItem Content="3.0" />
+                    </ComboBox>
+                </StackPanel>
 
             </StackPanel>
         </Border>

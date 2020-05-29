@@ -63,7 +63,7 @@
                     <TextBlock Grid.Column="0" Grid.Row="0" Text="VR Provider:" FontWeight="Bold" VerticalAlignment="Center"/>
 
                     <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
-                        <ComboBox Name="ProviderComboBox" SelectedIndex="2" Width="115" Margin="5 0 0 0" SelectionChanged="ProviderComboBox_OnSelectionChanged">
+                        <ComboBox Name="ProviderComboBox" SelectedIndex="1" Width="115" Margin="5 0 0 0" SelectionChanged="ProviderComboBox_OnSelectionChanged">
                             <ComboBoxItem Name="NoProvider" Content="None" />
                             <ComboBoxItem Name="AnaglyphProvider" Content="Anaglyph" />
                             <ComboBoxItem Name="SplitScreenProvider" Content="Split Screen" />

@@ -35,7 +35,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     // 2)
     // For each segment multiple views (Index Buffers) are created where the number of positions is defined by the pixel size 
     // on the screen and how close together the positions are (positions that are closer then size of one pixel are rendered as one pixel).
-    // Number of views is defined by MaxOptimizationSubsetsCount and OptimizationIndicesNumberTreshold properties.
+    // Number of views is defined by MaxOptimizationSubsetsCount and OptimizationIndicesNumberThreshold properties.
     // 
     // 
     // IMPORTANT:
@@ -64,6 +64,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private int _lastRenderedPositionsCount;
         private int _lastTotalPositionsCount;
         private WireCrossVisual3D _wireCrossVisual3D;
+        private SceneNodeVisual3D _sceneNodeVisual3D;
+
+        private int _transformCounter;
+        private AxisAngleRotation3D _axisAngleRotation3D;
+
+        private bool _hasTransformationMatrix;
+        private SharpDX.Matrix _transformationMatrix;
+
 
         public OptimizedPointCloud()
         {
@@ -230,8 +238,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             // NOTE that you can also use OptimizedPointMesh that takes more complex vertex struct for example PositionColor or PositionNormal. In this case use the other constructor.
 
-            _optimizedPointMesh.OptimizationIndicesNumberTreshold = 100000; // We are satisfied with reducing the number of shown positions to 100000 (no need to optimize further - higher number reduced the initialization time)
-            _optimizedPointMesh.MaxOptimizationViewsCount = 10; // Maximum number of created data sub-sets. The actual number can be lower when we hit the OptimizationIndicesNumberTreshold or when all vertices needs to be shown.
+            _optimizedPointMesh.OptimizationIndicesNumberThreshold = 100000; // We are satisfied with reducing the number of shown positions to 100000 (no need to optimize further - higher number reduced the initialization time)
+            _optimizedPointMesh.MaxOptimizationViewsCount = 10; // Maximum number of created data sub-sets. The actual number can be lower when we hit the OptimizationIndicesNumberThreshold or when all vertices needs to be shown.
             
             _optimizedPointMesh.Optimize(new SharpDX.Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), pixelSize);
 
@@ -298,18 +306,27 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             _modelDisposables.Add(_customRenderableNode);
 
-            var sceneNodeVisual3D = new SceneNodeVisual3D(_customRenderableNode);
-            //sceneNodeVisual3D.Transform = transform;
+            _sceneNodeVisual3D = new SceneNodeVisual3D(_customRenderableNode);
 
-            MainViewport.Children.Add(sceneNodeVisual3D);
+            MainViewport.Children.Add(_sceneNodeVisual3D);
         }
 
         private void RenderAction(RenderingContext renderingContext, CustomRenderableNode customRenderableNode, object objectToRender)
         {
             SharpDX.Matrix worldViewProjectionMatrix = renderingContext.UsedCamera.GetViewProjection();
 
-            if (customRenderableNode.Transform != null && !customRenderableNode.Transform.IsIdentity)
-                worldViewProjectionMatrix = customRenderableNode.Transform.Value * worldViewProjectionMatrix;
+            if (_hasTransformationMatrix)
+                worldViewProjectionMatrix = _transformationMatrix * worldViewProjectionMatrix;
+
+            // We could also read the transformation manually (as in the commented code below),
+            // but it is faster to prepare the matrix when it is changed and not read WPF's DependencyProperties in rendering loop.
+
+            //if (_sceneNodeVisual3D.Transform != null && !_sceneNodeVisual3D.Transform.Value.IsIdentity)
+            //    worldViewProjectionMatrix = _sceneNodeVisual3D.Transform.Value.ToMatrix() * worldViewProjectionMatrix;
+
+            //if (customRenderableNode.Transform != null && !customRenderableNode.Transform.IsIdentity)
+            //    worldViewProjectionMatrix = customRenderableNode.Transform.Value * worldViewProjectionMatrix;
+
 
             var optimizedPointMesh = (OptimizedPointMesh<Vector3>)objectToRender;
 
@@ -448,6 +465,54 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     }
                 }
             }
+        }
+
+        private void ChangeColorButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_pixelMaterial == null || _customRenderableNode == null)
+                return;
+
+            var rnd = new Random();
+            _pixelMaterial.PixelColor = System.Windows.Media.Color.FromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255)).ToColor4();
+            _customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+        }
+
+        private void ChangeTransformButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            _transformCounter++;
+            double rotationAngle = _transformCounter * 15;
+
+
+            // We can apply transformation to DXEngine's _customRenderableNode:
+
+            //_transformationMatrix = Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians((float) rotationAngle));
+            //_hasTransformationMatrix = true;
+
+            //if (_customRenderableNode.Transform == null)
+            //    _customRenderableNode.Transform = new Ab3d.DirectX.Transformation(_transformationMatrix);
+            //else
+            //    _customRenderableNode.Transform.SetMatrix(_transformationMatrix);
+
+            // When we are changing DXEngine's SceneNodes we need to notify the rendering engine about the changes
+            // (this is not needed when working with WPF objects as seen below).
+            //_customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+
+
+            // Or simply add transformation to the _sceneNodeVisual3D:
+
+            if (_axisAngleRotation3D == null)
+            {
+                _axisAngleRotation3D = new AxisAngleRotation3D(new Vector3D(0, 1, 0), rotationAngle);
+                _sceneNodeVisual3D.Transform = new RotateTransform3D(_axisAngleRotation3D);
+            }
+            else
+            {
+                _axisAngleRotation3D.Angle = rotationAngle;
+            }
+
+            // Save the transformation matrix here so we do not need to read it from DependencyProperties on each rendering:
+            _transformationMatrix = _sceneNodeVisual3D.Transform.Value.ToMatrix();
+            _hasTransformationMatrix = true;
         }
     }
 }

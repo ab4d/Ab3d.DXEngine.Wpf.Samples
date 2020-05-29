@@ -98,6 +98,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DXEngineAdvanced\BackgroundAndOverlayRendering.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DXEngineAdvanced\CustomFogShaderEffectSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -107,6 +111,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineAdvanced\CustomShaderMaterialSample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineHitTesting\ObjectIdRendering.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,6 +146,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEnginePerformance\SolidColorInstanceRendering.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DXEngineAdvanced\SubMeshesSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -147,8 +159,8 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineOther\DeviceRemovedHandlerSample.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DXEngineOther\DXEngineOtherIntroPage.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -158,7 +170,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DXEngineHitTesting\OctTreeSample.xaml">
+    <Page Include="DXEngineHitTesting\MeshOctTreeSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -167,10 +179,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineHitTesting\DXEventManager3DSample.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="DXEnginePerformance\ColoredPointCloud.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -223,10 +231,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DXEnginePerformance\MouseControllerForPointCloud.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEnginePerformance\MultiThreadingSample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEnginePerformance\ColoredPointCloud.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DXEnginePerformance\MultiThreadingSample.xaml">
+    <Page Include="DXEnginePerformance\ScreenSpaceScaledInstancing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\AlphaClippingSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -254,13 +274,21 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DXEngineVisuals\PlanarShadows.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="DXEngineVisuals\PlanarShadowsCustomization.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\PlanarShadows.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\TransparencySortingSample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Other\DXEngineSnoopTool.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Other\OnlineHelp.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -384,6 +412,9 @@
     <Compile Include="Common\SceneViewType.cs" />
     <Compile Include="Controls\GradientColorLegend.cs" />
     <Compile Include="Controls\SimpleGrid.cs" />
+    <Compile Include="DXEngineAdvanced\BackgroundAndOverlayRendering.xaml.cs">
+      <DependentUpon>BackgroundAndOverlayRendering.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineAdvanced\CustomFogShaderEffectSample.xaml.cs">
       <DependentUpon>CustomFogShaderEffectSample.xaml</DependentUpon>
     </Compile>
@@ -396,6 +427,9 @@
     <Compile Include="DXEngineAdvanced\IColorMaskMaterial.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalEffect.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalMaterial.cs" />
+    <Compile Include="DXEngineHitTesting\ObjectIdRendering.xaml.cs">
+      <DependentUpon>ObjectIdRendering.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineAdvanced\ObjectSelectionWithSubMeshes.xaml.cs">
       <DependentUpon>ObjectSelectionWithSubMeshes.xaml</DependentUpon>
     </Compile>
@@ -419,6 +453,9 @@
     <Compile Include="DXEngineAdvanced\AdvancedInstanceRendering.xaml.cs">
       <DependentUpon>AdvancedInstanceRendering.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEnginePerformance\SolidColorInstanceRendering.xaml.cs">
+      <DependentUpon>SolidColorInstanceRendering.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineAdvanced\SubMeshesSample.xaml.cs">
       <DependentUpon>SubMeshesSample.xaml</DependentUpon>
     </Compile>
@@ -434,17 +471,14 @@
     <Compile Include="DXEngineHitTesting\DXEventManager3DWrapperSample.xaml.cs">
       <DependentUpon>DXEventManager3DWrapperSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DXEngineHitTesting\OctTreeSample.xaml.cs">
-      <DependentUpon>OctTreeSample.xaml</DependentUpon>
+    <Compile Include="DXEngineHitTesting\MeshOctTreeSample.xaml.cs">
+      <DependentUpon>MeshOctTreeSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineHitTesting\HitTestingSample.xaml.cs">
       <DependentUpon>HitTestingSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineHitTesting\DXEventManager3DSample.xaml.cs">
       <DependentUpon>DXEventManager3DSample.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DXEnginePerformance\ColoredPointCloud.xaml.cs">
-      <DependentUpon>ColoredPointCloud.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEnginePerformance\DXEnginePerformanceIntroPage.xaml.cs">
       <DependentUpon>DXEnginePerformanceIntroPage.xaml</DependentUpon>
@@ -496,14 +530,29 @@
     <Compile Include="DXEngineAdvanced\OutlinesSample.xaml.cs">
       <DependentUpon>OutlinesSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEnginePerformance\ColoredPointCloud.xaml.cs">
+      <DependentUpon>ColoredPointCloud.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEnginePerformance\ScreenSpaceScaledInstancing.xaml.cs">
+      <DependentUpon>ScreenSpaceScaledInstancing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\AlphaClippingSample.xaml.cs">
+      <DependentUpon>AlphaClippingSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineVisuals\ColoredPolyLinesSample.xaml.cs">
       <DependentUpon>ColoredPolyLinesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\PlanarShadowsCustomization.xaml.cs">
+      <DependentUpon>PlanarShadowsCustomization.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\PlanarShadows.xaml.cs">
       <DependentUpon>PlanarShadows.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DXEngineVisuals\PlanarShadowsCustomization.xaml.cs">
-      <DependentUpon>PlanarShadowsCustomization.xaml</DependentUpon>
+    <Compile Include="DXEngineVisuals\TransparencySortingSample.xaml.cs">
+      <DependentUpon>TransparencySortingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Other\DXEngineSnoopTool.xaml.cs">
+      <DependentUpon>DXEngineSnoopTool.xaml</DependentUpon>
     </Compile>
     <Compile Include="Other\OnlineHelp.xaml.cs">
       <DependentUpon>OnlineHelp.xaml</DependentUpon>
@@ -799,22 +848,34 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="..\lib\Assimp32.dll">
+    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp32.dll">
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\lib\Assimp64.dll">
+    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp64.dll">
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\info_icon.png" />
+    <Resource Include="Resources\DXEngineSnoop.PNG" />
+    <Content Include="Resources\TreeTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\AlphaTextures\readme.txt" />
+    <Content Include="Resources\AlphaTextures\tree0.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\AlphaTextures\WireFence.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\BricksMaps\bricks_ao.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\DXEngineReferenceHelp.png" />
     <Resource Include="Resources\DXEngineUsersGuide.png" />
+    <Resource Include="Resources\DXEngineReferenceHelp.png" />
     <Content Include="Resources\Models\duckCM.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -900,9 +961,6 @@
     <Content Include="Resources\RobotModel\Robot_Saw.FBX">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Resources\Models\duck.dae">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -932,6 +990,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\SemiTransparentFrame.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Shaders\ShadedPointCloudShader.hlsl" />
@@ -1039,8 +1100,7 @@
     <Content Include="Resources\Models\dragon_vrip_res3_readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\Models\ship_boat_readme.txt" />
-    <Resource Include="Resources\info_icon.png" />
+    <None Include="Resources\Models\ship_boat_readme.txt" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -1079,6 +1139,16 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.csproj">
+      <Project>{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}</Project>
+      <Name>Ab3d.DirectX.Client.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.csproj">
+      <Project>{39512d68-5ad7-4933-81fb-fd603ef611b7}</Project>
+      <Name>Ab3d.DirectX.Client.Settings</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Resources\PowerToysTexture.png" />
   </ItemGroup>
   <ItemGroup>
@@ -1103,16 +1173,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\Settings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.csproj">
-      <Project>{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}</Project>
-      <Name>Ab3d.DirectX.Client.Diagnostics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.csproj">
-      <Project>{39512d68-5ad7-4933-81fb-fd603ef611b7}</Project>
-      <Name>Ab3d.DirectX.Client.Settings</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

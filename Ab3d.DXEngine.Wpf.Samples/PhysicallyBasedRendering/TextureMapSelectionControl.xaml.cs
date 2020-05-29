@@ -16,6 +16,7 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
 using MessageBox = System.Windows.MessageBox;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -39,8 +40,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         public TextureMapTypes TextureMapType { get; private set; }
 
-        // If you want that the ShaderResourceView is loaded in this control, then you need to set the Device
-        public SharpDX.Direct3D11.Device Device { get; set; }
+        // If you want that the ShaderResourceView is loaded in this control, then you need to set the DXDevice
+        public DXDevice DXDevice { get; set; }
 
 
         public bool ShowTextureTextBox
@@ -214,7 +215,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
         private void LoadCurrentTexture()
         {
-            if (this.Device == null)
+            if (this.DXDevice == null)
                 return;
 
             bool hasChanges = false;
@@ -256,11 +257,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                     }
 
 
-                    var convertTo32bppPRGBA = (TextureMapType == TextureMapTypes.BaseColor ||
-                                               TextureMapType == TextureMapTypes.Albedo ||
-                                               TextureMapType == TextureMapTypes.DiffuseColor);
+                    var isBaseColor = (TextureMapType == TextureMapTypes.BaseColor ||
+                                       TextureMapType == TextureMapTypes.Albedo ||
+                                       TextureMapType == TextureMapTypes.DiffuseColor);
 
-                    var shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(this.Device, fileName, loadDdsIfPresent: false, convertTo32bppPRGBA: convertTo32bppPRGBA);
+                    // To load a texture from file, you can use the TextureLoader.LoadShaderResourceView (this supports loading standard image files and also loading dds files).
+                    // This method returns a ShaderResourceView and it can also set a textureInfo parameter that defines some of the properties of the loaded texture (bitmap size, dpi, format, hasTransparency).
+                    TextureInfo textureInfo;
+                    var shaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(this.DXDevice.Device,
+                                                                                               fileName,
+                                                                                               loadDdsIfPresent: true,
+                                                                                               convertTo32bppPRGBA: isBaseColor,
+                                                                                               generateMipMaps: true,
+                                                                                               textureInfo: out textureInfo);
 
                     // Only 2D textures are supported
                     if (shaderResourceView.Description.Dimension != ShaderResourceViewDimension.Texture2D)
@@ -273,6 +282,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
                     _textureMapInfo = new TextureMapInfo(TextureMapType, shaderResourceView, null, fileName);
                     Material.TextureMaps.Add(_textureMapInfo);
+
+
+                    var physicallyBasedMaterial = Material as PhysicallyBasedMaterial;
+                    if (isBaseColor && physicallyBasedMaterial != null)
+                    {
+                        // Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+                        // Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+                        var recommendedBlendState = this.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
+
+                        physicallyBasedMaterial.BlendState      = recommendedBlendState;
+                        physicallyBasedMaterial.HasTransparency = textureInfo.HasTransparency;
+                    }
 
 
                     if (CurrentMaskColor == Colors.Black)

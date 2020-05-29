@@ -23,6 +23,28 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Ab3d.DXEngine" Version="4.0.7447" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="4.0.7447" />
+    <PackageReference Include="Ab3d.PowerToys" Version="9.2.7447" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.core3.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.core3.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>    
+    <Reference Include="Ab3d.PowerToys.Assimp">
+      <HintPath>..\lib\Ab3d.PowerToys.Assimp.dll</HintPath>
+    </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\lib\AssimpNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>  
+  
+  <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   
@@ -33,6 +55,8 @@
     <None Remove="Resources\ab4d-logo-220x220.DDS" />
     <None Remove="Resources\ab4d-logo-220x220.png" />
     <None Remove="Resources\ab4d-logo.png" />
+    <None Remove="Resources\AlphaTextures\tree0.dds" />
+    <None Remove="Resources\AlphaTextures\WireFence.dds" />
     <None Remove="Resources\BricksMaps\bricks.png" />
     <None Remove="Resources\BricksMaps\bricks_ao.png" />
     <None Remove="Resources\BricksMaps\bricks_normal.png" />
@@ -43,6 +67,7 @@
     <None Remove="Resources\DXEngine-car_engine.png" />
     <None Remove="Resources\DXEngine-OculusWrap-590.jpg" />
     <None Remove="Resources\DXEngineReferenceHelp.png" />
+    <None Remove="Resources\DXEngineSnoop.PNG" />
     <None Remove="Resources\DXEngineUsersGuide.png" />
     <None Remove="Resources\DXEngineWinForms.png" />
     <None Remove="Resources\GrassTexture.jpg" />
@@ -105,6 +130,7 @@
     <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Metallic.png" />
     <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Normal.png" />
     <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png" />
+    <None Remove="Resources\SemiTransparentFrame.png" />
     <None Remove="Resources\Settings.png" />
     <None Remove="Resources\ShaderFactoryScreenshot.PNG" />
     <None Remove="Resources\Shaders\FogShader.ps" />
@@ -124,6 +150,7 @@
     <None Remove="Resources\SkyboxTextures\CloudyLightRaysRight512.png" />
     <None Remove="Resources\SkyboxTextures\CloudyLightRaysUp512.png" />
     <None Remove="Resources\SkyboxTextures\readme.txt" />
+    <None Remove="Resources\TreeTexture.png" />
     <None Remove="Resources\updated_icon.png" />
     <None Remove="Resources\warningIcon.png" />
     <None Remove="Samples.xml" />
@@ -147,6 +174,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ab4d-logo-220x220.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\AlphaTextures\tree0.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\AlphaTextures\WireFence.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\BricksMaps\bricks.png">
@@ -330,6 +363,9 @@
     <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\SemiTransparentFrame.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Shaders\FogShader.ps">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -369,6 +405,9 @@
     <Content Include="Resources\SkyboxTextures\readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\TreeTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -376,28 +415,6 @@
     <EmbeddedResource Include="Resources\Shaders\ShadedPointCloud.ps" />
     <EmbeddedResource Include="Resources\Shaders\ShadedPointCloud.vs" />
     <EmbeddedResource Include="Resources\Shaders\ShadedPointCloudPerPointColor.vs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="3.3.7279" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="3.3.7279" />
-    <PackageReference Include="Ab3d.PowerToys" Version="9.1.7279" />
-    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.core3.csproj" />
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.core3.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>    
-    <Reference Include="Ab3d.PowerToys.Assimp">
-      <HintPath>..\lib\Ab3d.PowerToys.Assimp.dll</HintPath>
-    </Reference>
-    <Reference Include="AssimpNet">
-      <HintPath>..\lib\AssimpNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -411,6 +428,7 @@
     <Resource Include="Resources\DXEngine-car_engine.png" />
     <Resource Include="Resources\DXEngine-OculusWrap-590.jpg" />
     <Resource Include="Resources\DXEngineReferenceHelp.png" />
+    <Resource Include="Resources\DXEngineSnoop.PNG" />
     <Resource Include="Resources\DXEngineUsersGuide.png" />
     <Resource Include="Resources\DXEngineWinForms.png" />
     <Content Include="Resources\GrassTexture.jpg">

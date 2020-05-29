@@ -352,7 +352,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private void OnPixelSizeChanged(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded || DesignerProperties.GetIsInDesignMode(this) || _isInternalChange)
+            if (!this.IsLoaded || DesignerProperties.GetIsInDesignMode(this) || _isInternalChange || _pixelEffect == null)
                 return;
 
             _isPixelSizeChanged = true;
@@ -402,9 +402,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             var positionsArray = new Vector3[xCount * yCount * zCount];
 
-            float xStep = xCount > 1 ? (float)(size.X / (xCount - 1)) : 1;
-            float yStep = yCount > 1 ? (float)(size.Y / (yCount - 1)) : 1;
-            float zStep = zCount > 1 ? (float)(size.Z / (zCount - 1)) : 1;
+            float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
+            float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
+            float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
 
             float xStart = (float)center.X - ((float)size.X / 2.0f);
             float yStart = (float)center.Y - ((float)size.Y / 2.0f);

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Title="DXEngine Diagnostics"
              Icon="ab4d.ico"
-             Width="300" SizeToContent="Height">
+             Width="310" SizeToContent="Height">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -28,13 +28,23 @@
                         <Rectangle Canvas.Top="12" Height="3" Width="18" Fill="#444" />
                     </Canvas>
                 </MenuItem.Header>
+
+                <RadioButton Name="ShowRenderingStatisticsRadioButton" Content="Show rendering statistics" IsChecked="True" GroupName="StatisticsType" Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
+                <RadioButton Name="ShowCameraInfoRadioButton" Content="Show camera info" GroupName="StatisticsType"  Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
                 
+                <Separator />
                 <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingQueuesMenuItem" Header="Dump RenderingQueues" Click="DumpRenderingQueuesMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
                 <MenuItem Name="DumpDXEngineSettingsMenuItem" Header="Dump DXEngine settings" Click="DumpDXEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpCurrentSceneMenuItem" Header="Get full scene dump" Click="DumpCurrentSceneMenuItem_OnClick"/>
+                
+                <Separator />
+                <MenuItem Name="EditDXEngineSettingsMenuItem" Header="Edit DXEngine settings" Click="EditDXEngineSettingsMenuItem_OnClick"/>
+                <MenuItem Name="RenderObjectIdMenuItem" Header="Render Object-Id bitmap" Click="RenderObjectIdMenuItemMenuItem_OnClick"/>
+                <MenuItem Name="RenderingFilterMenuItem" Header="Rendering filter" Click="RenderingFilterMenuItem_OnClick"/>
+                
                 <Separator />
                 <MenuItem Name="GetCameraDetailsMenuItem" Header="Get camera details" Click="GetCameraDetailsMenuItem_OnClick"/>
                 <MenuItem Name="GetSceneXamlMenuItem" Header="Get scene XAML" Click="GetSceneXamlMenuItem_OnClick"/>
@@ -58,10 +68,6 @@
                 <!--<CheckBox Name="ShowCameraMatricesCheckBox" Content="Show camera matrices" Visibility="Collapsed" Height="0" IsChecked="True" Checked="OnShowCameraMatricesCheckBoxCheckedChanged" Unchecked="OnShowCameraMatricesCheckBoxCheckedChanged"/>-->
                 
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" Checked="AlwaysOnTopCheckBoxChanged" Unchecked="AlwaysOnTopCheckBoxChanged"/>
-
-                <Separator />
-                <RadioButton Name="ShowRenderingStatisticsRadioButton" Content="Show rendering statistics" IsChecked="True" GroupName="StatisticsType" Checked="StatisticsTypeRadioButton_OnChecked" />
-                <RadioButton Name="ShowCameraInfoRadioButton" Content="Show camera info" GroupName="StatisticsType" Checked="StatisticsTypeRadioButton_OnChecked" />
 
             </MenuItem>
         </Menu>

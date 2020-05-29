@@ -7,6 +7,7 @@
       xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
       xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"   
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="InstancedMeshGeometry3DTest"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="800">
@@ -63,15 +64,15 @@
 
         <Rectangle Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
         <WrapPanel Grid.Row="2" Margin="0 7 10 5" Orientation="Horizontal">
-            <TextBlock Text="Mesh geometry:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-            <ComboBox Name="MeshTypeComboBox" SelectedIndex="2" Margin="0 0 15 0" SelectionChanged="OnSettingsChanged">
+            <TextBlock Text="Mesh geometry:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 5"/>
+            <ComboBox Name="MeshTypeComboBox" SelectedIndex="2" Margin="0 0 15 5" SelectionChanged="OnSettingsChanged">
                 <ComboBoxItem>Boxes (24 positions per object)</ComboBoxItem>
                 <ComboBoxItem>Spheres (382 positions per object)</ComboBoxItem>
                 <ComboBoxItem>Bunnies (11.553 positions per object)</ComboBoxItem>
             </ComboBox>
 
-            <TextBlock Text="Instances count:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-            <ComboBox Name="InstancesCountComboBox" SelectedIndex="1" Margin="0 0 15 0" SelectionChanged="OnSettingsChanged">
+            <TextBlock Text="Instances count:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 5"/>
+            <ComboBox Name="InstancesCountComboBox" SelectedIndex="1" Margin="0 0 15 5" SelectionChanged="OnSettingsChanged">
                 <ComboBoxItem>1600 (20 x 4 x 20)</ComboBoxItem>
                 <ComboBoxItem>4000 (20 x 10 x 20)</ComboBoxItem>
                 <ComboBoxItem>8000 (20 x 20 x 20)</ComboBoxItem>
@@ -79,11 +80,19 @@
                 <ComboBoxItem>800.000 (20 x 2000 x 20)</ComboBoxItem>
             </ComboBox>
 
-            <TextBlock Name="TotalTextBlock" Text="Total positions: 4000 * 24 = 12.345" Margin="0 0 15 0" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Name="TotalTextBlock" Text="Total positions: 4000 * 24 = 12.345" Margin="0 0 15 5" FontWeight="Bold" VerticalAlignment="Center"/>
 
-            <CheckBox Name="UseTransparencyCheckBox" Content="Use transparent objects" IsChecked="False" VerticalAlignment="Center"
+            <CheckBox Name="UseTransparencyCheckBox" Content="Use transparent objects" IsChecked="False" VerticalAlignment="Center" Margin="0 0 15 5"
                       Checked="UseTransparencyCheckBoxCheckedChanged" Unchecked="UseTransparencyCheckBoxCheckedChanged" />
-                
+
+            
+
+            <Button Name="ShowHideInstancesButton" Content="Hide some instances" Margin="0 0 0 5" Click="ShowHideInstancesButton_OnClick" />
+
+            <controls:InfoControl x:Name="ShowHideInstancesInfoControl" Margin="5 0 0 5" VerticalAlignment="Center"
+                                  InfoText="Set instance alpha color to 0 to quickly discard some instances"/>
+
+            <Image Source="/Resources/new_icon.png" Height="12" Margin="5 0 0 5" VerticalAlignment="Center" />
         </WrapPanel>
     </Grid>
 </Page>

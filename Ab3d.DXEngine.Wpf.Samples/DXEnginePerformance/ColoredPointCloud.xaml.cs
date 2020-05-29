@@ -143,8 +143,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 // NOTE that you can also use OptimizedPointMesh that takes more complex vertex struct for example PositionColor or PositionNormal. In this case use the other constructor.
 
-                _optimizedPointMesh.OptimizationIndicesNumberTreshold = 100000; // We are satisfied with reducing the number of shown positions to 100000 (no need to optimize further - higher number reduced the initialization time)
-                _optimizedPointMesh.MaxOptimizationViewsCount = 10;     // Maximum number of created data sub-sets. The actual number can be lower when we hit the OptimizationIndicesNumberTreshold or when all vertices needs to be shown.
+                _optimizedPointMesh.OptimizationIndicesNumberThreshold = 100000; // We are satisfied with reducing the number of shown positions to 100000 (no need to optimize further - higher number reduced the initialization time)
+                _optimizedPointMesh.MaxOptimizationViewsCount = 10;     // Maximum number of created data sub-sets. The actual number can be lower when we hit the OptimizationIndicesNumberThreshold or when all vertices needs to be shown.
 
                 _optimizedPointMesh.Optimize(new SharpDX.Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), standardPointSize: 1);
 

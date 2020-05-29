@@ -389,6 +389,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         {
             Color3 ambientColor = Color3.Black;
 
+            if (lights == null)
+                return ambientColor;
+
             foreach (ILight oneLight in lights)
             {
                 if (oneLight is IAmbientLight && oneLight.IsEnabled)

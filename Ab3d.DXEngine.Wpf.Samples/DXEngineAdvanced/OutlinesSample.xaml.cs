@@ -540,8 +540,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             if (!this.IsLoaded)
                 return;
 
-            _horizontalExpandPostProcess.ExpansionWidth = (int)OutlineSizeSlider.Value;
-            _verticalExpandPostProcess.ExpansionWidth   = (int)OutlineSizeSlider.Value;
+            if (_horizontalExpandPostProcess != null)
+                _horizontalExpandPostProcess.ExpansionWidth = (int)OutlineSizeSlider.Value;
+
+            if (_verticalExpandPostProcess != null)
+                _verticalExpandPostProcess.ExpansionWidth = (int)OutlineSizeSlider.Value;
 
             MainDXViewportView.Refresh(); // Render scene again
         }

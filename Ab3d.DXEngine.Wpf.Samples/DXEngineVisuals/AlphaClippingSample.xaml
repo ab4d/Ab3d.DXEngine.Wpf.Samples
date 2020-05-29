@@ -1,0 +1,106 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.AlphaClippingSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="StandardXaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+    <Page.Resources>
+        <!--<DiffuseMaterial x:Key="TreeTextureMaterial">
+            <DiffuseMaterial.Brush>
+                <ImageBrush ImageSource="/Resources/TreeTexture.png"/>
+            </DiffuseMaterial.Brush>
+        </DiffuseMaterial>-->
+        <!--<DiffuseMaterial x:Key="SemiTransparentFrameMaterial">
+            <DiffuseMaterial.Brush>
+                <ImageBrush ImageSource="/Resources/SemiTransparentFrame.png"/>
+            </DiffuseMaterial.Brush>
+        </DiffuseMaterial>-->
+    </Page.Resources>
+    <Grid Name="RootGrid">
+        <Border Name="ViewportBorder" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="SkyBlue">
+
+                <Viewport3D Name="MainViewport">
+
+                    <!-- brighter background works better with AlphaToCoverage -->
+                    <visuals:PlaneVisual3D x:Name="BackgroundPlaneVisual3D" CenterPosition="0 -0.1 -70" Size="800 600" Material="LightGray" BackMaterial="Black" />
+
+                    <visuals:BoxVisual3D x:Name="GoldBoxVisual3D" CenterPosition="0 10 0" Size="60 20 40" Material="Gold" />
+
+                    <ModelVisual3D x:Name="SemiTransparentRootVisual3D"></ModelVisual3D>
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <AmbientLight Color="#333333"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                      TargetPosition="0 0 0" 
+                                      Heading="30" Attitude="-30" Bank="0" 
+                                      Distance="400" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    ShowRotationCenterMarker="True"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+
+        <Border  Margin="5 10" VerticalAlignment="Bottom" HorizontalAlignment="Right" BorderBrush="Black" BorderThickness="2" Background="#CCFFFFFF">
+            <StackPanel Orientation="Vertical" Margin="10 10">
+
+                <TextBlock Text="Transparent objects rendering type:" FontWeight="Bold" Margin="0 0 0 5" />
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="StandardAlphaBlendingRadioButton" Content="Standard alpha blending" GroupName="AlphaBlendingType" Checked="OnAlphaBlendingTypeChanged" />
+                    <controls:InfoControl x:Name="StandardAlphaBlendingInfoControl" Margin="5 0 0 0" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="AlphaClippingRadioButton" Content="Alpha clipping - threshold:" GroupName="AlphaBlendingType" VerticalAlignment="Center" Checked="OnAlphaBlendingTypeChanged" />
+                    <ComboBox Name="AlphaClippingThresholdComboBox" Width="100" Margin="3 0 0 0" SelectionChanged="AlphaClippingThresholdComboBox_OnSelectionChanged" />
+                    <controls:InfoControl x:Name="AlphaClippingThresholdInfoControl" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="AlphaToCoverageRadioButton" Content="Alpha-to-coverage" IsChecked="True" GroupName="AlphaBlendingType" Checked="OnAlphaBlendingTypeChanged" />
+                    <controls:InfoControl x:Name="AlphaToCoverageInfoControl" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="DimGray" Margin="0 10 0 5" SnapsToDevicePixels="True" />
+
+                <Button Name="RandomObjectsOrderButton" Content="Randomize objects order" Margin="0 10 0 5" Padding="8 3" Background="White" HorizontalAlignment="Left" Width="200" Click="RandomObjectsOrderButton_OnClick" />
+
+                <CheckBox Name="IsCameraDistanceSortingEnabledCheckBox" Content="Is sorting objects by camera distance" IsChecked="False" Margin="0 5 0 0"  
+                          Checked="OnIsCameraDistanceSortingEnabledCheckBoxCheckedChanged" Unchecked="OnIsCameraDistanceSortingEnabledCheckBoxCheckedChanged"/>
+                
+                <CheckBox Name="AnimateCameraCheckBox" Content="Animate camera rotation" IsChecked="False" Margin="0 5 0 0"  
+                          Checked="OnAnimateCameraCheckBoxChanged" Unchecked="OnAnimateCameraCheckBoxChanged"/>
+
+            </StackPanel>
+        </Border>
+
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="#444" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="Different ways to render transparent objects"/>
+
+    </Grid>
+</Page>

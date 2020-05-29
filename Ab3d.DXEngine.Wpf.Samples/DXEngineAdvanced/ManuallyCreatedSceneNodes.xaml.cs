@@ -87,7 +87,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             this.Unloaded += delegate(object sender, RoutedEventArgs e)
             {
-                _disposables.Dispose();
+                if (_disposables != null)
+                {
+                    _disposables.Dispose();
+                    _disposables = null;
+                }
 
                 MainDXViewportView.Dispose();
             };
@@ -418,21 +422,45 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
                 // Load texture file into ShaderResourceView (in our case we load dds file; but we could also load png file)
                 string textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/ab4d-logo-220x220.dds");
-                var loadedShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, textureFileName);
 
-                _disposables.Add(loadedShaderResourceView);
 
-                // Now we can create a DXEngine's StandardMaterial
-                var standardMaterial = new StandardMaterial()
-                {
-                    // Set ShaderResourceView into array of diffuse textures
-                    DiffuseTextures = new ShaderResourceView[] {loadedShaderResourceView},
+                // The easiest way to load image file and in the same time create a material with the loaded texture is to use the CreateStandardTextureMaterial method.
+                var standardMaterial = Ab3d.DirectX.TextureLoader.CreateStandardTextureMaterial(MainDXViewportView.DXScene.DXDevice, textureFileName);
 
-                    // When showing texture, the DiffuseColor represents a color mask - each color from texture is multiplied with DiffuseColor (White preserves the original color)
-                    DiffuseColor = Colors.White.ToColor3()
-                };
-
+                // We need to manually dispose the created StandardMaterial and ShaderResourceView
                 _disposables.Add(standardMaterial);
+                _disposables.Add(standardMaterial.DiffuseTextures[0]);
+
+
+                // If we want more control over the material creation process, we can use the following code:
+
+                //// To load a texture from file, you can use the TextureLoader.LoadShaderResourceView (this supports loading standard image files and also loading dds files).
+                //// This method returns a ShaderResourceView and it can also set a textureInfo parameter that defines some of the properties of the loaded texture (bitmap size, dpi, format, hasTransparency).
+                //TextureInfo textureInfo;
+                //var loadedShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.Device,
+                //                                                                                 textureFileName,
+                //                                                                                 out textureInfo);
+                //_disposables.Add(loadedShaderResourceView);
+
+                //// Get recommended BlendState based on HasTransparency and HasPreMultipliedAlpha values.
+                //// Possible values are: CommonStates.Opaque, CommonStates.PremultipliedAlphaBlend or CommonStates.NonPremultipliedAlphaBlend.
+                //var recommendedBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(textureInfo.HasTransparency, textureInfo.HasPremultipliedAlpha);
+
+                //// Now we can create a DXEngine's StandardMaterial
+                //var standardMaterial = new StandardMaterial()
+                //{
+                //    // Set ShaderResourceView into array of diffuse textures
+                //    DiffuseTextures = new ShaderResourceView[] {loadedShaderResourceView},
+                //    TextureBlendState = recommendedBlendState,
+
+                //    HasTransparency = textureInfo.HasTransparency,
+
+                //    // When showing texture, the DiffuseColor represents a color mask - each color from texture is multiplied with DiffuseColor (White preserves the original color)
+                //    DiffuseColor = Colors.White.ToColor3()
+                //};
+
+                //_disposables.Add(standardMaterial);
+
 
                 meshObjectNode = new Ab3d.DirectX.MeshObjectNode(dxMeshGeometry3D, standardMaterial);
                 meshObjectNode.Name = "MeshObjectNode-from-PlaneMesh3D";
