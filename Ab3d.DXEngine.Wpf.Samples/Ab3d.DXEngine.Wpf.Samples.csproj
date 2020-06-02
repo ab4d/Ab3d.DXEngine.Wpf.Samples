@@ -848,11 +848,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp32.dll">
+    <Content Include="..\lib\Assimp32.dll">
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp64.dll">
+    <Content Include="..\lib\Assimp64.dll">
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
