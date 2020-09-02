@@ -43,6 +43,7 @@ The projects uses the following dependencies:
 ## See also
 
 * [AB4D Homepage](https://www.ab4d.com/)
+* [Ab3d.DXEngine](https://www.ab4d.com/DXEngine.aspx) library
 * [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) library
 * [Ab3d.PowerToys Samples on GitHub](https://github.com/ab4d/Ab3d.PowerToys.Wpf.Samples)
 * [AB4D products price list](https://www.ab4d.com/Purchase.aspx#DXEngine)
