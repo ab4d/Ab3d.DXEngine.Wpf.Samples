@@ -74,32 +74,44 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             EyeSeparationSlider.Value = _currentVirtualRealityProvider.EyeSeparation * 1000; // Convert from m to mm
             ParallaxSlider.Value = _currentVirtualRealityProvider.Parallax;
 
-            VRProviderInfoImage.ToolTip =
+            VRProviderInfoControl.InfoText =
 @"VR Provider ComboBox specifies type of stereoscopic rendering. The following types are supported:
 AnaglyphProvider - rendered 3D scene for colored glasses (for example for red - cyan glasses).
 SplitScreenProvider - rendered 3D scene for 3D TV
 None - removes all virtual reality providers";
 
             // Set ToolTip to code documentation text for StereoscopicVirtualRealityProvider.EyeSeparation
-            EyeSeparationInfoImage.ToolTip =
+            EyeSeparationInfoControl.InfoText =
 @"Gets or sets a distance between left and right eye. The best value for EyeSeparation is based on the size of objects
 in the scene, the size of the Viewport3D, monitor DPI settings and the actual distance between eyes of the user.";
 
 
+            SeparationDistanceInfoControl.InfoText =
+                @"When Split-screen stereoscopic rendering is used to render the 3D scene on a 3D TV, it may be necessary to adjust the image separation distance before a good 3D effect can be achieved.
+
+Please use the following steps to calibrate the settings for 3D TV:
+When using HDMI cable to connect computer and TV, make sure that the computer screen is not cropped or too small (with black border on TV). You might need to adjust graphics card settings to achieve the full computer screen is visible from one edge of the TV to the other.
+Set EyeSeparation, Parallax angle and Separation distance to 0. This removes the 3D effect and produces the same images for left and right eye.
+On the TV, turn the 3D mode on (use Side-by-side or Top-and-bottom mode).
+Without wearing the 3D glasses the TV should be showing one clear image (because images for left and right eye are the same). If you see blurry left and right images that are shown one near another, then you need to adjust the image separation distance by clicking on '+' and '-' buttons. With clicking on the buttons, you need to bring the separate left and right images closer together and finnally the two images should combine into one clear image. For example some Samsung TVs work best with separation distance set to 42 for side-by-side and 22 for top-and-bottom.
+When you see one clear image, then you can put the 3D glasses on (turn them on if you have active glasses; this is not needed for passive glasses).
+Now you can increase the EyeSeparation and Parallax angle. Note that for stronger 3D effect you can increase parallax angle - this also requires increased eye separation.";
+
+
             // Set ToolTip to code documentation text for StereoscopicVirtualRealityProvider.Parallax
-            ParallaxInfoImage.ToolTip =
+            ParallaxInfoControl.InfoText =
 @"Parallax defines a value in degrees that specifies an angle of the left and right eye look direction.
 If the parallax is zero, then the look directions of left and right cameras are parallel.
 If parallax is bigger then zero, then the left and right look directions are pointed to each other and
 they cross at some position in front of the camera (the bigger the angle the closer the crossing point).
 
-Usually the best 3D effect is producted when the parallax is set so that the look directions cross 
+Usually the best 3D effect is produced when the parallax is set so that the look directions cross 
 at the center of the scene - look directions of human eyes cross at the point of focus.";
 
 
             // Support dragging .obj files to load the 3D models from obj file
             var dragAndDropHelper = new DragAndDropHelper(MainDXViewportView, ".obj");
-            dragAndDropHelper.FileDroped += OnObjFileDropped;
+            dragAndDropHelper.FileDropped += OnObjFileDropped;
 
 
             // IMPORTANT:
@@ -453,7 +465,7 @@ at the center of the scene - look directions of human eyes cross at the point of
             Camera1.Refresh();
         }
 
-        private void OnObjFileDropped(object sender, FileDropedEventArgs args)
+        private void OnObjFileDropped(object sender, FileDroppedEventArgs args)
         {
             LoadObjFile(args.FileName);
 

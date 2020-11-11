@@ -55,7 +55,7 @@
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}"/>
 
-        <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Post-processing effect sample"/>
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Post-processing samples"/>
 
         <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#CCFFFFFF" BorderBrush="Black" BorderThickness="2">
             <StackPanel Orientation="Vertical" Margin="5">
@@ -74,8 +74,19 @@
 
                 <CheckBox Name="GaussianBlurCheckBox" Content="Gaussian blur" FontWeight="Bold" IsChecked="False"  Margin="0 7 0 2" ToolTip="More accurate gaussian blur effect" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+                    <TextBlock Text="Filter size:" VerticalAlignment="Center"/>
+                    <ComboBox Name="FilterSizeComboBox" Margin="5 0 0 0" Width="60" SelectedIndex="5" SelectionChanged="FilterSizeComboBox_OnSelectionChanged">
+                        <ComboBoxItem Content="5" />
+                        <ComboBoxItem Content="7" />
+                        <ComboBoxItem Content="9" />
+                        <ComboBoxItem Content="11" />
+                        <ComboBoxItem Content="13" />
+                        <ComboBoxItem Content="15" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
                     <TextBlock Text="Standard deviation:" />
-                    <Slider Name="StandardDeviationSlider" Minimum="0" Maximum="4" Value="2" Width="60" 
+                    <Slider Name="StandardDeviationSlider" Minimum="0" Maximum="2" Value="1" Width="60" 
                             AutoToolTipPrecision="1" AutoToolTipPlacement="BottomRight" TickFrequency="1" 
                             ValueChanged="StandardDeviationSlider_OnValueChanged" />
                 </StackPanel>
@@ -92,7 +103,7 @@
 
                 <CheckBox Name="EdgeDetectionCheckBox" Content="Edge detection" FontWeight="Bold" IsChecked="True" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
-                    <TextBlock Text="Edge threshold:" />
+                    <TextBlock Text="Edge threshold:" VerticalAlignment="Center" />
                     <ComboBox Name="EdgeThresholdComboBox" Margin="5 0 0 0" Width="75" SelectedIndex="3" SelectionChanged="EdgeThresholdComboBox_OnSelectionChanged">
                         <ComboBoxItem Content="0.01" />
                         <ComboBoxItem Content="0.02" />
@@ -110,7 +121,7 @@
 
                 <CheckBox Name="GammaCorrectionCheckBox" Content="Gamma correction" FontWeight="Bold" IsChecked="False" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
-                    <TextBlock Text="Gamma value:" />
+                    <TextBlock Text="Gamma value:" VerticalAlignment="Center" />
                     <ComboBox Name="GammaCorrectionComboBox" Margin="5 0 0 0" Width="75" SelectedIndex="1" SelectionChanged="GammaCorrectionComboBox_OnSelectionChanged">
                         <ComboBoxItem Content="0.25" />
                         <ComboBoxItem Content="0.5" />

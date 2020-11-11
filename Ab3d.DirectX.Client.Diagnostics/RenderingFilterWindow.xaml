@@ -23,8 +23,8 @@
         <TextBlock Grid.Row="2" Text="Enabled Rendering steps:" FontWeight="Bold" FontSize="13" Foreground="#333" Margin="0 20 0 2" />
         <StackPanel Name="RenderingStepsStackPanel" Grid.Row="3" Orientation="Vertical"></StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 0">
-            <Button Name="RefreshButton" Content="Refresh values" Width="80" Padding="4 3" Margin="10 0 0 0" Click="RefreshButton_OnClick" />
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 0">
+            <Button Name="RefreshButton" Content="Refresh items count" Padding="6 3" Click="RefreshButton_OnClick" />
             <Button Name="CloseButton" Content="Close" IsDefault="True" IsCancel="True" Width="80" Padding="4 3" Margin="15 0 0 0" Click="CloseButton_OnClick" />
         </StackPanel>
     </Grid>

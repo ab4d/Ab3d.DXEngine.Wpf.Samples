@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Models;
@@ -65,6 +66,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             Cylinder2.SetName("Cylinder2");
             Cylinder3.SetName("Cylinder3");
             TransparentPlaneVisual3D.SetName("TransparentPlaneVisual3D");
+
+
+            MainDXViewportView.SceneUpdating += MainDXViewportViewOnSceneUpdating;
 
 
             this.Loaded += new RoutedEventHandler(DXEventManager3DWrapperSample_Loaded);
@@ -120,14 +124,68 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             ArrowLineVisual3D.LineColor = Colors.Red;
         }
 
+        //void movableEventSource3D_MouseDrag(object sender, Ab3d.Common.EventManager3D.MouseDrag3DEventArgs e)
+        //{
+        //    if (e.HitSurface != null)
+        //    {
+        //        MovableVisualTranslate.OffsetX = e.CurrentSurfaceHitPoint.X;
+        //        MovableVisualTranslate.OffsetY = e.CurrentSurfaceHitPoint.Y + MovableBoxVisual3D.Size.Y / 2;
+        //        MovableVisualTranslate.OffsetZ = e.CurrentSurfaceHitPoint.Z;
+        //    }
+        //    double result = Power(1.000001, 5000000);
+        //    Text1.Text = result.ToString();
+
+        //    MainDXViewportView.Refresh();
+        //}
+
+
+        private Point3D _lastHitPoint;
+        private Point3D _lastUsedHitPoint;
+
         void movableEventSource3D_MouseDrag(object sender, Ab3d.Common.EventManager3D.MouseDrag3DEventArgs e)
         {
             if (e.HitSurface != null)
+                _lastHitPoint = e.CurrentSurfaceHitPoint; // No processing in input event handler - just save the last position
+        }
+        
+        private void MainDXViewportViewOnSceneUpdating(object sender, EventArgs e)
+        {
+            if (_lastUsedHitPoint == _lastHitPoint) // No change
+                return;
+
+            _lastUsedHitPoint = _lastHitPoint;
+
+            // TODO: Move that to background thread:
+            // The value that is required for the prcessing should be written to some shared fields (use locking).
+            // Then if background thread is not working already on some previous data, it should be signaled to grab the new data and start working.
+            // When the bg thread finishes working, it writes the last result so some shared filed that can be read by this method.
+            // It checks if there is some new input data available - if it is it starts working on that.
+            // If not it stops working and starts waiting on a signal from the main thread that there is some new data again.
+            //
+            // An advantage is that this does not block the main thread so used can rotate the camera or do some other UI tasks.
+            double result = Power(1.000001, 5000000);
+            Text1.Text = result.ToString();
+
+            // TODO: Check if the last result from the background thread is different from what is currently shown.
+            // In this case change the 3D scene:
+            MovableVisualTranslate.OffsetX = _lastUsedHitPoint.X;
+            MovableVisualTranslate.OffsetY = _lastUsedHitPoint.Y + MovableBoxVisual3D.Size.Y / 2;
+            MovableVisualTranslate.OffsetZ = _lastUsedHitPoint.Z;
+
+            // No need to manually call Refresh - we are already in the Update state and if there are some changes, the scene will be automatically rendered
+            //MainDXViewportView.Refresh();
+        }
+
+
+        private double Power(double number, uint exponent)
+        {
+            double result = 1;
+            while (exponent > 0)
             {
-                MovableVisualTranslate.OffsetX = e.CurrentSurfaceHitPoint.X;
-                MovableVisualTranslate.OffsetY = e.CurrentSurfaceHitPoint.Y + MovableBoxVisual3D.Size.Y / 2;
-                MovableVisualTranslate.OffsetZ = e.CurrentSurfaceHitPoint.Z;
+                result *= number;
+                exponent--;
             }
+            return result;
         }
 
         void movableEventSource3D_MouseClick(object sender, Ab3d.Common.EventManager3D.MouseButton3DEventArgs e)

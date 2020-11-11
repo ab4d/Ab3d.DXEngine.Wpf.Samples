@@ -6,17 +6,20 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Ab3d.DXEngine.Wpf.Samples.Controls
 {
-    public class InfoControl : Image
+    public class InfoControl : Grid
     {
-        private static BitmapImage _infoIcon;
         private TextBlock _tooltipTextBlock;
 
         public static DependencyProperty InfoTextProperty = DependencyProperty.Register("InfoText", typeof(object), typeof(InfoControl),
-                 new FrameworkPropertyMetadata(null, new PropertyChangedCallback(InfoControl.OnTextChanged)));
+                 new FrameworkPropertyMetadata(null, InfoControl.OnTextChanged));
 
+        /// <summary>
+        /// Text that will be shown as ToolTip.
+        /// </summary>
         public object InfoText
         {
             get
@@ -31,9 +34,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            InfoControl thisInfoControl = null;
-
-            thisInfoControl = (InfoControl)d;
+            var thisInfoControl = (InfoControl)d;
 
             if (e.NewValue is string)
             {
@@ -49,8 +50,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
 
         public static DependencyProperty InfoWidthProperty = DependencyProperty.Register("InfoWidth", typeof(double), typeof(InfoControl),
-                 new FrameworkPropertyMetadata(0.0, new PropertyChangedCallback(InfoControl.OnInfoWidthChanged)));
+                 new FrameworkPropertyMetadata(0.0, InfoControl.OnInfoWidthChanged));
 
+        /// <summary>
+        /// Width of the ToolTip TextBlock. Longer text will be automatically wrapped.
+        /// Default value is 0 that does not limit the TextBlock width.
+        /// </summary>
         public double InfoWidth
         {
             get
@@ -65,12 +70,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
         private static void OnInfoWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            double newWidth;
-
-            InfoControl thisInfoControl = null;
-
-            thisInfoControl = (InfoControl)d;
-            newWidth = (double)e.NewValue;
+            var thisInfoControl = (InfoControl)d;
+            var newWidth = (double)e.NewValue;
 
             if (newWidth == 0)
                 newWidth = double.NaN;
@@ -80,8 +81,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
 
         public static DependencyProperty ShowDurationProperty = DependencyProperty.Register("ShowDuration", typeof(int), typeof(InfoControl),
-                 new FrameworkPropertyMetadata(30000, new PropertyChangedCallback(InfoControl.OnShowDurationChanged)));
+                 new FrameworkPropertyMetadata(120000, InfoControl.OnShowDurationChanged));
 
+
+        /// <summary>
+        /// Duration of showing ToolTip in milliseconds. Default value is 120000.
+        /// </summary>
         public int ShowDuration
         {
             get
@@ -96,56 +101,89 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
         private static void OnShowDurationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            InfoControl thisInfoControl = null;
-
-            thisInfoControl = (InfoControl)d;
-
+            var thisInfoControl = (InfoControl)d;
             ToolTipService.SetShowDuration(thisInfoControl, (int)e.NewValue);
         }
 
 
-  //<Grid Width="12" Height="12">  
-  //     <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Width="12" Height="12" Fill="#6666FF"/>
-  //     <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Width="12" Height="12" Stroke="#AAAAFF" StrokeThickness="1"/>       
-  //     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" SnapsToDevicePixels="True" Margin="0 1 0 0" Foreground="White" FontSize="8" FontFamily="Times New Roman" Text="i"/>
-  // </Grid>
+        /// <summary>
+        /// Gets the Ellipse that is used to show background circle.
+        /// </summary>
+        public Ellipse BackGroundEllipse { get; private set; }
 
+        /// <summary>
+        /// Gets the TextBlock that is used to show the question character.
+        /// </summary>
+        public TextBlock QuestionTextBlock { get; private set; }
+
+
+        /// <summary>
+        /// Gets or sets the fill brush for the Ellipse shape. Default value is Gray.
+        /// </summary>
+        public Brush EllipseFillBrush
+        {
+            get { return BackGroundEllipse.Fill; }
+            set { BackGroundEllipse.Fill = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the foreground brush for the question character. Default value is White.
+        /// </summary>
+        public Brush QuestionCharacterForeground
+        {
+            get { return QuestionTextBlock.Foreground; }
+            set { QuestionTextBlock.Foreground = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the FontSize for the question character. Default value is 10.
+        /// </summary>
+        public double QuestionCharacterFontSize
+        {
+            get { return QuestionTextBlock.FontSize; }
+            set { QuestionTextBlock.FontSize = value; }
+        }
+
+
+
+
+        //<Grid>
+        //  <Ellipse Fill = "Gray" Width="12" Height="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        //  <TextBlock Text = "?" Foreground="White" FontWeight="Bold" FontFamily="Tahoma" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 0 0 0" />
+        //</Grid>
 
         public InfoControl()
         {
-            EnsureInfoIcon();
-
-            this.Width = 12;
+            this.Width  = 12;
             this.Height = 12;
-            this.Source = _infoIcon;
+            this.VerticalAlignment = VerticalAlignment.Center;
+
+            BackGroundEllipse = new Ellipse()
+            {
+                VerticalAlignment   = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Fill                = Brushes.Gray
+            };
+
+            QuestionTextBlock = new TextBlock()
+            {
+                Text                = "?",
+                FontFamily          = new FontFamily("Tahoma"),
+                FontWeight          = FontWeights.Bold,
+                FontSize            = 10,
+                Foreground          = Brushes.White,
+                VerticalAlignment   = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+
+            this.Children.Add(BackGroundEllipse);
+            this.Children.Add(QuestionTextBlock);
+
 
             _tooltipTextBlock = new TextBlock();
             _tooltipTextBlock.TextWrapping = TextWrapping.Wrap;
 
             this.Loaded += (sender, args) => ToolTipService.SetShowDuration(this, this.ShowDuration);          
-        }
-
-        public void ChangeIcon(ImageSource bitmap)
-        {
-            if (bitmap == null)
-                this.Source = _infoIcon;
-            else
-                this.Source = bitmap;
-        }
-
-        private void EnsureInfoIcon()
-        {
-            if (DesignerProperties.GetIsInDesignMode(this))
-                return;
-
-            if (_infoIcon == null)
-            {
-                _infoIcon = new BitmapImage();
-
-                _infoIcon.BeginInit();
-                _infoIcon.StreamSource = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/info_icon.png", UriKind.Absolute)).Stream;
-                _infoIcon.EndInit();
-            }
         }
     }
 }

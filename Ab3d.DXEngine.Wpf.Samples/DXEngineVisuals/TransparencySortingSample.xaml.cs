@@ -348,8 +348,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             private Model3DGroup Create3DScene(Point3D center, int xCount, int yCount, int zCount, float modelSize)
             {
-                var semiTransparentBrush = new SolidColorBrush(Color.FromArgb(64, 200, 200, 200)); // alpha = 1/4
-                var diffuseMaterial = new DiffuseMaterial(semiTransparentBrush);
+                var semiTransparentBrush = new SolidColorBrush(Color.FromArgb(32, 26,  161, 226)); // alpha = 1/8; color: #1aa1e2
+                var diffuseMaterial      = new DiffuseMaterial(semiTransparentBrush);
                 diffuseMaterial.Freeze(); // This will significantly speed up the creation of objects
 
                 var modelSizeWithMargin = modelSize * 1.2;

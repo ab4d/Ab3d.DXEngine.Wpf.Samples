@@ -64,6 +64,26 @@ namespace Ab3d.DirectX.Client.Settings
         {
             InitializeComponent();
 
+            AntiAliasingInfoControl.InfoText =
+@"Anti-aliasing is a technique used in computer graphics that tries to minimizing aliasing. Ab3d.DXEngine support the following two techniques:
+
+1) Multi-sampling (MSAA) can produce smoother edges with storing multiple color values for each pixel. To improve performance, pixel shader is executed once for each pixel and then its result (color) is shared across multiple pixels. This produces smoother edges but do not provide additional sub-pixel details. For example, 4xMSAA runs pixel shader only once per each pixel but require 4 times the amount of memory.
+
+2) Super-sampling (SSAA) is a technique that renders the image at a higher resolution and then down-samples the rendered image to the final resolution. The Ab3d.DXEngine can use smart down-sampling filter that improves smoothness of the final image. Super-sampling produces smoother edges and also provides additional sub-pixel details. For example, 4xSSAA renders the scene to a texture with 4 times more pixels (width and height are multiplied by 2). This requires running the pixel shader 4 times for each final pixel and requires 4 times the amount of memory.";
+
+
+            ShaderQualityInfoControl.InfoText =
+@"Ab3d.DXEngine currently support only Low and Normal quality shaders. 
+
+When using Low quality shaders the per-vertex lighting is used. This means that lighting calculations are done for each vertex (in vertex shader) and then interpolated to the pixels between vertices.
+When using Normal and High quality shader, then per-pixel lighting is used. As the name suggests, in per-pixel lighting the lighting calculations are done for each rendered pixel  (in pixel shader). This produces more accurate results but requires more work on the GPU.
+
+Usually modern graphics cards are so fast that using low quality shaders do not result in a significantly better performance.";
+
+
+            TextureFilteringInfoControl.InfoText = "Texture filtering defines how textures are read. Anisotropic filtering provides better quality when texture is viewed at low angles.";
+
+
             // IsAsyncAdaptersCheck can be set to true to show the panel immediately and when the device data are read fill controls that depend on device data
             IsAsyncAdaptersCheck = false;
 
@@ -85,18 +105,40 @@ namespace Ab3d.DirectX.Client.Settings
 
             this.Loaded += OnLoaded;
         }
-
-        private bool IsCustomRenderQuality()
+        
+        private AdapterCapabilitiesBase.RenderQualityTypes GetExistingRenderQuality(GraphicsProfile selectedGraphicsProfile)
         {
-            var renderQuality = AdapterCapabilitiesBase.GetGraphicsProfileQuality(_selectedGraphicsProfile);
-            var graphicsProfile = _selectedAdapterCapabilities.GetGraphicsProfileForQuality(renderQuality);
+            var allRenderQualities = (AdapterCapabilitiesBase.RenderQualityTypes[]) QualityComboBox.ItemsSource;
 
-            var isCustomRenderQuality = !(graphicsProfile.PreferedMultisampleCount == _selectedGraphicsProfile.PreferedMultisampleCount &&
-                                          graphicsProfile.ShaderQuality == _selectedGraphicsProfile.ShaderQuality &&
-                                          graphicsProfile.TextureFiltering == _selectedGraphicsProfile.TextureFiltering);
+            var existingRenderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Custom;
 
-            return isCustomRenderQuality;
+            foreach (var renderQuality in allRenderQualities)
+            {
+                if (renderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Custom) // Skip Custom quality
+                    continue;
+
+                var graphicsProfile = _selectedAdapterCapabilities.GetGraphicsProfileForQuality(renderQuality);
+
+                if (graphicsProfile.PreferedMultisampleCount == selectedGraphicsProfile.PreferedMultisampleCount &&
+                    graphicsProfile.SupersamplingCount       == selectedGraphicsProfile.SupersamplingCount &&
+                    graphicsProfile.ShaderQuality            == selectedGraphicsProfile.ShaderQuality &&
+                    graphicsProfile.TextureFiltering         == selectedGraphicsProfile.TextureFiltering)
+                {
+                    existingRenderQuality = renderQuality;
+                    break;
+                }
+            }
+
+            return existingRenderQuality;
         }
+
+        //private bool IsCustomRenderQuality()
+        //{
+        //    var existingGraphicsProfile = GetExistingGraphicsProfile(_selectedGraphicsProfile);
+
+        //    var isCustomRenderQuality = existingGraphicsProfile == null;
+        //    return isCustomRenderQuality;
+        //}
         
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
@@ -146,20 +188,13 @@ namespace Ab3d.DirectX.Client.Settings
             {
                 // This sets _selectedAdapterCapabilities and _selectedRenderQuality
                 SystemCapabilities.SelectRecommendedAdapter(out _selectedAdapterCapabilities, out _selectedRenderQuality);
-
                 _selectedGraphicsProfile = _selectedAdapterCapabilities.GetGraphicsProfileForQuality(_selectedRenderQuality);
             }
             else
             {
                 // This sets _selectedAdapterCapabilities and _selectedRenderQuality
                 _selectedAdapterCapabilities = SystemCapabilities.CreateAdapterCapabilitiesFromGraphicsProfile(_selectedGraphicsProfile);
-
-                var isCustomRenderQuality = IsCustomRenderQuality();
-
-                if (isCustomRenderQuality)
-                    _selectedRenderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Custom;
-                else
-                    _selectedRenderQuality = AdapterCapabilitiesBase.GetGraphicsProfileQuality(_selectedGraphicsProfile);
+                _selectedRenderQuality = GetExistingRenderQuality(_selectedGraphicsProfile);
             }      
         }
 
@@ -205,12 +240,21 @@ namespace Ab3d.DirectX.Client.Settings
 
                 _isInternalChange = true;
 
-                FillAntialiasingComboBox(AntialiasingComboBox, _selectedGraphicsProfile.PreferedMultisampleCount, _selectedAdapterCapabilities.DeviceCapabilities.MaxSupportedMultisamplingCount);
+
+                var msaaValues = new List<int>();
+                int count = 1;
+                while (_selectedAdapterCapabilities.DeviceCapabilities.MaxSupportedMultisamplingCount >= count)
+                {
+                    msaaValues.Add(count);
+                    count *= 2;
+                }
+
+                FillAntialiasingComboBox(MultisamplingComboBox, "MSAA", msaaValues.ToArray(),     _selectedGraphicsProfile.PreferedMultisampleCount, firstValueText: "No MSAA");
+                FillAntialiasingComboBox(SupersamplingComboBox, "SSAA", new int[]{ 1, 4, 16, 64}, _selectedGraphicsProfile.SupersamplingCount,       firstValueText: "No SSAA");
+
+
                 FillTextureFilteringComboBox(TextureFilteringComboBox, _selectedGraphicsProfile.TextureFiltering, maxAnisotropicLevel: 16); // All feature levels from 9.2 on support 16x AnisotropicLevel
                 ShaderQualityComboBox.SelectedItem = _selectedGraphicsProfile.ShaderQuality;
-
-                // Comboboxes inside Custom panel can be changed only when on custom quality settings
-                //CustomSettingsGrid.IsEnabled = (_selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Custom);
 
                 _isInternalChange = false;
             }
@@ -297,23 +341,52 @@ namespace Ab3d.DirectX.Client.Settings
 
         private void CheckIfCustomRenderQuality()
         {
-            var isCustomRenderQuality = IsCustomRenderQuality();
-            if (isCustomRenderQuality)
+            var selectedRenderQuality = GetExistingRenderQuality(_selectedGraphicsProfile);
+
+            if (selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Custom)
             {
                 _isInternalChange = true;
                 QualityComboBox.SelectedIndex = QualityComboBox.Items.Count - 1; // Set as Custom
                 _isInternalChange = false;
+
+                string customName = "Custom";
+                
+                if (_selectedGraphicsProfile.PreferedMultisampleCount > 1)
+                    customName += string.Format("_{0}xMSAA", _selectedGraphicsProfile.PreferedMultisampleCount);
+  
+                if (_selectedGraphicsProfile.SupersamplingCount > 1)
+                    customName += string.Format("_{0}xSSAA", _selectedGraphicsProfile.SupersamplingCount);
+
+                _selectedGraphicsProfile.Name = customName + "_GraphicsProfile";
+            }
+            else
+            {
+                QualityComboBox.SelectedItem = selectedRenderQuality;
             }
         }
 
-        private void AntialiasingComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void MultisamplingComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!this.IsLoaded || _isInternalChange)
                 return;
 
-            int selectedMultisamplingCount = GetSelectedComboBoxItemTagValue<int>(AntialiasingComboBox);
+            int selectedMultisamplingCount = GetSelectedComboBoxItemTagValue<int>(MultisamplingComboBox);
 
             _selectedGraphicsProfile.PreferedMultisampleCount = selectedMultisamplingCount;
+
+            CheckIfCustomRenderQuality();
+        }
+        
+        private void SupersamplingComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded || _isInternalChange)
+                return;
+
+            int selectedSupersamplingFactor = GetSelectedComboBoxItemTagValue<int>(SupersamplingComboBox);
+            if (selectedSupersamplingFactor == 0)
+                selectedSupersamplingFactor = 1;
+
+            _selectedGraphicsProfile.SupersamplingCount = selectedSupersamplingFactor;
 
             CheckIfCustomRenderQuality();
         }
@@ -427,75 +500,75 @@ namespace Ab3d.DirectX.Client.Settings
         }
 
 
-        public static void FillAntialiasingComboBox(ComboBox comboBox, int selectedMultisampleCount, int maxMultisampleCount = 8)
+        public static void FillAntialiasingComboBox(ComboBox comboBox, string techniqueName, int[] values, int selectedValue, string firstValueText = null)
         {
             int selectedIndex = 0;
 
             comboBox.BeginInit();
             comboBox.Items.Clear();
 
-            comboBox.Items.Add(new ComboBoxItem { Content = "Off", Tag = 0 });
-
-            if (maxMultisampleCount >= 2)
+            for (int i = 0; i < values.Length; i++)
             {
-                comboBox.Items.Add(new ComboBoxItem { Content = "2x MSAA", Tag = 2 });
+                int    oneValue = values[i];
+                string contentText;
 
-                if (selectedMultisampleCount >= 2)
-                    selectedIndex = 1;
+                if (i == 0 && firstValueText != null)
+                    contentText = firstValueText;
+                else
+                    contentText = string.Format("{0}x {1}", oneValue, techniqueName);
 
-                if (maxMultisampleCount >= 4)
-                {
-                    comboBox.Items.Add(new ComboBoxItem { Content = "4x MSAA", Tag = 4 });
+                comboBox.Items.Add(new ComboBoxItem { Content = contentText, Tag = oneValue, HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
 
-                    if (selectedMultisampleCount >= 4)
-                        selectedIndex = 2;
-
-                    if (maxMultisampleCount >= 8)
-                    {
-                        comboBox.Items.Add(new ComboBoxItem { Content = "8x MSAA", Tag = 8 });
-
-                        if (selectedMultisampleCount >= 8)
-                            selectedIndex = 3;
-
-                        if (maxMultisampleCount >= 16)
-                        {
-                            comboBox.Items.Add(new ComboBoxItem { Content = "16x MSAA", Tag = 16 });
-
-                            if (selectedMultisampleCount >= 16)
-                                selectedIndex = 4;
-                        }
-                    }
-                }
+                if (selectedValue == oneValue)
+                    selectedIndex = i;
             }
+
+            //comboBox.Items.Add(new ComboBoxItem { Content = "No " + techniqueName, Tag = 0, HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
+
+            //int index = 1;
+            //int count = 2;
+            //while (maxCount >= count)
+            //{
+            //    comboBox.Items.Add(new ComboBoxItem { Content = string.Format("{0}x {1}", count, techniqueName), Tag = count, HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
+
+            //    if (selectedCount >= count)
+            //        selectedIndex ++;
+
+            //    index++;
+
+            //    if (isPowerOfTwo)
+            //        count = index * index;
+            //    else
+            //        count = index * 2;
+            //}
 
             comboBox.EndInit();
             comboBox.SelectedIndex = selectedIndex;
         }
-
 
         public static void FillTextureFilteringComboBox(ComboBox comboBox, TextureFilteringTypes textureFiltering, int maxAnisotropicLevel = 16)
         {
             comboBox.BeginInit();
             comboBox.Items.Clear();
 
-            comboBox.Items.Add(new ComboBoxItem { Content = "Point", Tag = TextureFilteringTypes.Point, ToolTip = "Uses the color of the nearest neighboring pixel (produces square pixels when zoomed in)." });
-            comboBox.Items.Add(new ComboBoxItem { Content = "Bilinear", Tag = TextureFilteringTypes.Bilinear, ToolTip = "Uses the color that is linearly interpolated from the nearest colors from the texture." });
-            comboBox.Items.Add(new ComboBoxItem { Content = "Trilinear", Tag = TextureFilteringTypes.Trilinear, ToolTip = "Uses the color that is linearly interpolated from the nearest colors from the two nearest mip map textures." });
+            comboBox.Items.Add(new ComboBoxItem { Content = "Point", Tag = TextureFilteringTypes.Point, ToolTip = "Uses the color of the nearest neighboring pixel (produces square pixels when zoomed in).", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
+            comboBox.Items.Add(new ComboBoxItem { Content = "Bilinear", Tag = TextureFilteringTypes.Bilinear, ToolTip = "Uses the color that is linearly interpolated from the nearest colors from the texture.", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
+            comboBox.Items.Add(new ComboBoxItem { Content = "Trilinear", Tag = TextureFilteringTypes.Trilinear, ToolTip = "Uses the color that is linearly interpolated from the nearest colors from the two nearest mip map textures.", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
 
             if (maxAnisotropicLevel >= 2)
             {
-                comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 2x", Tag = TextureFilteringTypes.Anisotropic_x2, ToolTip = "Anisotropic filtering with level 2 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low)." });
+                comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 2x", Tag = TextureFilteringTypes.Anisotropic_x2, ToolTip = "Anisotropic filtering with level 2 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low).", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
 
                 if (maxAnisotropicLevel >= 4)
                 {
-                    comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 4x", Tag = TextureFilteringTypes.Anisotropic_x4, ToolTip = "Anisotropic filtering with level 4 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low)." });
+                    comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 4x", Tag = TextureFilteringTypes.Anisotropic_x4, ToolTip = "Anisotropic filtering with level 4 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low).", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
 
                     if (maxAnisotropicLevel >= 8)
                     {
-                        comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 8x", Tag = TextureFilteringTypes.Anisotropic_x8, ToolTip = "Anisotropic filtering with level 8 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low)." });
+                        comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 8x", Tag = TextureFilteringTypes.Anisotropic_x8, ToolTip = "Anisotropic filtering with level 8 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low).", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
 
                         if (maxAnisotropicLevel >= 8)
-                            comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 16x", Tag = TextureFilteringTypes.Anisotropic_x16, ToolTip = "Anisotropic filtering with level 16 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low)." });
+                            comboBox.Items.Add(new ComboBoxItem { Content = "Anisotropic 16x", Tag = TextureFilteringTypes.Anisotropic_x16, ToolTip = "Anisotropic filtering with level 16 (compared to linear interpolation Anisotropic filtering improves details when camera angle is low).", HorizontalContentAlignment = HorizontalAlignment.Left, VerticalContentAlignment = VerticalAlignment.Center });
                     }
                 }
             }

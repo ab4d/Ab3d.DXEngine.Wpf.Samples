@@ -26,10 +26,6 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         public event EventHandler ValueChanged;
 
-        private List<RenderingQueue> _allRenderingQueues;
-        private List<RenderingQueue> _disabledRenderingQueues;
-
-
         public RenderingFilterWindow(DXScene dxScene)
         {
             if (dxScene == null)
@@ -45,16 +41,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
         
         private void CreateRenderingQueuesEditor()
         {
-            if (_allRenderingQueues == null)
-            {
-                _allRenderingQueues = CurrentDXScene.RenderingQueues.ToList();
-                _disabledRenderingQueues = new List<RenderingQueue>();
-            }
-
-
             RenderingQueuesStackPanel.Children.Clear();
 
-            foreach (var renderingQueue in _allRenderingQueues)
+            foreach (var renderingQueue in CurrentDXScene.RenderingQueues)
             {
                 string renderingQueueTitle = renderingQueue.Name;
 
@@ -67,25 +56,19 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 var checkBox = new CheckBox()
                 {
                     Content   = renderingQueueTitle,
-                    IsChecked = !_disabledRenderingQueues.Contains(renderingQueue),
+                    IsChecked = renderingQueue.IsRenderingEnabled,
                     Margin    = new Thickness(0, 3, 0, 0)
                 };
 
                 checkBox.Checked += delegate(object sender, RoutedEventArgs args)
                 {
-                    _disabledRenderingQueues.Remove(renderingQueue);
-
-                    RecreateRenderingQueuesOnDXScene();
-                    CreateRenderingQueuesEditor();
+                    renderingQueue.IsRenderingEnabled = true;
                     OnValueChanged();
                 };
                 
                 checkBox.Unchecked += delegate(object sender, RoutedEventArgs args)
                 {
-                    _disabledRenderingQueues.Add(renderingQueue);
-
-                    RecreateRenderingQueuesOnDXScene();
-                    CreateRenderingQueuesEditor();
+                    renderingQueue.IsRenderingEnabled = false;
                     OnValueChanged();
                 };
 
@@ -123,26 +106,6 @@ namespace Ab3d.DirectX.Client.Diagnostics
             }
         }
 
-        private void RecreateRenderingQueuesOnDXScene()
-        {
-            // First remove all RenderingQueues
-            var allRenderingQueues = CurrentDXScene.RenderingQueues.ToList();
-
-            foreach (var oneRenderingQueue in allRenderingQueues)
-                CurrentDXScene.RemoveRenderingQueue(oneRenderingQueue);
-
-            // Now add enabled RenderingQueues
-            RenderingQueue previousRenderingQueue = null;
-            foreach (var oneRenderingQueue in _allRenderingQueues)
-            {
-                if (!_disabledRenderingQueues.Contains(oneRenderingQueue))
-                {
-                    CurrentDXScene.AddRenderingQueueAfter(oneRenderingQueue, previousRenderingQueue);
-                    previousRenderingQueue = oneRenderingQueue;
-                }
-            }
-        }
-
         protected void OnValueChanged()
         {
             if (ValueChanged != null)
@@ -156,8 +119,6 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private void RefreshButton_OnClick(object sender, RoutedEventArgs e)
         {
-            _allRenderingQueues = null;
-
             CreateRenderingQueuesEditor();
             CreateRenderingStepsEditor();
         }

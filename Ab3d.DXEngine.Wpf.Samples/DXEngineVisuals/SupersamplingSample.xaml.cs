@@ -12,8 +12,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
+using Ab3d.Controls;
 using Ab3d.DirectX;
+using Ab3d.DirectX.Controls;
 using SharpDX.Direct3D;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
@@ -23,78 +26,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
     /// </summary>
     public partial class SupersamplingSample : Page
     {
-        private bool _isInternalChange;
-
         public SupersamplingSample()
         {
             InitializeComponent();
 
+            // NOTE: Standard GraphicsProfiles use the following MSAA and SSAA settings:
+            // LowQualityHardwareRendering:    0xMSAA,  1xSSAA
+            // NormalQualityHardwareRendering: 4xMSAA,  1xSSAA
+            // HighQualityHardwareRendering:   4xMSAA,  4xSSAA
+            // UltraQualityHardwareRendering:  2xMSAA, 16xSSAA
 
-            MultisampledDXViewportView.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.HighQualityHardwareRendering, GraphicsProfile.HighQualitySoftwareRendering, GraphicsProfile.Wpf3D };
+            AddDXViewport3DGrid("No MSAA, No SSAA", "No multisampling and no supersampling", 
+                                multisamplingCount: 0, supersamplingCount: 1, rowIndex: 0, columnIndex: 0);
 
-            // For SupersampledDXViewportView we will use UltraQualityHardwareRendering (the same as HighQualityHardwareRendering but has ExecutePixelShaderPerSample set to true).
-            // There is no UltraQualitySoftwareRendering so we create one from HighQualitySoftwareRendering
-            var ultraQualitySoftwareRendering = GraphicsProfile.HighQualitySoftwareRendering.Clone();
-            ultraQualitySoftwareRendering.ExecutePixelShaderPerSample = true;
-
-            SupersampledDXViewportView.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.UltraQualityHardwareRendering, ultraQualitySoftwareRendering, GraphicsProfile.Wpf3D };
-
-
-            var sceneModelVisual1 = CreateScene();
-            SupersampledViewport.Children.Add(sceneModelVisual1);
-
-            var sceneModelVisual2 = CreateScene();
-            MultisampledViewport.Children.Add(sceneModelVisual2);
-
-
-            // We can turn on supersampling after the DXScene is created and initialized
-            SupersampledDXViewportView.DXSceneInitialized += delegate(object sender, EventArgs args)
-            {
-                // When DXEngine falls back to WPF 3D rendering, the DXScene is null; we could also check for MainDXViewportView.UsedGraphicsProfile.DriverType != GraphicsProfile.DriverTypes.Wpf3D
-                if (SupersampledDXViewportView.DXScene == null)
-                {
-                    SupersamplingTitleTextBlock.Text = "Supersampling not supported";
-                    MessageBox.Show("This sample is not supported in WPF 3D rendering");
-                    return;
-                }
-
-
-                if (SupersampledDXViewportView.DXScene.DXDevice.DeviceCapabilities.FeatureLevel <= FeatureLevel.Level_10_1)
-                {
-                    SupersamplingTitleTextBlock.Text = "Supersampling not supported";
-                    MessageBox.Show("Your graphics card does not support supersampling created with executing pixel shader for each sample. This is supported only in shader model 4.1 and later. This required that graphics card supports at least feature level 10.1.");
-                    return;
-                }
-
-
-                int multisamplingCount = SupersampledDXViewportView.DXScene.MultisampleCount; // Get the actually used multisampling count
-
-
-                // Update titles
-                MultisamplingTitleTextBlock.Text = string.Format("Standard {0}x Multisampling (MSAA)", multisamplingCount);
-                SupersamplingTitleTextBlock.Text = string.Format("{0}x Supersampling (SSAA)", multisamplingCount);
-
-                SupersamplingDetailsTextBlock.Text = SupersamplingDetailsTextBlock.Text.Replace("{0}", multisamplingCount.ToString());
-
-
-                if (multisamplingCount <= 1)
-                {
-                    MessageBox.Show("The currently used GraphicsProfile does not use multisampling.\r\n\r\nBecause of this the sample cannot show the advantage of using supersampling.\r\nPlease select another GraphicsProfile or run the sample on computer that support multisampling.");
-                    return;
-                }
-
-
-                // Now we can turn on supersampling
-                // This is done with setting ExecutePixelShaderPerSample to true.
-                // When ExecutePixelShaderPerSample is set to true, the pixel shader is executed for each multisampling sample instead of only once per pixel .
-                // This turns multisampling into supersampling which can improve rendering quality but can significantly reduce performance (especially for multiple point or spot lights; it is recommended to use up to 3 directional lights + ambient light).
-                // See help file for DXScene.ExecutePixelShaderPerSample for more info.
-                // 
-                // In the future there will be support for custom supersampling count that could be combined with custom multisampling count.
-                // For example: 4x supersampling + 8x multisampling.
-                // This is also a reason that the ExecutePixelShaderPerSample is not called EnableSupersampling because this would complicate API in the future.
-                SupersampledDXViewportView.DXScene.ExecutePixelShaderPerSample = true;
-            };
+            AddDXViewport3DGrid("8x MSAA, No SSAA", "Multisampling  (MSAA) produces smooth antialiased edges, but because color is calculated only once per each pixel, the smaller details can be lost.", 
+                                multisamplingCount: 8, supersamplingCount: 1, rowIndex: 0, columnIndex: 1);
+            
+            AddDXViewport3DGrid("No MSAA, 16x SSAA", "Supersampling (SSAA) renders the scene to a bigger texture (in this case 16 times bigger: width and height are 4 times bigger) and then down-samples the texture to the final size. This preserves tiny details.",
+                                multisamplingCount: 2, supersamplingCount: 16, rowIndex: 0, columnIndex: 2);
         }
 
         private ModelVisual3D CreateScene()
@@ -119,38 +68,105 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             return modelVisual3D;
         }
 
-        private void Camera1_OnCameraChanged(object sender, CameraChangedRoutedEventArgs e)
+        private void AddDXViewport3DGrid(string title, string subTitle, int multisamplingCount, int supersamplingCount, int rowIndex, int columnIndex)
         {
-            if (_isInternalChange) // Prevent infinite call or Camera1 / 2 change handlers
-                return;
+            var viewport3D = new Viewport3D();
 
-            _isInternalChange = true;
+            var sceneModelVisual3D = CreateScene();
+            viewport3D.Children.Add(sceneModelVisual3D);
 
-            Camera2.BeginInit();
-            Camera2.Heading  = Camera1.Heading;
-            Camera2.Attitude = Camera1.Attitude;
-            Camera2.Distance = Camera1.Distance;
-            Camera2.Offset   = Camera1.Offset;
-            Camera2.EndInit();
 
-            _isInternalChange = false;
-        }
+            var dxViewportView = new DXViewportView(viewport3D);
 
-        private void Camera2_OnCameraChanged(object sender, CameraChangedRoutedEventArgs e)
-        {
-            if (_isInternalChange) // Prevent infinite call or Camera1 / 2 change handlers
-                return;
+            // Set GraphicsProfile:
+            var graphicsProfile = new GraphicsProfile(string.Format("{0}MSAA_{1}SSAA_HardwareRendering", multisamplingCount, supersamplingCount), 
+                                                      GraphicsProfile.DriverTypes.DirectXHardware, 
+                                                      ShaderQuality.High, 
+                                                      preferedMultisampleCount: multisamplingCount,
+                                                      supersamplingCount: supersamplingCount, 
+                                                      textureFiltering: TextureFilteringTypes.Anisotropic_x4);
 
-            _isInternalChange = true;
+            dxViewportView.GraphicsProfiles = new GraphicsProfile[] { graphicsProfile, GraphicsProfile.Wpf3D }; // Add WPF 3D as fallback
 
-            Camera1.BeginInit();
-            Camera1.Heading = Camera2.Heading;
-            Camera1.Attitude = Camera2.Attitude;
-            Camera1.Distance = Camera2.Distance;
-            Camera1.Offset = Camera2.Offset;
-            Camera1.EndInit();
 
-            _isInternalChange = false;
+            var border = new Border()
+            {
+                Background          = Brushes.Transparent,
+                BorderBrush         = Brushes.Gray,
+                BorderThickness     = new Thickness(1, 1, 1, 1),
+                Margin              = new Thickness(1, 1, 3, 3),
+                UseLayoutRounding   = true,
+                SnapsToDevicePixels = true
+            };
+
+            border.Child = dxViewportView;
+            
+            
+            var targetPositionCamera = new TargetPositionCamera()
+            {
+                TargetPosition   = new Point3D(15, 50, 5),
+                Heading          = -17,
+                Attitude         = -25,
+                ShowCameraLight  = ShowCameraLightType.Always,
+                Distance         = 80,
+                TargetViewport3D = viewport3D
+            };
+
+            var mouseCameraController = new MouseCameraController()
+            {
+                TargetCamera           = targetPositionCamera,
+                EventsSourceElement    = border,
+                RotateCameraConditions = MouseCameraController.MouseAndKeyboardConditions.LeftMouseButtonPressed,
+                MoveCameraConditions   = MouseCameraController.MouseAndKeyboardConditions.ControlKey | MouseCameraController.MouseAndKeyboardConditions.LeftMouseButtonPressed,
+            };
+
+
+            var titlesPanel = new StackPanel()
+            {
+                Orientation         = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Top,
+                Margin              = new Thickness(10, 10, 10, 0)
+            };
+
+            if (title != null)
+            {
+                var textBlock = new TextBlock()
+                {
+                    Text = title,
+                    FontSize = 18,
+                    FontWeight = FontWeights.Bold,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = new SolidColorBrush(Color.FromRgb(32, 32, 32)),
+                };
+
+                titlesPanel.Children.Add(textBlock);
+            }
+            
+            if (subTitle != null)
+            {
+                var textBlock = new TextBlock()
+                {
+                    Text         = subTitle,
+                    FontSize     = 14,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin       = new Thickness(0, 3, 0, 0)
+                };
+
+                titlesPanel.Children.Add(textBlock);
+            }
+
+
+            var viewRootGrid = new Grid();
+            viewRootGrid.Children.Add(border);
+            viewRootGrid.Children.Add(titlesPanel);
+            viewRootGrid.Children.Add(targetPositionCamera);
+            viewRootGrid.Children.Add(mouseCameraController);
+
+
+            Grid.SetColumn(viewRootGrid, columnIndex);
+            Grid.SetRow(viewRootGrid, rowIndex);
+            RootGrid.Children.Add(viewRootGrid);
         }
     }
 }

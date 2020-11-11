@@ -5,7 +5,7 @@
         xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
         Title="Ab3d.DXEngine Samples"
         Icon="Ab4d.ico"
-        Width="1280" Height="720">
+        Width="1300" Height="720">
     <Window.Resources>
 
         <SolidColorBrush x:Key="BackgroundBrush">#333</SolidColorBrush>
@@ -81,7 +81,7 @@
     
     <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="270"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -106,14 +106,12 @@
             <TextBlock Grid.Row="0" Margin="10 15 5 0" HorizontalAlignment="Left" Text="Ab3d.DXEngine by"
                        FontWeight="Bold" FontSize="16" Foreground="{StaticResource HeaderBrush}"/>
 
-            <Image Grid.Row="1" Margin="10 5 5 0" HorizontalAlignment="Left" Cursor="Hand" MouseUp="LogoImage_OnMouseUp"
+            <Image Name="LogoImage" Grid.Row="1" Margin="10 5 5 0" HorizontalAlignment="Left" Cursor="Hand" MouseUp="LogoImage_OnMouseUp"
                    Source="Resources/ab4d-logo.png" Width="128" ToolTip="Click to visit the AB4D company web site"/>
 
             
-            <TextBlock Name="GraphicsProfileTypeTextBlock" Grid.Row="2" Margin="10 15 5 3" HorizontalAlignment="Left"
-                       Text="Selected graphics profile:" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
-
-            <TextBlock Name="SelectedAdapterInfoTextBlock" Grid.Row="3" Margin="10 0 5 0" Foreground="{StaticResource ForegroundBrush}" Visibility="Collapsed"/>
+            <TextBlock Name="GraphicsProfileTypeTextBlock" Grid.Row="2" Margin="10 15 5 0" HorizontalAlignment="Left"
+                       Text="Used graphics profile:" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
 
             <Grid Grid.Row="4" Margin="10 0 5 0" HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
@@ -128,7 +126,7 @@
 
             </Grid>
 
-            <StackPanel  Grid.Row="5" Margin="10 3 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
+            <StackPanel  Grid.Row="5" Margin="10 5 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
                 <Button Name="GraphicsSettingsButton" Width="100" HorizontalContentAlignment="Left" Click="GraphicsSettingsButton_OnClick">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources/Settings.png" Width="18" Height="18" Margin="5 1 0 0" />
@@ -142,20 +140,20 @@
                         <TextBlock Name="DiagnosticsTextBlock" Text="Diagnostics" Margin="5 3" />
                     </StackPanel>
                 </Button>
+
+                <Image Name="DiagnosticsInfoImage" Source="Resources/info_orange_icon.png" Height="14" Margin="5 0 0 0" HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="Hand" MouseUp="DiagnosticsInfoImage_OnMouseDown"
+                       ToolTip="Click to show web page with more information about Diagnostics and using DXEngineSnoop tool." ToolTipService.ShowDuration="60000"/>
             </StackPanel>
 
-            <ScrollViewer Grid.Row="6" Margin="0 20 0 5" VerticalAlignment="Center" 
-                          HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-                <ListBox Name="SampleList"
+            <ListBox Name="SampleList" Grid.Row="6" 
+                     Margin="0 20 0 5" Padding="0 0 0 0"
 	                 SelectedIndex="0"
                      ItemsSource="{Binding Source={StaticResource SamplesXml}, XPath=Samples/Sample}"
                      ItemTemplate="{StaticResource SamplesTemplate}"    
                      ItemContainerStyle="{StaticResource SimpleListBoxItem}" 
                      Background="{StaticResource BackgroundBrush}"
                      BorderThickness="1"
-                     BorderBrush="{StaticResource BackgroundBrush}"
-	                 Padding="5 0"/>
-            </ScrollViewer>
+                     BorderBrush="{StaticResource BackgroundBrush}" />
 
         </Grid>
 
@@ -179,15 +177,19 @@
                 </Grid.RowDefinitions>
 
                 <Frame Name="ContentFrame" Grid.Row="0" Source="{Binding XPath=@Page}" NavigationUIVisibility="Hidden" Navigated="ContentFrame_OnNavigated" Focusable="false"/>
-                
-                <Expander Name="DescriptionExpander"  Grid.Row="1" 
+
+                <Expander Name="DescriptionExpander" Grid.Row="1"  
                           Style="{StaticResource MyExpanderStyle}"
                           Header="Description" IsExpanded="True" Padding="0"
-                          Visibility="{Binding Converter={StaticResource IsStringEmptyConverter}}">
-                    <TextBlock Name="DescriptionTextBlock" Margin="40 5 0 0" DataContextChanged="TextBlock_DataContextChanged"
-							   TextWrapping="Wrap" TextAlignment="Left" FontSize="12"/>
+                          Visibility="{Binding Converter={StaticResource IsStringEmptyConverter}}" >
+                        <controls:TextBlockEx x:Name="DescriptionTextBlock" Margin="40 5 0 0"
+                                              TextWrapping="Wrap" TextAlignment="Left" FontSize="12"
+                                              ContentText="{Binding XPath=@Description}"/>
                 </Expander>
             </Grid>
         </Border>
+
+        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="1 0 0 0" Width="3" Background="{StaticResource BackgroundBrush}" />
+
     </Grid>
 </Window>

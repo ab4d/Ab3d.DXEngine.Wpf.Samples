@@ -33,10 +33,11 @@ namespace Ab3d.DirectX.Client.Settings
         /// GetCustomGraphicsProfile in WpfAdapterCapabilities always returns the Wpf3D GraphicsProfile.
         /// </summary>
         /// <param name="multisampleCount">multisampleCount</param>
+        /// <param name="superSamplingCount"></param>
         /// <param name="shaderQuality">shaderQuality</param>
         /// <param name="textureFiltering">textureFiltering</param>
         /// <returns>Wpf3D GraphicsProfile</returns>
-        public override GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering)
+        public override GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, int superSamplingCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering)
         {
             return GraphicsProfile.Wpf3D;
         }

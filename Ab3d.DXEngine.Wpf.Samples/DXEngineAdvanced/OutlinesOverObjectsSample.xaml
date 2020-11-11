@@ -1,4 +1,4 @@
-﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced.OutlinesSample"
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced.OutlinesOverObjectsSample"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -53,12 +53,15 @@
                 <Slider Name="OutlineSizeSlider" Minimum="1" Maximum="16" Value="2" TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
                         ValueChanged="OutlineSizeSlider_OnValueChanged" />
 
+                <TextBlock Name="SSAAInfoTextBlock" Foreground="Red" TextWrapping="Wrap" Width="150" Margin="0 3 0 0" Visibility="Collapsed"
+                           Text="Max outline size reduced because of SSAA" />
+
                 <TextBlock Text="Selected objects:" FontWeight="Bold" Margin="0 10 0 5" />
             </StackPanel>
         </Border>
 
         <TextBlock Text="Object outlines that are visible through other objects"
-                   FontWeight="Bold" FontSize="18" Foreground="Silver" Margin="5 0 5 5" TextWrapping="Wrap" 
+                   FontWeight="Bold" FontSize="18" Foreground="Silver" Margin="10 5 5 5" TextWrapping="Wrap" 
                    VerticalAlignment="Top" HorizontalAlignment="Left"/>
     </Grid>
 </Page>

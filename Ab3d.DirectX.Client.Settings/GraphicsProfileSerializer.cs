@@ -32,8 +32,8 @@ namespace Ab3d.DirectX.Client.Settings
         /// <returns>serialized GraphicsProfile</returns>
         public static string Serialize(GraphicsProfile graphicsProfile)
         {
-            return string.Format("Name: {0}; DriverType: {1}; ShaderQuality: {2}; MultisampleCount: {3}; TextureFiltering: {4}{5}",
-                graphicsProfile.Name, graphicsProfile.DriverType, graphicsProfile.ShaderQuality, graphicsProfile.PreferedMultisampleCount, graphicsProfile.TextureFiltering,
+            return string.Format("Name: {0}; DriverType: {1}; ShaderQuality: {2}; MultisampleCount: {3}; SupersamplingCount: {4}; TextureFiltering: {5}{6}",
+                graphicsProfile.Name, graphicsProfile.DriverType, graphicsProfile.ShaderQuality, graphicsProfile.PreferedMultisampleCount, graphicsProfile.SupersamplingCount, graphicsProfile.TextureFiltering,
                 (graphicsProfile.DefaultAdapter != null && !graphicsProfile.DefaultAdapter.IsDisposed) ? "; Adapter: " + graphicsProfile.DefaultAdapterDescription : "");
         }
 
@@ -81,11 +81,12 @@ namespace Ab3d.DirectX.Client.Settings
 
             // Setup default values
             // We cannot change the properties of GraphicProfile, so we will need to prepare all the property values and after that create a new GraphicProfile with out property values
-            var driverType = graphicsProfile.DriverType;
-            var shaderQuality = graphicsProfile.ShaderQuality;
-            int preferedMultisampleCount = graphicsProfile.PreferedMultisampleCount;
-            var textureFiltering = graphicsProfile.TextureFiltering;
-            Adapter1 defaultAdapter = graphicsProfile.DefaultAdapter;
+            var      driverType               = graphicsProfile.DriverType;
+            var      shaderQuality            = graphicsProfile.ShaderQuality;
+            int      preferedMultisampleCount = graphicsProfile.PreferedMultisampleCount;
+            int      supersamplingCount       = graphicsProfile.SupersamplingCount;
+            var      textureFiltering         = graphicsProfile.TextureFiltering;
+            Adapter1 defaultAdapter           = graphicsProfile.DefaultAdapter;
 
             match = match.NextMatch();
             while (match.Success)
@@ -111,6 +112,10 @@ namespace Ab3d.DirectX.Client.Settings
                         case "multisamplecount":
                             preferedMultisampleCount = Int32.Parse(propertyValue);
                             break;
+                        
+                        case "supersamplingcount":
+                            supersamplingCount = Int32.Parse(propertyValue);
+                            break;
 
                         case "texturefiltering":
                             textureFiltering = (TextureFilteringTypes) Enum.Parse(typeof (TextureFilteringTypes), propertyValue);
@@ -131,8 +136,8 @@ namespace Ab3d.DirectX.Client.Settings
                 match = match.NextMatch();
             }
 
-            // Now we have the final values of all GraphicsProfile properties and we can create a new instace of GraphicsProfile
-            graphicsProfile = new GraphicsProfile(graphicProfileName, driverType, shaderQuality, preferedMultisampleCount, textureFiltering, defaultAdapter);
+            // Now we have the final values of all GraphicsProfile properties and we can create a new instance of GraphicsProfile
+            graphicsProfile = new GraphicsProfile(graphicProfileName, driverType, shaderQuality, preferedMultisampleCount, supersamplingCount, textureFiltering, defaultAdapter);
 
             return graphicsProfile;
         }

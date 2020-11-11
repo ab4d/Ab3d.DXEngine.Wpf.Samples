@@ -24,6 +24,8 @@
                     \n
                     For the best possible results it provides PBR (Physically Based Rendering) materials that can render real-life object with their physically based properties.\n
                     \n
+                    Ab3d.DXEngine provides many different kinds of 3D lines: lines with patterns, hidden lines, lines with colors and use depth bias to render the lines on top of 3D geometry.\n
+                    \n
                     It is also possible to render advanced effects like environment and normal mapping with using standard materials.\n
                     \n
                     All the lighting calculations are by default done with per-pixel accuracy. For even better precision it is possible to enable super-sampling.

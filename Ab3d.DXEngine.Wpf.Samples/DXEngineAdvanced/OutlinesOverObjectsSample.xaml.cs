@@ -40,6 +40,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     //    We add the expanded solid color object to the existing scene only for those pixels that do not have stencil buffer set to 1
     //    (so only those that do not belong to the original solid color object but were added with using ExpandPostProcess).
     //
+    // Note that this sample work without multi-sampling (MSAA) and super-sampling (SSAA)!
+    // MSAA is not supported because it is not possible to use texture sampler on a MSAA texture (back buffer).
+    // But it is possible to render outlines with SSAA. To update the code see the code comments at the end of constructor and
+    // in the SetupOutlineBackBuffers method to see how to update the sample to support SSAA.
+    // In this case note that maximum expand in the ExpandPostProcess is 16 - so if you have 4xSSAA then you can only expand the objects by 4 (after resolving the SSAA).
+    //
+    //
     // 
     // The following shows all the rendering steps after setting them up to also render outlines (new steps are marked with *)
     // - InitializeRenderingStep Name: 'Initialize'
@@ -48,7 +55,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     // *   - RenderPostProcessingRenderingStep Name: 'Expand objects rendering step'
     // - PrepareRenderTargetsRenderingStep Name: 'PrepareRenderTargets'
     // - RenderObjectsRenderingStep Name: 'StandardRenderObjects'
-    // - ResolveMultisampledBackBufferRenderingStep Name: 'StandardResolveMultisampledBackBuffer'
+    // - ResolveBackBufferRenderingStep Name: 'StandardResolveBackBuffer'
     // - RenderingStepsGroup Name: 'RenderPostProcessingGroup' (DISABLED)
     // -    - PreparePostProcessingRenderingStep Name: 'PreparePostProcessing' (PARENT DISABLED)
     // -    - RenderPostProcessingRenderingStep Name: 'RenderPostProcessing' (PARENT DISABLED)
@@ -57,9 +64,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
 
     /// <summary>
-    /// Interaction logic for OutlinesSample.xaml
+    /// Interaction logic for OutlinesOverObjectsSample.xaml
     /// </summary>
-    public partial class OutlinesSample : Page
+    public partial class OutlinesOverObjectsSample : Page
     {
         private SolidColorEffect _solidColorEffectWithOutline;
         private ExpandPostProcess _horizontalExpandPostProcess;
@@ -71,7 +78,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private List<string> _selectedObjectNames;
 
-        public OutlinesSample()
+        public OutlinesOverObjectsSample()
         {
             InitializeComponent();
 
@@ -101,6 +108,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         private RenderTargetView _savedRenderTargetView;
         private DepthStencilView _savedDepthStencilView;
         private ViewportF _savedViewport;
+        private int _savedSuperSamplingCount;
 
         private Texture2D _outlineBackBuffer;
         private Texture2DDescription _outlineBackBufferDescription;
@@ -268,10 +276,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             _disposables.Add(_horizontalExpandPostProcess);
             _disposables.Add(_verticalExpandPostProcess);
 
-            var expandPostProcesses = new List<PostProcessBase>();
-            expandPostProcesses.Add(_horizontalExpandPostProcess);
-            expandPostProcesses.Add(_verticalExpandPostProcess);
-
+            var expandPostProcesses = new PostProcessBase[]
+            {
+                _horizontalExpandPostProcess,
+                _verticalExpandPostProcess
+            };
 
             // We could also blur the outline to make it bigger, but Expand creates better results
             //var horizontalBlurPostProcess = new Ab3d.DirectX.PostProcessing.SimpleBlurPostProcess(isVerticalBlur: false, filterWidth: 5);
@@ -303,11 +312,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             {
                 var renderingContext = args.RenderingContext;
 
-                renderingContext.SetBackBuffer(renderingContext.CurrentBackBuffer, renderingContext.CurrentBackBufferDescription, renderingContext.CurrentRenderTargetView, _outlineDepthStencilView, false);
-                //renderingContext.DeviceContext.OutputMerger.SetTargets(_outlineDepthStencilView, renderingContext.CurrentRenderTargetView);
+                renderingContext.SetBackBuffer(renderingContext.CurrentBackBuffer, 
+                                               renderingContext.CurrentBackBufferDescription, 
+                                               renderingContext.CurrentRenderTargetView,
+                                               _outlineDepthStencilView,
+                                               renderingContext.CurrentSupersamplingCount,
+                                               false);
             };
 
             MainDXViewportView.DXScene.RenderingSteps.AddBefore(MainDXViewportView.DXScene.DefaultCompleteRenderingStep, _addOutlineRenderingStep);
+
+            // To render the outlines with super-sampling (SSAA), then instead of adding the _addOutlineRenderingStep before DefaultCompleteRenderingStep,
+            // add it before DefaultResolveBackBufferRenderingStep (comment the previous line and uncomment the next line).
+            // This way the outlines will be rendered at super-sampled resolutions and and down-sampled.
+            // You will also need to update the _outlineBackBufferDescription (see comment in the SetupOutlineBackBuffers method).
+            // Note that it is not possible to render outlines with multi-sampling (MSAA) because there it is not possible to use texture sampler in pixel shader.
+            //MainDXViewportView.DXScene.RenderingSteps.AddBefore(MainDXViewportView.DXScene.DefaultResolveBackBufferRenderingStep, _addOutlineRenderingStep);
         }
 
         private void SetupOutlineBackBuffers(RenderingContext renderingContext)
@@ -320,6 +340,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             _savedRenderTargetView      = renderingContext.CurrentRenderTargetView;
             _savedDepthStencilView      = renderingContext.CurrentDepthStencilView;
             _savedViewport              = renderingContext.CurrentViewport;
+            _savedSuperSamplingCount    = renderingContext.CurrentSupersamplingCount;
 
             // If size is changed, we need to recreate the back buffer
             if (_outlineBackBuffer != null &&
@@ -331,14 +352,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             if (_outlineBackBuffer == null)
             {
-                _outlineBackBufferDescription = dxDevice.CreateTexture2DDescription(renderingContext.CurrentBackBufferDescription.Width,
-                                                                                    renderingContext.CurrentBackBufferDescription.Height,
+                _outlineBackBufferDescription = dxDevice.CreateTexture2DDescription(renderingContext.FinalBackBufferDescription.Width, // Read size from FinalBackBufferDescription because CurrentBackBufferDescription can be super-sampled
+                                                                                    renderingContext.FinalBackBufferDescription.Height,
                                                                                     new SampleDescription(1, 0),
                                                                                     isRenderTarget: true,
                                                                                     isSharedResource: false,
                                                                                     isStagingTexture: false,
                                                                                     isShaderResource: true,
                                                                                     format: DXDevice.StandardBufferFormat);
+
+                // Super-sampling note:
+                // To render the outlines at super-sampling resolution, then use the size from CurrentBackBufferDescription and not from FinalBackBufferDescription:
+                // (you will also need to update the position of _addOutlineRenderingStep at the end of the constructor).
+                //_outlineBackBufferDescription.Width  = renderingContext.CurrentBackBufferDescription.Width;
+                //_outlineBackBufferDescription.Height = renderingContext.CurrentBackBufferDescription.Height;
 
                 _outlineBackBuffer = dxDevice.CreateTexture2D(_outlineBackBufferDescription);
 
@@ -394,7 +421,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 }
             }
 
-            renderingContext.SetBackBuffer(_outlineBackBuffer, _outlineBackBufferDescription, _outlineRenderTargetView, _outlineDepthStencilView, bindNewRenderTargetsToDeviceContext: true);
+            renderingContext.SetBackBuffer(_outlineBackBuffer, 
+                _outlineBackBufferDescription, 
+                _outlineRenderTargetView, 
+                _outlineDepthStencilView, 
+                currentSupersamplingCount: 1,
+                bindNewRenderTargetsToDeviceContext: true);
 
             renderingContext.CurrentViewport = _outlineBufferViewport;
             renderingContext.DeviceContext.Rasterizer.SetViewport(_outlineBufferViewport);
@@ -405,7 +437,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void RestoreBackBuffers(RenderingContext renderingContext)
         {
-            renderingContext.SetBackBuffer(_savedBackBuffer, _savedBackBufferDescription, _savedRenderTargetView, _savedDepthStencilView, bindNewRenderTargetsToDeviceContext: true);
+            renderingContext.SetBackBuffer(_savedBackBuffer, 
+                                           _savedBackBufferDescription, 
+                                           _savedRenderTargetView, 
+                                           _savedDepthStencilView,
+                                           _savedSuperSamplingCount,
+                                           bindNewRenderTargetsToDeviceContext: true);
+
             renderingContext.CurrentViewport = _savedViewport;
 
             _savedBackBuffer       = null;
@@ -537,14 +575,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void OutlineSizeSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!this.IsLoaded)
+            if (!this.IsLoaded || MainDXViewportView.DXScene == null)
                 return;
 
+            int newExpansionWidth = (int)OutlineSizeSlider.Value;
+
             if (_horizontalExpandPostProcess != null)
-                _horizontalExpandPostProcess.ExpansionWidth = (int)OutlineSizeSlider.Value;
+                _horizontalExpandPostProcess.ExpansionWidth = newExpansionWidth;
 
             if (_verticalExpandPostProcess != null)
-                _verticalExpandPostProcess.ExpansionWidth = (int)OutlineSizeSlider.Value;
+                _verticalExpandPostProcess.ExpansionWidth = newExpansionWidth;
 
             MainDXViewportView.Refresh(); // Render scene again
         }

@@ -112,7 +112,7 @@ OptimizeNearAndFarCameraPlanes";
         {
             FrameworkElement editorControl;
 
-            var propertyValue = propertyInfo.GetValue(CurrentDXScene);
+            var propertyValue = propertyInfo.GetValue(CurrentDXScene, null);
 
             if (propertyInfo.PropertyType == typeof(Boolean))
             {
@@ -138,14 +138,14 @@ OptimizeNearAndFarCameraPlanes";
 
             checkBox.Checked += delegate(object sender, RoutedEventArgs args)
             {
-                propertyInfo.SetValue(CurrentDXScene, true);
+                propertyInfo.SetValue(CurrentDXScene, true, null);
                 OnValueChanged();
             };
 
 
             checkBox.Unchecked += delegate (object sender, RoutedEventArgs args)
             {
-                propertyInfo.SetValue(CurrentDXScene, false);
+                propertyInfo.SetValue(CurrentDXScene, false, null);
                 OnValueChanged();
             };
 
@@ -178,7 +178,7 @@ OptimizeNearAndFarCameraPlanes";
                 if (Int32.TryParse(valueText, out newValue))
                 {
                     textBox.ClearValue(ForegroundProperty);
-                    propertyInfo.SetValue(CurrentDXScene, newValue);
+                    propertyInfo.SetValue(CurrentDXScene, newValue, null);
 
                     OnValueChanged();
                 }

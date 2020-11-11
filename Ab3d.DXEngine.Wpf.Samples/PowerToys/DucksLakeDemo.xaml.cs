@@ -71,6 +71,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
                 if (MainDXViewportView.DXScene == null)
                     return; // Probably WPF 3D rendering
 
+                if (MainDXViewportView.DXScene.ShaderQuality == ShaderQuality.Low)
+                    LowQualityInfoTextBlock.Visibility = Visibility.Visible; // Show info that shadow rendering is not supported with low quality rendering
+
                 // Setup shadow rendering
                 _varianceShadowRenderingProvider = new VarianceShadowRenderingProvider();
 

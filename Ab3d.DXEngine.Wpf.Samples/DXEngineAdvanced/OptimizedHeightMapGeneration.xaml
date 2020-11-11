@@ -15,13 +15,17 @@
     <Grid>
         <Border Name="ViewportBorder" Grid.Row="0" Background="Transparent">
             <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="White">
-                <Viewport3D Name="MainViewport" />
+                <Viewport3D Name="MainViewport" >
+                    <visuals:ContentVisual3D x:Name="RootContentVisual3D" />
+                </Viewport3D>
             </dxControls:DXViewportView>
         </Border>
 
+        <ProgressBar Name="GenerationProgressBar" Grid.Row="0" Minimum="0" Maximum="100" Height="20" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Visibility="Collapsed" />
+
         <cameras:TargetPositionCamera Name="Camera1" Grid.Row="0"
                                       TargetPosition="0 20 0" 
-                                      Heading="50" Attitude="-20" Bank="0" 
+                                      Heading="50" Attitude="-15" Bank="0" 
                                       Distance="600" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
@@ -34,5 +38,9 @@
                                     MoveOnlyHorizontally="True" 
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
+
+        <TextBlock Name="TitleTextBlock" Text="Improving initialization with creating DirectX buffers for height map in the background" 
+                   FontWeight="Bold" FontSize="16" Foreground="#333" Margin="0 0 10 0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
     </Grid>
 </Page>

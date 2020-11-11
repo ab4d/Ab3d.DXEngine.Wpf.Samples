@@ -25,8 +25,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     {
         private DispatcherTimer _sliderTimer;
 
-        private bool _isWarningIconShown;
-
         public PolyLinesSample()
         {
             InitializeComponent();
@@ -129,24 +127,7 @@ You can get rendering statistics (including number of draw calls) with setting A
             DrawCallsCountTextBlock.Text = string.Format("{0} x {1} = {2:#,##0}", xCount, yCount, drawCallsCount);
 
             // Show waring icon when number of draw calls is over 1000
-            if (drawCallsCount > 1000)
-            {
-                if (!_isWarningIconShown)
-                {
-                    DrawCallsCountInfoControl.ChangeIcon(new BitmapImage(new Uri("pack://application:,,,/Resources/warningIcon.png", UriKind.Absolute)));
-                    _isWarningIconShown = true;
-                }
-            }
-            else
-            {
-                if (_isWarningIconShown)
-                {
-                    // Remove waring icon and show standard info icon instead
-                    DrawCallsCountInfoControl.ChangeIcon(null);
-                    _isWarningIconShown = false;
-                }
-            }
-
+            WarningImage.Visibility = (drawCallsCount > 1000) ? Visibility.Visible : Visibility.Collapsed;
 
 
             if (xCount == 0 || yCount == 0)

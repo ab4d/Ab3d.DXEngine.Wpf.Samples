@@ -46,7 +46,7 @@
             </dxControls:DXViewportView>
         </Border>
         
-        <TextBlock FontWeight="Bold" FontSize="20" Foreground="Gray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Click on blue box or drag it around"/>
+        <TextBlock Name="Text1" FontWeight="Bold" FontSize="20" Foreground="Gray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Click on blue box or drag it around"/>
         
         <cameras:TargetPositionCamera Name="Camera1" Heading="30" Attitude="-20" TargetPosition="0 40 0" Distance="400" TargetViewport3D="{Binding ElementName=Viewport3D1}"/>
 

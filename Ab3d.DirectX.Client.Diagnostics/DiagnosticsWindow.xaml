@@ -36,6 +36,7 @@
                 <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingQueuesMenuItem" Header="Dump RenderingQueues" Click="DumpRenderingQueuesMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
+                <MenuItem Name="DumpBackBufferChangesMenuItem" Header="Dump BackBuffer changes" Click="DumpBackBufferChangesMenuItem_OnClick"/>
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
                 <MenuItem Name="DumpDXEngineSettingsMenuItem" Header="Dump DXEngine settings" Click="DumpDXEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpCurrentSceneMenuItem" Header="Get full scene dump" Click="DumpCurrentSceneMenuItem_OnClick"/>
@@ -80,12 +81,12 @@
             <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0"></TextBlock>
         </StackPanel>
 
-        <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10">
+        <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10" Visibility="Collapsed">
             <Button Name="StopPerformanceAnalyzerButton" Content="STOP Analyzer" Padding="10 4" Visibility="Collapsed" Click="StopPerformanceAnalyzerButton_OnClick" />
             <Button Name="ShowStatisticsButton" Content="Show rendering statistics" Padding="10 4" Visibility="Collapsed" Click="ShowStatisticsButton_OnClick" />
         </StackPanel>
 
-        <TextBlock Name="ResultsTitleTextBlock" Grid.Row="3" TextDecorations="Underline" Margin="10 0 10 2" Visibility="Collapsed"
+        <TextBlock Name="ResultsTitleTextBlock" Grid.Row="3" TextDecorations="Underline" Margin="10 10 10 2" Visibility="Collapsed"
                    Text="Rendering statistics:"/>
         
         <TextBlock Name="StatisticsTextBlock" Grid.Row="4" Margin="10 0 10 10" Visibility="Collapsed" />

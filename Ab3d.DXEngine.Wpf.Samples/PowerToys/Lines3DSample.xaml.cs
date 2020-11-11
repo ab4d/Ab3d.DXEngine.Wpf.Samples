@@ -25,7 +25,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
         {
             InitializeComponent();
 
-            ArrowLengthInfoImage.ToolTip =
+            ArrowLengthInfoControl.InfoText =
 @"Specifies the maximum arrow length set as fraction of the line length.
 For example: 0.2 means that the maximum arrow length will be 1 / 5 (=0.2) of the line length.
 If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength,

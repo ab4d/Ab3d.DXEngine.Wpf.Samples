@@ -46,6 +46,6 @@
         </CheckBox>
 
         <TextBlock FontWeight="Bold" Grid.Column="0" FontSize="18" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"
-                   Text="ContentVisual3D is showing Model3D and supports IsVisible property"/>
+                   Text="Quickly showing and hiding models with ContentVisual3D"/>
     </Grid>
 </Page>

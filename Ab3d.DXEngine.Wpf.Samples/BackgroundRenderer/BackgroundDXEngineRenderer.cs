@@ -105,11 +105,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
         /// <param name="dpiScaleX">DPI scale: 1 means no scale (96 DPI)</param>
         /// <param name="dpiScaleY">DPI scale: 1 means no scale (96 DPI)</param>
         /// <param name="preferedMultisamplingCount">preferedMultisamplingCount</param>
+        /// <param name="supersamplingCount">super-sampling count (1 for no super-sampling)</param>
         public void InitializeDXViewportView(int clientWindowWidth,
                                              int clientWindowHeight,
                                              double dpiScaleX,
                                              double dpiScaleY,
-                                             int preferedMultisamplingCount)
+                                             int preferedMultisamplingCount,
+                                             int supersamplingCount = 1)
         {
             // To render the 3D scene to the custom hWnd, we need to create the DXViewportView with a custom DXScene,
             // that was initialized with calling InitializeSwapChain mathod (with passed hWnd).
@@ -147,6 +149,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
                                         (int) (clientWindowWidth * dpiScaleX),
                                         (int) (clientWindowHeight * dpiScaleY),
                                         preferedMultisamplingCount,
+                                        supersamplingCount,
                                         (float) dpiScaleX,
                                         (float) dpiScaleY);
 

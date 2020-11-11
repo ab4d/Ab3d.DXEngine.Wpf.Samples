@@ -42,9 +42,12 @@
                 <RadioButton Name="ShowTeapotRadioButton" Content="Show Teapot" GroupName="ObjectType" Margin="0 2 0 0" Checked="ShowTeapotRadioButton_OnChecked" />
             </StackPanel>
         </Border>
-        
-        <TextBlock Name="TitleTextBlock" Grid.Column="0" Grid.Row="0" Text="Line depth bias can prevent depth z-fighting of lines and solid object" TextWrapping="Wrap"
-                   FontWeight="Bold" FontSize="20" Foreground="DimGray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Panel.ZIndex="3"/>
+
+        <StackPanel Grid.Column="0" Grid.Row="0"  Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="17" Foreground="#444" Panel.ZIndex="3" TextWrapping="Wrap"
+                       Text="Line depth bias can prevent depth z-fighting of lines and solid object" />
+            <TextBlock Text="DepthBias moves line closer to the camera for the specified amount" FontSize="14" TextWrapping="Wrap" Margin="0 5 0 0" />
+        </StackPanel>
     </Grid>
 </Page>
 

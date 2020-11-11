@@ -26,11 +26,11 @@ using Color = System.Windows.Media.Color;
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
     /// <summary>
-    /// Interaction logic for ColoredPolyLinesSample.xaml
+    /// Interaction logic for ColoredLinesSample.xaml
     /// </summary>
-    public partial class ColoredPolyLinesSample : Page
+    public partial class ColoredLinesSample : Page
     {
-        public ColoredPolyLinesSample()
+        public ColoredLinesSample()
         {
             InitializeComponent();
 

@@ -83,12 +83,13 @@ namespace Ab3d.DirectX.Client.Settings
         /// GetCustomGraphicsProfile returns a custom quality GraphicsProfile with settings provided as method parameters.
         /// </summary>
         /// <param name="multisampleCount">multisampleCount</param>
+        /// <param name="superSamplingCount">superSamplingCount</param>
         /// <param name="shaderQuality">shaderQuality</param>
         /// <param name="textureFiltering">textureFiltering</param>
         /// <returns>GraphicsProfile</returns>
-        public override GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering)
+        public override GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, int superSamplingCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering)
         {
-            return new GraphicsProfile("CustomHardwareRendering", GraphicsProfile.DriverTypes.DirectXHardware, shaderQuality, multisampleCount, textureFiltering, this.Adapter);
+            return new GraphicsProfile("CustomHardwareRendering", GraphicsProfile.DriverTypes.DirectXHardware, shaderQuality, multisampleCount, superSamplingCount, textureFiltering, this.Adapter);
         }
 
 

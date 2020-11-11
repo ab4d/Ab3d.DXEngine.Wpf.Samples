@@ -99,10 +99,11 @@ namespace Ab3d.DirectX.Client.Settings
         /// GetCustomGraphicsProfile returns a custom quality GraphicsProfile with settings provided as method parameters.
         /// </summary>
         /// <param name="multisampleCount">multisampleCount</param>
+        /// <param name="superSamplingCount">superSamplingCount</param>
         /// <param name="shaderQuality">shaderQuality</param>
         /// <param name="textureFiltering">textureFiltering</param>
         /// <returns>GraphicsProfile</returns>
-        public abstract GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering);
+        public abstract GraphicsProfile GetCustomGraphicsProfile(int multisampleCount, int superSamplingCount, ShaderQuality shaderQuality, TextureFilteringTypes textureFiltering);
 
         // Note: this method "guesses" the RenderQualityTypes from the name of GraphicsProfile
 

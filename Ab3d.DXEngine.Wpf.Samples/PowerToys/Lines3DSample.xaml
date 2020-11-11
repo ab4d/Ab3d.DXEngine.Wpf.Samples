@@ -5,6 +5,7 @@
     xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
     xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
     xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+    xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
     Title="AllModelsSample"
     MinHeight="300"
     MinWidth="600">
@@ -110,7 +111,8 @@
 
         <ab3d:CameraControlPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5" Width="225" Height="75" ShowMoveButtons="True"/>
 
-        <TextBlock FontWeight="Bold" FontSize="20" Foreground="Silver" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Text="3D lines and 3D axis created with Ab3d.Visuals"/>
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="Silver" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="3D lines and 3D axis created with Ab3d.Visuals"/>
 
         <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#33000000" BorderBrush="Black" BorderThickness="2" CornerRadius="3">
             <Grid Margin="10">
@@ -131,9 +133,7 @@
                     <ComboBoxItem>30</ComboBoxItem>
                     <ComboBoxItem>45</ComboBoxItem>
                 </ComboBox>
-                <Image Grid.Row="0" Grid.Column="2" Source="/Resources/info_icon.png" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                       Margin="5 -2 0 0" ToolTipService.ShowDuration="30000" ToolTip="Sets the angle of the arrow in degrees" />
-
+                <controls:InfoControl Grid.Row="0" Grid.Column="2" Margin="5 0 0 0" InfoText="Sets the angle of the arrow in degrees" />
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="Max arrow length:"/>
                 <ComboBox Name="LengthComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="1" Width="60" Margin="0 3" SelectionChanged="LengthComboBox_OnSelectionChanged">
@@ -143,8 +143,7 @@
                     <ComboBoxItem>0.4</ComboBoxItem>
                     <ComboBoxItem>0.5</ComboBoxItem>
                 </ComboBox>
-                <Image Name="ArrowLengthInfoImage" Grid.Row="1" Grid.Column="2" Source="/Resources/info_icon.png" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                       Margin="5 -2 0 0" ToolTipService.ShowDuration="30000" />
+                <controls:InfoControl x:Name="ArrowLengthInfoControl" Grid.Row="1" Grid.Column="2" Margin="5 0 0 0" />
             </Grid>
         </Border>
     </Grid>

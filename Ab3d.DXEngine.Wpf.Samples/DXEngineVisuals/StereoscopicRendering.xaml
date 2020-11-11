@@ -68,8 +68,7 @@
                             <ComboBoxItem Name="AnaglyphProvider" Content="Anaglyph" />
                             <ComboBoxItem Name="SplitScreenProvider" Content="Split Screen" />
                         </ComboBox>
-                        <Image Name="VRProviderInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                                   ToolTipService.ShowDuration="30000" /> <!-- ToolTip is set in code to add line breaks -->
+                        <controls:InfoControl x:Name="VRProviderInfoControl" Margin="5 0 0 0" />
                     </StackPanel>
 
                     <TextBlock Name="ProviderSettingsTextBlock" Grid.Column="0" Grid.Row="1" Text="Anaglyph type:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 3 0 0"/>
@@ -80,24 +79,7 @@
                     <StackPanel Name="SeparationDistancePanel" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Visibility="Collapsed" Orientation="Vertical" Margin="10 0 0 0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Separation" FontWeight="Bold"/>
-                            <Image Name="SeparationDistanceInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                                   ToolTipService.ShowDuration="30000" >
-                                <Image.ToolTip>
-                                    <controls:TextBlockEx FontFamily="Verdana" MaxWidth="600" FontSize="12" Foreground="#333" TextWrapping="Wrap" LineHeight="16">
-                                        When Split-screen stereoscopic rendering is used to render the 3D scene on a 3D TV, it may be necessary to
-adjust the image separation distance before a good 3D effect can be achieved.\n
-\n
-Please use the following steps to calibrate the settings for 3D TV:\n
-\* When using HDMI cable to connect computer and TV, make sure that the computer screeen is not cropped or too small (with black border on TV). You might need to adjust graphics card settings to achive the full computer screen is visible from one edge of the TV to the other.\n
-\* Set EyeSeparation, Parallax angle and Separation distance to 0. This removes the 3D effect and produces the same images for left and right eye.\n
-\* On the TV, turn the 3D mode on (use Side-by-side or Top-and-bottom mode).\n
-\* Without wearing the 3D glasses the TV should be showing one clear image (because images for left and right eye are the same). If you see blurry left and right images that are shown one near another, then you need to adjust the image separation distance by clicking on '+' and '-' buttons. With clicking on the buttons, you need to bring the separate left and right images closer together and finnally the two images should combine into one clear image. For example some Samsung TVs work best with separation distance set to 42 for side-by-side and 22 for top-and-bottom.\n
-\* When you see one clear image, then you can put the 3D glasses on (turn them on if you have active glasses; this is not needed for passive glasses).\n
-\* Now you can increase the EyeSeparation and Parallax angle. Note that for stronger 3D effect you can increase parallax angle - this also requires increased eye separation.
-
-                                    </controls:TextBlockEx>
-                                </Image.ToolTip>
-                            </Image>
+                            <controls:InfoControl x:Name="SeparationDistanceInfoControl" Margin="5 0 0 0" />
                         </StackPanel>
                         <TextBlock Name="SeparationDistanceTextBlock" Text="distance: 0" />
                         <StackPanel Orientation="Horizontal">
@@ -115,9 +97,7 @@ Please use the following steps to calibrate the settings for 3D TV:\n
 
                     <StackPanel Grid.Column="5" Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding ElementName=EyeSeparationSlider, Path=Value, StringFormat={}{0:0} mm}" VerticalAlignment="Center"/>
-                        <Image Name="EyeSeparationInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                                   ToolTipService.ShowDuration="30000" />
-                        <!-- ToolTip is set in code to add line breaks -->
+                        <controls:InfoControl x:Name="EyeSeparationInfoControl" Margin="5 0 0 0" />
                     </StackPanel>
 
                     <TextBlock Grid.Column="3" Grid.Row="1" Text="Parallax angle:" FontWeight="Bold" Margin="10 0 0 0" VerticalAlignment="Center" />
@@ -128,9 +108,7 @@ Please use the following steps to calibrate the settings for 3D TV:\n
 
                     <StackPanel Grid.Column="5" Grid.Row="1" Orientation="Horizontal" Margin="0 0 0 0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding ElementName=ParallaxSlider, Path=Value, StringFormat={}{0:0.00}°}" Margin="0 0 0 0" VerticalAlignment="Center"/>
-
-                        <Image Name="ParallaxInfoImage" Source="/Resources/info_icon.png" Margin="5 0 0 0" SnapsToDevicePixels="True" Width="16" Height="16" VerticalAlignment="Center"
-                               ToolTipService.ShowDuration="30000" /> <!-- ToolTip is set in code to add line breaks -->
+                        <controls:InfoControl x:Name="ParallaxInfoControl" Margin="5 0 0 0" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="6" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" Margin="10 0 0 0">

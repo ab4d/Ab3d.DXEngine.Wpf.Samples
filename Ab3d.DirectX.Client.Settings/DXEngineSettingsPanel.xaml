@@ -2,13 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:settings="clr-namespace:Ab3d.DirectX.Client.Settings"
              mc:Ignorable="d" 
-             Width="335">
+             Width="351">
     <Grid IsSharedSizeScope="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition SharedSizeGroup="KeyColumn" Width="110" />
             <ColumnDefinition SharedSizeGroup="ValueColumn" Width="225"/>
+            <ColumnDefinition SharedSizeGroup="InfoIconColumn" Width="16"/>
         </Grid.ColumnDefinitions>     
         <Grid.RowDefinitions>
              <RowDefinition Height="Auto" />            
@@ -27,10 +29,11 @@
         <TextBlock Name="QualityTextBlock" Grid.Column="0" Grid.Row="3" Text="Render quality:" Margin="0 15 5 10" VerticalAlignment="Center" />
         <ComboBox Name="QualityComboBox" Grid.Column="1" Grid.Row="3" Margin="0 15 0 10" SelectionChanged="QualityComboBox_OnSelectionChanged" />
 
-        <Grid Name="CustomSettingsGrid" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4">
+        <Grid Name="CustomSettingsGrid" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition SharedSizeGroup="KeyColumn" Width="Auto" />
                 <ColumnDefinition SharedSizeGroup="ValueColumn" Width="Auto" />
+                <ColumnDefinition SharedSizeGroup="InfoIconColumn" Width="16" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -40,13 +43,30 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Column="0" Grid.Row="0" Text="Anti-aliasing:" Margin="0 2 5 2" VerticalAlignment="Center" />
-            <ComboBox Name="AntialiasingComboBox" Grid.Column="1" Grid.Row="0" Margin="0 2 0 2" SelectionChanged="AntialiasingComboBox_OnSelectionChanged"/>
+
+            <Grid Grid.Column="1" Grid.Row="0" Margin="0 2 0 2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Name="MultisamplingComboBox" Grid.Column="0" Margin="0 2 0 2" SelectionChanged="MultisamplingComboBox_OnSelectionChanged"/>
+                <TextBlock Grid.Column="1" Text="x" Margin="10 0" VerticalAlignment="Center"/>
+                <ComboBox Name="SupersamplingComboBox" Grid.Column="2" Margin="0 2 0 2" SelectionChanged="SupersamplingComboBox_OnSelectionChanged"/>
+                
+            </Grid>
+
+            <settings:InfoControl x:Name="AntiAliasingInfoControl" Grid.Row="0" Grid.Column="2" Margin="3 0 0 0" InfoWidth="500" />
         
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Shaders quality:" Margin="0 2 5 2" VerticalAlignment="Center" />
             <ComboBox Name="ShaderQualityComboBox" Grid.Column="1" Grid.Row="1" Margin="0 2 0 2" SelectionChanged="ShaderQualityComboBox_OnSelectionChanged"/>
-        
+            <settings:InfoControl x:Name="ShaderQualityInfoControl" Grid.Row="1" Grid.Column="2" Margin="3 0 0 0" InfoWidth="500" />
+
             <TextBlock Grid.Column="0" Grid.Row="2" Text="Texture filtering:" Margin="0 2 5 2" VerticalAlignment="Center" />
             <ComboBox Name="TextureFilteringComboBox" Grid.Column="1" Grid.Row="2" Margin="0 2 0 2" SelectionChanged="TextureFilteringComboBox_OnSelectionChanged"/>
+            <settings:InfoControl x:Name="TextureFilteringInfoControl" Grid.Row="2" Grid.Column="2" Margin="3 0 0 0" InfoWidth="500" />
 
             <!--<TextBlock Grid.Column="0" Grid.Row="3" Text="Shadows quality:" Margin="0 2 5 2" VerticalAlignment="Center" />
             <ComboBox Name="ShadowsComboBox" Grid.Column="1" Grid.Row="3" Margin="0 2 0 2" SelectionChanged="ShadowsComboBox_OnSelectionChanged">

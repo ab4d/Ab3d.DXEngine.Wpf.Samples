@@ -7,9 +7,7 @@
     xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
     xmlns:dxModels="clr-namespace:Ab3d.DirectX.Models;assembly=Ab3d.DXEngine.Wpf"
     xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
-    Title="PolyLinesSample"
-    MinHeight="300"      
-    MinWidth="600">
+    Title="PolyLinesSample">
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -103,6 +101,8 @@
             <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
                 <TextBlock Text="Draw calls count:"/>
                 <controls:InfoControl x:Name="DrawCallsCountInfoControl" ShowDuration="1200000" InfoWidth="600" Margin="5 0 0 0"/>
+                <Image Name="WarningImage" Source="pack://application:,,,/Resources/warningIcon.png" Width="12" Height="12" VerticalAlignment="Center" Margin="3 0 0 0" ToolTipService.ShowDuration="120000" 
+                       ToolTip="More than 1000 individual lines objects shown.&#10;This will require more then 1000 draw calls and&#10;can decrease performance.&#10;Consider using MultiPolyLineVisual3D to&#10;reduce number of line objects."/>
             </StackPanel>
             <TextBlock Name="DrawCallsCountTextBlock" FontWeight="Bold" Margin="0 0 0 0" Text="100 x 100 = 10.000"/>
 

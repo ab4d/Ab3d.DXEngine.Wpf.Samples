@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,22 +21,35 @@ using Ab3d.DirectX;
 using Ab3d.Meshes;
 using Ab3d.Visuals;
 using SharpDX;
+using Material = Ab3d.DirectX.Material;
 using Point = System.Windows.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
-    // This sample shows how to generate height maps with direct vertex and index buffer generation.
-    // This greatly improves initialization time and reduce memory consumption.
+    // This sample shows how to generate height maps with generating vertex buffer and index buffer directly
+    // (not with first generating WPF 3D objects and then converting that into DirectX objects).
+    // The sample first generates a very simple mesh that can be shown immediately,
+    // then a background worked is started that generates the big height map and the required DirectX objects in the background thread.
+    // When the data are prepared, then the new SceneNodes are created in the main UI thread.
 
     /// <summary>
     /// Interaction logic for OptimizedHeightMapGeneration.xaml
     /// </summary>
     public partial class OptimizedHeightMapGeneration : Page
     {
+        private const bool AddDelay = true; // Add some Thread.Sleep during generation of height data to simulate big cpu load and to still make the sample run on slower computers
+
+        private const int XCount = 3000;
+        private const int YCount = 2000;
+
+        private const float MaxHeightMapHeight = 100;
+
         private DisposeList _disposables;
 
-        private int _xCount = 5000;
-        private int _yCount = 1000;
+        private BackgroundWorker _backgroundWorker;
+        private Material _simplePositionColorMaterial;
+        private Material _dxMaterial;
+
 
         //private int _xCount = 10000;
         //private int _yCount = 2000;
@@ -47,31 +62,148 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         {
             InitializeComponent();
 
+
+            TitleTextBlock.Text += string.Format(" ({0}x{1} height values)", XCount, YCount);
+
+            // First create very simple height map that can be created immediately.
+            // After that we will wait until DXScene is initialized and then start a background worker
+            // that will generate the mesh in the background. When this is done, we will update the 3D scene.
+
+
             _disposables = new DisposeList();
 
+            int xCount = XCount / 100;
+            int yCount = YCount / 100;
 
-            float[,] heightData;
-            Color4[] positionColorsArray;
+            float[,] simpleHeightData;
+            Color4[] simplePositionColorsArray;
 
-            //GenerateSimpleHeightData(out heightData, out positionColorsArray);
-            //GenerateRandomHeightData(out heightData, out positionColorsArray);
-            GenerateSinusHeightData(out heightData, out positionColorsArray);
+            //GenerateSimpleHeightData(XCount, YCount, out heightData, out positionColorsArray);
+            //GenerateRandomHeightData(XCount, YCount, out heightData, out positionColorsArray);
+            GenerateSinusHeightData(xCount, yCount, null, out simpleHeightData, out simplePositionColorsArray);
 
-            GenerateHeightMapObject(heightData, positionColorsArray);
+            var simpleHeightMapMesh = GenerateHeightMapMesh(simpleHeightData, dxDevice: null);
+            _simplePositionColorMaterial = GeneratePositionColorMaterial(simplePositionColorsArray, dxDevice: null);
 
+            _disposables.Add(simpleHeightMapMesh);
+            _disposables.Add(_simplePositionColorMaterial);
+
+            GenerateHeightMapSceneNodes(simpleHeightMapMesh, _simplePositionColorMaterial);
+
+            //GenerateHeightMapObject(heightData, positionColorsArray);
+
+
+            MainDXViewportView.DXSceneInitialized += delegate(object sender, EventArgs args)
+            {
+                if (MainDXViewportView.DXScene == null)
+                    return; // WPF 3D rendering
+
+                MeshBase heightMapMesh = null;
+                _dxMaterial = null;
+
+                var dxDevice = MainDXViewportView.DXScene.DXDevice;
+
+                _backgroundWorker = new BackgroundWorker()
+                {
+                    WorkerSupportsCancellation = true,
+                    WorkerReportsProgress = true
+                };
+
+                _backgroundWorker.DoWork += delegate(object o, DoWorkEventArgs eventArgs)
+                {
+                    // 1)
+                    // Generate height map data in the background.
+
+                    float[,] heightData;
+                    Color4[] positionColorsArray;
+
+                    //GenerateSimpleHeightData(XCount, YCount, out heightData, out positionColorsArray);
+                    //GenerateRandomHeightData(XCount, YCount, out heightData, out positionColorsArray);
+                    GenerateSinusHeightData(XCount, YCount, _backgroundWorker, out heightData, out positionColorsArray);
+
+                    if (_backgroundWorker.CancellationPending)
+                        return;
+
+                    // 2)
+                    // Generate the mesh object and initialize it with dxDevice 
+                    // This will generate DirectX resources and send them to GPU
+                    heightMapMesh = GenerateHeightMapMesh(heightData, dxDevice);
+
+                    if (_backgroundWorker.CancellationPending)
+                        return;
+
+                    _backgroundWorker.ReportProgress(95);
+
+                    if (_dxMaterial != null)
+                        _dxMaterial.Dispose();
+
+                    // 3)
+                    // Generate material with position color data and sent that to GPU
+                    _dxMaterial = GeneratePositionColorMaterial(positionColorsArray, dxDevice);
+
+                    _backgroundWorker.ReportProgress(100);
+                };
+
+                _backgroundWorker.ProgressChanged += delegate(object o, ProgressChangedEventArgs eventArgs)
+                {
+                    GenerationProgressBar.Value = eventArgs.ProgressPercentage;
+                };
+
+                _backgroundWorker.RunWorkerCompleted += delegate(object o, RunWorkerCompletedEventArgs eventArgs)
+                {
+                    // Clean and dispose existing models
+                    RootContentVisual3D.Children.Clear();
+                    _disposables.Dispose();
+
+                    // Create new DisposeList
+                    _disposables = new DisposeList();
+                    _disposables.Add(simpleHeightMapMesh);
+                    _disposables.Add(_simplePositionColorMaterial);
+
+                    // Generate SceneNode with new heightMapMesh and dxMaterial.
+                    // Note that this is a very fast operation
+                    if (heightMapMesh != null && _dxMaterial != null)
+                        GenerateHeightMapSceneNodes(heightMapMesh, _dxMaterial);
+
+                    _backgroundWorker = null;
+                    GenerationProgressBar.Visibility = Visibility.Collapsed;
+
+                    MainDXViewportView.Refresh();
+                };
+
+                GenerationProgressBar.Value = 0;
+                GenerationProgressBar.Visibility = Visibility.Visible;
+
+                _backgroundWorker.RunWorkerAsync();
+            };
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
             {
+                if (_backgroundWorker != null)
+                    _backgroundWorker.CancelAsync();
+
+                if (_dxMaterial != null)
+                {
+                    _dxMaterial.Dispose();
+                    _dxMaterial = null;
+                }
+                
+                if (_simplePositionColorMaterial != null)
+                {
+                    _simplePositionColorMaterial.Dispose();
+                    _simplePositionColorMaterial = null;
+                }
+
                 _disposables.Dispose();
                 MainDXViewportView.Dispose();
             };
         }
 
-        private void GenerateSimpleHeightData(out float[,] heightData, out Color4[] positionColorsArray)
+        private void GenerateSimpleHeightData(int xCount, int yCount, out float[,] heightData, out Color4[] positionColorsArray)
         {
-            heightData = new float[_xCount, _yCount]; // This will initialize everything to 0
+            heightData = new float[xCount, yCount]; // This will initialize everything to 0
 
-            int positionsCount = _xCount * _yCount;
+            int positionsCount = xCount * yCount;
             positionColorsArray = new Color4[positionsCount];
 
             var singleColor = Colors.Green.ToColor4();
@@ -79,20 +211,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 positionColorsArray[i] = singleColor;
         }
 
-        private void GenerateRandomHeightData(out float[,] heightData, out Color4[] positionColorsArray)
+        private void GenerateRandomHeightData(int xCount, int yCount, out float[,] heightData, out Color4[] positionColorsArray)
         {
-            int positionsCount = _xCount * _yCount;
+            int positionsCount = xCount * yCount;
 
-            heightData = new float[_xCount, _yCount]; // This will initialize everything to 0
+            heightData = new float[xCount, yCount]; // This will initialize everything to 0
             positionColorsArray = new Color4[positionsCount];
 
             var rnd = new Random();
 
             int positionIndex = 0;
 
-            for (int x = 0; x < _xCount; x++)
+            for (int x = 0; x < xCount; x++)
             {
-                for (int y = 0; y < _yCount; y++)
+                for (int y = 0; y < yCount; y++)
                 {
                     var height = (float)rnd.NextDouble(); // random from 0 to 1
 
@@ -104,20 +236,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             }
         }
 
-        private void GenerateSinusHeightData(out float[,] heightData, out Color4[] positionColorsArray)
+        private void GenerateSinusHeightData(int xCount, int yCount, BackgroundWorker backgroundWorker, out float[,] heightData, out Color4[] positionColorsArray)
         {
-            int positionsCount = _xCount * _yCount;
+            int lastPercent = 0;
+            int positionsCount = xCount * yCount;
 
-            heightData = new float[_xCount, _yCount]; // This will initialize everything to 0
+            heightData = new float[xCount, yCount]; // This will initialize everything to 0
             positionColorsArray = new Color4[positionsCount];
 
             int positionIndex = 0;
 
-            for (int x = 0; x < _xCount; x++)
+            // 3 waves in each direction
+            double xFactor = 6 * Math.PI / xCount;
+            double yFactor = 6 * Math.PI / yCount;
+
+            for (int x = 0; x < xCount; x++)
             {
-                for (int y = 0; y < _yCount; y++)
+                for (int y = 0; y < yCount; y++)
                 {
-                    float height = (float)Math.Sin(x * 0.001 * 2 * Math.PI) * (float)Math.Sin(y * 0.001 * 2 * Math.PI);
+                    float height = (float)Math.Sin(x * xFactor) * (float)Math.Sin(y * yFactor);
                     height = height * 0.5f + 0.5f; // put in range from 0 to 1
 
                     heightData[x, y] = height;
@@ -125,36 +262,61 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
                     positionIndex++;
                 }
+
+                if (backgroundWorker != null)
+                {
+                    int percent = 90 * x / xCount; // we assume that 90% of the time is spent to generate the data for the float array. 10% is spent to create DirectX resources and send that to GPU.
+
+                    if (lastPercent != percent)
+                    {
+                        if (AddDelay)
+                            Thread.Sleep(10);
+
+                        backgroundWorker.ReportProgress(percent);
+
+                        lastPercent = percent;
+                    }
+                }
             }
         }
 
-        private void GenerateHeightMapObject(float[,] heightData, Color4[] positionColorsArray)
-        { 
+        private SimpleMesh<PositionNormalTexture> GenerateHeightMapMesh(float[,] heightData, DXDevice dxDevice)
+        {
             PositionNormalTexture[] vertexBuffer;
             int[] indexBuffer;
 
-            CreateHeightVertexAndIndexBuffer(heightData, 
-                                             centerPosition: new Vector3(0,0,0), 
-                                             size: new Vector3(1000, 20, 200), 
-                                             vertexBuffer: out vertexBuffer, 
+            int xCount = heightData.GetUpperBound(0) + 1;
+            int yCount = heightData.GetUpperBound(1) + 2;
+
+            CreateHeightVertexAndIndexBuffer(heightData,
+                                             centerPosition: new Vector3(0, 0, 0),
+                                             size: new Vector3(1000, MaxHeightMapHeight, 1000.0f * (float) yCount / (float) xCount),
+                                             vertexBuffer: out vertexBuffer,
                                              indexBuffer: out indexBuffer);
 
-            var simpleMesh = new SimpleMesh<PositionNormalTexture>(vertexBuffer,
-                                                                   indexBuffer,
-                                                                   inputLayoutType: InputLayoutType.Position | InputLayoutType.Normal | InputLayoutType.TextureCoordinate,
-                                                                   name: "HeightSimpleMesh");
+            var heightMapMesh = new SimpleMesh<PositionNormalTexture>(vertexBuffer,
+                                                                      indexBuffer,
+                                                                      inputLayoutType: InputLayoutType.Position | InputLayoutType.Normal | InputLayoutType.TextureCoordinate,
+                                                                      name: "HeightSimpleMesh");
 
-            _disposables.Add(simpleMesh);
+            // If DXDevice is already initialized, then we can also initialize (create DirectX resources) for the SimpleMesh.
+            // This will create the DirectX resources and send them to the GPU
+            if (dxDevice != null)
+                heightMapMesh.InitializeResources(dxDevice);
 
+            return heightMapMesh; 
+        }
 
+        private Ab3d.DirectX.Material GeneratePositionColorMaterial(Color4[] positionColorsArray, DXDevice dxDevice)
+        {
             Ab3d.DirectX.Material dxMaterial;
-            
+
             if (positionColorsArray != null)
             {
                 dxMaterial = new Ab3d.DirectX.Materials.VertexColorMaterial()
                 {
-                    PositionColors      = positionColorsArray, // The PositionColors property is used to specify colors for each vertex
-                    CreateDynamicBuffer = false,               // We will not update the colors frequently
+                    PositionColors = positionColorsArray, // The PositionColors property is used to specify colors for each vertex
+                    CreateDynamicBuffer = false, // We will not update the colors frequently
 
                     // To show specular effect set the specular data here:
                     //SpecularPower = 16,
@@ -165,7 +327,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             else
             {
                 // Solid color material:
-                var diffuseMaterial = new DiffuseMaterial(Brushes.Green); 
+                var diffuseMaterial = new DiffuseMaterial(Brushes.Green);
 
                 // Texture material:
                 //var imageBrush = new ImageBrush();
@@ -175,15 +337,26 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 dxMaterial = new Ab3d.DirectX.Materials.WpfMaterial(diffuseMaterial);
             }
 
-            _disposables.Add(dxMaterial);
+            // If DXDevice is already initialized, then we can also initialize (create DirectX resources) for the SimpleMesh.
+            // This will create the DirectX resources and send them to the GPU
+            if (dxDevice != null)
+                dxMaterial.InitializeResources(dxDevice);
 
-            var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(simpleMesh, dxMaterial);
+            return dxMaterial;
+        }
+
+
+
+        //private void GenerateHeightMapObject(float[,] heightData, Color4[] positionColorsArray)
+        private void GenerateHeightMapSceneNodes(MeshBase heightMapMesh, Ab3d.DirectX.Material dxMaterial)
+        {
+            var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(heightMapMesh, dxMaterial);
             meshObjectNode.Name = "HeightMeshObjectNode";
 
             _disposables.Add(meshObjectNode);
 
             var sceneNodeVisual3D = new SceneNodeVisual3D(meshObjectNode);
-            MainViewport.Children.Add(sceneNodeVisual3D);
+            RootContentVisual3D.Children.Add(sceneNodeVisual3D);
 
 
             // If you also want to render back faces of the height map you need to create another MeshObjectNode and set its IsBackFaceMaterial to true.
@@ -191,14 +364,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             var backDiffuseMaterial = new DiffuseMaterial(Brushes.Gray);
             var backDXMaterial = new Ab3d.DirectX.Materials.WpfMaterial(backDiffuseMaterial);
 
-            meshObjectNode = new Ab3d.DirectX.MeshObjectNode(simpleMesh, backDXMaterial);
+            meshObjectNode = new Ab3d.DirectX.MeshObjectNode(heightMapMesh, backDXMaterial);
             meshObjectNode.IsBackFaceMaterial = true;
             meshObjectNode.Name = "HeightBackMeshObjectNode";
 
             _disposables.Add(meshObjectNode);
 
             sceneNodeVisual3D = new SceneNodeVisual3D(meshObjectNode);
-            MainViewport.Children.Add(sceneNodeVisual3D);
+            RootContentVisual3D.Children.Add(sceneNodeVisual3D);
         }
 
 

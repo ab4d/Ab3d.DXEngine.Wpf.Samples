@@ -18,7 +18,6 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Diagnostics;
 using Ab3d.DirectX.Client.Settings;
 using Ab3d.DirectX.Controls;
-using Ab3d.DXEngine.Wpf.Samples.Common;
 
 namespace Ab3d.DXEngine.Wpf.Samples
 {
@@ -28,7 +27,8 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        private string _startupPage = null; //"DXEngineVisuals/PlanarShadows.xaml";
+        //private string _startupPage = "DXEngineVisuals/SmoothLinesSample.xaml";
+        private string _startupPage = null;
 
         private DXViewportView _lastShownDXViewportView;
 
@@ -141,7 +141,6 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            // Show MessageBox with warning if we are using an operating system that does not support DirectX 11 (supported on Windows 7 or newer; or with Windows Vista or Server 2008 with platform update)
             bool isSupportedOS = DXEngineSettings.Current.CheckIfSupportedOperatingSystem();
 
             if (isSupportedOS)
@@ -149,30 +148,12 @@ namespace Ab3d.DXEngine.Wpf.Samples
                 DXEngineSettings.Current.InitializeGraphicProfiles();
 
                 if (DXEngineSettings.Current.GraphicsProfiles != null && DXEngineSettings.Current.GraphicsProfiles.Length > 0)
-                    ShowGraphicsProfile(DXEngineSettings.Current.GraphicsProfiles[0], isUsedGraphicsProfile: true);
+                    ShowGraphicsProfile(DXEngineSettings.Current.GraphicsProfiles[0], dxViewportView: null);
             }
             else
             {
                 // If we are running on unsupported system we can still use WPF 3D for rendering
                 DXEngineSettings.Current.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.Wpf3D };
-            }
-        }
-
-        private void ShowGraphicsProfile(GraphicsProfile graphicsProfile, bool isUsedGraphicsProfile)
-        {
-            GraphicsProfileTypeTextBlock.Text = isUsedGraphicsProfile ? "Used graphics profile:" : "Selected graphics profile:";
-
-            SelectedGraphicInfoTextBlock.Text = graphicsProfile.DisplayName ?? graphicsProfile.Name;
-
-            if (!string.IsNullOrEmpty(graphicsProfile.DefaultAdapterDescription))
-            {
-                SelectedAdapterInfoTextBlock.Text = graphicsProfile.DefaultAdapterDescription + ":";
-                SelectedAdapterInfoTextBlock.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedAdapterInfoTextBlock.Text = null;
-                SelectedAdapterInfoTextBlock.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -197,7 +178,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
             GraphicsProfile selectedGraphicsProfile = dxEngineSettingsWindow.SelectedGraphicsProfile;
 
-            ShowGraphicsProfile(selectedGraphicsProfile, isUsedGraphicsProfile: true);
+            ShowGraphicsProfile(selectedGraphicsProfile, dxViewportView: null);
 
             // Save the selected GraphicsProfile to application settings
             DXEngineSettings.Current.SaveGraphicsProfile(selectedGraphicsProfile);
@@ -216,8 +197,13 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
         private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_lastShownDXViewportView == null)
-                return;
+            if (_lastShownDXViewportView == null || _lastShownDXViewportView.IsDisposed)
+            {
+                _lastShownDXViewportView = FindDXViewportView(ContentFrame.Content);
+
+                if (_lastShownDXViewportView == null)
+                    return;
+            }
 
             OpenDiagnosticsWindow();
         }
@@ -229,15 +215,76 @@ namespace Ab3d.DXEngine.Wpf.Samples
             if (_lastShownDXViewportView.DXScene != null && MaxBackgroundThreadsCount >= 0)
                 _lastShownDXViewportView.DXScene.MaxBackgroundThreadsCount = MaxBackgroundThreadsCount;
 
+            
+
             if (_lastShownDXViewportView != null && _lastShownDXViewportView.UsedGraphicsProfile != null)
             {
-                SelectedGraphicInfoTextBlock.Text = _lastShownDXViewportView.UsedGraphicsProfile.DisplayName ?? _lastShownDXViewportView.UsedGraphicsProfile.Name;
+                UpdateUsedGraphicsProfileDescription(_lastShownDXViewportView.UsedGraphicsProfile, _lastShownDXViewportView);
 
                 if (_lastShownDXViewportView.UsedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D)
                     Wpf3DRenderingWarningPanel.Visibility = Visibility.Visible;
             }
 
             SetRejectedGraphicsProfileWarningImageToolTip(_rejectedGraphicProfilesReasons);
+        }
+
+        private void ShowGraphicsProfile(GraphicsProfile graphicsProfile, DXViewportView dxViewportView)
+        {
+            if (dxViewportView == null)
+            {
+                GraphicsProfileTypeTextBlock.Text = "Selected graphics profile:";
+                UpdateUsedGraphicsProfileDescription(graphicsProfile, null);
+            }
+            else
+            {
+                GraphicsProfileTypeTextBlock.Text = "Used graphics profile:";
+                UpdateUsedGraphicsProfileDescription(graphicsProfile, dxViewportView);
+            }
+        }
+
+        public void UpdateUsedGraphicsProfileDescription(GraphicsProfile usedGraphicsProfile, DXViewportView dxViewportView)
+        {
+            string graphicsInfoText;
+
+            string graphicsProfileName = usedGraphicsProfile.DisplayName ?? usedGraphicsProfile.Name;
+
+            if (usedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D ||
+                dxViewportView == null || dxViewportView.DXScene == null)
+            {
+                // Show only profile name for WPF 3D or when we do not have dxViewportView.DXScene
+                graphicsInfoText = graphicsProfileName + Environment.NewLine; 
+            }
+            else
+            {
+                string adapterInfo = usedGraphicsProfile.DefaultAdapterDescription ?? dxViewportView.DXScene.DXDevice.Adapter.Description1.Description;
+
+                string samplingDescription;
+                int multiSamplingCount, superSamplingCount;
+
+                if (_lastShownDXViewportView != null && _lastShownDXViewportView.DXScene != null)
+                {
+                    multiSamplingCount = _lastShownDXViewportView.DXScene.UsedMultisamplingDescription.Count;
+                    superSamplingCount = _lastShownDXViewportView.DXScene.SupersamplingCount;
+                }
+                else
+                {
+                    multiSamplingCount = 1;
+                    superSamplingCount = 1;
+                }
+
+                if (multiSamplingCount <= 1 && superSamplingCount <= 1)
+                    samplingDescription = "";
+                else if (multiSamplingCount > 1 && superSamplingCount <= 1)
+                    samplingDescription = string.Format(" ({0}xMSAA)", multiSamplingCount);
+                else if (multiSamplingCount <= 1 && superSamplingCount > 1)
+                    samplingDescription = string.Format(" ({0}xSSAA)", superSamplingCount);
+                else
+                    samplingDescription = string.Format(" ({0}xMSAA {1}xSSAA)", multiSamplingCount, superSamplingCount);
+
+                graphicsInfoText = graphicsProfileName + " on \r\n" + adapterInfo + samplingDescription;
+            }
+
+            SelectedGraphicInfoTextBlock.Text = graphicsInfoText;
         }
 
         // OnGraphicsProfileRejected is called when a GraphicsProfile is rejected 
@@ -324,7 +371,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
             GraphicsProfileTypeTextBlock.Text = "Selected graphics profile:";
 
             if (DXEngineSettings.Current.GraphicsProfiles != null && DXEngineSettings.Current.GraphicsProfiles[0] != null)
-                ShowGraphicsProfile(DXEngineSettings.Current.GraphicsProfiles[0], isUsedGraphicsProfile: false);
+                ShowGraphicsProfile(DXEngineSettings.Current.GraphicsProfiles[0], dxViewportView: null);
 
             Wpf3DRenderingWarningPanel.Visibility = Visibility.Collapsed;
         }
@@ -409,71 +456,6 @@ namespace Ab3d.DXEngine.Wpf.Samples
             SampleList.ScrollIntoView(supportPageElement);
         }
 
-        //  The following method shows the sample description and formats its text (supports new lines and bold text)
-        private void TextBlock_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            System.Xml.XmlNode node = e.NewValue as System.Xml.XmlNode;
-
-            if (node == null)
-                return;
-
-            System.Xml.XmlAttribute attribute = node.Attributes["Description"];
-
-            if (attribute == null)
-            {
-                DescriptionTextBlock.Text = "";
-                return;
-            }
-
-            string description = attribute.Value;
-
-            if (!string.IsNullOrEmpty(description))
-            {
-                DescriptionTextBlock.BeginInit();
-                DescriptionTextBlock.Inlines.Clear();
-
-                bool isBold = false;
-                string part = "";
-
-                int pos1 = 0;
-                while (pos1 != -1 || pos1 > description.Length - 1)
-                {
-                    int pos2 = description.IndexOf('\\', pos1);
-
-                    if (pos2 == -1)
-                    {
-                        part = description.Substring(pos1);
-                        break;
-                    }
-
-                    part = description.Substring(pos1, pos2 - pos1);
-                    char command = description[pos2 + 1];
-
-                    var run = new Run(part);
-                    if (isBold)
-                        run.FontWeight = FontWeights.Bold;
-
-                    DescriptionTextBlock.Inlines.Add(run);
-
-                    if (command == 'n') // NewLine
-                        DescriptionTextBlock.Inlines.Add(new System.Windows.Documents.LineBreak());
-                    else if (command == 'b') // Toggle bold
-                        isBold = !isBold;
-
-                    pos1 = pos2 + 2;
-                }
-
-                if (!string.IsNullOrEmpty(part))
-                    DescriptionTextBlock.Inlines.Add(part);
-
-                DescriptionTextBlock.EndInit();
-            }
-            else
-            {
-                DescriptionTextBlock.Text = "";
-            }
-        }
-
         // Searches the logical controls tree and returns the first instance of DXViewportView if found
         private DXViewportView FindDXViewportView(object element)
         {
@@ -521,12 +503,20 @@ namespace Ab3d.DXEngine.Wpf.Samples
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
+        private void DiagnosticsInfoImage_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // For CORE3 project we need to set UseShellExecute to true,
+            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
+            System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com/DirectX/3D/Diagnostics.aspx") { UseShellExecute = true });
+        }
+
         private void ContentFrame_OnNavigated(object sender, NavigationEventArgs e)
         {
             // Prevent navigation (for example clicking back button) because our ListBox is not updated when this navigation occurs
             // We prevent navigation with clearing the navigation history each time navigation item changes
             ContentFrame.NavigationService.RemoveBackEntry();
         }
+
 
         public void ReloadCurrentSample()
         {

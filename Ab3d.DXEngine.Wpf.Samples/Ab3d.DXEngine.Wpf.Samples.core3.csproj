@@ -7,9 +7,9 @@
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>3.3.7279</Version>
-    <AssemblyVersion>3.3.7279.2300</AssemblyVersion>
-    <FileVersion>3.3.7279.2300</FileVersion>    
+    <Version>4.1.7619</Version>
+    <AssemblyVersion>4.1.7619.2300</AssemblyVersion>
+    <FileVersion>4.1.7619.2300</FileVersion>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,9 +23,9 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="4.0.7447" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="4.0.7447" />
-    <PackageReference Include="Ab3d.PowerToys" Version="9.2.7447" />
+    <PackageReference Include="Ab3d.DXEngine" Version="4.1.7619" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="4.1.7619" />
+    <PackageReference Include="Ab3d.PowerToys" Version="9.3.7619" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>
@@ -78,6 +78,7 @@
     <None Remove="Resources\HeightMaps\srtm_ramp2.world.500x250.png" />
     <None Remove="Resources\HeightMaps\world.topo.200407.3x500x250.png" />
     <None Remove="Resources\info_icon.png" />
+    <None Remove="Resources\info_orange_icon.png" />
     <None Remove="Resources\Models\bun_zipper_res3.obj" />
     <None Remove="Resources\Models\bun_zipper_res3.obj.mtl" />
     <None Remove="Resources\Models\bun_zipper_res3_readme.txt" />
@@ -86,6 +87,9 @@
     <None Remove="Resources\Models\dragon_vrip_res3_readme.txt" />
     <None Remove="Resources\Models\duck.dae" />
     <None Remove="Resources\Models\duckCM.png" />
+    <None Remove="Resources\Models\house with trees.3DS" />
+    <None Remove="Resources\Models\planetary-gear source.txt" />
+    <None Remove="Resources\Models\planetary-gear.FBX" />
     <None Remove="Resources\Models\robotarm-upper-part.3DS" />
     <None Remove="Resources\Models\ship_boat.mtl" />
     <None Remove="Resources\Models\ship_boat.obj" />
@@ -235,6 +239,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Models\duckCM.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\house with trees.3DS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\planetary-gear source.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\planetary-gear.FBX">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Models\robotarm-upper-part.3DS">
@@ -434,7 +447,7 @@
     <Content Include="Resources\GrassTexture.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\info_icon.png" />
+    <Resource Include="Resources\info_orange_icon.png" />
     <Resource Include="Resources\new_icon.png" />
     <Resource Include="Resources\PowerToysTexture.png" />
     <Resource Include="Resources\Settings.png" />

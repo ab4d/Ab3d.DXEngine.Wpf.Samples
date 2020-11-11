@@ -19,41 +19,31 @@
                 <Viewport3D Name="MainViewport">
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
-                            <PointLight Position="0 100 0" />
+                            <AmbientLight Color="#555"></AmbientLight>
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
                 </Viewport3D>
 
             </dxControls:DXViewportView>
         </Border>
-        <Canvas Name="OverlayCanvas" IsHitTestVisible="False">
-            <Line Name="BeamLine1" Stroke="Red" StrokeThickness="4" />
-            <Line Name="BeamLine2" Stroke="Red" StrokeThickness="4" />
-        </Canvas>
 
         <cameras:TargetPositionCamera Name="Camera1" 
                                       TargetPosition="0 20 0" 
-                                      Heading="30" Attitude="-20" Bank="0" 
-                                      Distance="150" 
+                                      Heading="-60" Attitude="-20" Bank="0" 
+                                      Distance="300" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
         <ab3d:MouseCameraController Name="MouseCameraController1"
-                                    RotateCameraConditions="RightMouseButtonPressed"
-                                    MoveCameraConditions="RightMouseButtonPressed, ControlKey"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
 
         <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
 
-        <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo" 
-                                        ShowRotateInfo="True" ShowMoveInfo="True"
-                                        MouseCameraController="{Binding ElementName=MouseCameraController1}" 
-                                        Foreground="DimGray" FontSize="15" FontWeight="Bold"
-                                        Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
-
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"
-                   Text="Showing &quot;heat distribution map&quot; with using VertexColorMaterial"/>
+                   Text="Using VertexColorMaterial to specify different color for each position"/>
 
     </Grid>
 </Page>

@@ -40,27 +40,27 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private DXViewportView _customDXViewportView;
         private TargetPositionCamera _customCamera;
 
+        private DisposeList _disposables;
+
         // This sample shows how to prevent problems when 3D lines are rendered on top of 3D solid models.
-        // In this case the lines can appear broken because it is rendered at the same position as a solid model - a problem know as z-fighting.
+        // In this case the lines can appear broken because they are rendered at the same 3D position as a solid model - a problem know as z-fighting.
         // The standard way to solve this problem is by applying a so called depth bias.
-        // Depth bias is a value that is added to each z-value (depth of a pixel from the camera) that represents a 3D line.
-        // This way the line is rendered on top of the solid model that does not have any depth bias.
-        // 
+        //
         // This cannot be done with WPF 3D rendering, but line rendering in DXEngine supports that.
         //
         // The easiest way to set depth bias is to use the following code:
         // lineVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, depthBias);
         //
-        // This works for all Visual3D objects from Ab3d.PowerToys library that show 3D lines (LineVisual3D, MultiLineVisual3D, PolyLineVisual3D, WireframeVisual3D, etc.)
+        // In this case the lineVisual3D will be moved for the depthBias amount (in world coordinates) closer to the camera.
+        // This calculation is done in the vertex shader so this works for any camera orientation.
         //
-        // The problem with DepthBias is that it is not possible to set one DepthBias value that would work for all cases.
-        // The value needs to be defined manually based on the size of the 3D objects in the scene.
+        // The LineDepthBias attribute can be applied for all Visual3D objects from Ab3d.PowerToys library that show 3D lines
+        // (LineVisual3D, MultiLineVisual3D, PolyLineVisual3D, WireframeVisual3D, etc.)
         //
+        // Note that the scene is big (camera distance is big) then a bigger depth bias is needed.
         // For example:
-        // When this sample is rendered with sphere with radius 10, the DepthBias 0.1 works well.
-        // But when the sphere's radius is 1000, the 0.1 is not enough. In this case DepthBias 1 is needed. But this would in the smaller sphere causes that the 3D lines are rendered away from the 3D model
-        //
-        // This sample shows how to set DepthBias on 3D lines and WireframeVisual3D from Ab3d.PowerToys library.
+        // When this sample is rendered with sphere with radius 10, the DepthBias 0.01 works well.
+        // But when the sphere's radius is 1000, the 0.01 is not enough. In this case DepthBias 1 is needed. 
 
         public LineDepthBiasSample()
         {
@@ -70,8 +70,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             SphereRadiusComboBox.ItemsSource = new double[] { 1, 10, 100, 1000 };
             SphereRadiusComboBox.SelectedItem = 100.0;
 
-            DepthBiasComboBox.ItemsSource = new double[] {0, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 20.0};
+            DepthBiasComboBox.ItemsSource = new double[] { 0, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0 };
             DepthBiasComboBox.SelectedItem = 0.1;
+
+
+            _disposables = new DisposeList();
 
             CreateAllScenes();
 
@@ -85,16 +88,25 @@ may appear too distance from the solid object or disconnected
 because of z-fighting.
 
 This shows that different object sizes require different bias values.";
+
+            Unloaded += delegate(object sender, RoutedEventArgs args)
+            {
+                if (_disposables != null)
+                {
+                    _disposables.Dispose();
+                    _disposables = null;
+                }
+            };
         }
 
         private void CreateAllScenes()
         {
-            AddNewDXViewportView(RootGrid, rowIndex: 0, columnIndex: 1, sphereRadius: 100, depthBias: 0.0, createDXEngine: false, title: "WPF");
-            AddNewDXViewportView(RootGrid, rowIndex: 0, columnIndex: 2, sphereRadius: 100, depthBias: 0.0, createDXEngine: true, title: "DXEngine\r\nNo bias");
-            AddNewDXViewportView(RootGrid, rowIndex: 1, columnIndex: 1, sphereRadius: 100, depthBias: 0.2, createDXEngine: true, title: "DXEngine - correct bias\r\nRadius 100; Bias: 0.2");
-            AddNewDXViewportView(RootGrid, rowIndex: 1, columnIndex: 2, sphereRadius: 1000, depthBias: 2.0, createDXEngine: true, title: "DXEngine - correct bias\r\nRadius 1000; Bias: 2.0\r\nbigger object => bigger bias");
-            AddNewDXViewportView(RootGrid, rowIndex: 2, columnIndex: 1, sphereRadius: 10, depthBias: 2.0, createDXEngine: true, title: "DXEngine - too big bias\r\nRadius 10; Bias: 2.0");
-            AddNewDXViewportView(RootGrid, rowIndex: 2, columnIndex: 2, sphereRadius: 1000, depthBias: 0.1, createDXEngine: true, title: "DXEngine - too small bias\r\nRadius 1000; Bias: 0.1");
+            AddNewDXViewportView(RootGrid, rowIndex: 0, columnIndex: 1, sphereRadius: 100,  depthBias: 0.0, createDXEngine: false, title: "WPF");
+            AddNewDXViewportView(RootGrid, rowIndex: 0, columnIndex: 2, sphereRadius: 100,  depthBias: 0.0, createDXEngine: true,  title: "DXEngine\r\nNo bias");
+            AddNewDXViewportView(RootGrid, rowIndex: 1, columnIndex: 1, sphereRadius: 100,  depthBias: 0.2, createDXEngine: true,  title: "DXEngine - correct bias\r\nRadius 100; Bias: 0.2");
+            AddNewDXViewportView(RootGrid, rowIndex: 1, columnIndex: 2, sphereRadius: 1000, depthBias: 2.0, createDXEngine: true,  title: "DXEngine - correct bias\r\nRadius 1000; Bias: 2.0\r\nbigger object => bigger bias");
+            AddNewDXViewportView(RootGrid, rowIndex: 2, columnIndex: 1, sphereRadius: 10,   depthBias: 2.0, createDXEngine: true,  title: "DXEngine - too big bias\r\nRadius 10; Bias: 2.0");
+            AddNewDXViewportView(RootGrid, rowIndex: 2, columnIndex: 2, sphereRadius: 1000, depthBias: 0.1, createDXEngine: true,  title: "DXEngine - too small bias\r\nRadius 1000; Bias: 0.1");
 
             Border createdBorder;
             AddNewDXViewportView(RootGrid, rowIndex: 0, columnIndex: 0, sphereRadius: 100, depthBias: 0.1, createDXEngine: true, title: null,
@@ -128,6 +140,10 @@ This shows that different object sizes require different bias values.";
             }
 
             RootGrid.EndInit();
+
+
+            _disposables.Dispose();
+            _disposables = new DisposeList();
         }
 
         private void AddNewDXViewportView(Grid parentGrid, int rowIndex, int columnIndex, double sphereRadius, double depthBias, bool createDXEngine, string title)
@@ -169,10 +185,14 @@ This shows that different object sizes require different bias values.";
 
             if (createDXEngine)
             {
-                createdDXViewportView = new DXViewportView(createdViewport3D);
-                createdDXViewportView.SnapsToDevicePixels = true;
+                createdDXViewportView = new DXViewportView(createdViewport3D)
+                {
+                    SnapsToDevicePixels = true
+                };
 
                 createdBorder.Child = createdDXViewportView;
+
+                _disposables.Add(createdDXViewportView);
             }
             else
             {
@@ -214,9 +234,9 @@ This shows that different object sizes require different bias values.";
                 var sphereVisual3D = new Ab3d.Visuals.SphereVisual3D()
                 {
                     CenterPosition = new Point3D(0, 0, 0),
-                    Radius = sphereRadius,
-                    Segments = 10,
-                    Material = new DiffuseMaterial(Brushes.SkyBlue),
+                    Radius         = sphereRadius,
+                    Segments       = 10,
+                    Material       = new DiffuseMaterial(Brushes.SkyBlue),
                     UseCachedMeshGeometry3D = false // This will create a new MeshGeometry3D and will not use the shared MeshGeometry3D with radius = 1
                 };
 
@@ -229,9 +249,9 @@ This shows that different object sizes require different bias values.";
 
                 var multiLineVisual3D = new Ab3d.Visuals.MultiLineVisual3D()
                 {
-                    Positions = sphereLinePositions,
+                    Positions     = sphereLinePositions,
                     LineThickness = 0.5,
-                    LineColor = Colors.Black
+                    LineColor     = Colors.Black, 
                 };
 
                 // To specify line depth bias to the Ab3d.PowerToys line Visual3D objects,
@@ -375,8 +395,8 @@ This shows that different object sizes require different bias values.";
                 if (ReferenceEquals(_customCamera, targetPositionCamera))
                     continue;
 
-                targetPositionCamera.Heading  = _customCamera.Heading;
-                targetPositionCamera.Attitude = _customCamera.Attitude;
+                targetPositionCamera.Heading  =  _customCamera.Heading;
+                targetPositionCamera.Attitude =  _customCamera.Attitude;
                 targetPositionCamera.Distance *= distanceChangeFactor;
             }
         }

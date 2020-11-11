@@ -51,8 +51,6 @@
 
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Objects type:" VerticalAlignment="Center" Margin="0 0 5 0"/>
             <ComboBox Name="ObjectsTypeComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="0" Margin="0 3" SelectionChanged="ObjectsTypeComboBox_OnSelectionChanged" />
-            <Image Grid.Column="2" Grid.Row="1" Source="/Resources/new_icon.png" Height="12" Margin="5 0 0 0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                   ToolTip="There are new options to demonstrate multi-threaded rendering of 3D lines"/>
 
             <TextBlock Grid.Column="0" Grid.Row="2" Text="Objects count:" VerticalAlignment="Center" Margin="0 0 5 0"/>
             <ComboBox Name="ObjectsCountComboBox" Grid.Column="1" Grid.Row="2" SelectedIndex="0" Margin="0 3" SelectionChanged="ObjectsCountComboBox_OnSelectionChanged" />
@@ -81,8 +79,6 @@
                               Checked="OnIsCachingCommandListsCheckBoxCheckedChanged" Unchecked="OnIsCachingCommandListsCheckBoxCheckedChanged" />
 
                     <controls:InfoControl x:Name="IsCachingCommandListsInfoControl" Margin="5 0 0 0" />
-
-                    <Image Source="/Resources/new_icon.png" Height="12" Margin="5 0 0 0" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="0 12 0 4">

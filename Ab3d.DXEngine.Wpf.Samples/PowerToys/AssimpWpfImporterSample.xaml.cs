@@ -57,7 +57,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 
 
             var dragAndDropHelper = new DragAndDropHelper(this, ".*");
-            dragAndDropHelper.FileDroped += (sender, args) => LoadModel(args.FileName);
+            dragAndDropHelper.FileDropped += (sender, args) => LoadModel(args.FileName);
 
 
             string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\duck.dae");

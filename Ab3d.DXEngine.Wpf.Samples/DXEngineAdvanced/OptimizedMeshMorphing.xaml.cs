@@ -114,7 +114,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             this.Unloaded += delegate(object sender, RoutedEventArgs e)
             {
                 CompositionTarget.Rendering -= CompositionTargetOnRendering;
-                _disposables.Dispose();
+
+                if (_disposables != null)
+                {
+                    _disposables.Dispose();
+                    _disposables = null;
+                }
 
                 MainDXViewportView.Dispose();
             };

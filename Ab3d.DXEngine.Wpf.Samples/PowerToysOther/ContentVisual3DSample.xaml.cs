@@ -15,6 +15,12 @@ using System.Windows.Shapes;
 
 namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 {
+    // ContentVisual3D class is very similar to the standard WPF's ModelVisual3D class.
+    // A difference is that ContentVisual3D also supports IsVisible property.
+    // This means that when rendered with Ab3d.DXEngine the processing of IsVisible property can be optimized.
+    // In this case DirectX resources stay im memory when IsVisible is set to false; this way the object can be shown quickly because all the DirectX resources are still ready.
+    // When using ModelVisual3D you need to remove the model from the Content or Children collection and this disposes the DirectX resources.
+
     /// <summary>
     /// Interaction logic for ContentVisual3DSample.xaml
     /// </summary>

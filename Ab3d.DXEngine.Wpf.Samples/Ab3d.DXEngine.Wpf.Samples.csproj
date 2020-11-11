@@ -13,8 +13,6 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,17 +42,16 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=4.0.7447.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.4.0.7447\lib\net45\Ab3d.DXEngine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.DXEngine, Version=3.3.7279.1045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ab3d.DXEngine.4.1.7619\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.0.7447.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.0.7447\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.3.7279.1045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.1.7619\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=9.2.7447.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.9.2.7447\lib\net45\Ab3d.PowerToys.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.PowerToys, Version=9.3.7619.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.9.3.7619\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -114,6 +111,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEngineHitTesting\LinesSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineHitTesting\ObjectIdRendering.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -143,6 +144,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineAdvanced\AdvancedInstanceRendering.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineOther\MultiDXViewportViewsSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -250,7 +255,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DXEngineVisuals\ColoredPolyLinesSample.xaml">
+    <Page Include="DXEngineVisuals\ColoredLinesSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -270,7 +275,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DXEngineAdvanced\OutlinesSample.xaml">
+    <Page Include="DXEngineAdvanced\OutlinesOverObjectsSample.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -281,6 +290,14 @@
     <Page Include="DXEngineVisuals\PlanarShadows.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\SmoothLinesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\AdvancedEdgeLinesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineVisuals\TransparencySortingSample.xaml">
       <SubType>Designer</SubType>
@@ -349,6 +366,10 @@
     <Page Include="PowerToysOther\ContentVisual3DSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PowerToysOther\HierarchyWithContentVisual3D.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PowerToysOther\Viewport2DVisual3DTest.xaml">
       <SubType>Designer</SubType>
@@ -427,6 +448,9 @@
     <Compile Include="DXEngineAdvanced\IColorMaskMaterial.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalEffect.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalMaterial.cs" />
+    <Compile Include="DXEngineHitTesting\LinesSelector.xaml.cs">
+      <DependentUpon>LinesSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineHitTesting\ObjectIdRendering.xaml.cs">
       <DependentUpon>ObjectIdRendering.xaml</DependentUpon>
     </Compile>
@@ -452,6 +476,9 @@
     </Compile>
     <Compile Include="DXEngineAdvanced\AdvancedInstanceRendering.xaml.cs">
       <DependentUpon>AdvancedInstanceRendering.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineOther\MultiDXViewportViewsSample.xaml.cs">
+      <DependentUpon>MultiDXViewportViewsSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEnginePerformance\SolidColorInstanceRendering.xaml.cs">
       <DependentUpon>SolidColorInstanceRendering.xaml</DependentUpon>
@@ -527,8 +554,8 @@
     <Compile Include="DXEnginePerformance\MultiThreadingSample.xaml.cs">
       <DependentUpon>MultiThreadingSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DXEngineAdvanced\OutlinesSample.xaml.cs">
-      <DependentUpon>OutlinesSample.xaml</DependentUpon>
+    <Compile Include="DXEngineAdvanced\OutlinesOverObjectsSample.xaml.cs">
+      <DependentUpon>OutlinesOverObjectsSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEnginePerformance\ColoredPointCloud.xaml.cs">
       <DependentUpon>ColoredPointCloud.xaml</DependentUpon>
@@ -539,14 +566,23 @@
     <Compile Include="DXEngineVisuals\AlphaClippingSample.xaml.cs">
       <DependentUpon>AlphaClippingSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DXEngineVisuals\ColoredPolyLinesSample.xaml.cs">
-      <DependentUpon>ColoredPolyLinesSample.xaml</DependentUpon>
+    <Compile Include="DXEngineVisuals\ColoredLinesSample.xaml.cs">
+      <DependentUpon>ColoredLinesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml.cs">
+      <DependentUpon>ObjectOutlinesRenderingSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\PlanarShadowsCustomization.xaml.cs">
       <DependentUpon>PlanarShadowsCustomization.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\PlanarShadows.xaml.cs">
       <DependentUpon>PlanarShadows.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\SmoothLinesSample.xaml.cs">
+      <DependentUpon>SmoothLinesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\AdvancedEdgeLinesSample.xaml.cs">
+      <DependentUpon>AdvancedEdgeLinesSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\TransparencySortingSample.xaml.cs">
       <DependentUpon>TransparencySortingSample.xaml</DependentUpon>
@@ -609,6 +645,9 @@
     <Compile Include="DXEngineHitTesting\DXEventManager3DWrapper.cs" />
     <Compile Include="PowerToysOther\ContentVisual3DSample.xaml.cs">
       <DependentUpon>ContentVisual3DSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PowerToysOther\HierarchyWithContentVisual3D.xaml.cs">
+      <DependentUpon>HierarchyWithContentVisual3D.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToysOther\Viewport2DVisual3DTest.xaml.cs">
       <DependentUpon>Viewport2DVisual3DTest.xaml</DependentUpon>
@@ -753,10 +792,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PowerToys\WireframeSample.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DXEnginePerformance\InstancedMeshGeometry3DTest.xaml.cs">
@@ -831,10 +866,6 @@
     <Compile Include="PowerToys\TextBlockVisual3DSample.xaml.cs">
       <DependentUpon>TextBlockVisual3DSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PowerToys\WireframeSample.xaml.cs">
-      <DependentUpon>WireframeSample.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -859,11 +890,15 @@
     <Content Include="Resources\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\info_icon.png" />
     <Resource Include="Resources\DXEngineSnoop.PNG" />
+    <Resource Include="Resources\info_orange_icon.png" />
+    <Content Include="Resources\Models\planetary-gear source.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\TreeTexture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="packages.config" />
     <None Include="Resources\AlphaTextures\readme.txt" />
     <Content Include="Resources\AlphaTextures\tree0.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -965,6 +1000,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Models\robotarm-upper-part.3DS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\house with trees.3DS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\planetary-gear.FBX">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\Shaders\ShadedPointCloud.gs.txt" />
@@ -1139,16 +1180,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.csproj">
-      <Project>{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}</Project>
-      <Name>Ab3d.DirectX.Client.Diagnostics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.csproj">
-      <Project>{39512d68-5ad7-4933-81fb-fd603ef611b7}</Project>
-      <Name>Ab3d.DirectX.Client.Settings</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\PowerToysTexture.png" />
   </ItemGroup>
   <ItemGroup>
@@ -1174,7 +1205,16 @@
     </Content>
     <Resource Include="Resources\Settings.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.csproj">
+      <Project>{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}</Project>
+      <Name>Ab3d.DirectX.Client.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.csproj">
+      <Project>{39512d68-5ad7-4933-81fb-fd603ef611b7}</Project>
+      <Name>Ab3d.DirectX.Client.Settings</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

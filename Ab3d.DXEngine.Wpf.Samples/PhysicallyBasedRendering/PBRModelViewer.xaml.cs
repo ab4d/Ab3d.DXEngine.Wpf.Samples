@@ -66,7 +66,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
             // Support dragging .obj files to load the 3D models from obj file
             var dragAndDropHelper = new DragAndDropHelper(ViewportBorder, ".*");
-            dragAndDropHelper.FileDroped += delegate(object sender, FileDropedEventArgs e)
+            dragAndDropHelper.FileDropped += delegate(object sender, FileDroppedEventArgs e)
             {
                 FileNameTextBox.Text = e.FileName;
                 FolderPathTextBox.Text = System.IO.Path.GetDirectoryName(e.FileName);

@@ -58,7 +58,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
             this.Loaded += delegate(object sender, RoutedEventArgs args)
             {
-                LoadObjFile();
+                AddHouseWithTreesModel();
             };
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
@@ -179,21 +179,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             ShowModel(_loadedModel3D);
         }
 
-        private void LoadObjFile()
+        private void AddHouseWithTreesModel()
         {
-            // We do not use robotarm.obj for this sample because obj files do not support hierarhies and therefore the robotarm model from obj file is not very good to be animated.
-            //// Use ObjModelVisual3D to load robotarm.obj and then set objModelVisual3D.Content (as Model3D) to WireframeVisual
-            //_objModelVisual3D = new ObjModelVisual3D()
-            //{
-            //    //Source = new Uri("pack://application:,,,/Ab3d.PowerToys.Samples;component/Resources/ObjFiles/robotarm.obj", UriKind.Absolute),
-            //    SizeX = 50,
-            //    Position = new Point3D(0, 0, 0),
-            //    PositionType = ObjModelVisual3D.VisualPositionType.BottomCenter
-            //};
-
-            //_loadedModel3D = _objModelVisual3D.Content;
-            //_animatedModel3D = _objModelVisual3D.UsedReaderObj.NamedObjects["Teapot"] as Model3D;
-
             var houseWithTreesModel = this.FindResource("HouseWithTreesModel") as Model3D;
 
             var personModel = this.FindResource("PersonModel") as Model3D;

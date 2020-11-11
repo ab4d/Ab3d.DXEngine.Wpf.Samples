@@ -46,9 +46,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private int _shadowMapSize;
         private int _shadowDepthBluringSize;
         private float _shadowThreshold;
+        private float _shadowDepthBias;
         private BoxVisual3D _greenBox3D;
         private Model3D _teapotModel;
         private WpfGeometryModel3DNode _teapotSceneNode;
+
+        private bool _isShadowArtifactsMessageBoxShown;
 
         public ShadowRenderingSample()
         {
@@ -75,6 +78,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 if (MainDXViewportView.DXScene == null)
                     return; // Probably WPF 3D rendering
 
+                if (MainDXViewportView.DXScene.ShaderQuality == ShaderQuality.Low)
+                    LowQualityInfoTextBlock.Visibility = Visibility.Visible; // Show info that shadow rendering is not supported with low quality rendering
+
 
                 // The DXScene.InitializeShadowRendering method must be called with the VarianceShadowRenderingProvider.
                 // The VarianceShadowRenderingProvider controls the rendering of shadows.
@@ -99,6 +105,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // The value is used to map all shadow values from 0 ... ShadowThreshold to 0 and then linearly rescale the values from ShadowThreshold to 1 into 0 to 1.
                 // For more info see "Shadow bleeding" in "Chapter 8. Summed-Area Variance Shadow Maps" (https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch08.html)
                 _varianceShadowRenderingProvider.ShadowThreshold = _shadowThreshold;
+                
+                _varianceShadowRenderingProvider.ShadowDepthBias = _shadowDepthBias;
 
 
                 // Initialize shadow rendering
@@ -336,13 +344,21 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             string[] sizeTextParts = sizeText.Split('x');
             _shadowMapSize = Int32.Parse(sizeTextParts[0]);
 
-
+            
             string blurText = GetSelectedText(BlurAmountComboBox);
             _shadowDepthBluringSize = Int32.Parse(blurText);
 
-
+            
             string shadowThresholdText = GetSelectedText(ShadowThresholdComboBox);
             _shadowThreshold = Single.Parse(shadowThresholdText.Substring(0, 3), NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+
+
+            string shadowDepthBiasText = GetSelectedText(ShadowDepthBiasComboBox);
+            
+            if (shadowDepthBiasText.Contains(' '))
+                shadowDepthBiasText = shadowDepthBiasText.Substring(0, shadowDepthBiasText.IndexOf(' ') - 1); // Removed " (default)"
+
+            _shadowDepthBias = Single.Parse(shadowDepthBiasText, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
 
             UpdateShadowSettings();
         }
@@ -376,7 +392,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 {
                     ShadowMapSize = _shadowMapSize,
                     ShadowDepthBluringSize = _shadowDepthBluringSize,
-                    ShadowThreshold = _shadowThreshold
+                    ShadowThreshold = _shadowThreshold,
+                    ShadowDepthBias = _shadowDepthBias
                 };
 
                 MainDXViewportView.DXScene.InitializeShadowRendering(_varianceShadowRenderingProvider);
@@ -385,9 +402,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 // ShadowThreshold can be changed without reinitializing the shadow rendering
                 _varianceShadowRenderingProvider.ShadowThreshold = _shadowThreshold;
+                _varianceShadowRenderingProvider.ShadowDepthBias = _shadowDepthBias;
             }
 
             UpdateCastingShadowLight();
+
+
+            MainDXViewportView.Refresh(); // Render the scene again
         }
 
 
@@ -616,6 +637,35 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             _lightHorizontalAngle -= (float)elapsedSeconds * 30;
             UpdateLights();
+        }
+
+        private void ShowArtifactsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            StopLightAnimation();
+
+            LightTypeComboBox.SelectedIndex = 1; // Use Directional light
+            SizeComboBox.SelectedIndex      = 3; // Set map size to 1024 x 1024
+
+            _lightHorizontalAngle = 85;
+            _lightVerticalAngle   = 30;
+            _lightDistance        = 500;
+
+            UpdateLights();
+
+
+            Camera1.TargetPosition = new Point3D(400, 5, 0);
+            Camera1.Offset         = new Vector3D(0, 0, 0);
+
+            Camera1.Heading  = -70;
+            Camera1.Attitude = -20;
+            Camera1.Distance = 150;
+
+
+            if (!_isShadowArtifactsMessageBoxShown)
+            {
+                MessageBox.Show("Change the value of the \"Shadow depth bias\" ComboBox to remove the artifacts.\r\n\r\nNote that the correct value depends on the size of 3D scene and do not work for every scene.", "Shadow depth bias", MessageBoxButton.OK, MessageBoxImage.Information);
+                _isShadowArtifactsMessageBoxShown = true;
+            }
         }
     }
 }

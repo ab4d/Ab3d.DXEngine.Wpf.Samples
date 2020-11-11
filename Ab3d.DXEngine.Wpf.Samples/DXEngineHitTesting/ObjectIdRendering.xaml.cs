@@ -22,8 +22,6 @@ using SharpDX;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
-    // TODO: P3: S: Show how to create rectangular object selection.
-
     // This sample shows how to render each object with a color defined by its ObjectIds to a bitmap.
     // The ObjectId is actually an index of the RenderingQueue and an index of the object inside the RenderingQueue.
     // This way it is possible to get the rendered RenderablePrimitive from the color and 
@@ -52,7 +50,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             int modelsXCount = 20;
             int modelsYCount = 1;
             int modelsZCount = 20;
-
+            
             var model3DGroup = CreateModel3DGroup(boxMesh, new Point3D(0, 5, 0), new Size3D(500, modelsYCount * 10, 500), 10, modelsXCount, modelsYCount, modelsZCount);
 
             MainViewport.Children.Add(model3DGroup.CreateModelVisual3D());
@@ -60,7 +58,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
             _disposables = new DisposeList();
 
-            MainDXViewportView.DXSceneDeviceCreated += MainDxViewportViewOnDxSceneDeviceCreated;
+            MainDXViewportView.DXSceneDeviceCreated += OnDxSceneDeviceCreated;
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
             {
@@ -74,22 +72,35 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             };
         }
 
-        private void MainDxViewportViewOnDxSceneDeviceCreated(object sender, EventArgs e)
+        private void OnDxSceneDeviceCreated(object sender, EventArgs e)
         {
             // Create a SolidColorEffect that will be used to render each objects with a color from object's id
-            _solidColorEffect = new SolidColorEffect();
-            _solidColorEffect.OverrideModelColor = true; // We will overwrite the object's color with color specified in SolidColorEffect.Color
+            _solidColorEffect = new SolidColorEffect
+            {
+                // We will overwrite the object's color with color specified in SolidColorEffect.Color
+                OverrideModelColor = true,
+
+                // Always use Opaque blend state even if alpha is less then 1 (usually PremultipliedAlphaBlend is used in this case).
+                // This will allow us to also use alpha component for the object id (in our case RenderingQueue id)
+                OverrideBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.Opaque,
+
+                // By default for alpha values less then 1, the color components are multiplied with alpha value to produce pre-multiplied colors.
+                // This will allow us to also use alpha component for the object id (in our case RenderingQueue id)
+                PremultiplyAlphaColors = false
+            };
+            
 
             _disposables.Add(_solidColorEffect);
 
             MainDXViewportView.DXScene.DXDevice.EffectsManager.RegisterEffect(_solidColorEffect);
 
 
-            // Create a custom rendering step that will be used instead of standard rendering step
+            // Create a custom rendering step that will be used instead of standard rendering step.
+            // It will be used in the CreateObjectIdBitmapButton_OnClick method below
             _objectIdRenderingStep = new CustomActionRenderingStep("ObjectIdRenderingStep")
             {
                 CustomAction = ObjectIdRenderingAction,
-                IsEnabled = false
+                IsEnabled = false                       // IMPORTANT: disable this custom rendering step - it will be enabled when rendering to bitmap
             };
 
             MainDXViewportView.DXScene.RenderingSteps.AddAfter(MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep, _objectIdRenderingStep);
@@ -97,6 +108,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             // In this sample we render Object ids to a custom bitmap,
             // so for standard rendering, we disable our custom rendering.
             // But if you went you can enable it and disabled the standard rendering - this will always render objects ids:
+            //
             //_objectIdRenderingStep.IsEnabled = true;
             //MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = false;
         }
@@ -138,47 +150,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Color4 GetObjectIdColor4(int renderingQueueIndex, int objectIndex)
-        {
-            // Encode renderingQueueIndex and objectIndex into 3 colors (rendering is done in 32 bits, so each color have 8 bits; but the Color4 requires float values for color (this is also what the shader gets as parameter)
-            // renderingQueueIndex is written to the 4 highest bits of the red color
-            // objectIndex is written to lower 4 bit in red and 8 bits in green and blue (max written index is 1.048.575).
-            // Note that in the current version of DXEngine we cannot use alpha color because
-            // if it is less than 1, the alpha blending is used (and also the color is premultiplied with alpha).
-            // In the next version, it will be possible to use all 4 color attributes and prevent alpha blending.
-            //
-            // If you already need more ids, then you may increase the available objects ids to 16.777.215 with using all 3 colors for objectIndex and not writing renderingQueueIndex (for example for rendering only objects in dxScene.StandardGeometryRenderingQueue)
-
-            float red   = (float)((renderingQueueIndex << 4) + ((objectIndex >> 16) & 0x0F)) / 255f;
-            float green = (float)                              ((objectIndex >> 8)  & 0xFF)  / 255f;
-            float blue  = (float)                              ( objectIndex        & 0xFF)  / 255f;
-
-            return new Color4(red, green, blue, 1f);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void GetObjectId(Color4 idColor, out int renderingQueueIndex, out int objectIndex)
-        {
-            byte red   = (byte)(idColor.Red   * 255);
-            byte green = (byte)(idColor.Green * 255);
-            byte blue  = (byte)(idColor.Blue  * 255);
-
-            renderingQueueIndex = red >> 4;
-            objectIndex = ((red & 0x0F) << 16) + (green << 8) + blue;
-        }
-
         private void CreateObjectIdBitmapButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (_objectIdRenderingStep == null)
                 return;
 
+            // Now enable our custom rendering step that will be used only for RenderToBitmap
             _objectIdRenderingStep.IsEnabled = true;
             MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = false;
 
             try
             {
-                var renderToBitmap = MainDXViewportView.RenderToBitmap(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height, preferedMultisampling: 0);
+                // Render bitmap but do not use super-sampling (so divide by SupersamplingFactor)
+                var supersamplingFactor = MainDXViewportView.DXScene.SupersamplingFactor;
+                int width               = (int)(MainDXViewportView.DXScene.Width / supersamplingFactor);
+                int height              = (int)(MainDXViewportView.DXScene.Height / supersamplingFactor);
+
+                var renderToBitmap = MainDXViewportView.RenderToBitmap(width, height, preferedMultisampling: 0, supersamplingCount: 1);
 
                 string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "ObjectIds.png");
 
@@ -191,6 +179,37 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 _objectIdRenderingStep.IsEnabled = false;
                 MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = true;
             }
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Color4 GetObjectIdColor4(int renderingQueueIndex, int objectIndex)
+        {
+            // Encode renderingQueueIndex and objectIndex into 4 colors components (rendering is done in 32 bits, so each color have 8 bits; but the Color4 requires float values for color (this is also what the shader gets as parameter)
+            // renderingQueueIndex is written to the 4 low bits of the alpha color component
+            // objectIndex is written to red, green and blue (max written index is 16.777.215)
+            //
+            // This way it is possible to write ids for 16.777.215 objects in each rendering queue (so 16M solid + 16M lines + 16M transparent objects).
+            // If you need more ids, then you can move the renderingQueueIndex into 4 high bits of alpha and use lower 4 bits for extra index increasing the ids count by 16.
+
+            float red   = (float)((objectIndex >> 16) & 0xFF) / 255f;
+            float green = (float)((objectIndex >> 8)  & 0xFF) / 255f;
+            float blue  = (float)( objectIndex        & 0xFF) / 255f;
+            float alpha = (float)(0xF0 + (renderingQueueIndex & 0x0F)) / 255f; // preserve the high 4 bits of alpha value so that the colors are visible and write renderingQueueIndex into the low 4 bits (0...15 possible values)
+
+            return new Color4(red, green, blue, alpha);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetObjectId(Color4 idColor, out int renderingQueueIndex, out int objectIndex)
+        {
+            byte red   = (byte)(idColor.Red   * 255);
+            byte green = (byte)(idColor.Green * 255);
+            byte blue  = (byte)(idColor.Blue  * 255);
+            byte alpha = (byte)(idColor.Alpha * 255);
+
+            renderingQueueIndex = alpha & 0x0F;
+            objectIndex         = (red << 16) + (green << 8) + blue;
         }
 
         /// <summary>

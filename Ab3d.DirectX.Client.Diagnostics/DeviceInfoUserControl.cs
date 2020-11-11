@@ -19,7 +19,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
     /// <summary>
     /// Interaction logic for DeviceInfoUserControl.xaml
     /// </summary>
-    public partial class DeviceInfoUserControl : UserControl
+    public class DeviceInfoUserControl : TextBlock
     {
         private bool _isDXSceneInitializedSubscribed;
 
@@ -34,8 +34,10 @@ namespace Ab3d.DirectX.Client.Diagnostics
                     return;
 
                 if (_dxView != null)
-                    _dxView.Disposing -= DXSceneViewBaseOnDisposing;
-
+                {
+                    _dxView.Disposing -= DXViewOnDisposing;
+                    _dxView.SizeChanged -= DXViewOnSizeChanged;
+                }
 
                 _dxView = value;
 
@@ -44,18 +46,27 @@ namespace Ab3d.DirectX.Client.Diagnostics
                     Update();
                 }
                 catch
-                { 
+                {
                     // This can happen in case of DXEngineSnoop that is started with wrong SharpDX reference  
                 }
 
                 if (_dxView != null)
-                    _dxView.Disposing += DXSceneViewBaseOnDisposing;
+                {
+                    _dxView.Disposing += DXViewOnDisposing;
+                    _dxView.SizeChanged += DXViewOnSizeChanged;
+                }
             }
         }
 
+        public bool ShowViewSize { get; set; }
+        public bool ShowAntialiasinigSettings { get; set; }
+        public bool ShowViewMemoryUsage { get; set; }
+
         public DeviceInfoUserControl()
         {
-            InitializeComponent();
+            ShowViewSize              = true;
+            ShowAntialiasinigSettings = true;
+            ShowViewMemoryUsage       = true;
 
             this.Unloaded += (sender, args) => UnsubscribeDXSceneInitialized();
         }
@@ -64,7 +75,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
         {
             if (_dxView == null || (_dxView.UsedGraphicsProfile == null && _dxView.DXScene == null)) // It is possible that UsedGraphicsProfile is null, but DXScene is not null when user manually created DXScene
             {
-                AdapterInfoTextBlock.Text = "DXView is not initialized";
+                this.Text = "DXView is not initialized";
 
                 if (_dxView != null && _dxView.UsedGraphicsProfile == null)
                     SubscribeDXSceneInitialized();
@@ -75,7 +86,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             string adapterInfo;
 
-            if (_dxView.UsedGraphicsProfile == null && _dxView.DXScene != null)
+            var dxScene = _dxView.DXScene;
+
+            if (_dxView.UsedGraphicsProfile == null && dxScene != null)
             {
                 try
                 {
@@ -121,7 +134,78 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 adapterInfo = "";
             }
 
-            AdapterInfoTextBlock.Text = adapterInfo;
+            string viewInfo;
+            if (dxScene != null)
+            {
+                int width = dxScene.BackBufferDescription.Width;
+                int height = dxScene.BackBufferDescription.Height;
+
+                if (ShowViewSize)
+                    viewInfo = string.Format("{0} x {1}", width, height);
+                else
+                    viewInfo = "";
+
+                var multisampleCount    = dxScene.MultisampleCount;
+                var supersamplingCount  = dxScene.SupersamplingCount;  // number of pixels used for one final pixel
+
+                if (ShowAntialiasinigSettings)
+                {
+                    if (multisampleCount > 1)
+                        viewInfo += string.Format(" x {0}xMSAA", multisampleCount);
+                    
+                    if (supersamplingCount > 1)
+                        viewInfo += string.Format(" x {0}xSSAA", supersamplingCount);
+                }
+
+                if (ShowViewMemoryUsage)
+                {
+                    // Get memory size of the finally shown texture
+                    long finalBackBufferSize = (long)(4.0 * (double)dxScene.Width * (double)dxScene.Height / supersamplingCount); // 4 bytes for RGBA format
+
+                    // we start with the same size for depth buffer - this can change in case of MSAA or SSAA
+                    long depthBufferSize = finalBackBufferSize;                                                        
+
+                    long msaaBackBufferSize, ssaaBackBufferSize;
+
+                    if (supersamplingCount > 1)
+                    {
+                        // when using SSAA we render to this buffer (or to MSAA is used - but this is then down-sampled to ssaa buffer)
+                        ssaaBackBufferSize = finalBackBufferSize * supersamplingCount;
+                        depthBufferSize    = ssaaBackBufferSize;
+                    }
+                    else
+                    {
+                        ssaaBackBufferSize = 0;
+                    }
+
+                    if (multisampleCount > 1)
+                    {
+                        // when using MSAA we render to this buffer that is then resolved into SSAA (if used) or to finalBackBufferSize
+                        msaaBackBufferSize = finalBackBufferSize * multisampleCount * supersamplingCount;
+                        depthBufferSize    = msaaBackBufferSize;
+                    }
+                    else
+                    {
+                        msaaBackBufferSize = 0;
+                    }
+
+                    long totalMemoryUsage = ssaaBackBufferSize + msaaBackBufferSize + finalBackBufferSize + depthBufferSize;
+
+                    if (totalMemoryUsage > 1024 * 1024)
+                        viewInfo += string.Format(System.Globalization.CultureInfo.InvariantCulture, " = {0:#,##0.0} Mb", (double)totalMemoryUsage / (1024.0 * 1024.0));
+                    else
+                        viewInfo += string.Format(System.Globalization.CultureInfo.InvariantCulture, " = {0:#,##0.0} Kb", (double)totalMemoryUsage / 1024.0);
+                }
+            }
+            else
+            {
+                viewInfo = "";
+            }
+
+            this.Text = adapterInfo;
+
+            if (viewInfo.Length > 0)
+                this.Text += Environment.NewLine + viewInfo;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)] // No inlining so case of invalid SharpDX reference, the caller method will still be called
@@ -178,10 +262,10 @@ namespace Ab3d.DirectX.Client.Diagnostics
             if (_dxView != null)
             {
                 _dxView.DXSceneInitialized += DXSceneViewBaseOnDXSceneInitialized;
-                _isDXSceneInitializedSubscribed =  true;
+                _isDXSceneInitializedSubscribed = true;
             }
         }
-        
+
         private void UnsubscribeDXSceneInitialized()
         {
             if (!_isDXSceneInitializedSubscribed)
@@ -193,9 +277,14 @@ namespace Ab3d.DirectX.Client.Diagnostics
             _isDXSceneInitializedSubscribed = false;
         }
 
-        private void DXSceneViewBaseOnDisposing(object sender, EventArgs eventArgs)
+        private void DXViewOnDisposing(object sender, EventArgs eventArgs)
         {
-            AdapterInfoTextBlock.Text = "DXSceneView is disposed";
+            this.Text = "DXSceneView is disposed";
+        }
+
+        private void DXViewOnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Update();
         }
     }
 }

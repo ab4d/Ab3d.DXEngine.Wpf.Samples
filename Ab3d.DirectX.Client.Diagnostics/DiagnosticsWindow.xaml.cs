@@ -182,6 +182,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 DumpSceneNodesMenuItem,
                 DumpRenderingQueuesMenuItem,
                 DumpRenderingStepsMenuItem,
+                DumpBackBufferChangesMenuItem,
                 SaveToBitmapMenuItem,
                 StartPerformanceAnalyzerMenuItem,
                 DumpResourcesMenuItem
@@ -207,6 +208,12 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 if (DXView != null)
                     DXView.DXSceneDeviceCreated += (sender, args) => UpdateEnabledMenuItems();
             }
+
+            // Show DumpBackBufferChangesMenuItem only with debug device (because we need resource names otherwise we will not see anything)
+            if (DXView != null && DXView.DXScene != null && DXView.DXScene.DXDevice != null && DXView.DXScene.DXDevice.IsDebugDevice)
+                DumpBackBufferChangesMenuItem.Visibility = Visibility.Visible;
+            else
+                DumpBackBufferChangesMenuItem.Visibility = Visibility.Collapsed;
 
             // On each new scene reset the StartStopCameraRotationMenuItem text
             StartStopCameraRotationMenuItem.Header = "Toggle camera rotation";
@@ -340,6 +347,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             DeviceInfoControl.DXView = dxView;
 
+            StartShowingStatistics();
+
             if (Ab3d.DirectX.DXDiagnostics.IsCollectingStatistics)
             {
                 if (dxView.DXScene != null && dxView.DXScene.Statistics != null)
@@ -347,8 +356,6 @@ namespace Ab3d.DirectX.Client.Diagnostics
                     ResultsTitleTextBlock.Visibility = Visibility.Visible;
                     UpdateStatistics(dxView.DXScene.Statistics);
                 }
-
-                StartShowingStatistics();
             }
 
             UpdateEnabledMenuItems();
@@ -697,6 +704,11 @@ namespace Ab3d.DirectX.Client.Diagnostics
             DumpRenderingSteps();
         }
 
+        private void DumpBackBufferChangesMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            BackBufferChanges();
+        }
+
         private void DumpSystemInfoMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             DumpSystemInfo();
@@ -749,14 +761,14 @@ namespace Ab3d.DirectX.Client.Diagnostics
             AnalyerResultsTextBox.Visibility = Visibility.Collapsed;
 
             ResultsTitleTextBlock.Visibility = Visibility.Collapsed;
-            ShowStatisticsButton.Visibility = Visibility.Collapsed;
 
             // Start new test
             _performanceAnalyzer = new PerformanceAnalyzer(DXView, "DXEngine Snoop performance test", initialCapacity: 10000);
             _performanceAnalyzer.StartCollectingStatistics();
 
             ActionsMenu.Visibility = Visibility.Collapsed;
-            StopPerformanceAnalyzerButton.Visibility = Visibility.Visible;
+
+            ShowButtons(showStopPerformanceAnalyzerButton: true, showShowStatisticsButton: false);
         }
 
         private void StopPerformanceAnalyzerButton_OnClick(object sender, RoutedEventArgs e)
@@ -799,11 +811,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             SaveAnalyzerResultsMenuItem.IsEnabled = true;
 
-
-            StopPerformanceAnalyzerButton.Visibility = Visibility.Collapsed;
-
             ShowStatisticsButton.Content = _showRenderingStatistics ? "Show rendering statistics" : "Show camera info";
-            ShowStatisticsButton.Visibility = Visibility.Visible;
+            
+            ShowButtons(showStopPerformanceAnalyzerButton: false, showShowStatisticsButton: true);
         }
 
         private void SaveAnalyzerResultsMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -906,7 +916,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
         private void ShowStatisticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             StartShowingStatistics();
-            ShowStatisticsButton.Visibility = Visibility.Collapsed;
+            ShowButtons(showStopPerformanceAnalyzerButton: false, showShowStatisticsButton: false);
         }
 
         private void AlwaysOnTopCheckBoxChanged(object sender, RoutedEventArgs e)
@@ -922,6 +932,13 @@ namespace Ab3d.DirectX.Client.Diagnostics
             ShowCameraDetails();
         }
 
+        private void ShowButtons(bool showStopPerformanceAnalyzerButton, bool showShowStatisticsButton)
+        {
+            StopPerformanceAnalyzerButton.Visibility = showStopPerformanceAnalyzerButton ? Visibility.Visible : Visibility.Collapsed;
+            ShowStatisticsButton.Visibility          = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+
+            ButtonsPanel.Visibility = showStopPerformanceAnalyzerButton || showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+        }
 
 
         private string GetRenderingStatisticsDetails(RenderingStatistics renderingStatistics, string fpsText)
@@ -1122,6 +1139,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             _lastStatisticsUpdate = now;
 
+            ResultsTitleTextBlock.Visibility = Visibility.Visible;
             StatisticsTextBlock.Visibility = Visibility.Visible;
         }
 
@@ -1377,6 +1395,21 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 sb.AppendLine(renderingStepBase.ToString());
 
             ShowInfoText(sb.ToString());
+        }
+        
+        private void BackBufferChanges()
+        {
+            if (DXView == null || DXView.DXScene == null)
+                return;
+
+            DXView.DXScene.RenderingContext.IsCollectingBackBufferChanges = true;
+
+            DXView.Refresh();
+            var backBufferChangesReport = DXView.DXScene.RenderingContext.GetBackBufferChangesReport();
+
+            DXView.DXScene.RenderingContext.IsCollectingBackBufferChanges = false;
+
+            ShowInfoText(backBufferChangesReport);
         }
 
         private void DumpDXEngineSettings()
@@ -2152,7 +2185,12 @@ StateChangesCount: {16:#,##0}{17}{18}",
             {
                 SetupObjectIdRendering();
 
-                var renderToBitmap = DXView.RenderToBitmap(DXView.DXScene.Width, DXView.DXScene.Height, preferedMultisampling: 0);
+                // Render bitmap but do not use super-sampling (so divide by SupersamplingFactor)
+                var supersamplingFactor = DXView.DXScene.SupersamplingFactor;
+                int width               = (int)(DXView.DXScene.Width / supersamplingFactor);
+                int height              = (int)(DXView.DXScene.Height / supersamplingFactor);
+
+                var renderToBitmap = DXView.RenderToBitmap(width, height, preferedMultisampling: 0, supersamplingCount: 1);
 
                 SaveRenderedBitmap(renderToBitmap, openSavedImage: true, initialFileName: "ObjectIds.png");
             }
@@ -2192,8 +2230,19 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
 
             // Create a SolidColorEffect that will be used to render each objects with a color from object's id
-            _solidColorEffect = new SolidColorEffect();
-            _solidColorEffect.OverrideModelColor = true; // We will overwrite the object's color with color specified in SolidColorEffect.Color
+            _solidColorEffect = new SolidColorEffect
+            {
+                // We will overwrite the object's color with color specified in SolidColorEffect.Color
+                OverrideModelColor = true,
+
+                // Always use Opaque blend state even if alpha is less then 1 (usually PremultipliedAlphaBlend is used in this case).
+                // This will allow us to also use alpha component for the object id (in our case RenderingQueue id)
+                OverrideBlendState = DXView.DXScene.DXDevice.CommonStates.Opaque,
+
+                // By default for alpha values less then 1, the color components are multiplied with alpha value to produce pre-multiplied colors.
+                // This will allow us to also use alpha component for the object id (in our case RenderingQueue id)
+                PremultiplyAlphaColors = false
+            };
 
             DXView.DXScene.DXDevice.EffectsManager.RegisterEffect(_solidColorEffect);
 
@@ -2221,6 +2270,10 @@ StateChangesCount: {16:#,##0}{17}{18}",
             for (var i = 0; i < renderingQueues.Count; i++)
             {
                 var oneRenderingQueue = renderingQueues[i];
+
+                if (!oneRenderingQueue.IsRenderingEnabled)
+                    continue;
+
                 int objectsCount = oneRenderingQueue.Count;
 
                 // ... and each object in rendering queue.
@@ -2242,34 +2295,38 @@ StateChangesCount: {16:#,##0}{17}{18}",
             }
         }
 
+#if NET45 || CORE3
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static Color4 GetObjectIdColor4(int renderingQueueIndex, int objectIndex)
         {
-            // Encode renderingQueueIndex and objectIndex into 3 colors (rendering is done in 32 bits, so each color have 8 bits; but the Color4 requires float values for color (this is also what the shader gets as parameter)
-            // renderingQueueIndex is written to the 4 highest bits of the red color
-            // objectIndex is written to lower 4 bit in red and 8 bits in green and blue (max written index is 1.048.575).
-            // Note that in the current version of DXEngine we cannot use alpha color because
-            // if it is less than 1, the alpha blending is used (and also the color is premultiplied with alpha).
-            // In the next version, it will be possible to use all 4 color attributes and prevent alpha blending.
+            // Encode renderingQueueIndex and objectIndex into 4 colors components (rendering is done in 32 bits, so each color have 8 bits; but the Color4 requires float values for color (this is also what the shader gets as parameter)
+            // renderingQueueIndex is written to the 4 low bits of the alpha color component
+            // objectIndex is written to red, green and blue (max written index is 16.777.215)
             //
-            // If you already need more ids, then you may increase the available objects ids to 16.777.215 with using all 3 colors for objectIndex and not writing renderingQueueIndex (for example for rendering only objects in dxScene.StandardGeometryRenderingQueue)
+            // This way it is possible to write ids for 16.777.215 objects in each rendering queue (so 16M solid + 16M lines + 16M transparent objects).
+            // If you need more ids, then you can move the renderingQueueIndex into 4 high bits of alpha and use lower 4 bits for extra index increasing the ids count by 16.
 
-            float red = (float)((renderingQueueIndex << 4) + ((objectIndex >> 16) & 0x0F)) / 255f;
+            float red   = (float)((objectIndex >> 16) & 0xFF) / 255f;
             float green = (float)((objectIndex >> 8) & 0xFF) / 255f;
-            float blue = (float)(objectIndex & 0xFF) / 255f;
+            float blue  = (float)(objectIndex & 0xFF) / 255f;
+            float alpha = (float)(0xF0 + (renderingQueueIndex & 0x0F)) / 255f; // preserve the high 4 bits of alpha value so that the colors are visible and write renderingQueueIndex into the low 4 bits (0...15 possible values)
 
-            return new Color4(red, green, blue, 1f);
+            return new Color4(red, green, blue, alpha);
         }
 
+#if NET45 || CORE3
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static void GetObjectId(Color4 idColor, out int renderingQueueIndex, out int objectIndex)
         {
-            byte red = (byte)(idColor.Red * 255);
+            byte red   = (byte)(idColor.Red * 255);
             byte green = (byte)(idColor.Green * 255);
-            byte blue = (byte)(idColor.Blue * 255);
+            byte blue  = (byte)(idColor.Blue * 255);
+            byte alpha = (byte)(idColor.Alpha * 255);
 
-            renderingQueueIndex = red >> 4;
-            objectIndex = ((red & 0x0F) << 16) + (green << 8) + blue;
+            renderingQueueIndex = alpha & 0x0F;
+            objectIndex         = (red << 16) + (green << 8) + blue;
         }
 
 
@@ -2734,7 +2791,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
             return sb.ToString();
         }
 
-        #region GetMatrix3DText, FormatTable
+#region GetMatrix3DText, FormatTable
         // This code is taken from Ab3d.PowerToys Ab3d.Utilities.Dumper.GetMatrix3DText
 
         private static string GetMatrix3DText(SharpDX.Matrix matrix)
@@ -2870,7 +2927,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             return sb.ToString();
         }
-        #endregion
+#endregion
 
         private void StatisticsTypeRadioButton_OnChecked(object sender, RoutedEventArgs e)
         {

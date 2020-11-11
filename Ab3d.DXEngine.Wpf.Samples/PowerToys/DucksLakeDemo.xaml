@@ -91,5 +91,8 @@
                                                   Changed="TransformEditor_OnChanged"/>
             </Border>
         </StackPanel>
+
+        <TextBlock Name="LowQualityInfoTextBlock" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" FontWeight="Bold" Foreground="Red" FontSize="14" Visibility="Collapsed"
+                   Text="Shadow rendering is not supported with Low quality rendering!&#10;Open Settings and increase rendering quality to see the shadows."/>
     </Grid>
 </Page>

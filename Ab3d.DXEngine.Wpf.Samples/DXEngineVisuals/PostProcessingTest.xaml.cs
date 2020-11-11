@@ -30,6 +30,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private GaussianBlurPostProcess _gaussianHorizontalBlurPostProcess;
         private GaussianBlurPostProcess _gaussianVerticalBlurPostProcess;
+        private int _gaussianBlueFilterSize;
+
         private SimpleBlurPostProcess _simpleBlurHorizontalBlurPostProcess;
         private SimpleBlurPostProcess _simpleBlurVerticalBlurPostProcess;
         private ExpandPostProcess _expandHorizontalPostProcess;
@@ -112,17 +114,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             if (GaussianBlurCheckBox.IsChecked ?? false)
             {
-                // Blur is done in two passes - one horizontal and one vertical
-                _gaussianHorizontalBlurPostProcess = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: false, blurStandardDeviation: 2.0f);
-                _gaussianVerticalBlurPostProcess   = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: true, blurStandardDeviation: 2.0f);
-
                 UpdateGaussianBlurParameters();
-
-                MainDXViewportView.DXScene.PostProcesses.Add(_gaussianHorizontalBlurPostProcess);
-                MainDXViewportView.DXScene.PostProcesses.Add(_gaussianVerticalBlurPostProcess);
-
-                _createdPostProcesses.Add(_gaussianHorizontalBlurPostProcess);
-                _createdPostProcesses.Add(_gaussianVerticalBlurPostProcess);
             }
 
             if (ExpandCheckBox.IsChecked ?? false)
@@ -182,6 +174,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 onePostProcess.Dispose();
 
             _createdPostProcesses.Clear();
+
+            _gaussianBlueFilterSize = 0;
         }
 
         private void UpdateEdgeDetectionParameters()
@@ -195,11 +189,57 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void UpdateGaussianBlurParameters()
         {
+            var dxScene = MainDXViewportView.DXScene;
+
+            if (dxScene == null)
+                return;
+
+
+            // Filter size defines how many pixels are read to produce the Gaussian value.
+            // Possible values: 5, 7, 9, 11, 13, 15 (15 by default)
+            // For example for filterSize = 15, the center pixel is read and also 7 pixels to the left, right (up and down for vertical blur) are read.
+            int filterSize = (int)GetSelectedComboBoxFloatValue(FilterSizeComboBox);
+
+            // We want to have values that are at max 3.5 standard deviations away from center point
+            // This formula is set so that for filterSize = 15, the commonStandardDeviation is 2
+            // The (filterSize - 1.0f) / 2.0f calculates how many samples in each direction we go (filterSize - 1 to remove the center pixel).
+            // When filterSize is reduces, the commonStandardDeviation is reduces also so that final blurred results are similar
+            float commonStandardDeviation = ((filterSize - 1.0f) / 2.0f) / 3.5f;
+
+            // Filter size is set with the GaussianBlurPostProcess constructor,
+            // so we need to replace the existing GaussianBlurPostProcess objects when this is changed
+            if (_gaussianBlueFilterSize != filterSize)
+            {
+                if (_gaussianHorizontalBlurPostProcess != null)
+                {
+                    _createdPostProcesses.Remove(_gaussianHorizontalBlurPostProcess);
+                    _createdPostProcesses.Remove(_gaussianVerticalBlurPostProcess);
+
+                    dxScene.PostProcesses.Remove(_gaussianHorizontalBlurPostProcess);
+                    dxScene.PostProcesses.Remove(_gaussianVerticalBlurPostProcess);
+
+                    _gaussianHorizontalBlurPostProcess.Dispose();
+                    _gaussianVerticalBlurPostProcess.Dispose();
+                }
+
+                // Blur is done in two passes - one horizontal and one vertical
+                _gaussianHorizontalBlurPostProcess = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: false, commonStandardDeviation, filterSize);
+                _gaussianVerticalBlurPostProcess   = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: true,  commonStandardDeviation, filterSize);
+
+                _createdPostProcesses.Add(_gaussianHorizontalBlurPostProcess);
+                _createdPostProcesses.Add(_gaussianVerticalBlurPostProcess);
+
+                dxScene.PostProcesses.Add(_gaussianHorizontalBlurPostProcess);
+                dxScene.PostProcesses.Add(_gaussianVerticalBlurPostProcess);
+
+                _gaussianBlueFilterSize = filterSize;
+            }
+
             if (_gaussianHorizontalBlurPostProcess == null)
                 return;
 
-            _gaussianHorizontalBlurPostProcess.BlurStandardDeviation = (float)StandardDeviationSlider.Value;
-            _gaussianVerticalBlurPostProcess.BlurStandardDeviation = (float)StandardDeviationSlider.Value;
+            _gaussianHorizontalBlurPostProcess.BlurStandardDeviation = commonStandardDeviation * (float)StandardDeviationSlider.Value;
+            _gaussianVerticalBlurPostProcess.BlurStandardDeviation   = commonStandardDeviation * (float)StandardDeviationSlider.Value;
         }
 
         private float GetSelectedComboBoxFloatValue(ComboBox comboBox)
@@ -261,6 +301,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             MainDXViewportView.Refresh(); // Render the scene again
         }
 
+        private void FilterSizeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            UpdateGaussianBlurParameters();
+
+            MainDXViewportView.Refresh(); // Render the scene again
+        }
+
         private void FilterWidthSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!this.IsLoaded)
@@ -283,7 +333,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void GammaCorrectionComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!this.IsLoaded && _gammaCorrectionPostProcess == null)
+            if (!this.IsLoaded || _gammaCorrectionPostProcess == null)
                 return;
 
             _gammaCorrectionPostProcess.Gamma = GetSelectedComboBoxFloatValue(GammaCorrectionComboBox);

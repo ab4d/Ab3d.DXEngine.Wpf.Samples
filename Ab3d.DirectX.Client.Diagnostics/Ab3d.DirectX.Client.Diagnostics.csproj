@@ -39,13 +39,13 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=4.0.7447.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.4.0.7447\lib\net45\Ab3d.DXEngine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.DXEngine, Version=3.3.7279.1045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ab3d.DXEngine.4.1.7619\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.0.7447.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.0.7447\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=3.3.7279.1045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.1.7619\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
@@ -77,9 +77,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeviceInfoUserControl.xaml.cs">
-      <DependentUpon>DeviceInfoUserControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="DeviceInfoUserControl.cs" />
     <Compile Include="DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>
@@ -94,18 +92,18 @@
     </Compile>
     <Compile Include="SettingsEditorWindow.xaml.cs">
       <DependentUpon>SettingsEditorWindow.xaml</DependentUpon>
-    </Compile>      
+    </Compile>
     <Compile Include="SystemInfo.cs" />
     <Compile Include="WpfPreviewWindow.xaml.cs">
       <DependentUpon>WpfPreviewWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DeviceInfoUserControl.xaml">
+    <Page Include="DiagnosticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DiagnosticsWindow.xaml">
+    <Page Include="LogMessagesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -114,10 +112,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SettingsEditorWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>       
-    <Page Include="LogMessagesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

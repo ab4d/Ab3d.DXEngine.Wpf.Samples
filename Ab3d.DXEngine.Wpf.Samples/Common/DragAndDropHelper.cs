@@ -1,22 +1,23 @@
 // ----------------------------------------------------------------
-// <copyright file="FileDropedEventArgs.cs" company="AB4D d.o.o.">
+// <copyright file="DragAndDropHelper.cs" company="AB4D d.o.o.">
 //     Copyright (c) AB4D d.o.o.  All Rights Reserved
 // </copyright>
 // ----------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows;
 
 namespace Ab3d.DXEngine.Wpf.Samples.Common
 {
-    public class FileDropedEventArgs : EventArgs
+    public class FileDroppedEventArgs : EventArgs
     {
         public string FileName;
 
-        public FileDropedEventArgs(string fileName)
+        public FileDroppedEventArgs(string fileName)
         {
             FileName = fileName;
         }
@@ -24,76 +25,90 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
 
     public class DragAndDropHelper
     {
-        private FrameworkElement _parentToAddDragAndDrop;
-        private string[] _allowedFileExtensions;
+        private readonly string[] _allowedFileExtensions;
 
-        public event EventHandler<FileDropedEventArgs> FileDroped;
+        public event EventHandler<FileDroppedEventArgs> FileDropped;
 
-        public DragAndDropHelper(FrameworkElement pageToAddDragAndDrop, string allowedFileExtensions)
+        // set usePreviewEvents to true for TextBox or some other controls that handle dropping by themselves
+        public DragAndDropHelper(FrameworkElement controlToAddDragAndDrop, string allowedFileExtensions = null, bool usePreviewEvents = false)
         {
-            _parentToAddDragAndDrop = pageToAddDragAndDrop;
-
             if (string.IsNullOrEmpty(allowedFileExtensions) || allowedFileExtensions == "*" || allowedFileExtensions == ".*")
-                _allowedFileExtensions = null; // no filter
+            {
+                // no filter
+                _allowedFileExtensions = null;
+            }
             else
-                _allowedFileExtensions = allowedFileExtensions.Split(';');
+            {
+                _allowedFileExtensions = allowedFileExtensions.Split(new[] { ';', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                              .Select(e => e.Trim())
+                                                              .Select(e => e.StartsWith(".") ? e : '.' + e) // make sure that each extension has leading '.' because Path.GetExtension also gets such extension
+                                                              .ToArray();
+            }
 
-            pageToAddDragAndDrop.AllowDrop = true;
-            pageToAddDragAndDrop.Drop += new System.Windows.DragEventHandler(pageToAddDragAndDrop_Drop);
-            pageToAddDragAndDrop.DragOver += new System.Windows.DragEventHandler(pageToAddDragAndDrop_DragOver);
+            controlToAddDragAndDrop.AllowDrop = true;
+
+            if (usePreviewEvents)
+            {
+                controlToAddDragAndDrop.PreviewDrop += pageToAddDragAndDrop_Drop;
+                controlToAddDragAndDrop.PreviewDragOver += pageToAddDragAndDrop_DragOver;
+            }
+            else
+            {
+                controlToAddDragAndDrop.Drop += pageToAddDragAndDrop_Drop;
+                controlToAddDragAndDrop.DragOver += pageToAddDragAndDrop_DragOver;
+
+            }
         }
 
-        public void pageToAddDragAndDrop_DragOver(object sender, DragEventArgs e)
+        public void pageToAddDragAndDrop_DragOver(object sender, DragEventArgs args)
         {
-            e.Effects = DragDropEffects.None;
-            e.Handled = true;
+            args.Effects = DragDropEffects.None;
 
-            if (e.Data.GetDataPresent("FileNameW"))
+            if (args.Data.GetDataPresent("FileNameW"))
             {
-                var dropData = e.Data.GetData("FileNameW");
+                var dropData = args.Data.GetData("FileNameW");
 
-                if (dropData is string[])
+                var dropFileNames = dropData as string[];
+                if (dropFileNames != null && dropFileNames.Length > 0)
                 {
-                    var dropFileNames = dropData as string[];
-
-                    var fileName = dropFileNames[0].ToString();
-                    var fileExtension = System.IO.Path.GetExtension(fileName).ToLower();
+                    var fileName = dropFileNames[0];
+                    var fileExtension = System.IO.Path.GetExtension(fileName);
 
                     if (_allowedFileExtensions == null)
                     {
-                        e.Effects = DragDropEffects.Move;
+                        args.Effects = DragDropEffects.Move;
                     }
                     else
                     {
-                        foreach (string oneFileFilter in _allowedFileExtensions)
-                        {
-                            if (fileExtension == oneFileFilter)
-                            {
-                                e.Effects = DragDropEffects.Move;
-                                break;
-                            }
-                        }
+                        if (_allowedFileExtensions.Any(e => e.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
+                            args.Effects = DragDropEffects.Move;
                     }
+                }
+            }
+
+            if (args.Effects != DragDropEffects.None)
+                args.Handled = true;
+        }
+
+        public void pageToAddDragAndDrop_Drop(object sender, DragEventArgs args)
+        {
+            if (args.Data.GetDataPresent("FileNameW"))
+            {
+                var dropData = args.Data.GetData("FileNameW");
+
+                var dropFileNames = dropData as string[];
+                if (dropFileNames != null && dropFileNames.Length > 0)
+                {
+                    OnFileDropped(dropFileNames[0]);
+                    args.Handled = true;
                 }
             }
         }
 
-        public void pageToAddDragAndDrop_Drop(object sender, DragEventArgs e)
+        protected void OnFileDropped(string fileName)
         {
-            if (e.Data.GetDataPresent("FileNameW"))
-            {
-                var dropData = e.Data.GetData("FileNameW");
-
-                if (dropData is string[])
-                {
-                    var dropFileNames = dropData as string[];
-
-                    var fileName = dropFileNames[0].ToString();
-
-                    if (FileDroped != null)
-                        FileDroped(this, new FileDropedEventArgs(fileName));
-                }
-            }
+            if (FileDropped != null)
+                FileDropped(this, new FileDroppedEventArgs(fileName));
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     // 1) InitializeRenderingStep - InitializeRendering is the first rendering step. It sets up the RenderingContext with current RenderTargets, resets statistics, etc.
     // 2) PrepareRenderTargetsRenderingStep - PrepareRenderTargets sets rendering targets and clears them and sets Viewport.
     // 3) RenderObjectsRenderingStep - Default RenderObjects renders the objects with their default effect and material.
-    // 4) ResolveMultisampledBackBufferRenderingStep - Resolve multisampled back buffer (MSAABackBuffer) into back buffer.
+    // 4) ResolveBackBufferRenderingStep - Resolve multi-sampled back buffer (MSAABackBuffer) into back buffer.
     // 5) PreparePostProcessingRenderingStep - prepares the buffers for post-processing. When no post-processing effects are used, this and the next steps are not present in the RenderingSteps collection.
     // 6) RenderPostProcessingRenderingStep - renders the post processing effects.
     // 7) CompleteRenderingStep - CompleteRendering is the last rendering step. It Presents SwapChain (if used) or prepares the output buffer that can be send to WPF or CPU memory.

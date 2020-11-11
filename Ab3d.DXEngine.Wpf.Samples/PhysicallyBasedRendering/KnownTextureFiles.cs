@@ -37,7 +37,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             TextureMapTypes.Roughness,
             TextureMapTypes.AmbientOcclusion,
             TextureMapTypes.NormalMap,
-            TextureMapTypes.SpecularColor,
             TextureMapTypes.Emissive
         };
 

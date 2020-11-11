@@ -183,7 +183,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
             // To add support for drop into TextBox, we need to use PreviewDrop and PreviewDragOver events in DragAndDropHelper
             //var dragAndDropHelper = new DragAndDropHelper(FileNameTextBox, ".*");
-            //dragAndDropHelper.FileDroped += delegate (object sender, FileDropedEventArgs e)
+            //dragAndDropHelper.FileDroped += delegate (object sender, FileDroppedEventArgs e)
             //{
             //    FileNameTextBox.Text = e.FileName;
             //    MasterCheckBox.IsChecked = true;
@@ -414,7 +414,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 isMaskValid = false;
             }
