@@ -27,7 +27,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string _startupPage = "DXEngineVisuals/SmoothLinesSample.xaml";
+        //private string _startupPage = "DXEngineVisuals/TwoDimensionalCameraLineEditor.xaml";
         private string _startupPage = null;
 
         private DXViewportView _lastShownDXViewportView;
@@ -43,9 +43,15 @@ namespace Ab3d.DXEngine.Wpf.Samples
         private BitmapImage _diagnosticsDisabledImage;
         private BitmapImage _diagnosticsEnabledImage;
 
-
         public MainWindow()
         {
+            // When using the DXEngine from NuGet and when you have purchase a commercial version,
+            // then uncomment the following line to activate the license uncomment (see your User Account web page for more info):
+            //Ab3d.Licensing.DXEngine.LicenseHelper.SetLicense(licenseOwner: "[CompanyName]", 
+            //                                                 licenseType: "[LicenseType]", 
+            //                                                 license: "[LicenseText]");
+            
+
             // The following is a sample global exception handler that can be used 
             // to get system info (with details about graphics card and drivers)
             // in case of exception in DXEngine.
@@ -75,13 +81,6 @@ namespace Ab3d.DXEngine.Wpf.Samples
                         "Ab3d.DXEngine exception", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             };
-
-
-            // When using the DXEngine from NuGet and when you have purchase a commercial version,
-            // then uncomment the following line to activate the license uncomment (see your User Account web page for more info):
-            //Ab3d.Licensing.DXEngine.LicenseHelper.SetLicense(licenseOwner: "[CompanyName]", 
-            //                                                 licenseType: "[LicenseType]", 
-            //                                                 license: "[LicenseText]");
 
 
             // Initialize the DXEngineSettings helper class

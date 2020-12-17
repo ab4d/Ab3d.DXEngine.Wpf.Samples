@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.DirectX.Common;
 using Ab3d.DirectX.Controls;
 
 namespace Ab3d.DirectX.Client.Diagnostics
@@ -36,7 +37,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 if (_dxView != null)
                 {
                     _dxView.Disposing -= DXViewOnDisposing;
-                    _dxView.SizeChanged -= DXViewOnSizeChanged;
+                    _dxView.DXRenderSizeChanged -= DxViewOnDXRenderSizeChanged;
                 }
 
                 _dxView = value;
@@ -53,7 +54,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 if (_dxView != null)
                 {
                     _dxView.Disposing += DXViewOnDisposing;
-                    _dxView.SizeChanged += DXViewOnSizeChanged;
+                    _dxView.DXRenderSizeChanged += DxViewOnDXRenderSizeChanged;
                 }
             }
         }
@@ -282,7 +283,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
             this.Text = "DXSceneView is disposed";
         }
 
-        private void DXViewOnSizeChanged(object sender, SizeChangedEventArgs e)
+        private void DxViewOnDXRenderSizeChanged(object sender, DXViewSizeChangedEventArgs e)
         {
             Update();
         }

@@ -1,0 +1,68 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.TwoDimensionalCameraSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      Title="StandardXaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+
+    <Grid Name="RootGrid">
+
+        <Border Name="ViewportBorder" Background="White">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="White">
+
+                <Viewport3D Name="MainViewport">
+                    <visuals:ContentVisual3D x:Name="RootLinesVisual3D" />
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <!-- TargetPositionCamera and MouseCameraController are created by the TwoDimensionalCamera -->
+        <!--<cameras:TargetPositionCamera Name="Camera1"
+                                      TargetPosition="0 0 0" 
+                                      Heading="0" Attitude="0" Bank="0" 
+                                      CameraWidth="200"
+                                      CameraType="OrthographicCamera"
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="Disabled"
+                                    MoveCameraConditions="LeftMouseButtonPressed"
+                                    IsMouseWheelZoomEnabled="True"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />-->
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <ab3d:CameraAxisPanel x:Name="CameraAxisPanel1" ZAxisColor="Transparent" Is3DAxesShown="False" />
+            <ab3d:MouseCameraControllerInfo x:Name="MouseCameraControllerInfo1" 
+                                            ShowMoveInfo="True" ShowQuickZoomInfo="True" ShowRotateInfo="False" />
+        </StackPanel>
+
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="Showing 2D lines with Ab3d.DXEngine and TwoDimensionalCamera"/>
+
+        <Border BorderBrush="Black" BorderThickness="1" Background="#AAFFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
+            <StackPanel Orientation="Vertical" Margin="10 5" Width="130">
+                <!--<StackPanel.LayoutTransform>
+                    <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
+                </StackPanel.LayoutTransform>-->
+                <TextBlock Text="Scene selection:" FontWeight="Bold" TextDecorations="Underline" FontSize="14" Margin="0 0 0 3" />
+                <RadioButton Name="SimpleSceneRadioButton" Content="Simple 2D scene" IsChecked="True" FontWeight="Bold" GroupName="SceneType" Margin="0 2" Checked="OnSceneTypeRadioButtonChecked" />
+                <RadioButton Name="StadiumPlanRadioButton" Content="Stadium plan" FontWeight="Bold" GroupName="SceneType" Margin="0 2" Checked="OnSceneTypeRadioButtonChecked" />
+
+                <TextBlock Text="View info:" FontWeight="Bold" TextDecorations="Underline" FontSize="14" Margin="0 10 0 3" />
+                <TextBlock Name="SceneInfoTextBlock" Margin="0 5 0 0" />
+
+                <Button Name="ResetCameraButton" Content="Reset camera" Margin="0 10 0 0" Click="ResetCameraButton_OnClick" />
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>

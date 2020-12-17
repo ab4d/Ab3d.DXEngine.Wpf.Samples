@@ -1,22 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <AssemblyName>Ab3d.DirectX.Client.Diagnostics</AssemblyName>
-    <RootNamespace>Ab3d.DirectX.Client.Diagnostics</RootNamespace>
+    <AssemblyName>Ab3d.DirectX.Client.Settings</AssemblyName>
+    <RootNamespace>Ab3d.DirectX.Client.Settings</RootNamespace>
     <Version>4.2.7655</Version>
     <AssemblyVersion>4.2.7655.2300</AssemblyVersion>
     <FileVersion>4.2.7655.2300</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG; CORE3</DefineConstants>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DefineConstants>TRACE;DEBUG;</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE; CORE3</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>
@@ -24,8 +23,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Remove="ab4d.ico" />
-    <None Remove="warningIcon.png" />
+    <None Remove="Resources\warningIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,8 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="ab4d.ico" />
-    <Resource Include="warningIcon.png" />
+    <Resource Include="Resources\warningIcon.png" />
   </ItemGroup>  
 
 </Project>

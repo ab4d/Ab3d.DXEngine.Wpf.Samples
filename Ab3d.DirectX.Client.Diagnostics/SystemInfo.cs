@@ -99,8 +99,22 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             sb.AppendFormat("    <GeneralInfo {0}OSVersion=\"{1}\" Is64BitOS=\"{2}\" Is64BitProcess=\"{3}\" ProcessorCount=\"{4}\" {5}IsDirectXDebugLayerAvailable=\"{6}\" />\r\n",
                 systemName, Environment.OSVersion.Version, Environment.Is64BitOperatingSystem, Environment.Is64BitProcess, Environment.ProcessorCount, cpuInfo, isDirectXDebugLayerAvailable);
-            
 
+
+#if NETCOREAPP || NET5_0
+            try
+            {
+                sb.AppendFormat("    <RuntimeInformation FrameworkDescription=\"{0}\" OSDescription=\"{1}\" OSArchitecture=\"{2}\" ProcessArchitecture=\"{3}\" />\r\n",
+                    System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                    System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+                    System.Runtime.InteropServices.RuntimeInformation.OSArchitecture,
+                    System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);
+            }
+            catch (Exception ex)
+            {
+                AppendError(sb, "Error getting RuntimeInformation info", ex, indent: 4);
+            }
+#else
             try
             {
                 sb.AppendFormat("    <NetRuntime Versions=\"{0}\" />\r\n", GetNetVersionsFromRegistry());
@@ -109,6 +123,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
             {
                 AppendError(sb, "Error getting NetRuntime info", ex, indent: 4);
             }
+#endif
 
 
 
@@ -148,7 +163,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
             sb.AppendLine("    </Adapters>");
 
 
-#if !CORE3
+#if !NETCOREAPP && !NET5_0
             try
             {
                 string adapterDetailsText = GetVideoControllerDetailsText(indent: 4);
@@ -242,6 +257,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
                     (adapterDescription1.VendorId == 0x1414 && adapterDescription1.DeviceId == 0x8c)); // "Microsoft Basic Render Driver" is identified by by specified VendorId and DeviceId - it is the same as Software rendered (WARP) so we do not want to show it 2 times
         }
 
+#if !NETCOREAPP && !NET5_0
         // From: http://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx
         private static string GetNetVersionsFromRegistry()
         {
@@ -314,8 +330,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 ndpKey.Close();
             }
         }
+#endif
 
-#if !CORE3 // System.Management is not supported in core3
+#if !NETCOREAPP && !NET5_0 // System.Management is not supported in core3
         /// <summary>
         /// Return a string with details of all graphics adapters on the system. The details are get using Windows WMI with the following query: "SELECT * FROM Win32_VideoController".
         /// </summary>

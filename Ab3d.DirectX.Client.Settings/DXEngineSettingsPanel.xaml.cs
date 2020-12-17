@@ -289,6 +289,9 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
 
         private void ChangeSelectedAdapter(AdapterCapabilitiesBase newSelectedAdapter)
         {
+            if (_selectedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D && _selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Low)
+                _selectedRenderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Normal;
+            
             _selectedAdapterCapabilities = newSelectedAdapter;
 
             if (_selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Custom)
@@ -297,6 +300,8 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
             _selectedGraphicsProfile = newSelectedAdapter.GetGraphicsProfileForQuality(_selectedRenderQuality);
 
             UpdateCustomSettingsComboBoxes();
+
+            QualityComboBox.SelectedItem = _selectedRenderQuality;
         }
 
         private void ShowError(string message)

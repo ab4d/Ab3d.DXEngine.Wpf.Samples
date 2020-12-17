@@ -97,6 +97,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private SolidColorEffect _solidColorEffect;
         private CustomActionRenderingStep _objectIdRenderingStep;
+        private List<MaterialSortedRenderingQueue> _alteredRenderingQueues;
 
         private float _lastCpuUsage;
 
@@ -2220,13 +2221,50 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 _solidColorEffect = null;
             }
 
+            if (_alteredRenderingQueues != null)
+            {
+                foreach (var materialSortedRenderingQueue in _alteredRenderingQueues)
+                    materialSortedRenderingQueue.IsRenderingEnabled = !materialSortedRenderingQueue.IsRenderingEnabled;
+
+                _alteredRenderingQueues = null;
+            }
+
             DXView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = true;
         }
-
+        
         private void SetupObjectIdRendering()
         {
             if (DXView.DXScene == null)
                 return; // WPF 3d rendering
+
+
+            //
+            // !!! IMPORTANT !!!
+            //
+            // Some rendering queues are being sorted by material. 
+            // This improves performance by rendering objects with similar material one after another and
+            // this reduces number of DirectX state changes.
+            // But when using ObjectId map, we need to disable rendering queues by material.
+            // If this is not done, the objects rendered in the standard rendering pass and 
+            // objects rendered for object id map will be rendered in different order.
+            // Because of this we would not be able to get the original object id from the back.
+            //
+            // Therefore go through all MaterialSortedRenderingQueue and disable sorting.
+            //
+            // Note the we do not need to disable sorting by camera distance (TransparentRenderingQueue)
+            // because the object order does not change when rendering object id map.
+
+            _alteredRenderingQueues = new List<MaterialSortedRenderingQueue>();
+
+            foreach (var materialSortedRenderingQueue in DXView.DXScene.RenderingQueues.OfType<MaterialSortedRenderingQueue>())
+            {
+                if (materialSortedRenderingQueue.IsSortingEnabled)
+                {
+                    materialSortedRenderingQueue.IsSortingEnabled = false;
+                    _alteredRenderingQueues.Add(materialSortedRenderingQueue);
+                }
+            }
+            
 
 
             // Create a SolidColorEffect that will be used to render each objects with a color from object's id
@@ -2295,7 +2333,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
             }
         }
 
-#if NET45 || CORE3
+#if NET45 || NETCOREAPP
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         private static Color4 GetObjectIdColor4(int renderingQueueIndex, int objectIndex)
@@ -2310,22 +2348,26 @@ StateChangesCount: {16:#,##0}{17}{18}",
             float red   = (float)((objectIndex >> 16) & 0xFF) / 255f;
             float green = (float)((objectIndex >> 8) & 0xFF) / 255f;
             float blue  = (float)(objectIndex & 0xFF) / 255f;
-            float alpha = (float)(0xF0 + (renderingQueueIndex & 0x0F)) / 255f; // preserve the high 4 bits of alpha value so that the colors are visible and write renderingQueueIndex into the low 4 bits (0...15 possible values)
+
+            // Write renderingQueueIndex
+            // We increase the index by 1 so that value 0 represents an invalid index that is used for areas where there is no 3D object
+            // We preserve the high 4 bits of alpha value so that the colors are visible and write renderingQueueIndex into the low 4 bits (0...15 possible values)
+            float alpha = (float)(0xF0 + ((renderingQueueIndex + 1) & 0x0F)) / 255f;
 
             return new Color4(red, green, blue, alpha);
         }
 
-#if NET45 || CORE3
+#if NET45 || NETCOREAPP
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static void GetObjectId(Color4 idColor, out int renderingQueueIndex, out int objectIndex)
         {
-            byte red   = (byte)(idColor.Red * 255);
+            byte red   = (byte)(idColor.Red   * 255);
             byte green = (byte)(idColor.Green * 255);
-            byte blue  = (byte)(idColor.Blue * 255);
+            byte blue  = (byte)(idColor.Blue  * 255);
             byte alpha = (byte)(idColor.Alpha * 255);
 
-            renderingQueueIndex = alpha & 0x0F;
+            renderingQueueIndex = (alpha & 0x0F) - 1;
             objectIndex         = (red << 16) + (green << 8) + blue;
         }
 

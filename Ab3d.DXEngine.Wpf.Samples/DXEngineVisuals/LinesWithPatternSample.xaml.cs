@@ -32,7 +32,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
 
             AddLineWithText(linePattern: 0x5555, linePatternOffset: 0, linePatternScale: 1); // 0x5555 is 0101010101010101 - note that the pattern starts on the right side with the first bit - has value 1.
-            AddLineWithText(0x3333, 0, 1); // 0xF0F0 is 0011001100110011
+            AddLineWithText(0x3333, 0, 1); // 0x3333 is 0011001100110011
             AddLineWithText(0x1010, 0, 1); // 0x1010 is 1000000010000000
             AddLineWithText(0xF0F0, 0, 1); // 0xF0F0 is 1111000011110000
 

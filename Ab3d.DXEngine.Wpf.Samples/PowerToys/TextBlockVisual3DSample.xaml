@@ -12,9 +12,12 @@
       d:DesignHeight="400" d:DesignWidth="800">
 
     <Grid Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-        
-        <Border Name="ViewportBorder">
+        <Border Name="ViewportBorder" Grid.Column="0" Grid.ColumnSpan="2">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
                     <GradientStop Offset="0" Color="#033C62"/>
@@ -25,76 +28,71 @@
             <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
                 <Viewport3D Name="MainViewport">
                     <visuals:WireCrossVisual3D x:Name="PositionWireCross" Position="0 0 0" LineThickness="2" LineColor="Red" />
-                
+
                     <visuals:TextBlockVisual3D x:Name="TextBlockVisual1"
-                                           
+                                               
                                                Position="0 0 0" PositionType="Center"
                                                Size="200 0"
                                                TextDirection="1 0 0" UpDirection="0 1 0" 
-                                           
+                                               
                                                Text="{Binding ElementName=TextTextBox, Path=Text}"
-                                           
+                                               
                                                Foreground="Green" FontSize="12" FontWeight="Bold"
                                                BorderThickness="2" BorderBrush="Black" Background="LightGray"
-                                           
-                                               TextHorizontalAlignment="Right"
-                                               TextVerticalAlignment="Bottom"
-                                           
+     
                                                IsBackSidedTextFlipped="True" IsTwoSidedText="True"
                                                TextPadding="0 0"/>
                 </Viewport3D>
             </dxControls:DXViewportView>
         </Border>
 
-        <cameras:TargetPositionCamera Name="Camera1"
-                                      TargetPosition="0 0 0" 
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0"
+                                      TargetPosition="30 0 0" RotationCenterPosition="0 0 0"
                                       Heading="50" Attitude="0" Bank="0" 
                                       Distance="300" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
-        <ab3d:MouseCameraController Name="MouseCameraController1"
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Column="0"
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     ShowRotationCenterMarker="True"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
 
-        <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
-        
-        <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" BorderBrush="Black" BorderThickness="2" Background="#55000000" Margin="10">
-            <StackPanel Orientation="Vertical" Margin="10 5" TextBlock.Foreground="Silver">
-                <TextBlock FontWeight="Bold" FontSize="18" Margin="0 3" TextDecorations="Underline" Text="TextBlockVisual3D"/>
-                
-                <TextBlock Text="Text:" FontWeight="Bold" Margin="0 8 0 1"/>
-                <TextBox Name="TextTextBox" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="68" />
+        <ab3d:CameraAxisPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
 
-                <Grid Name="OptionsGrid" Margin="0 10 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="2" Background="#55000000" Margin="10">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10 5" TextBlock.Foreground="Silver">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" MinHeight="34" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <TextBlock FontWeight="Bold" FontSize="18" Margin="0 3" TextDecorations="Underline" Text="TextBlockVisual3D"/>
+
+                        <TextBlock Margin="0 5" TextWrapping="Wrap" Width="300"
+                                   Text="TextBlockVisual3D renders Border and TextBlock to a texture and shows it on a PlaneVisual3D."/>
+
+                        <TextBlock Text="Text:" FontWeight="Bold" Margin="0 8 0 1"/>
+                    </StackPanel>
+                    <TextBox Name="TextTextBox" Grid.Row="1" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                    <Grid Name="OptionsGrid" Grid.Row="2" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+
+                    <Button Name="AlignWithCameraButton" Grid.Row="3" Content="Align with camera" Margin="0 5 0 0" Click="AlignWithCameraButton_OnClick" 
+                            ToolTip="AlignWithCamera method aligns the TextBlockVisual3D so that it is facing the camera."/>
                 </Grid>
-            </StackPanel>
+            </ScrollViewer>
         </Border>
-
-        <!--<Rectangle Width="200" Height="100" Stroke="Yellow" StrokeThickness="1">
-            <Rectangle.Fill>
-                <VisualBrush>
-                    <VisualBrush.RelativeTransform>
-                        <MatrixTransform Matrix="-1, 0, 0, 1, 1, 0"></MatrixTransform>
-                    </VisualBrush.RelativeTransform>
-                    <VisualBrush.Visual>
-                        <TextBlock Text="1234" />
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </Rectangle.Fill>
-        </Rectangle>-->        
-
-        <!--<Border Background="Red" Width="200" Height="50">
-            <TextBlock TextTrimming="WordEllipsis" Text="47934738 4238 409238423849349230 4932+30+4 aaaaa"></TextBlock>
-        </Border>-->
     </Grid>
 </Page>
 

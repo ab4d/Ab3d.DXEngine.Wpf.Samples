@@ -185,7 +185,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
                         sb.AppendFormat("CPU: {0}\r\n", cpuInfo);
                 }
                 catch
-                { }
+                {
+                    // pass
+                }
 
                 if (_dxScene.DXDevice.Adapter != null && !_dxScene.DXDevice.Adapter.IsDisposed)
                 {
@@ -197,6 +199,20 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
                     sb.AppendFormat("Adapter: {0}\r\n", adapterDescription);
                 }
+
+#if NETCOREAPP
+                try
+                {
+                    sb.AppendFormat("FrameworkDescription: {0}\r\nOSDescription: {1} {2}\r\n",
+                        System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                        System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+                        System.Runtime.InteropServices.RuntimeInformation.OSArchitecture);
+                }
+                catch
+                {
+                    // pass
+                }
+#endif
 
                 sb.AppendLine();
             }

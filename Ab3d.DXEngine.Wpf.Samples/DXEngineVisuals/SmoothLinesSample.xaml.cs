@@ -110,24 +110,28 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
 
             // Add lines that start from vertical lines and then continue with slightly angled lines
+            var linePositions = new Point3DCollection();
+
             double xPos = 100;
             for (int i = 0; i <= 16; i++)
             {
-                //var startPosition = RoundPositionToCenterOfScreenPixel(new Point3D(xPos, 90, 0));
                 var startPosition = new Point3D(xPos, -5.5, 0);
 
-                var lineVisual3D = new LineVisual3D()
-                {
-                    StartPosition = startPosition,
-                    EndPosition = startPosition + new Vector3D(i, 100, 0),
-                    LineColor = Colors.Black,
-                    LineThickness = screenPixelLineThickness
-                };
-
-                rootModelVisual3D.Children.Add(lineVisual3D);
-
+                linePositions.Add(startPosition);
+                linePositions.Add(startPosition + new Vector3D(i, 100, 0));
+                
                 xPos += 6;
             }
+
+            var multiLineVisual3D = new MultiLineVisual3D()
+            {
+                Positions     = linePositions,
+                LineColor     = Colors.Black,
+                LineThickness = screenPixelLineThickness
+            };
+
+            rootModelVisual3D.Children.Add(multiLineVisual3D);
+
 
 
             // Add line circles
@@ -176,20 +180,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             parentModelVisual3D.Children.Add(textBlockVisual3D);
 
+
+            var linePositions = new Point3DCollection();
+
             for (int a = 0; a <= 90; a += 5)
             {
                 Point3D endPosition = startPosition + new Vector3D(linesLength * Math.Cos(a / 180.0 * Math.PI), linesLength * Math.Sin(a / 180.0 * Math.PI), 0);
 
-                var lineVisual3D = new LineVisual3D()
-                {
-                    StartPosition = startPosition,
-                    EndPosition   = endPosition,
-                    LineColor     = Colors.Black,
-                    LineThickness = lineThickness
-                };
-
-                parentModelVisual3D.Children.Add(lineVisual3D);
+                linePositions.Add(startPosition);
+                linePositions.Add(endPosition);
             }
+
+            var multiLineVisual3D = new MultiLineVisual3D()
+            {
+                Positions     = linePositions,
+                LineColor     = Colors.Black,
+                LineThickness = lineThickness
+            };
+
+            parentModelVisual3D.Children.Add(multiLineVisual3D);
         }
 
         private DXViewportView AddDXViewport3DGrid(string title, string graphicsProfileName, int multisamplingCount, int supersamplingCount, int rowIndex, int columnIndex)
