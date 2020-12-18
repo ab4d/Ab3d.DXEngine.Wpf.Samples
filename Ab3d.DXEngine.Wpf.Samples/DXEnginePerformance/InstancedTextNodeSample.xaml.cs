@@ -239,7 +239,7 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             if (_instancedTextNode2 != null)
                 charactersCount += _instancedTextNode2.CharactersCount;
 
-            CharactersCountTextBlock.Text = string.Format("Chars count: {0:#,##0}", charactersCount);
+            CharactersCountTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Chars count: {0:#,##0}", charactersCount);
         }
 
         private void SceneTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

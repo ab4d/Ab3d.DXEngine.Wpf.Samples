@@ -64,9 +64,9 @@
                 <TextBlock Text="Scene type:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
                 <ComboBox Name="SceneTypeComboBox" Width="150" SelectedIndex="0" SelectionChanged="SceneTypeComboBox_OnSelectionChanged">
                     <ComboBoxItem>Simple demo scene</ComboBoxItem>
-                    <ComboBoxItem>8.000 coordinates</ComboBoxItem>
-                    <ComboBoxItem>200.000 coordinates</ComboBoxItem>
-                    <ComboBoxItem>1.000.000 coordinates</ComboBoxItem>
+                    <ComboBoxItem>8,000 coordinates</ComboBoxItem>
+                    <ComboBoxItem>200,000 coordinates</ComboBoxItem>
+                    <ComboBoxItem>1,000,000 coordinates</ComboBoxItem>
                 </ComboBox>
 
                 <TextBlock Name="CharactersCountTextBlock" Text="Chars count: 0" Margin="5 0 0 0" VerticalAlignment="Center" />
