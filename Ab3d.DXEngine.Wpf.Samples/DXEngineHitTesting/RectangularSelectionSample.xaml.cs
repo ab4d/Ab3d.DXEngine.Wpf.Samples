@@ -30,16 +30,6 @@ using Point = SharpDX.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
-    // This sample shows how to render each object with a color defined by its ObjectIds to a bitmap.
-    // The ObjectId is actually an index of the RenderingQueue and an index of the object inside the RenderingQueue.
-    // This way it is possible to get the rendered RenderablePrimitive from the color and 
-    // from RenderablePrimitive you can get the SceneNode from the OriginalObject property.
-    // This way the bitmap can be used for complex hit-testing and box or lasso selection.
-    //
-    // Limitations:
-    // - only standard 3D objects can be rendered
-    // - lines are rendered with thickness 1
-
     /// <summary>
     /// Interaction logic for RectangularSelectionSample.xaml
     /// </summary>
