@@ -42,13 +42,13 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=4.2.7655.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+    <Reference Include="Ab3d.DXEngine, Version=4.2.7695.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Ab3d.DXEngine.4.2.7655\lib\net45\Ab3d.DXEngine.dll</HintPath>
+      <HintPath>..\packages\Ab3d.DXEngine.4.2.7695\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.2.7655.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.2.7695.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.2.7655\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.2.7695\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Ab3d.PowerToys, Version=9.4.7656.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
       <HintPath>..\packages\Ab3d.PowerToys.9.4.7656\lib\net45\Ab3d.PowerToys.dll</HintPath>
@@ -915,11 +915,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp32.dll">
+    <Content Include="..\lib\Assimp32.dll">
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="C:\Program Files\AB4D Products (Trial)\Ab3d.PowerToys\bin\Assimp\Assimp64.dll">
+    <Content Include="..\lib\Assimp64.dll">
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
