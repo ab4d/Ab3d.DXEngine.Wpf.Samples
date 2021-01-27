@@ -37,6 +37,7 @@ The projects uses the following dependencies:
 
 * Online users guide: https://www.ab4d.com/DirectX/3D/Introduction.aspx
 * Online reference help: https://www.ab4d.com/help/DXEngine/html/R_Project_Ab3d_DXEngine_Help.htm
+* Change log: https://www.ab4d.com/DXEngine-history.aspx
 * Forum: https://forum.ab4d.com/forumdisplay.php?fid=11
 * Related blog posts: http://blog.ab4d.com/category/DXEngine.aspx
 * Feedback: https://www.ab4d.com/Feedback.aspx
