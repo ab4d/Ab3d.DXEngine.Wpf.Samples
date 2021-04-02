@@ -60,7 +60,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
         // For testing purposes it is possible to run the BackgroundDXEngineRenderer on the Main UI thread
         // To do that, set the following const to false.
-        private const bool IsRenderingInBackgroundThread = true;
+        private bool IsRenderingInBackgroundThread = true;
 
 
 

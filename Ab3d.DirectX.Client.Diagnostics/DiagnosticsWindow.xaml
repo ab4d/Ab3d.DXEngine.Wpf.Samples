@@ -69,6 +69,8 @@
                 <!--<CheckBox Name="ShowCameraMatricesCheckBox" Content="Show camera matrices" Visibility="Collapsed" Height="0" IsChecked="True" Checked="OnShowCameraMatricesCheckBoxCheckedChanged" Unchecked="OnShowCameraMatricesCheckBoxCheckedChanged"/>-->
                 
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" Checked="AlwaysOnTopCheckBoxChanged" Unchecked="AlwaysOnTopCheckBoxChanged"/>
+                <Separator />
+                <MenuItem Name="OnlineHelpMenuItem" Header="Online help" Click="OnlineHelpMenuItem_OnClick" />
 
             </MenuItem>
         </Menu>

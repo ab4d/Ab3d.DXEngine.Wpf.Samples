@@ -8,7 +8,7 @@
     MinWidth="600"
     Title="Sphere Model sample">
     <Grid>
-        <Border Name="ViewportBorder" BorderBrush="Black" BorderThickness="2" Margin="5" CornerRadius="5">
+        <Border Name="ViewportBorder" BorderBrush="Black" BorderThickness="2" Margin="5">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
                     <GradientStop Offset="0" Color="#033C62"/>

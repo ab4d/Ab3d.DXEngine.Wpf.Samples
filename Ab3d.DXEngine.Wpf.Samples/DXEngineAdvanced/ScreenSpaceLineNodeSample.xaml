@@ -24,7 +24,7 @@
 
         <cameras:TargetPositionCamera Name="Camera1" 
                                       TargetPosition="0 0 0" 
-                                      Heading="-20" Attitude="-20" Bank="0" 
+                                      Heading="10" Attitude="-20" Bank="0" 
                                       Distance="450" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
@@ -38,17 +38,17 @@
         <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
-            <Button Name="UpdatePositionsButton" Content="UPDATE POSITIONS" FontWeight="Bold" Padding="10 2" Click="UpdatePositionsButton_OnClick" >
+            <Button Name="ChangePositionsButton" Content="CHANGE POSITIONS" FontWeight="Bold" Padding="10 2" Click="ChangePositionsButton_OnClick" >
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
                 </Button.LayoutTransform>
             </Button>
-            <Button Name="UpdateColorButton" Content="UPDATE COLOR" FontWeight="Bold" Padding="10 2" Margin="10 0" Click="UpdateColorButton_OnClick" >
+            <Button Name="ChangeColorButton" Content="CHANGE COLOR" FontWeight="Bold" Padding="10 2" Margin="10 0" Click="ChangeColorButton_OnClick" >
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
                 </Button.LayoutTransform>
             </Button>
-            <Button Name="UpdateThicknessButton" Content="UPDATE THICKNESS" FontWeight="Bold" Padding="10 2" Click="UpdateThicknessButton_OnClick" >
+            <Button Name="ChangeThicknessButton" Content="CHANGE THICKNESS" FontWeight="Bold" Padding="10 2" Click="ChangeThicknessButton_OnClick" >
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
                 </Button.LayoutTransform>

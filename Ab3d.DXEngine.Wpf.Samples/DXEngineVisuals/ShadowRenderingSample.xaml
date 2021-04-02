@@ -62,13 +62,13 @@
                     <TextBlock Text="Manual light control:" FontWeight="Bold" FontSize="13" Margin="0 10 0 0"/>
                     <TextBlock Text="Arrow keys: Rotate light&#x0a;Page Up / Down: Light distance" FontSize="13"/>
 
-                    <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
+                    <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
                         <Button Name="ChangeBoxSizeButton" Content="Change 3D scene size" Padding="10 1" Click="ChangeBoxSizeButton_OnClick" />
                         <controls:InfoControl x:Name="ChangeBoxSizeInfoControl" InfoWidth="400" Margin="5 0 0 0" VerticalAlignment="Center" 
                                           InfoText="When rendering shadows for directional light the size of the 3D scene can significantly decrease the resolution of the shadow map (bigger 3D scene size required bigger shadow map size for the same resolution).&#10;&#10;When using Spot light the shadow resolution stays the same when the scene size is changed." />
                     </StackPanel>
 
-                    <TextBlock Text="Shadow settings:" FontWeight="Bold" Margin="0 20 0 0"/>
+                    <TextBlock Text="Shadow settings:" FontWeight="Bold" Margin="0 15 0 0"/>
 
                     <CheckBox Name="EnableShadowsCheckBox" Content="Is shadow rendering enabled" IsChecked="True" Margin="0 5 0 0"
                           Checked="OnShadowSettingsSelectedValueChanged" Unchecked="OnShadowSettingsSelectedValueChanged" />
@@ -140,7 +140,7 @@
                     </Grid>
 
 
-                    <TextBlock Text="Objects filter:" FontWeight="Bold" Margin="0 20 0 0"/>
+                    <TextBlock Text="Objects filter:" FontWeight="Bold" Margin="0 15 0 0"/>
 
                     <CheckBox Name="TeapotIsCastingShadowCheckBox" Content="Teapot IsCastingShadow" IsChecked="True" Margin="0 5 0 0"
                           Checked="OnObjectsFilterValueChanged" Unchecked="OnObjectsFilterValueChanged" />

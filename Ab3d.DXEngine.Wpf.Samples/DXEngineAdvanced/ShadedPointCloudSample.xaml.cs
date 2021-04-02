@@ -48,7 +48,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         // The first three values represents x,y and z value of the point 's position, the next 3 values represent the point's normal.
 
         //private const string SampleDataFile = @"C:\...\abnahmewerkzeug.normal-tab.csv";
-        private const string SampleDataFile = null; // When null, sample cylinder is created
+        private string SampleDataFile = null; // When null, sample cylinder is created
 
 
         // SegmentsCount NOTE: Increasing number of segments increases the number of required draw calls

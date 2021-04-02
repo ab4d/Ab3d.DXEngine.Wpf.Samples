@@ -45,7 +45,19 @@ using System.Runtime.InteropServices;
 // and that DXEngine do not need to copy those data into its own vertex buffer array.
 // In case of using SimpleMesh<PositionNormalTexture> we can update the Positions and Normals directly in the vertex buffer array.
 //
-// To even further optimize the code, it is possible to use unsafe codo to change position and normal data.
+// This sample also can create a dynamic vertex buffer.
+// When using a dynamic vertex buffer, the existing vertex buffer is reused when updating the data;
+// otherwise the existing vertex buffer is disposed and a new vertex buffer is created - this can lead to GPU memory fragmentation.
+// The dynamic vertex buffer is created with setting the createDynamicVertexBuffer argument to true when creating the SimpleMesh object.
+//
+// When using standard WPF objects, the code can automatically start using dynamic vertex buffer when the Positions in MeshGeometry3D are
+// changed very often.
+// You can also manually force creation of dynamic vertex buffer with setting the CreateDynamicVertexBuffer to true on a GeometryModel3D:
+// geometryModel3D.SetDXAttribute(DXAttributeType.CreateDynamicVertexBuffer, true);
+// You can also prevent automatically using dynamic vertex buffer with setting CreateDynamicVertexBuffer attribute to false.
+//
+//
+// To even further optimize the code, it is possible to use unsafe code to change position and normal data.
 // This can bring a big 50% performance gains.
 // See code comments in the AnimateSimpleMesh method for more info.
 //

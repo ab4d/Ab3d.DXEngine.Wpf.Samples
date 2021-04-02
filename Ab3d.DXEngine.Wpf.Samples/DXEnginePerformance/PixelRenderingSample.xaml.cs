@@ -28,7 +28,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     /// </summary>
     public partial class PixelRenderingSample : Page
     {
-        private const bool _isUsingPixelsVisual3D = true; // Set to false to use low lever DXEngine objects (MeshObjectNode and PixelMaterial) instead of PixelsVisual3D
+        private bool IsUsingPixelsVisual3D = true; // Set to false to use low lever DXEngine objects (MeshObjectNode and PixelMaterial) instead of PixelsVisual3D
 
         private DisposeList _disposables;
 
@@ -188,7 +188,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private void ShowPositionsArray(Vector3[] positionsArray, float pixelSize, Color4 pixelColor, Bounds positionBounds)
         {
-            if (_isUsingPixelsVisual3D)
+            if (IsUsingPixelsVisual3D)
             {
                 // The easiest way to show many pixels is to use PixelsVisual3D.
                 var pixelsVisual3D = new PixelsVisual3D()
@@ -359,7 +359,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             var newPixelSize = (float)PixelSizeComboBox.SelectedItem;
 
-            if (_isUsingPixelsVisual3D)
+            if (IsUsingPixelsVisual3D)
             {
                 foreach (var pixelsVisual3D in MainViewport.Children.OfType<PixelsVisual3D>())
                     pixelsVisual3D.PixelSize = newPixelSize;

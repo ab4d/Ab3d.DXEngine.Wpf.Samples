@@ -270,7 +270,12 @@ control text and border style.";
 
         private void AlignWithCameraButton_OnClick(object sender, RoutedEventArgs e)
         {
-            TextBlockVisual1.AlignWithCamera(Camera1);
+            if (MainViewport.Children.Contains(TextBlockVisual1))
+                MainViewport.Children.Remove(TextBlockVisual1);
+            else
+                MainViewport.Children.Add(TextBlockVisual1);
+
+            //TextBlockVisual1.AlignWithCamera(Camera1);
         }
     }
 }

@@ -2998,5 +2998,10 @@ StateChangesCount: {16:#,##0}{17}{18}",
             // Close the menu
             ActionsRootMenuItem.IsSubmenuOpen = false;
         }
+
+        private void OnlineHelpMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            StartProcess("https://www.ab4d.com/DirectX/3D/Diagnostics.aspx");
+        }
     }
 }

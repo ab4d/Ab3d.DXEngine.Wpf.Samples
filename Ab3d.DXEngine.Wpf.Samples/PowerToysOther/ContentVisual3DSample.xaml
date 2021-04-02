@@ -39,11 +39,14 @@
 
         <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
 
-        <CheckBox Name="IsVisibleCheckBox" Content="IsVisible" IsChecked="True" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
-            <CheckBox.LayoutTransform>
-                <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
-            </CheckBox.LayoutTransform>
-        </CheckBox>
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Vertical" Margin="10 5">
+            <CheckBox Name="IsVisibleCheckBox" Content="ContentVisual3D.IsVisible" IsChecked="True" FontWeight="Bold">
+                <CheckBox.LayoutTransform>
+                    <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
+                </CheckBox.LayoutTransform>
+            </CheckBox>
+            <TextBlock Text="Ship 3D model is set to the Content property of the ContentVisual3D. When ContentVisual3D is hidden, the DirectX resources are preserved and therefore the 3D model can be quickly shown when IsVisible is set to true." Margin="0 5 0 0" Width="310" TextWrapping="Wrap" />
+        </StackPanel>
 
         <TextBlock FontWeight="Bold" Grid.Column="0" FontSize="18" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"
                    Text="Quickly showing and hiding models with ContentVisual3D"/>

@@ -20,7 +20,11 @@
                 <controls:TextBlockEx Style="{StaticResource InfoTitle}" Margin="20 30 20 10">Ab3d.PowerToys samples inside Ab3d.DXEngine</controls:TextBlockEx>
 
                 <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 0">
-                    The samples in the Ab3d.PowerToys section are the same samples as in the samples project for the Ab3d.PowerToys library (the ultimate WPF 3D helper library).\n
+                    The Ab3d.PowerToys is the ultimate 3D toolkit library with many helper objects for 3D graphics. By default the Ab3d.PowerToys uses WPF 3D rendering engine (DirectX 9). 
+                    But when the \!WPF's Viewport3D\! objects is included into the \!EXEngine's DXViewportView\! object, then the 3D scene that is defined by WPF 3D and Ab3d.PowerToys objects is rendered 
+                    by the Ab3d.DXEngine rendering engine (DirectX 11). This way you can reuse all the helper objects from Ab3d.PowerToys library.\n
+                    \n
+                    The samples in the Ab3d.PowerToys section are the same samples as in the samples project for the Ab3d.PowerToys library.\n
                     \n
                     They are used in the Ab3d.DXEngine's project to show that all the great features of the Ab3d.PowerToys library still work when using DXEngine.\n
                 </controls:TextBlockEx>
@@ -36,7 +40,8 @@
                     \n
                     In some cases, some additional changes are required. Those cases are demonstrated and documented in the "Other Ab3d.PowerToys samples" section.\n
                     \n
-                    For more information see the "Using Ab3d.PowerToys library" section in the Ab3d.DXEngine help file (installed into root DXEngine folder).
+                    For more information see the \@Using Ab3d.PowerToys library:https://www.ab4d.com/DirectX/3D/UsingPowerToys.aspx| section in the online Users Guide.
+                    
                 </controls:TextBlockEx>
             </StackPanel>
         </ScrollViewer>

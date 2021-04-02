@@ -23,7 +23,7 @@ using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 
-namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
+namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 {
     /// <summary>
     /// Interaction logic for ImprovedTextBlockVisual3D.xaml

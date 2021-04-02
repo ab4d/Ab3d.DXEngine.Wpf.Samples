@@ -262,6 +262,7 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
                 Camera1.Heading        = 30;
                 Camera1.Attitude       = -20;
                 Camera1.Distance       = 600;
+                Camera1.Offset         = new Vector3D(0, 0, 0);
                 Camera1.TargetPosition = new Point3D(0, 0, 0);
             }
             else

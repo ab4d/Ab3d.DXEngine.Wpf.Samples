@@ -115,6 +115,11 @@
             Gets or sets a logger callback action that takes two strings (message and data).
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.IsVerboseLoggingEnabled">
+            <summary>
+            Gets or sets a boolean that specifies if verbose logging is enabled. Default value is false.
+            </summary>
+        </member>
         <member name="P:Ab3d.Assimp.AssimpWpfExporter.ObjectNames">
             <summary>
             Gets or sets a Dictionary where keys are objects and values are object names.
@@ -646,10 +651,10 @@
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.LoadAssimpNativeLibrary(System.String,System.String)">
             <summary>
-            Loads assimp native library from the specified folders. If folder is not specified than the folder when the managed Assimp wrapper library (AssimpNet.dll) is located is used.
+            Loads assimp native library from the specified folder or full file path. If folder is not specified than the folder when the managed Assimp wrapper library (AssimpNet.dll) is located is used.
             </summary>
-            <param name="assimp32BitLibraryFolder">folder when the 32 bit native assimp libraries are located.</param>
-            <param name="assimp64BitLibraryFolder">folder when the 64 bit native assimp libraries are located.</param>
+            <param name="assimp32BitLibrary">folder or full file path of the 32 bit native assimp library.</param>
+            <param name="assimp64BitLibrary">folder or full file path of the 64 bit native assimp library.</param>
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.Dispose">
             <summary>

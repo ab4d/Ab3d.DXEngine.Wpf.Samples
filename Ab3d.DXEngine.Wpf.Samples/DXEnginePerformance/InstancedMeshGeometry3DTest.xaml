@@ -91,8 +91,6 @@
 
             <controls:InfoControl x:Name="ShowHideInstancesInfoControl" Margin="5 0 0 5" VerticalAlignment="Center"
                                   InfoText="Set instance alpha color to 0 to quickly discard some instances"/>
-
-            <Image Source="/Resources/new_icon.png" Height="12" Margin="5 0 0 5" VerticalAlignment="Center" />
         </WrapPanel>
     </Grid>
 </Page>

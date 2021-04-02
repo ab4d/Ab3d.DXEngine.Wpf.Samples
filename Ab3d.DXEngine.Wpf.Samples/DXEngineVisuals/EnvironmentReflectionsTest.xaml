@@ -21,12 +21,12 @@
         <Viewport3D Name="SkyboxViewport">
             <visuals:MultiMaterialBoxVisual3D CenterPosition="0 0 0" Size="500 1000 500" 
                                               IsTwoSidedMaterial="True"
-                                              TopMaterial="Resources/SkyboxTextures/CloudyLightRaysUp512.png" 
-                                              LeftMaterial="Resources/SkyboxTextures/CloudyLightRaysLeft512.png"
-                                              BackMaterial="Resources/SkyboxTextures/CloudyLightRaysBack512.png"
-                                              RightMaterial="Resources/SkyboxTextures/CloudyLightRaysRight512.png"
-                                              FrontMaterial="Resources/SkyboxTextures/CloudyLightRaysFront512.png"
-                                              BottomMaterial="Resources/SkyboxTextures/CloudyLightRaysDown512.png" />
+                                              TopMaterial="/Resources/SkyboxTextures/CloudyLightRaysUp512.png" 
+                                              LeftMaterial="/Resources/SkyboxTextures/CloudyLightRaysLeft512.png"
+                                              BackMaterial="/Resources/SkyboxTextures/CloudyLightRaysBack512.png"
+                                              RightMaterial="/Resources/SkyboxTextures/CloudyLightRaysRight512.png"
+                                              FrontMaterial="/Resources/SkyboxTextures/CloudyLightRaysFront512.png"
+                                              BottomMaterial="/Resources/SkyboxTextures/CloudyLightRaysDown512.png" />
 
             <ModelVisual3D>
                 <ModelVisual3D.Content>

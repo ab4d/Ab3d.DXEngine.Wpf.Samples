@@ -207,6 +207,90 @@ namespace Ab3d.DXEngine.Wpf.Samples
             OpenDiagnosticsWindow();
         }
 
+        private void RightSideBorder_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            string newDescriptionText = "";
+
+            var node = e.NewValue as System.Xml.XmlNode;
+
+            if (node != null && node.Attributes != null)
+            {
+                var descriptionAttribute = node.Attributes["Description"];
+
+                if (descriptionAttribute != null)
+                    newDescriptionText = descriptionAttribute.Value;
+
+
+                var seeAlsoAttribute = node.Attributes["SeeAlso"];
+
+                if (seeAlsoAttribute != null)
+                {
+                    var seeAlsoText = seeAlsoAttribute.Value;
+                    var seeAlsoParts = seeAlsoText.Split(';');
+
+                    var seeAlsoContent = new StringBuilder();
+                    for (var i = 0; i < seeAlsoParts.Length; i++)
+                    {
+                        var seeAlsoPart = seeAlsoParts[i].Trim();
+                        if (seeAlsoPart.Length == 0)
+                            continue;
+
+                        if (seeAlsoContent.Length > 0)
+                            seeAlsoContent.Append(", ");
+
+                        // TextBlockEx support links, for example: "click here \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| to learn more"
+                        if (seeAlsoPart.StartsWith("\\@"))
+                        {
+                            seeAlsoContent.Append(seeAlsoPart);
+                        }
+                        else
+                        {
+                            string linkDescription;
+
+                            // remove prefix that specifies the type ("T_"), property ("P_"), event ("E_"), ...
+                            if (seeAlsoPart[1] == '_') // "T_Ab3d_Controls_MouseCameraController", "P_Ab3d_Controls_MouseCameraController_ClosedHandCursor", ...
+                                linkDescription = seeAlsoPart.Substring(2);
+                            else
+                                linkDescription = seeAlsoPart;
+
+                            linkDescription = linkDescription.Replace('_', '.')                // Convert '_' to '.'
+                                                             .Replace("Ab3d.Controls.", "")    // Remove the most common namespaces (preserve less common, for example Ab3d.Utilities)
+                                                             .Replace("Ab3d.Visuals.", "")
+                                                             .Replace("Ab3d.Cameras.", "")
+                                                             .Replace("Ab3d.DirectX.", "");
+
+                            if (seeAlsoPart.EndsWith(".html") || seeAlsoPart.EndsWith(".htm"))
+                                linkDescription = linkDescription.Replace(".html", "").Replace(".htm", ""); // remove .html / .htm from linkDescription
+                            else
+                                seeAlsoPart += ".htm";                                                      // and make sure that the link will end with .htm
+
+                            seeAlsoContent.AppendFormat("\\@{0}:https://www.ab4d.com/help/DXEngine/html/{1}|", linkDescription, seeAlsoPart);
+                        }
+                    }
+
+                    if (seeAlsoContent.Length > 0)
+                    {
+                        if (newDescriptionText.Length > 0 && !newDescriptionText.EndsWith("\\n"))
+                            newDescriptionText += "\\n"; // Add new line for TextBlockEx
+
+                        newDescriptionText += "See also: " + seeAlsoContent.ToString();
+                    }
+                }
+            }
+
+            if (newDescriptionText.Length > 0)
+            {
+                DescriptionTextBlock.ContentText = newDescriptionText;
+                DescriptionExpander.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DescriptionTextBlock.ContentText = null;
+                DescriptionExpander.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
         // OnDXSceneInitialized is called when the DXScene and DirectX device has been created and when UsedGraphicsProfile is set
         // In this method we can read what type of rendering will be used by DXEngine
         private void OnDXSceneInitialized(object sender, EventArgs eventArgs)

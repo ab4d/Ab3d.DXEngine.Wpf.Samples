@@ -18,31 +18,43 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20 16 20 0">
-            <common:TextBlockEx Style="{StaticResource InfoTitle}" Margin="0 0 0 15">Welcome to the \!Ab3d.DXEngine\!</common:TextBlockEx>
-            <common:TextBlockEx x:Name="VirtualMachineWarningTextBlock" Style="{StaticResource InfoContent}" Visibility="Collapsed"
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20 0 20 0">
+            <common:TextBlockEx Style="{StaticResource InfoTitle}" Margin="0 30 0 20">Welcome to the \!Ab3d.DXEngine\!</common:TextBlockEx>
+            <common:TextBlockEx x:Name="VirtualMachineWarningTextBlock" Style="{StaticResource InfoContent}" FontSize="10" LineHeight="12" Visibility="Collapsed"
                                 Foreground="Red" Margin="0 0 0 15">
                 This application is running in a Virtual Machine!\n
                 Because Virtual Machines have only limited support for graphics cards, the Ab3d.DXEngine may be running in low quality software rendering mode.\n
                 To see the real power of the Ab3d.DXEngine, please run this sample application in a non-virtual environment.
             </common:TextBlockEx>
-            <common:TextBlockEx Style="{StaticResource InfoContent}">
-                Ab3d.DXEngine is a \!super fast DirectX 11 rendering engine\! for desktop .Net applications.\n
+            <common:TextBlockEx Style="{StaticResource InfoContent}" FontSize="14">
+                Ab3d.DXEngine is a \!blazing fast 3D rendering engine\! for desktop .Net applications.\n
                 \n
-                It provides the easiest access to the \!extreme GPU performance\! and \!great visual quality\!.
+                It provides the easiest access to the \!extreme GPU performance\! and \!great visual quality\!.\n
+                The engine is \!used by many companies\! around the world for their technical, scientific, business and other \!3D visualization scenarios\!.
             </common:TextBlockEx>
         </StackPanel>
         
-        <Image Name="CarEngineImage" Grid.Row="1" Source="/Resources/DXEngine-car_engine.png" HorizontalAlignment="Left" Margin="60 0 0 0" />
-
-        <common:TextBlockEx Grid.Row="2" Margin="20 0 20 10" Style="{StaticResource InfoContent}">
-            This sample project demonstrate many features of the Ab3d.DXEngine.\n
+        <Image Name="CarEngineImage" Grid.Row="1" Source="/Resources/DXEngine-car_engine.png" HorizontalAlignment="Left" Margin="60 0 0 0" 
+               SizeChanged="CarEngineImage_OnSizeChanged"/>
+               
+        <common:TextBlockEx Grid.Row="2" Margin="20 0 20 0" Style="{StaticResource InfoContent}" FontSize="14">
+            The 3D scene can be defined by using easy to use WPF 3D objects and by using many helper objects from the \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| library (the ultimate 3D toolkit). For advanced scenarios it is possible to define low-level objects (see Advanced usage section).\n
             \n
-            More information about the engine usage can be found in the "\!Ab3d.DXEngine Help.chm\!" help file (installed into the root DXEngine directory). Help file also contains a \!Quick start\! and many other guides.\n
-            \n
-            Most of the samples in this project use many helper objects from Ab3d.PowerToys library. To get more information on how to use that library make sure to \!check the Abd3.PowerToys samples project\!.
+            This sample project demonstrates many features of the Ab3d.DXEngine. It also shows the advantages of its usage compared to using only Ab3d.PowerToys and WPF 3D (see description of the next section for more info).\n
+        </common:TextBlockEx>
+        <common:TextBlockEx x:Name="NuGetVersionInfoTextBlockEx" Grid.Row="3" Margin="20 0 20 0" Style="{StaticResource InfoContent}" Foreground="Black" FontSize="12" LineHeight="18">
+            NOTE: You are using a version of Ab3d.PowerToys that is build for .Net Framework v4.0 - v4.8 (this version was installed by an evaluation or commercial installer). This version can be also used in the .Net Core or .Net 5.0+, but when using .Net Core or .Net 5.0+, it is recommended to use the version from \@NuGet:https://www.nuget.org/packages/Ab3d.DXEngine| that is build for the newer versions of .Net.\n
+        </common:TextBlockEx>
+        <common:TextBlockEx Grid.Row="4" Margin="20 0 20 10" Style="{StaticResource InfoContent}" FontSize="12" LineHeight="18">
+            Additional information:\n
+            \*\@Online Users Guide:https://www.ab4d.com/DirectX/3D/Introduction.aspx|\n
+            \*Reference help: \@Online:https://www.ab4d.com/help/DXEngine/html/R_Project_Ab3d_DXEngine_Help.htm| or in "Ab3d.DXEngine Help.chm" help file (available only when using installer - installed into the root Ab3d.DXEngine folder)\n
+            \*\@Blog posts:https://blog.ab4d.com/category/DXEngine.aspx| related to Ab3d.DXEngine library\n
+            \*\!Check the Abd3.PowerToys samples project\! \@(GitHub):https://github.com/ab4d/Ab3d.PowerToys.Wpf.Samples|
         </common:TextBlockEx>
     </Grid>
 </Page>

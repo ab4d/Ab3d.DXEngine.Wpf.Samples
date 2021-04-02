@@ -9,7 +9,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -22,11 +21,11 @@ using System.Windows.Navigation;
 namespace Ab3d.DXEngine.Wpf.Samples.Controls
 {
     /// <summary>
-    /// TextBlockEx is an extented TextBlock that adds simple support for bold text and adding new lines.
+    /// TextBlockEx is an extended TextBlock that adds simple support for bold text and adding new lines.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <strong>TextBlockEx</strong> is an extented TextBlock that adds simple support for bold text and adding new lines.
+    /// <strong>TextBlockEx</strong> is an extended TextBlock that adds simple support for bold text and adding new lines.
     /// </para>
     /// <para>
     /// To add <strong>bold text</strong> insert "\b" or "\!" (without quotes) into your text.
@@ -40,6 +39,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
     /// </para>
     /// <para>
     /// To add <strong>spaces</strong> insert "\_" with as many underscored as many spaces is needed - for example "\___" - for 3 spaces
+    /// </para>
+    /// <para>
+    /// To change <strong>text color</strong> (set Run.Foreground property) insert "\#RRGGBB" where RRGGBB is color is hex value. To reset the Foreground property to null, use "\#_".
     /// </para>
     /// <para>
     /// To add <strong>hyperlink</strong> insert "\@" that is followed by anchor text, then add ':' character and then url address. Complete with '|' character into the text - for example: "click here \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| to learn more"
@@ -63,7 +65,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
             /// text between custom actions markers (for example "abc" in the following text "...\1abc\1..."
             /// </summary>
             public string ContentText { get; private set; }
-            
+
             /// <summary>
             /// CreatedInline property must be set in the event handler.
             /// </summary>
@@ -105,7 +107,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
         #endregion
 
         #region ContentText
-        // To get propert design time support we need to redirect the Content from Inlines (as in TextBlock)
+        // To get property design time support we need to redirect the Content from Inlines (as in TextBlock)
         // to our own property so we can update the shown content.
         // Maybe there is a better way to do this, but for our case this works great.
 
@@ -118,7 +120,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                                 string.Empty,
                                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                                 FrameworkPropertyMetadataOptions.AffectsRender,
-                                new PropertyChangedCallback(OnContentTextChanged)));
+                                OnContentTextChanged));
 
         /// <summary>
         /// The Text property defines the content (text) to be displayed.
@@ -131,7 +133,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
         private static void OnContentTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var textBlockEx = (TextBlockEx) d;
+            var textBlockEx = (TextBlockEx)d;
             textBlockEx.UpdateText((string)e.NewValue);
         }
         #endregion
@@ -183,14 +185,21 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
         /// </summary>
         public event CreateCustomInlineEventHandler CreateCustomInlineCallback;
 
+        /// <summary>
+        /// Gets or sets the foreground brush that is used to show bullet symbols.
+        /// </summary>
+        public Brush BulletForeground { get; set; }
+
 
         public TextBlockEx()
         {
-            this.Loaded += OnLoaded;
+            BulletForeground = Brushes.Orange;
         }
-        
-        public TextBlockEx(Inline inline) : base(inline)
+
+        public TextBlockEx(Inline inline)
+            : base(inline)
         {
+            BulletForeground = Brushes.Orange;
             this.Loaded += OnLoaded;
         }
 
@@ -220,6 +229,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
             string part = "";
             var originalTextLength = originalText.Length;
 
+            Brush customForegroundBrush = null;
+
             int pos1 = 0;
             while (pos1 != -1 || pos1 > originalText.Length - 1)
             {
@@ -242,22 +253,27 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                 if (isBold)
                     run.FontWeight = FontWeights.Bold;
 
+                if (customForegroundBrush != null)
+                    run.Foreground = customForegroundBrush;
+
                 this.Inlines.Add(run);
 
                 if (command == 'n') // new paragraph
                 {
                     this.Inlines.Add(new LineBreak());
                     if (originalTextLength > pos2 + 2 && originalText[pos2 + 2] == ' ') // Usually when text is entered in xaml, a new line in the xaml is converted into one space - just skip it
-                        pos2 ++;
+                        pos2++;
                 }
                 else if (command == 'b' || command == '!') // Toggle bold
                 {
                     isBold = !isBold;
-                }   
+                }
                 else if (command == '*') // Orange square bullet sign
                 {
-                    var bulletRun = new Run(" ▪ ");
-                    bulletRun.Foreground = Brushes.Orange;
+                    var bulletRun = new Run(" ▪ ")
+                    {
+                        Foreground = BulletForeground
+                    };
                     this.Inlines.Add(bulletRun);
                 }
                 else if (command == '_')
@@ -265,6 +281,33 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                     int spacesCount = CountChars(originalText, '_', pos2 + 1);
                     this.Inlines.Add(new Run(new string(' ', spacesCount)));
                     pos2 += spacesCount - 1;
+                }
+                else if (command == '#')
+                {
+                    if (originalText[pos2 + 2] == '_')
+                    {
+                        customForegroundBrush = null;
+                        pos2++;
+                    }
+                    else
+                    {
+                        string colorHexText = originalText.Substring(pos2 + 2, 6);
+
+                        try
+                        {
+                            byte red = Convert.ToByte(colorHexText.Substring(0, 2), 16);
+                            byte green = Convert.ToByte(colorHexText.Substring(2, 2), 16);
+                            byte blue = Convert.ToByte(colorHexText.Substring(4, 2), 16);
+
+                            customForegroundBrush = new SolidColorBrush(Color.FromRgb(red, green, blue));
+                        }
+                        catch
+                        {
+                            customForegroundBrush = null;
+                        }
+
+                        pos2 += 6;
+                    }
                 }
                 else if (command == '\\')
                 {
@@ -290,6 +333,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                     if (isBold)
                         hyperlink.FontWeight = FontWeights.Bold;
 
+                    hyperlink.ToolTip = urlAddress;
+
                     hyperlink.RequestNavigate += HyperlinkOnRequestNavigate;
 
                     this.Inlines.Add(hyperlink);
@@ -302,10 +347,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
                     // We trigger CreateCustomInline event and send the index of the commands (0 for '0', 1 for '1')
                     // and text content between start and end command markers.
                     // The event handler should create a custom Inline and set it to CreatedInline property.
-                    int endPos = originalText.IndexOf("\\" + command, pos2 + 1); // find end of text for this custom action
+                    int endPos = originalText.IndexOf("\\" + command, pos2 + 1, StringComparison.Ordinal); // find end of text for this custom action
                     if (endPos > 0)
                     {
-                        var createCustomInlineEventArgs = new CreateCustomInlineEventArgs(customActionIndex: (int) (command - '0'),
+                        var createCustomInlineEventArgs = new CreateCustomInlineEventArgs(customActionIndex: (command - '0'),
                                                                                           contentText: originalText.Substring(pos2 + 2, endPos - pos2 - 2));
 
                         OnCreateCustomInlineCallback(createCustomInlineEventArgs);
@@ -334,7 +379,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
 
             while (pos < length && text[pos] == ch)
             {
-                pos ++;
+                pos++;
             }
 
             return pos - startPos;

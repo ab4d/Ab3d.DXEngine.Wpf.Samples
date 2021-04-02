@@ -469,6 +469,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 return;
 
             int indicesCount = indices.Length;
+            indicesCount -= indicesCount % 3; // snap to 3
+
             int vertexCount = vertexBuffer.Length;
 
             if (indicesCount == 0 || vertexCount == 0)
