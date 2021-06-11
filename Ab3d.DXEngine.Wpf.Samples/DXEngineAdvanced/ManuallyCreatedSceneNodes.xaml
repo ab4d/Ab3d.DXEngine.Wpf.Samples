@@ -14,7 +14,7 @@
     <Grid Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="200" />
+            <RowDefinition Height="160" />
         </Grid.RowDefinitions>
         
         <Border Name="ViewportBorder" Grid.Row="0" Background="Transparent">
@@ -50,13 +50,17 @@
         <TextBlock FontWeight="Bold" Grid.Row="0" FontSize="20" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
                    Text="Manually created SceneNodes (see code for more info)"/>
 
-        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
-            <CheckBox Name="RotateAroundMouseCheckBox" Content="RotateAroundMousePosition" IsChecked="True" VerticalAlignment="Center" />
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="TransformModelsButton" Content="Transfrom models" Padding="20 3" Click="TransformModelsButton_OnClick" />
+                <Button Name="ResetTransformModelsButton" Content="Reset transfromation" Padding="20 3" Margin="10 0 0 0" Click="ResetTransformModelsButton_OnClick" />
+            </StackPanel>
 
-            <Button Name="ResetCameraButton" Content="Reset camera" VerticalAlignment="Center" Margin="20 0 0 0" Padding="20 3" Click="ResetCameraButton_OnClick" />
-
-            <Button Name="FitIntoViewButton" Content="FitIntoView" VerticalAlignment="Center" Margin="10 0 0 0" Padding="20 3" Click="FitIntoViewButton_OnClick" />
+            <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                <CheckBox Name="RotateAroundMouseCheckBox" Content="RotateAroundMousePosition" IsChecked="True" VerticalAlignment="Center" />
+                <Button Name="ResetCameraButton" Content="Reset camera" VerticalAlignment="Center" Margin="20 0 0 0" Padding="20 3" Click="ResetCameraButton_OnClick" />
+                <Button Name="FitIntoViewButton" Content="FitIntoView" VerticalAlignment="Center" Margin="10 0 0 0" Padding="20 3" Click="FitIntoViewButton_OnClick" />
+            </StackPanel>
         </StackPanel>
-        
     </Grid>
 </Page>

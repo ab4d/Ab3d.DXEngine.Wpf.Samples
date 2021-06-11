@@ -21,6 +21,7 @@ using Ab3d.Visuals;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Buffer = System.Buffer;
+using Matrix = SharpDX.Matrix;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -31,6 +32,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     {
         private DisposeList _disposables;
         private WireCrossVisual3D _wireCrossVisual3D;
+
+        private MeshObjectNode _redPyramidObjectNode;
+        private MeshObjectNode _orangePyramidObjectNode;
+
+        private Matrix _redPyramidMatrix;
+        private float _orangePyramidYScale;
+        private float _orangePyramidYRotate;
+        
 
         public ManuallyCreatedSceneNodes()
         {
@@ -219,7 +228,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             // Use GeometryMesh to create MeshObjectNode (SceneNode from GeometryMesh object)
             var meshObjectNode = new Ab3d.DirectX.MeshObjectNode(geometryMesh, dxMaterial);
-            meshObjectNode.Name = "MeshObjectNode-from-GeometryMesh";
+            meshObjectNode.Name = "Green-MeshObjectNode-from-GeometryMesh";
 
             _disposables.Add(meshObjectNode);
 
@@ -261,12 +270,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             _disposables.Add(dxMaterial);
 
-            meshObjectNode = new Ab3d.DirectX.MeshObjectNode(simpleMesh, dxMaterial);
-            meshObjectNode.Name = "MeshObjectNode-from-SimpleMesh";
+            _redPyramidObjectNode = new Ab3d.DirectX.MeshObjectNode(simpleMesh, dxMaterial);
+            _redPyramidObjectNode.Name = "Red-MeshObjectNode-from-SimpleMesh";
 
-            _disposables.Add(meshObjectNode);
+            _disposables.Add(_redPyramidObjectNode);
 
-            sceneNodeVisual3D = new SceneNodeVisual3D(meshObjectNode);
+            sceneNodeVisual3D = new SceneNodeVisual3D(_redPyramidObjectNode);
             sceneNodeVisual3D.Transform = new TranslateTransform3D(100, 0, 0);
 
             MainViewport.Children.Add(sceneNodeVisual3D);
@@ -310,12 +319,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             _disposables.Add(dxMaterial);
 
-            meshObjectNode = new Ab3d.DirectX.MeshObjectNode(floatSimpleMesh, dxMaterial);
-            meshObjectNode.Name = "MeshObjectNode-from-FloatSimpleMesh";
+            _orangePyramidObjectNode = new Ab3d.DirectX.MeshObjectNode(floatSimpleMesh, dxMaterial);
+            _orangePyramidObjectNode.Name = "Orange-MeshObjectNode-from-FloatSimpleMesh";
 
-            _disposables.Add(meshObjectNode);
+            _disposables.Add(_orangePyramidObjectNode);
 
-            sceneNodeVisual3D = new SceneNodeVisual3D(meshObjectNode);
+            sceneNodeVisual3D = new SceneNodeVisual3D(_orangePyramidObjectNode);
             sceneNodeVisual3D.Transform = new TranslateTransform3D(200, 0, 0);
 
             MainViewport.Children.Add(sceneNodeVisual3D);
@@ -359,7 +368,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             _disposables.Add(dxMaterial);
 
             meshObjectNode = new Ab3d.DirectX.MeshObjectNode(byteSimpleMesh, dxMaterial);
-            meshObjectNode.Name = "MeshObjectNode-from-ByteSimpleMesh";
+            meshObjectNode.Name = "Yellow-MeshObjectNode-from-ByteSimpleMesh";
 
             _disposables.Add(meshObjectNode);
 
@@ -782,6 +791,88 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             Camera1.Heading = 50;
             Camera1.Attitude = -20;
             Camera1.Distance = 600;
+        }
+
+        
+        private void TransformModelsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_redPyramidObjectNode != null)
+            {
+                // Add translation to _redPyramidObjectNode
+                if (_redPyramidObjectNode.Transform == null)
+                {
+                    // First set the Transform object
+                    _redPyramidMatrix = Matrix.Translation(0, 10, 0);
+                    _redPyramidObjectNode.Transform = new Transformation(ref _redPyramidMatrix);
+                }
+                else
+                {
+                    // After Transform is set, we can update the transformation matrix
+                    _redPyramidMatrix.M42 += 10; // M42 == OffsetY
+                    _redPyramidObjectNode.Transform.SetMatrix(ref _redPyramidMatrix);
+                }
+
+                // We need to inform the engine about the the changes:
+                _redPyramidObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+            }
+
+
+            if (_orangePyramidObjectNode != null)
+            {
+                // Orange pyramid will be scaled and rotated
+                if (_orangePyramidObjectNode.Transform == null)
+                {
+                    _orangePyramidYScale = 1.2f;
+                    _orangePyramidYRotate = 10;
+
+                    // To combine multiple transformation, we need to multiply their matrices one after another (note that order of matrices is important)
+                    var transformMatrix = Matrix.Scaling(1, _orangePyramidYScale, 1) *
+                                          Matrix.RotationY(MathUtil.DegreesToRadians(_orangePyramidYRotate)) *
+                                          Matrix.Translation(0, -_orangePyramidYRotate, 0);
+
+                    _orangePyramidObjectNode.Transform = new Transformation(ref transformMatrix);
+                }
+                else
+                {
+                    _orangePyramidYScale *= 1.2f;
+                    _orangePyramidYRotate += 10;
+
+                    var transformMatrix = Matrix.Scaling(1, _orangePyramidYScale, 1) *
+                                          Matrix.RotationY(MathUtil.DegreesToRadians(_orangePyramidYRotate)) *
+                                          Matrix.Translation(0, -_orangePyramidYRotate, 0);
+
+                    _orangePyramidObjectNode.Transform.SetMatrix(transformMatrix);
+                }
+
+                // We need to inform the engine about the the changes:
+                _orangePyramidObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+            }
+        }
+
+        private void ResetTransformModelsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_redPyramidObjectNode != null)
+            {
+                // To reset transformation we can set the Transform to null.
+                _redPyramidObjectNode.Transform = null;
+
+                _redPyramidObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+            }
+
+
+            if (_orangePyramidObjectNode != null)
+            {
+                if (_orangePyramidObjectNode.Transform != null)
+                {
+                    // ... or we can call SetIdentity on the Transformation object to set the transformation matrix to identity.
+                    _orangePyramidObjectNode.Transform.SetIdentity();
+
+                    // We could also call:
+                    //_orangePyramidObjectNode.Transform.SetMatrix(Matrix.Identity);
+
+                    _orangePyramidObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+                }
+            }
         }
     }
 }
