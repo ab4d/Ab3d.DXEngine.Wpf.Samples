@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
 using Ab3d.Visuals;
@@ -139,7 +140,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
         private void UpdateVisibleBoxes()
         {
-            if (!(CullingCheckBox.IsChecked ?? false) || _frustumStatuses == null)
+            if (!(CullingCheckBox.IsChecked ?? false) || _frustumStatuses == null || !Camera1.IsValid())
                 return;
 
             //
@@ -155,10 +156,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             System.Windows.Media.Media3D.Matrix3D view, projection;
             Camera1.GetCameraMatrixes(out view, out projection);
 
-            var viewProjection = view * projection;
 
-            // Create BoundingFrustum from camera view-projection matrix (we need to convert the matrix from WPF to SharpDX format)
-            var boundingFrustum = new SharpDX.BoundingFrustum(viewProjection.ToMatrix());
+            SharpDX.Matrix viewProjection;
+
+            if (Camera1.CameraType == BaseCamera.CameraTypes.PerspectiveCamera)
+            {
+                // We need to convert the matrix from WPF to SharpDX format
+                viewProjection = (view * projection).ToMatrix();
+            }
+            else
+            {
+                // For OrthographicCamera the code in SharpDX.BBoundingFrustum expects a left handed projection matrix but WPF work with right handed projection.
+                // To make the code work correctly we create the left handed orthographic matrix from Matrix.OrthoLH:
+                var leftHandedProjectionMatrix = SharpDX.Matrix.OrthoLH((float)Camera1.CameraWidth, (float)(Camera1.CameraWidth * MainDXViewportView.ActualHeight / MainDXViewportView.ActualWidth), (float)Camera1.NearPlaneDistance, (float)Camera1.FarPlaneDistance);
+                
+                viewProjection = view.ToMatrix() * leftHandedProjectionMatrix;
+            }
+
+            // Create BoundingFrustum from camera view-projection matrix
+            var boundingFrustum = new SharpDX.BoundingFrustum(viewProjection);
 
 
             // We could also get the ViewProjection from DXScene (but when we are called from CameraChanged we may get an older version)
@@ -167,6 +183,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
             //SharpDX.Matrix worldViewProjectionMatrix = MainDXViewportView.DXScene.Camera.GetViewProjection();
             //var boundingFrustum = new SharpDX.BoundingFrustum(worldViewProjectionMatrix);
+
 
             bool hasChanged = false;
 

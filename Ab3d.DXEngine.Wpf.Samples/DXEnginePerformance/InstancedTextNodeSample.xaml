@@ -58,6 +58,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0 8 0 0">
@@ -69,23 +70,28 @@
                     <ComboBoxItem>1,000,000 coordinates</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Name="CharactersCountTextBlock" Text="Chars count: 0" Margin="5 0 0 0" VerticalAlignment="Center" />
-
-                <Button Name="ChangeColorButton" Content="Change color" Margin="15 0 0 0" Click="ChangeColorButton_OnClick" />
-                <Button Name="ChangePositionButton" Content="Change position" Margin="8 0 0 0" Click="ChangePositionButton_OnClick" />
-                <Button Name="ShowHideButton" Content="Hide" Margin="8 0 0 0" Click="ShowHideButton_OnClick" />
-                <Button Name="AddTextButton" Content="Add" Margin="8 0 0 0" Click="AddTextButton_OnClick" />
-                <Button Name="ShowReportButton" Content="Show report" Margin="15 0 0 0" Click="ShowReportButton_OnClick" />
+                <TextBlock Name="CharactersCountTextBlock" Text="Chars count: 0" Margin="15 0 0 0" VerticalAlignment="Center" />
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 4 0 0">
+            <StackPanel Name="SimpleDemoButtonsPanel" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 8 0 0">
+                <Button Name="ChangeTextButton" Content="Change text" Margin="0 0 0 0" Padding="5 2" Click="ChangeTextButton_OnClick" />
+                <Button Name="ChangeColorButton" Content="Change color" Margin="15 0 0 0" Padding="5 2" Click="ChangeColorButton_OnClick" />
+                <Button Name="ChangePositionButton" Content="Change position" Margin="15 0 0 0" Padding="5 2" Click="ChangePositionButton_OnClick" />
+                <Button Name="ShowHideButton" Content="Hide" Margin="15 0 0 0" Padding="5 2" Click="ShowHideButton_OnClick" />
+                <Button Name="AddTextButton" Content="Add" Margin="15 0 0 0" Padding="5 2" Click="AddTextButton_OnClick" />
+                <Button Name="RemoveTextButton" Content="Remove" IsEnabled="False" Margin="8 0 0 0" Padding="5 2" Click="RemoveTextButton_OnClick" />
+            </StackPanel>
+
+            <StackPanel Name="AlphaClipThresholdPanel" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Collapsed" Margin="0 4 0 0">
                 <TextBlock Text="AlphaClipThreshold: " VerticalAlignment="Center"/>
                 <TextBlock Name="AlphaClipThresholdValueTextBlock" Text="0.15" VerticalAlignment="Center" />
                 <Slider Name="AlphaClipThresholdSlider" Minimum="0" Maximum="1" Value="0.15" Width="100" Margin="3 0 5 0" VerticalAlignment="Center" ValueChanged="AlphaClipThresholdSlider_OnValueChanged"/>
                 <controls:InfoControl x:Name="AlphaClipThresholdInfoControl" InfoWidth="400"/>
             </StackPanel>
 
-            <Rectangle Grid.Column="0" Grid.ColumnSpan="2" Fill="Gray" Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" SnapsToDevicePixels="True" UseLayoutRounding="True" />
+            <Button Name="ShowReportButton" Grid.Column="2" Content="Show report" Margin="20 8 0 0" Click="ShowReportButton_OnClick" />
+
+            <Rectangle Grid.Column="0" Grid.ColumnSpan="3" Fill="Gray" Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" SnapsToDevicePixels="True" UseLayoutRounding="True" />
         </Grid>
 
         <TextBox Name="InfoTextBox" Grid.Row="3" Height="150" Margin="0 10 0 0" Visibility="Collapsed" FontFamily="Consolar" FontSize="10" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />

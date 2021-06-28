@@ -508,7 +508,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         }
 
 
-        private static void GetObjectDataArrays(out Vector3[] positions, out Vector3[] normals, out Vector2[] textureCoordinates, out int[] triangleIndices)
+        public static void GetObjectDataArrays(out Vector3[] positions, out Vector3[] normals, out Vector2[] textureCoordinates, out int[] triangleIndices)
         {
             //// The following commented code is used to generate the arrays definition below:
             //var pyramidMeshGeometry3D = new Ab3d.Meshes.PyramidMesh3D(new Point3D(0, 0, 0), new Size3D(80, 50, 80)).Geometry;
@@ -592,7 +592,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         }
 
 
-        private static void GetVertexAndIndexBuffer(out PositionNormalTexture[] vertexBuffer, out int[] indexBuffer)
+        public static void GetVertexAndIndexBuffer(out PositionNormalTexture[] vertexBuffer, out int[] indexBuffer)
         {
             vertexBuffer = new PositionNormalTexture[] {
                 /*                        Position                     Normal                                   TextureCoordinate */
@@ -625,7 +625,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             };
         }
 
-        private static void GetFloatVertexAndIndexBuffer(out float[] floatVertexBuffer, out int[] indexBuffer)
+        public static void GetFloatVertexAndIndexBuffer(out float[] floatVertexBuffer, out int[] indexBuffer)
         {
             floatVertexBuffer = new float[] {
             /*   Position            Normal                         TextureCoordinate */

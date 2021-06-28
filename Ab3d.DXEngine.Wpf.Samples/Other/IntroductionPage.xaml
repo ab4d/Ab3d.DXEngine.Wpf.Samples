@@ -24,7 +24,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20 0 20 0">
             <common:TextBlockEx Style="{StaticResource InfoTitle}" Margin="0 30 0 20">Welcome to the \!Ab3d.DXEngine\!</common:TextBlockEx>
-            <common:TextBlockEx x:Name="VirtualMachineWarningTextBlock" Style="{StaticResource InfoContent}" FontSize="10" LineHeight="12" Visibility="Collapsed"
+            <common:TextBlockEx x:Name="VirtualMachineWarningTextBlock" Style="{StaticResource InfoContent}"  FontSize="10" LineHeight="12" Visibility="Collapsed"
                                 Foreground="Red" Margin="0 0 0 15">
                 This application is running in a Virtual Machine!\n
                 Because Virtual Machines have only limited support for graphics cards, the Ab3d.DXEngine may be running in low quality software rendering mode.\n

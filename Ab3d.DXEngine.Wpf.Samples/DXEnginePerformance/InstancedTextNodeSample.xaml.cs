@@ -23,10 +23,6 @@ using Ab3d.Utilities;
 using Ab3d.Visuals;
 
 
-// TODO:
-// - Add support for back faces - add List<int> _backFacedInstances. - if Count = 0 - no back face; if Count the same as frontFaced, then the same instanceBuffer can be used; otherwise create a new InstanceBuffer for back faces
-// - Add support for updating InstancedText
-
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
     /// <summary>
@@ -39,7 +35,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         
         private InstancedText _instancedText;
 
-        private int _addedTextCount;
+        private List<InstancedText> _addedTexts;
 
         public InstancedTextNodeSample()
         {
@@ -136,8 +132,9 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             // Than we can call AddText to add individual text to the InstancedTextNode.
             // Note that to be able to show text from the back side, we need to set hasBackSide to true (this rendered twice as many objects).
             // AddText method returns an instance of InstancedText object that can be used to change the color, position, show or hide text.
-            _instancedText = _instancedTextNode.AddText("Ab3d.DXEngine", Colors.Orange, new Point3D(-190, 0, 0), size: 25, hasBackSide: true);
+            _instancedText = _instancedTextNode.AddText("Ab3d.DXEngine", Colors.Orange, new Point3D(-210, 0, 0), size: 25, hasBackSide: true);
 
+            /*
             // To change direction and orientation of text, we can call the SetTextDirection method.
             _instancedTextNode.SetTextDirection(textDirection: new Vector3D(1, 0, 0), upDirection: new Vector3D(0, 0, -1));
 
@@ -179,7 +176,7 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             // If we want to immediately create character textures, we can call the InitializeResources method.
             // Note that MainDXViewportView.DXScene must not be null (this can be called in MainDXViewportView.DXSceneDeviceCreated or MainDXViewportView.DXSceneInitialized event handler)
             //_instancedTextNode.InitializeResources(MainDXViewportView.DXScene);
-
+            */
             
             // Show the InstancedTextNode as any other DXEngine's SceneNode:
             var sceneNodeVisual1 = new SceneNodeVisual3D(_instancedTextNode);
@@ -197,6 +194,8 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             SetupDemoSceneButtons(isDemoSceneShown: true);
 
             UpdateCharactersCountInfo();
+
+            _addedTexts = new List<InstancedText>();
         }
 
         private void CreateInstanceText(InstancedTextNode instancedTextNode, Point3D centerPosition, Size3D size, int xCount, int yCount, int zCount, Color textColor, double textSize, string stringFormat = "({0:0} {1:0} {2:0})")
@@ -227,10 +226,8 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
 
         private void SetupDemoSceneButtons(bool isDemoSceneShown)
         {
-            ChangeColorButton.IsEnabled    = isDemoSceneShown;
-            ChangePositionButton.IsEnabled = isDemoSceneShown;
-            ShowHideButton.IsEnabled       = isDemoSceneShown;
-            AddTextButton.IsEnabled        = isDemoSceneShown;
+            SimpleDemoButtonsPanel.Visibility  = isDemoSceneShown ? Visibility.Visible : Visibility.Collapsed;
+            AlphaClipThresholdPanel.Visibility = isDemoSceneShown ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void UpdateCharactersCountInfo()
@@ -305,6 +302,48 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             }
         }
 
+        private void ChangeTextButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_instancedText == null)
+                return;
+
+            string currentText = _instancedText.Text;
+
+            char newEndChar;
+            char lastChar = _instancedText.Text[_instancedText.Text.Length - 1];
+
+            switch (lastChar)
+            {
+                case '/':
+                    newEndChar = '-';
+                    break;
+                
+                case '-':
+                    newEndChar = '\\';
+                    break;
+                
+                case '\\':
+                    newEndChar = '|';
+                    break;
+                
+                case '|':
+                    newEndChar = '/';
+                    break;
+                
+                default:
+                    newEndChar = '/';
+                    currentText += "  "; // No animated char yet - add 2 spaces so that last space will be replaced by the animated char
+                    break;
+            }
+
+            string newText = currentText.Substring(0, currentText.Length - 1) + newEndChar;
+
+            _instancedText.ChangeText(newText);
+            //_instancedText.ChangeText(_instancedText.Text + '!');
+
+            UpdateCharactersCountInfo();
+        }
+
         private void ChangeColorButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (_instancedText == null)
@@ -347,10 +386,30 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
                 return;
 
 
-            _addedTextCount++;
+            int addedTextCount = _addedTexts.Count + 1;
 
             _instancedTextNode.SetTextDirection(textDirection: new Vector3D(1, 0, 0), upDirection: new Vector3D(0, 1, 0));
-            _instancedTextNode.AddText("Added text " + _addedTextCount.ToString(), Colors.Black, new Point3D(-190, 50 + _addedTextCount * 10, -5), size: 10, hasBackSide: true);
+            var instancedText = _instancedTextNode.AddText("Added text " + addedTextCount.ToString(), Colors.Black, new Point3D(-190, 50 + addedTextCount * 10, -5), size: 10, hasBackSide: true);
+
+            _addedTexts.Add(instancedText);
+            RemoveTextButton.IsEnabled = true;
+
+            UpdateCharactersCountInfo();
+        }
+
+        private void RemoveTextButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_addedTexts.Count == 0)
+                return;
+
+            var instancedTextToRemove = _addedTexts[_addedTexts.Count - 1];
+
+            _instancedTextNode.RemoveText(instancedTextToRemove);
+
+            _addedTexts.RemoveAt(_addedTexts.Count - 1);
+
+            if (_addedTexts.Count == 0)
+                RemoveTextButton.IsEnabled = false;
 
             UpdateCharactersCountInfo();
         }

@@ -31,19 +31,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //
         // When ModelMoverVisual3D is used inside DXEngine, the mouse events on UIElement3D objects that are used inside ModelMoverVisual3D will not work.
-        // Therefore ModelMoverVisual3D also support using Ab3d.Utilities.EventManager3D that can process mouse events when inside Ab3d.DXEngine.
-        //
+        // Therefore ModelMoverVisual3D also supports using Ab3d.Utilities.EventManager3D that can process mouse events when inside Ab3d.DXEngine.
+        // 
         // To make ModelMoverVisual3D work inside DXEngine, the following code changes need to be done:
         // 1) EventManager3D needs to be created and its CustomEventsSourceElement must be set the DXViewportView
-        //    or a parent Border or some other parent element that has Background property set (see line 69)
-        //
-        // 2) When ModelMoverVisual3D is created, we need to call the SubscribeWithEventManager3D method 
-        //    on the created ModelMoverVisual3D and pass the EventManager3D as parameter (see line 84)
+        //    or a parent Border or some other parent element that has Background property set(see line 69)
         // 
-        // 3) To allow user to click on arrows that are inside the selected model, we need to exclude the selected
-        //    model from being processed by EventManager3D. This can be done with calling RegisterExcludedVisual3D on EventManager3D (see line 226)
-        //
-        // 4) Because we called RegisterExcludedVisual3D, we need to call RemoveExcludedVisual3D after the mouse moving is completed (see line 207)
+        // 2) When ModelMoverVisual3D is created, we need to call the SubscribeWithEventManager3D method
+        //    on the created ModelMoverVisual3D and pass the EventManager3D as a parameter(see line 84)
+        // 
+        // 3) To allow the user to click on arrows that are inside the selected model, we need to exclude the selected
+        //    model from being processed by EventManager3D.This can be done by calling RegisterExcludedVisual3D on EventManager3D(see line 226)
+        // 
+        // 4) Because we called RegisterExcludedVisual3D, we need to call RemoveExcludedVisual3D after the mouse moving is completed(see line 207)
         //
 
         private static Random _rnd = new Random();

@@ -114,6 +114,16 @@ In this sample you can see command list caching in action with observing the Dra
 When command list caching is used, then this time is very small because there is no need to set all DirectX
 rendering states and invoke DirectX draw calls. The time for that can be observed when caching is disabled.";
 
+            IsBackgroundWaitingInfoControl.InfoText =
+@"This CheckBox is enabled only when using DirectXImage PresentationType. In this presentation type the DXEngine needs to wait until the graphics card finishes rendering a frame.
+After that the DXEngine can inform the WPF's D3DImage control to invalidate the shared texture.
+
+This CheckBox sets the IsBackgroundWaitingUntilRendered property on the DXViewportView.
+
+When this CheckBox is unchecked, then waiting is done on the main UI thread (this is shown in increased CompleteRenderTime time).
+When this CheckBox is checked, then waiting is done in the background tread and when the frame is ready then the D3DImage is invalidated on the main UI thread.";
+
+
             _currentLightingMode = LightingMode.DirectionalLight;
             _currentObjectsType = ObjectsTypes.MultiColorBoxes;
 
@@ -712,6 +722,15 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
                 _mainDXViewportView.Refresh();
             }
         }
+        
+        private void OnIsWaitingInBackgroundCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (_mainDXViewportView != null)
+            {
+                _mainDXViewportView.IsWaitingInBackgroundUntilRendered = IsWaitingInBackgroundCheckBox.IsChecked ?? false;
+                _mainDXViewportView.Refresh();
+            }
+        }
 
         private void ObjectsCountComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -741,10 +760,17 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
             bool isDirectXOverlay = PresentationTypeComboBox.SelectedIndex == 0;
 
+            var isCameraRotating = _camera1.IsRotating;
+
             // Recreate the DXViewportView and the scene
             DisposeDXViewportView();
             CreateDXViewportView(isDirectXOverlay);
             CreateTestScene(_objectsCount);
+
+            IsWaitingInBackgroundCheckBox.IsEnabled = !isDirectXOverlay;
+
+            if (isCameraRotating)
+                _camera1.StartRotation(45, 0);
         }
 
         private void LightsComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

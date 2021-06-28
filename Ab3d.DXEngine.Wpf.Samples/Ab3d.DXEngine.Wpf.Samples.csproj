@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=4.3.7763.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.4.3.7763\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=4.4.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.4.4.7848\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.3.7763.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.3.7763\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.4.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.4.7848\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=9.5.7763.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.9.5.7763\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=9.6.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.9.6.7848\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -111,6 +111,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEngineAdvanced\InstancedMeshNodeSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineHitTesting\LinesSelector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -150,6 +154,14 @@
     <Page Include="DXEngineOther\MultiDXViewportViewsSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineOther\OverlayControlsSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineOther\SpritesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEnginePerformance\InstancedTextNodeSample.xaml">
       <SubType>Designer</SubType>
@@ -467,6 +479,9 @@
       <DependentUpon>CustomShaderMaterialSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineAdvanced\IColorMaskMaterial.cs" />
+    <Compile Include="DXEngineAdvanced\InstancedMeshNodeSample.xaml.cs">
+      <DependentUpon>InstancedMeshNodeSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineAdvanced\MeshNormalEffect.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalMaterial.cs" />
     <Compile Include="DXEngineHitTesting\LinesSelector.xaml.cs">
@@ -501,6 +516,14 @@
     <Compile Include="DXEngineOther\MultiDXViewportViewsSample.xaml.cs">
       <DependentUpon>MultiDXViewportViewsSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineOther\OverlayControlsSample.xaml.cs">
+      <DependentUpon>OverlayControlsSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineOther\SpritesSample.xaml.cs">
+      <DependentUpon>SpritesSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineOther\Viewport3DObjectOverlay.cs" />
+    <Compile Include="DXEngineOther\WpfElementOverlay.cs" />
     <Compile Include="DXEnginePerformance\InstancedTextNodeSample.xaml.cs">
       <DependentUpon>InstancedTextNodeSample.xaml</DependentUpon>
     </Compile>

@@ -16,7 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="145" />
+            <RowDefinition Height="155" />
         </Grid.RowDefinitions>
 
         <TextBlock Name="TitleTextBlock" Grid.Row="0" Text="Ab3d.DXEngine Multi-threading and DirectX commands caching demo" FontWeight="Bold" FontSize="16" Foreground="#444" Focusable="False"/>
@@ -80,8 +80,16 @@
 
                     <controls:InfoControl x:Name="IsCachingCommandListsInfoControl" Margin="5 0 0 0" />
                 </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                    <CheckBox Name="IsWaitingInBackgroundCheckBox" Content="Is waiting in background until rendered" IsChecked="True" IsEnabled="False" FontWeight="Bold"
+                              Checked="OnIsWaitingInBackgroundCheckBoxCheckedChanged" Unchecked="OnIsWaitingInBackgroundCheckBoxCheckedChanged" />
 
-                <StackPanel Orientation="Horizontal" Margin="0 12 0 4">
+                    <controls:InfoControl x:Name="IsBackgroundWaitingInfoControl" Margin="5 0 0 0" />
+                    <Image Source="/Resources/new_icon.png" Margin="10 0 0 0" Height="12" ToolTip="New in Ab3d.DXEngine v4.4" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 4">
                     <TextBlock Text="Rendering statistics:" FontWeight="Bold" />
                     <controls:InfoControl x:Name="StatisticsTitleInfoControl" ShowDuration="120000" InfoWidth="500" Margin="5 0 0 0" />
                 </StackPanel>

@@ -201,96 +201,6 @@
             Disposes the unmanaged assimp resources
             </summary>
         </member>
-        <member name="M:Ab3d.Assimp.Common.PolygonAnalyzer.MathUtils.IsZero(System.Double)">
-            <summary>
-            Returns true if the value is close to zero (taking double precision errors into account).
-            </summary>
-            <param name="value">value</param>
-            <returns>true if the value is close to zero</returns>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.PolygonAnalyzer.MathUtils.IsZeroOrBigger(System.Double)">
-            <summary>
-            Returns true if the value is close to zero or bigger (taking double precision errors into account).
-            </summary>
-            <param name="value">value</param>
-            <returns>true if the value is close to zero or bigger</returns>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.PolygonVertex.ToString">
-            <summary>
-            Returns a string that represents the current object.
-            </summary>
-            <returns>
-            A string that represents the current object.
-            </returns>
-        </member>
-        <member name="P:Ab3d.Assimp.Common.Triangulator.IsClosed">
-            <summary>
-            Gets a boolean that specifies if the specified points define a close path.
-            </summary>
-        </member>
-        <member name="P:Ab3d.Assimp.Common.Triangulator.IsClockwise">
-            <summary>
-            Gets a boolean that specifies if the specified points are oriented in clockwise direction.
-            </summary>
-            <remarks>
-            <para>
-            <b>IsClockwise </b> gets a boolean that specifies if the specified points are oriented in clockwise direction.
-            </para>
-            <para>
-            This property is useful when creating extruded objects from polygons - if the IsClockwise is false, the normals for the extruded object need to be flipped.
-            </para>
-            </remarks>
-        </member>
-        <member name="P:Ab3d.Assimp.Common.Triangulator.IsPolygonConvex">
-            <summary>
-            Gets a boolean that specifies if the specified points define a convex polygon.
-            In convex polygon every internal angle is less than or equal to 180 degrees and every line segment between two vertices remains inside or on the boundary of the polygon.
-            For example square is convex, but star is not (it is concave).
-            </summary>
-        </member>
-        <member name="P:Ab3d.Assimp.Common.Triangulator.PolygonArea">
-            <summary>
-            Gets a double that specifies the area defined by the specified points.
-            </summary>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.Triangulator.#ctor(System.Collections.Generic.IList{System.Windows.Point})">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="points">list of points that define the polygon that need to be triangulated.</param>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.Triangulator.#ctor(System.Collections.Generic.IList{System.Windows.Point},System.Collections.Generic.IList{System.Int32})">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="points">list of points that define the polygon that need to be triangulated.</param>
-            <param name="polygonIndices">list of indexes in the points list that define the polygon.</param>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.Triangulator.CreateTriangleIndices">
-            <summary>
-            CreateTriangleIndices method triangulates the specified points and creates a list of triangle indices that define the polygon.
-            </summary>
-            <exception cref="T:System.FormatException">FormatException is thrown when the points define an invalid polygon - usually when the polygon lines intersect each other.</exception>
-            <returns>List of triangle indices that define the polygon</returns>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.Triangulator.Triangulate(System.Collections.Generic.IList{System.Windows.Point})">
-            <summary>
-            Triangulate method triangulates the specified points and creates a list of triangle indices that define the polygon.
-            </summary>
-            <param name="points">List of triangle indices that define the polygon</param>
-            <exception cref="T:System.FormatException">FormatException is thrown when the points define an invalid polygon - usually when the polygon lines intersect each other.</exception>
-            <returns>List of triangle indices that define the polygon</returns>
-        </member>
-        <member name="M:Ab3d.Assimp.Common.Triangulator.Project3DPositionTo2D(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Collections.Generic.IList{System.Int32})">
-            <summary>
-            Returns a List of 2D points that are created with projecting the 3D positions onto the xy, xz or yz plane (removing one of the coordinates).
-            The plane is determined with checking the normal of the first triangle and determining which component of the normal vector is the biggest (this coordinate is removing).
-            This requires that the positions lie on the same plane. Input positions and polygonIndices must not be null or have less that 3 elements.
-            </summary>
-            <param name="positions">List of 3D positions</param>
-            <param name="polygonIndices">indexes of positions that define the positions that will be used in this method</param>
-            <returns>List of 2D Positions</returns>
-        </member>
         <member name="T:Ab3d.Assimp.AssimpDumper">
             <summary>
             Dumper class is a helper class that contains method that can show detailed information about Assimp Scene.
@@ -391,6 +301,12 @@
             By default standard triangulation is used but if you know that the read models use only convex polygons, you can speed up reading 3D models with setting UseSimpleTriangulation to true.
             </para>
             </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.TriangulatorFunc">
+            <summary>
+            TriangulatorFunc is a static property that can be set to a Func that takes list of 2D positions, triangulates them and returns a list of triangle indices (list of int values).
+            When this property is not set, then the triangulator from Ab3d.PowerToys will be used (loaded by Reflection).
+            </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfConverter.BitmapCacheOption">
             <summary>
