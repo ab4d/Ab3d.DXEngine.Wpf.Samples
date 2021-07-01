@@ -17,8 +17,17 @@
 
                 <Viewport3D Name="MainViewport">
                     <ModelVisual3D x:Name="ContentVisual" />
-                    <visuals:WireframeVisual3D x:Name="ContentWireframeVisual" ShowPolygonLines="True" WireframeType="Wireframe" UseModelColor="False"
-                                               LineColor="Black" LineThickness="1" />                
+                    <visuals:WireframeVisual3D x:Name="ContentWireframeVisual" 
+                                               ShowPolygonLines="True" 
+                                               WireframeType="Wireframe" 
+                                               UseModelColor="False"
+                                               LineColor="Black" 
+                                               LineThickness="{Binding ElementName=LineThicknessComboBox, Path=SelectedValue}" />       
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <AmbientLight Color="#444" />
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
                 </Viewport3D>
             </dxControls:DXViewportView>
         </Border>
@@ -47,7 +56,7 @@
             </Expander>
         </StackPanel>
 
-        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#55FFFFFF" Margin="5">
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#BBFFFFFF" Margin="5">
             <StackPanel Orientation="Vertical" Margin="10 5">
 
                 <Button Name="LoadButton" Content="Load file" Height="26" IsDefault="True" Margin="0 10 0 0" Click="LoadButton_OnClick" />
@@ -59,6 +68,12 @@
                           Checked="OnAddLineDepthBiasCheckBoxCheckedChanged" Unchecked="OnAddLineDepthBiasCheckBoxCheckedChanged" />
                 <CheckBox Name="ReadPolygonIndicesCheckBox" Content="Read PolygonIndices" Margin="0 4 0 0" IsChecked="True" Checked="OnReadPolygonIndicesCheckBoxCheckedChanged" Unchecked="OnReadPolygonIndicesCheckBoxCheckedChanged"
                           ToolTip="When checked ReaderObj will read PolygonIndices collection that can be used to show polygons instead of triangles. Object need to be shown with wireframe to see the difference."/>
+
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <TextBlock Text="LineThickness:" VerticalAlignment="Center" Margin="0 0 10 0" />
+                    <ComboBox Name="LineThicknessComboBox" Width="50" />
+                </StackPanel>
 
                 <Button Name="ShowInfoButton" Content="Show objects info" Margin="0 20 0 0" IsEnabled="False" Click="ShowInfoButton_OnClick"></Button>
             </StackPanel>
