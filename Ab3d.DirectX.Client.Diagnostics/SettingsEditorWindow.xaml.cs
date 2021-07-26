@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.DirectX.Controls;
 using SharpDX.Direct3D11;
 
 namespace Ab3d.DirectX.Client.Diagnostics
@@ -23,6 +24,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
     public partial class SettingsEditorWindow : Window
     {
         public readonly DXScene CurrentDXScene;
+        public readonly DXView CurrentDXView;
 
         public event EventHandler ValueChanged;
 
@@ -41,25 +43,45 @@ IsTransparencySortingEnabled
   
 OptimizeNearAndFarCameraPlanes";
         
+        private static readonly string _dxViewPropertiesList =
+@"IsAutomaticallyUpdatingDXScene
+IsWaitingInBackgroundUntilRendered";
+        
 
-        public SettingsEditorWindow(DXScene dxScene)
+        public SettingsEditorWindow(DXView dxView)
         {
-            if (dxScene == null)
+            if (dxView == null)
                 return;
 
-            CurrentDXScene = dxScene;
+            CurrentDXScene = dxView.DXScene;
+            CurrentDXView = dxView;
 
             InitializeComponent();
 
             CreateDXSceneSettings();
+            CreateDXViewSettings();
         }
-        
+
         private void CreateDXSceneSettings()
         {
-            var propertiesArray = _dxScenePropertiesList.Split(new string[] {"\r\n"}, StringSplitOptions.None);
+            DXSceneSettingsGrid.Children.Clear();
+            DXSceneSettingsGrid.RowDefinitions.Clear();
 
-            SettingsGrid.Children.Clear();
-            SettingsGrid.RowDefinitions.Clear();
+            AddPropertySettings(_dxScenePropertiesList, CurrentDXScene, DXSceneSettingsGrid);
+        }
+        
+        private void CreateDXViewSettings()
+        {
+            DXViewSettingsGrid.Children.Clear();
+            DXViewSettingsGrid.RowDefinitions.Clear();
+
+            if (CurrentDXView != null)
+                AddPropertySettings(_dxViewPropertiesList, CurrentDXView, DXViewSettingsGrid);
+        }
+
+        private void AddPropertySettings(string propertyNames, object targetObject, Grid targetGrid)
+        {
+            var propertiesArray = propertyNames.Split(new string[] {"\r\n"}, StringSplitOptions.None);
 
             bool addExtraTopMargin = false;
             foreach (var onePropertyName in propertiesArray)
@@ -70,15 +92,15 @@ OptimizeNearAndFarCameraPlanes";
                     continue;
                 }
 
-                var propertyInfo = typeof(DXScene).GetProperty(onePropertyName);
+                var propertyInfo = targetObject.GetType().GetProperty(onePropertyName);
                 if (propertyInfo == null)
                 {
-                    MessageBox.Show($"SettingsEditorWindow:\r\nCannot find {onePropertyName} in DXScene");
+                    MessageBox.Show($"SettingsEditorWindow:\r\nCannot find {onePropertyName} in {targetObject.GetType().Name}");
                     continue;
                 }
 
-                SettingsGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                int newRowIndex = SettingsGrid.RowDefinitions.Count - 1;
+                targetGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                int newRowIndex = targetGrid.RowDefinitions.Count - 1;
 
                 var textBlock = new TextBlock()
                 {
@@ -87,7 +109,7 @@ OptimizeNearAndFarCameraPlanes";
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var editorControl = CreateEditorControl(propertyInfo);
+                var editorControl = CreateEditorControl(propertyInfo, targetObject);
                 if (editorControl == null)
                     continue; // Not supported type
 
@@ -101,26 +123,26 @@ OptimizeNearAndFarCameraPlanes";
                 Grid.SetColumn(editorControl, 1);
                 Grid.SetRow(editorControl, newRowIndex);
 
-                SettingsGrid.Children.Add(textBlock);
-                SettingsGrid.Children.Add(editorControl);
+                targetGrid.Children.Add(textBlock);
+                targetGrid.Children.Add(editorControl);
 
                 addExtraTopMargin = false;
             }
         }
         
-        private FrameworkElement CreateEditorControl(PropertyInfo propertyInfo)
+        private FrameworkElement CreateEditorControl(PropertyInfo propertyInfo, object targetObject)
         {
             FrameworkElement editorControl;
 
-            var propertyValue = propertyInfo.GetValue(CurrentDXScene, null);
+            var propertyValue = propertyInfo.GetValue(targetObject, null);
 
             if (propertyInfo.PropertyType == typeof(Boolean))
             {
-                editorControl = CreateBooleanEditorControl(propertyInfo, propertyValue);
+                editorControl = CreateBooleanEditorControl(propertyInfo, targetObject, propertyValue);
             }
             else if (propertyInfo.PropertyType == typeof(Int32))
             {
-                editorControl = CreateInt32EditorControl(propertyInfo, propertyValue);
+                editorControl = CreateInt32EditorControl(propertyInfo, targetObject, propertyValue);
             }
             else
             {
@@ -131,33 +153,28 @@ OptimizeNearAndFarCameraPlanes";
             return editorControl;
         }
 
-        private FrameworkElement CreateBooleanEditorControl(PropertyInfo propertyInfo, object propertyValue)
+        private FrameworkElement CreateBooleanEditorControl(PropertyInfo propertyInfo, object targetObject, object propertyValue)
         {
             var checkBox = new CheckBox();
             checkBox.IsChecked = (bool) propertyValue;
 
             checkBox.Checked += delegate(object sender, RoutedEventArgs args)
             {
-                propertyInfo.SetValue(CurrentDXScene, true, null);
+                propertyInfo.SetValue(targetObject, true, null);
                 OnValueChanged();
             };
 
 
             checkBox.Unchecked += delegate (object sender, RoutedEventArgs args)
             {
-                propertyInfo.SetValue(CurrentDXScene, false, null);
+                propertyInfo.SetValue(targetObject, false, null);
                 OnValueChanged();
             };
 
             return checkBox;
         }
 
-        private void BooleanCheckBoxOnCheckedChanged(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private FrameworkElement CreateInt32EditorControl(PropertyInfo propertyInfo, object propertyValue)
+        private FrameworkElement CreateInt32EditorControl(PropertyInfo propertyInfo, object targetObject, object propertyValue)
         {
             var textBox = new TextBox()
             {
@@ -178,7 +195,7 @@ OptimizeNearAndFarCameraPlanes";
                 if (Int32.TryParse(valueText, out newValue))
                 {
                     textBox.ClearValue(ForegroundProperty);
-                    propertyInfo.SetValue(CurrentDXScene, newValue, null);
+                    propertyInfo.SetValue(targetObject, newValue, null);
 
                     OnValueChanged();
                 }

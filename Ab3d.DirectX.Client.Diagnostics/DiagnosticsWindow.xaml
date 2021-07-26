@@ -31,7 +31,10 @@
 
                 <RadioButton Name="ShowRenderingStatisticsRadioButton" Content="Show rendering statistics" IsChecked="True" GroupName="StatisticsType" Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
                 <RadioButton Name="ShowCameraInfoRadioButton" Content="Show camera info" GroupName="StatisticsType"  Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
-                
+
+                <Separator Name="ChangeDXViewSeparator"/>
+                <MenuItem Name="ChangeDXViewMenuItem" Header="Change DXViewportView" Click="ChangeDXViewMenuItem_OnClick"/>
+
                 <Separator />
                 <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingQueuesMenuItem" Header="Dump RenderingQueues" Click="DumpRenderingQueuesMenuItem_OnClick"/>

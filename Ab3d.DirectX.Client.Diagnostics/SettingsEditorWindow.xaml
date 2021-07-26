@@ -8,8 +8,10 @@
         Icon="ab4d.ico" ShowInTaskbar="True"
         Title="DXEngine settings editor"
         Width="320" SizeToContent="Height">
-    <Grid Margin="10">
+    <Grid Margin="10" Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,14 +19,23 @@
 
         <TextBlock Grid.Row="0" Text="DXScene properties:" FontWeight="Bold" FontSize="13" Foreground="#333" />
 
-        <Grid Name="SettingsGrid" Grid.Row="1" Margin="0 2 0 0">
+        <Grid Name="DXSceneSettingsGrid" Grid.Row="1" Margin="0 2 0 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="PropertyNames" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 0">
+        <TextBlock Grid.Row="2" Text="DXView properties:" FontWeight="Bold" FontSize="13" Margin="0 15 0 0" Foreground="#333" />
+
+        <Grid Name="DXViewSettingsGrid" Grid.Row="3" Margin="0 2 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="PropertyNames" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        </Grid>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 20 0 0">
             <Button Name="RefreshButton" Content="Refresh values" Width="80" Padding="4 3" Margin="10 0 0 0" Click="RefreshButton_OnClick" />
             <Button Name="CloseButton" Content="Close" IsDefault="True" IsCancel="True" Width="80" Padding="4 3" Margin="15 0 0 0" Click="CloseButton_OnClick" />
         </StackPanel>

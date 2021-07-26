@@ -218,6 +218,18 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             // On each new scene reset the StartStopCameraRotationMenuItem text
             StartStopCameraRotationMenuItem.Header = "Toggle camera rotation";
+
+
+            if (_dxView != null && (_dxView.MasterDXView != null || _dxView.ChildDXViews != null)) // ChildDXViews is set to null when the last child is disconnected (so list Count is never 0)
+            {
+                ChangeDXViewSeparator.Visibility = Visibility.Visible;
+                ChangeDXViewMenuItem.Visibility  = Visibility.Visible;
+            }
+            else
+            {
+                ChangeDXViewSeparator.Visibility = Visibility.Collapsed;
+                ChangeDXViewMenuItem.Visibility  = Visibility.Collapsed;
+            }
         }
 
         private bool CheckIsCaptureFrameSupported()
@@ -364,7 +376,10 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private void OnDXViewDisposing(object sender, EventArgs args)
         {
-            UnregisterCurrentDXView();
+            if (this.Dispatcher.CheckAccess())
+                UnregisterCurrentDXView();
+            else
+                this.Dispatcher.Invoke(new Action(() => UnregisterCurrentDXView()));
         }
 
         private void UnregisterCurrentDXView()
@@ -707,7 +722,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private void DumpBackBufferChangesMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            BackBufferChanges();
+            DumpBackBufferChanges();
         }
 
         private void DumpSystemInfoMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -1398,7 +1413,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
             ShowInfoText(sb.ToString());
         }
         
-        private void BackBufferChanges()
+        private void DumpBackBufferChanges()
         {
             if (DXView == null || DXView.DXScene == null)
                 return;
@@ -1415,7 +1430,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
         private void DumpDXEngineSettings()
         {
-            var dxEngineSettingsDump = GetDXEngineSettingsDump();
+            var dxEngineSettingsDump = GetDXEngineSettingsDump(this.DXView);
             ShowInfoText(dxEngineSettingsDump);
         }
         
@@ -1443,7 +1458,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 }
             }
 
-            _settingsEditorWindow = new SettingsEditorWindow(DXView.DXScene);
+            _settingsEditorWindow = new SettingsEditorWindow(DXView);
             _settingsEditorWindow.Owner = this;
             _settingsEditorWindow.Left = this.Left;
             _settingsEditorWindow.Top = this.Top + 80;
@@ -1503,20 +1518,20 @@ StateChangesCount: {16:#,##0}{17}{18}",
             _renderingFilterWindow.Show();
         }
 
-        private string GetDXEngineSettingsDump()
+        private string GetDXEngineSettingsDump(DXView dxView)
         {
-            if (DXView == null || DXView.DXScene == null)
+            if (dxView == null || dxView.DXScene == null)
                 return "";
 
             var sb = new StringBuilder();
 
-            DumpObjectProperties(DXView, sb, "  ");
+            DumpObjectProperties(dxView, sb, "  ");
             sb.AppendLine();
 
             sb.Append("  DXView.GraphicsProfiles: ");
-            if (DXView.GraphicsProfiles != null && DXView.GraphicsProfiles.Length > 0)
+            if (dxView.GraphicsProfiles != null && dxView.GraphicsProfiles.Length > 0)
             {
-                sb.Append(string.Join(", ", DXView.GraphicsProfiles.Select(p => p.Name)));
+                sb.Append(string.Join(", ", dxView.GraphicsProfiles.Select(p => p.Name)));
                 sb.AppendLine();
             }
             else
@@ -1525,24 +1540,24 @@ StateChangesCount: {16:#,##0}{17}{18}",
             }
 
             sb.Append("  DXView.UsedGraphicsProfile:\r\n  ");
-            DumpObjectProperties(DXView.UsedGraphicsProfile, sb, "    ");
+            DumpObjectProperties(dxView.UsedGraphicsProfile, sb, "    ");
             sb.AppendLine();
 
 
-            DumpObjectProperties(DXView.DXScene, sb, "  ");
+            DumpObjectProperties(dxView.DXScene, sb, "  ");
             sb.AppendLine();
 
 
-            if (DXView.DXScene.ShadowRenderingProvider != null)
+            if (dxView.DXScene.ShadowRenderingProvider != null)
             {
                 sb.Append("  DXScene.ShadowRenderingProvider:\r\n  ");
-                DumpObjectProperties(DXView.DXScene.ShadowRenderingProvider, sb, "    ");
+                DumpObjectProperties(dxView.DXScene.ShadowRenderingProvider, sb, "    ");
             }
 
-            if (DXView.DXScene.VirtualRealityProvider != null)
+            if (dxView.DXScene.VirtualRealityProvider != null)
             {
                 sb.Append("  DXScene.VirtualRealityProvider:\r\n  ");
-                DumpObjectProperties(DXView.DXScene.VirtualRealityProvider, sb, "    ");
+                DumpObjectProperties(dxView.DXScene.VirtualRealityProvider, sb, "    ");
             }
 
 
@@ -1619,9 +1634,12 @@ StateChangesCount: {16:#,##0}{17}{18}",
             StartProcess(DumpFileName);
         }
 
-        private DXViewportView GetDXViewportView()
+        private DXViewportView GetDXViewportView(DXView dxView = null)
         {
-            return DXView as DXViewportView;
+            if (dxView == null)
+                dxView = this.DXView;
+
+            return dxView as DXViewportView;
         }
 
         private static void StartProcess(string fileName)
@@ -2018,9 +2036,9 @@ StateChangesCount: {16:#,##0}{17}{18}",
             // Start with empty DumpFile 
             System.IO.File.WriteAllText(DumpFileName, "Ab3d.DXEngine FULL SCENE DUMP\r\n\r\n");
 
+
             try
             {
-
                 string systemInfoText;
                 try
                 {
@@ -2032,149 +2050,207 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 }
 
                 AppendDumpText("System info:", systemInfoText);
-
-
-                var dxEngineSettingsDump = GetDXEngineSettingsDump();
-                AppendDumpText("DXView settings:", dxEngineSettingsDump);
-
-
-                var cameraInfo = new StringBuilder();
-                AddCameraDetails(cameraInfo);
-
-                AppendDumpText("DXScene.Camera matrices:", cameraInfo.ToString());
-
-                if (DXView.DXScene != null)
-                {
-                    string lights = string.Join(Environment.NewLine, DXView.DXScene.Lights.Select(r => r.ToString()));
-                    AppendDumpText("DXScene.Lights:", lights);
-
-
-                    string renderingSteps = string.Join(Environment.NewLine, DXView.DXScene.RenderingSteps.Select(r => r.ToString()));
-                    AppendDumpText("DXScene.RenderingSteps:", renderingSteps);
-
-
-                    string sceneNodesText;
-                    try
-                    {
-                        sceneNodesText = GetSceneNodesDumpString(DXView.DXScene);
-                    }
-                    catch (Exception ex)
-                    {
-                        sceneNodesText = "Exception occured when calling DXScene.GetSceneNodesDumpString:\r\n" + ex.Message;
-                    }
-
-                    AppendDumpText("Scene nodes:", sceneNodesText);
-
-
-                    string renderingQueuesText;
-                    try
-                    {
-                        renderingQueuesText = GetRenderingQueuesDumpString(DXView.DXScene);
-                    }
-                    catch (Exception ex)
-                    {
-                        renderingQueuesText = "Exception occured when calling DXScene.GetRenderingQueuesDumpString:\r\n" + ex.Message;
-                    }
-
-                    AppendDumpText("DXScene.RenderingQueues:", renderingQueuesText);
-
-
-                    // Add XAML of the scene:
-                    var dxViewport3D = GetDXViewportView();
-                    if (dxViewport3D != null && dxViewport3D.Viewport3D != null)
-                    {
-                        string xaml;
-
-                        try
-                        {
-                            xaml = GetXaml(dxViewport3D.Viewport3D);
-                        }
-                        catch (Exception ex)
-                        {
-                            xaml = "Exception saving Viewport3D to XAML:\r\n" + ex.Message;
-                        }
-
-                        AppendDumpText("Viewport3D XAML:", xaml);
-
-
-                        try
-                        {
-                            xaml = GetViewport3DXaml(dxViewport3D.Viewport3D);
-                        }
-                        catch (Exception ex)
-                        {
-                            xaml = "Exception creating cleaned Viewport3D XAML:\r\n" + ex.Message;
-                        }
-
-                        AppendDumpText("Cleaned Viewport3D XAML:", xaml);
-                    }
-
-
-                    // Finally we add rendered bitmap as base64 string.
-                    // This is done 
-                    string renderedBitmapBase64String = null;
-
-                    // To get a copy of next rendered scene, we can use the RegisterBackBufferMapping method that is called when the rendered scene's bitmap is ready to be copied to main memory
-                    DXView.DXScene.RenderingContext.RegisterBackBufferMapping(delegate (object s, BackBufferReadyEventArgs args)
-                    {
-                        try
-                        {
-                            var renderedBitmap = CreatedRenderedBitmap(args);
-                            renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
-                        }
-                        catch
-                        {
-                            // Do not crash DXEngine in case of exception
-                        }
-                    });
-
-                    // After we have subscribed to capture next frame, we can force rendering that frame
-                    try
-                    {
-                        var savedLogLevels = DXDiagnostics.LogLevel;
-                        var savedLogAction = DXDiagnostics.LogAction;
-
-                        _logMessagesString = "";
-
-                        DXDiagnostics.LogAction = OnLogAction;
-                        DXDiagnostics.LogLevel = DXDiagnostics.LogLevels.Warn;
-
-
-                        // Render the scene again
-                        DXView.Refresh();
-
-
-                        DXDiagnostics.LogLevel = savedLogLevels;
-                        DXDiagnostics.LogAction = savedLogAction;
-
-                        if (DXView.DXScene != null && DXView.DXScene.Statistics != null)
-                            AppendDumpText("RenderingStatistics:", GetRenderingStatisticsDetails(DXView.DXScene.Statistics, fpsText: null));
-
-
-                        if (_logMessagesString.Length > 0)
-                            AppendDumpText("Log messages:", _logMessagesString);
-
-
-                        if (renderedBitmapBase64String != null)
-                        {
-                            Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-                            {
-                                // Show as html with embedded image so this can be easily shown in browser
-                                AppendDumpText("Rendered bitmap:", "<html><body>\r\n<img src=\"data:image/png;base64,\r\n" +
-                                                                   renderedBitmapBase64String +
-                                                                   "\" />\r\n</body></html>");
-                            }));
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-
             }
             catch (Exception ex)
             {
-                AppendDumpText("Error writing scene dump:", ex.Message);
+                AppendDumpText("Error writing system info:", ex.Message);
+            }
+
+
+
+            var allDxViews = GetAllDXViews();
+
+            if (allDxViews == null)
+                return;
+
+            if (allDxViews.Count > 1)
+            {
+                string multipleViewsText = "";
+
+                for (var i = 0; i < allDxViews.Count; i++)
+                    multipleViewsText += string.Format("[{0}] {1}\r\n", i, GetDXViewDescription(allDxViews[i], null));
+
+                multipleViewsText += "\r\n\r\n";
+
+                AppendDumpText("Multiple DXViewportViews included in this dump:", multipleViewsText);
+            }
+
+            for (var dxViewIndex = 0; dxViewIndex < allDxViews.Count; dxViewIndex++)
+            {
+                var dxView = allDxViews[dxViewIndex];
+
+                if (allDxViews.Count > 1)
+                {
+                    AppendDumpText("==========================================================================================",
+                                   string.Format("DXViewportView[{0}]:\r\n{1}\r\n", dxViewIndex, GetDXViewDescription(allDxViews[dxViewIndex], null)));
+                }
+
+                try
+                {
+                    var dxEngineSettingsDump = GetDXEngineSettingsDump(dxView);
+                    AppendDumpText("DXView settings:", dxEngineSettingsDump);
+
+
+                    var cameraInfo = new StringBuilder();
+                    AddCameraDetails(cameraInfo, dxView);
+
+                    AppendDumpText("DXScene.Camera matrices:", cameraInfo.ToString());
+
+                    if (dxView.DXScene != null)
+                    {
+                        string lights = string.Join(Environment.NewLine, dxView.DXScene.Lights.Select(r => r.ToString()));
+                        AppendDumpText("DXScene.Lights:", lights + "\r\n");
+
+
+                        string renderingSteps;
+                        if (dxView.DXScene.RenderingSteps == null)
+                        {
+                            if (dxView.DXScene.MasterDXScene != null)
+                                renderingSteps = "RenderingSteps are null (using RenderingSteps from master DXScene)\r\n";
+                            else
+                                renderingSteps = "RenderingSteps are null\r\n";
+                        }
+                        else
+                        {
+                            renderingSteps = string.Join(Environment.NewLine, dxView.DXScene.RenderingSteps.Select(r => r.ToString()));
+                        }
+
+                        AppendDumpText("DXScene.RenderingSteps:", renderingSteps);
+
+
+                        string sceneNodesText;
+                        if (dxView.DXScene.RenderingSteps == null)
+                        {
+                            if (dxView.DXScene.MasterDXScene != null)
+                                sceneNodesText = "RootNode is null (using RootNode from master DXScene)\r\n";
+                            else
+                                sceneNodesText = "RootNode is null\r\n";
+                        }
+                        else
+                        {
+                            try
+                            {
+                                sceneNodesText = GetSceneNodesDumpString(dxView.DXScene);
+                            }
+                            catch (Exception ex)
+                            {
+                                sceneNodesText = "Exception occurred when calling DXScene.GetSceneNodesDumpString:\r\n" + ex.Message;
+                            }
+                        }
+
+                        AppendDumpText("Scene nodes:", sceneNodesText);
+
+
+                        string renderingQueuesText;
+                        try
+                        {
+                            renderingQueuesText = GetRenderingQueuesDumpString(dxView.DXScene);
+                        }
+                        catch (Exception ex)
+                        {
+                            renderingQueuesText = "Exception occurred when calling DXScene.GetRenderingQueuesDumpString:\r\n" + ex.Message;
+                        }
+
+                        AppendDumpText("DXScene.RenderingQueues:", renderingQueuesText);
+
+
+                        // Add XAML of the scene:
+                        var dxViewport3D = GetDXViewportView(dxView);
+                        if (dxViewport3D != null && dxViewport3D.Viewport3D != null)
+                        {
+                            string xaml;
+
+                            try
+                            {
+                                xaml = GetXaml(dxViewport3D.Viewport3D);
+                            }
+                            catch (Exception ex)
+                            {
+                                xaml = "Exception saving Viewport3D to XAML:\r\n" + ex.Message;
+                            }
+
+                            AppendDumpText("Viewport3D XAML:", xaml + "\r\n");
+
+
+                            try
+                            {
+                                xaml = GetViewport3DXaml(dxViewport3D.Viewport3D);
+                            }
+                            catch (Exception ex)
+                            {
+                                xaml = "Exception creating cleaned Viewport3D XAML:\r\n" + ex.Message;
+                            }
+
+                            AppendDumpText("Cleaned Viewport3D XAML:", xaml + "\r\n");
+                        }
+
+
+                        // Finally we add rendered bitmap as base64 string.
+                        // This is done 
+                        string renderedBitmapBase64String = null;
+
+                        // To get a copy of next rendered scene, we can use the RegisterBackBufferMapping method that is called when the rendered scene's bitmap is ready to be copied to main memory
+                        dxView.DXScene.RenderingContext.RegisterBackBufferMapping(delegate(object s, BackBufferReadyEventArgs args)
+                        {
+                            try
+                            {
+                                var renderedBitmap = CreatedRenderedBitmap(args);
+                                renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
+                            }
+                            catch
+                            {
+                                // Do not crash DXEngine in case of exception
+                            }
+                        });
+
+                        // After we have subscribed to capture next frame, we can force rendering that frame
+                        try
+                        {
+                            var savedLogLevels = DXDiagnostics.LogLevel;
+                            var savedLogAction = DXDiagnostics.LogAction;
+
+                            _logMessagesString = "";
+
+                            DXDiagnostics.LogAction = OnLogAction;
+                            DXDiagnostics.LogLevel = DXDiagnostics.LogLevels.Warn;
+
+
+                            // Render the scene again
+                            dxView.Refresh();
+
+
+                            DXDiagnostics.LogLevel = savedLogLevels;
+                            DXDiagnostics.LogAction = savedLogAction;
+
+                            if (dxView.DXScene != null && dxView.DXScene.Statistics != null)
+                                AppendDumpText("RenderingStatistics:", GetRenderingStatisticsDetails(dxView.DXScene.Statistics, fpsText: null) + "\r\n");
+
+
+                            if (_logMessagesString.Length > 0)
+                                AppendDumpText("Log messages:", _logMessagesString);
+
+
+                            if (renderedBitmapBase64String != null)
+                            {
+                                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                                {
+                                    // Show as html with embedded image so this can be easily shown in browser
+                                    AppendDumpText("Rendered bitmap:", "<html><body>\r\n<img src=\"data:image/png;base64,\r\n" +
+                                                                       renderedBitmapBase64String +
+                                                                       "\" />\r\n</body></html>\r\n");
+                                }));
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    AppendDumpText("Error writing scene dump:", ex.Message);
+                }
             }
 
             StartProcess(DumpFileName);
@@ -2496,18 +2572,24 @@ StateChangesCount: {16:#,##0}{17}{18}",
         //    return dxViewSettings;
         //}
 
-        private Camera GetWpfCamera()
+        private Camera GetWpfCamera(DXView dxView = null)
         {
-            var dxViewport3D = GetDXViewportView();
+            if (dxView == null)
+                dxView = this.DXView;
+
+            var dxViewport3D = GetDXViewportView(dxView);
             if (dxViewport3D == null || dxViewport3D.Viewport3D == null)
                 return null;
 
             return dxViewport3D.Viewport3D.Camera;
         }
 
-        private object GetPowerToysCamera()
+        private object GetPowerToysCamera(DXView dxView = null)
         {
-            var dxViewport3D = GetDXViewportView();
+            if (dxView == null)
+                dxView = this.DXView;
+
+            var dxViewport3D = GetDXViewportView(dxView);
             if (dxViewport3D == null || dxViewport3D.Viewport3D == null)
                 return null;
 
@@ -2622,7 +2704,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             try
             {
-                AddCameraDetails(sb);
+                AddCameraDetails(sb, this.DXView);
             }
             catch (Exception ex)
             {
@@ -2640,48 +2722,44 @@ StateChangesCount: {16:#,##0}{17}{18}",
         {
             var viewport3DCamera = GetWpfCamera();
 
-            if (viewport3DCamera == null)
-                return;
-
-
-            string singleDigitFormatString = "{0}: {1:0.#}\r\n";
-
-            var powerToysCamera = GetPowerToysCamera();
-
-            if (powerToysCamera != null)
-            {
-                AppendCameraPropertyValue(powerToysCamera, "Heading", sb, singleDigitFormatString);
-                AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, singleDigitFormatString);
-
-                string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, singleDigitFormatString);
-                if (bankText != null && bankText != "0")
-                    AppendCameraPropertyValue(powerToysCamera, "Bank", sb, singleDigitFormatString);
-
-                string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, singleDigitFormatString);
-                if (cameraType == "OrthographicCamera")
-                {
-                    sb.Append("\r\nCameraType: OrthographicCamera\r\n");
-                    AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, singleDigitFormatString);
-                }
-                else
-                {
-                    AppendCameraPropertyValue(powerToysCamera, "Distance", sb, singleDigitFormatString);
-                    AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, singleDigitFormatString);
-                }
-
-                sb.AppendLine();
-
-                AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, singleDigitFormatString);
-                AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, singleDigitFormatString);
-
-
-                string offsetText = AppendCameraPropertyValue(powerToysCamera, "Offset", null, singleDigitFormatString);
-                if (offsetText != "0, 0, 0")
-                    AppendCameraPropertyValue(powerToysCamera, "Offset", sb, singleDigitFormatString);
-            }
-
             if (viewport3DCamera != null)
             {
+                string singleDigitFormatString = "{0}: {1:0.#}\r\n";
+
+                var powerToysCamera = GetPowerToysCamera();
+
+                if (powerToysCamera != null)
+                {
+                    AppendCameraPropertyValue(powerToysCamera, "Heading", sb, singleDigitFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, singleDigitFormatString);
+
+                    string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, singleDigitFormatString);
+                    if (bankText != null && bankText != "0")
+                        AppendCameraPropertyValue(powerToysCamera, "Bank", sb, singleDigitFormatString);
+
+                    string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, singleDigitFormatString);
+                    if (cameraType == "OrthographicCamera")
+                    {
+                        sb.Append("\r\nCameraType: OrthographicCamera\r\n");
+                        AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, singleDigitFormatString);
+                    }
+                    else
+                    {
+                        AppendCameraPropertyValue(powerToysCamera, "Distance", sb, singleDigitFormatString);
+                        AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, singleDigitFormatString);
+                    }
+
+                    sb.AppendLine();
+
+                    AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, singleDigitFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, singleDigitFormatString);
+
+
+                    string offsetText = AppendCameraPropertyValue(powerToysCamera, "Offset", null, singleDigitFormatString);
+                    if (offsetText != "0, 0, 0")
+                        AppendCameraPropertyValue(powerToysCamera, "Offset", sb, singleDigitFormatString);
+                }
+
                 sb.AppendLine();
 
                 AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, "CameraPosition: {1:0.#}\r\n");
@@ -2705,12 +2783,19 @@ StateChangesCount: {16:#,##0}{17}{18}",
             }           
         }
 
-        private void AddCameraDetails(StringBuilder sb)
+        private void AddCameraDetails(StringBuilder sb, DXView dxView)
         {
-            var viewport3DCamera = GetWpfCamera();
+            Camera viewport3DCamera;
 
-            if (viewport3DCamera == null)
-                return;
+            try
+            {
+                viewport3DCamera = GetWpfCamera(dxView);
+            }
+            catch (InvalidOperationException)
+            { 
+                // This can happen when called from another thread
+                viewport3DCamera = null;
+            }
 
             if (viewport3DCamera != null)
             {
@@ -2724,7 +2809,17 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             //var ab3dCamera = FindControlsHelper.FindFirstElement<Ab3d.Cameras.BaseCamera>(dxViewport3D.Viewport3D);
 
-            var powerToysCamera = GetPowerToysCamera();
+            object powerToysCamera;
+
+            try
+            {
+                powerToysCamera = GetPowerToysCamera(dxView);
+            }
+            catch (InvalidOperationException)
+            {
+                // This can happen when called from another thread
+                powerToysCamera = null;
+            }
 
             if (powerToysCamera != null)
             {
@@ -2754,13 +2849,13 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 sb.AppendLine("/>");
             }
 
-            var dxViewport3D = GetDXViewportView();
+            var dxViewport3D = GetDXViewportView(dxView);
             if (dxViewport3D != null && dxViewport3D.DXScene != null && dxViewport3D.DXScene.Camera != null)
             {
                 sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
                                 "\r\n\r\nNearPlaneDistance: {0}\r\n" +
                                 "FarPlaneDistance: {1}\r\n" +
-                                "OptimizeNearAndFarCameraPlanes: {2}\r\n\r\n", 
+                                "OptimizeNearAndFarCameraPlanes: {2}\r\n", 
                                 dxViewport3D.DXScene.Camera.NearPlaneDistance, 
                                 dxViewport3D.DXScene.Camera.FarPlaneDistance,
                                 dxViewport3D.DXScene.OptimizeNearAndFarCameraPlanes);
@@ -3002,6 +3097,198 @@ StateChangesCount: {16:#,##0}{17}{18}",
         private void OnlineHelpMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             StartProcess("https://www.ab4d.com/DirectX/3D/Diagnostics.aspx");
+        }
+
+        private void ChangeDXViewMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_dxView == null)
+                return;
+
+            var dxViews = GetAllDXViews();
+
+            if (dxViews == null || dxViews.Count < 2) 
+                return; // Nothing to select (only one or less DXViews)
+
+            
+            var selectedDXView = SelectDXView(dxViews, _dxView);
+
+            if (selectedDXView == _dxView || selectedDXView == null)
+                return; // No change
+
+
+            // Change DXView
+            this.DXView = selectedDXView;
+        }
+
+        private List<DXView> GetAllDXViews()
+        {
+            var dxViews = new List<DXView>();
+
+            if (_dxView == null)
+                return dxViews;
+
+
+            DXView masterDXView;
+
+            if (_dxView.ChildDXViews != null)
+                masterDXView = _dxView;
+            else
+                masterDXView = _dxView.MasterDXView;
+
+            if (masterDXView == null)
+            {
+                // Cannot find master master dxView => there is only one DXView
+                dxViews.Add(_dxView);
+            }
+            else
+            {
+                dxViews.Add(masterDXView);
+                dxViews.AddRange(masterDXView.ChildDXViews);
+            }
+
+            return dxViews;
+        }
+
+        private DXView SelectDXView(List<DXView> dxViews, DXView currentlySelectedDXView)
+        {
+            if (dxViews == null || dxViews.Count == 0)
+                return null;
+
+
+            DXView selectedDXView = null;
+
+
+            Window mainWindow = null;
+
+            if (currentlySelectedDXView != null)
+                mainWindow = Window.GetWindow(currentlySelectedDXView);
+
+            if (mainWindow == null)
+                mainWindow = Window.GetWindow(dxViews[0]);
+
+
+
+            var window = new Window();
+            window.Title = "Select DXViewportView";
+            window.Width = 600;
+            window.SizeToContent = SizeToContent.Height;
+
+
+            var grid = new Grid();
+            grid.Margin = new Thickness(20, 10, 20, 10);
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+            var textBlock = new TextBlock()
+            {
+                Text = "Select DXViewportView:",
+                FontWeight = FontWeights.Bold,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 0, 0, 5),
+            };
+
+            Grid.SetRow(textBlock, 0);
+            grid.Children.Add(textBlock);
+
+
+            var stackPanel = new StackPanel()
+            {
+                Orientation = Orientation.Vertical, 
+                Margin = new Thickness(0, 10, 0, 10)
+            };
+
+            foreach (var dxView in dxViews)
+            {
+                string dxViewDescription = GetDXViewDescription(dxView, mainWindow);
+
+                var radioButton = new RadioButton()
+                {
+                    Content = dxViewDescription,
+                    Margin = new Thickness(0, 0, 0, 3),
+                    Tag = dxView,
+                    IsChecked = dxView == currentlySelectedDXView
+                };
+
+                radioButton.Checked += delegate(object sender, RoutedEventArgs args)
+                {
+                    selectedDXView = (DXView)radioButton.Tag;
+
+                    try
+                    {
+                        window.Close();
+                    }
+                    catch
+                    { }
+                };
+
+                stackPanel.Children.Add(radioButton);
+            }
+
+            Grid.SetRow(stackPanel, 1);
+            grid.Children.Add(stackPanel);
+
+
+            var cancelButton = new Button()
+            {
+                Content = "Cancel",
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, 10, 0, 0),
+                Padding = new Thickness(20, 3, 20, 3)
+            };
+
+            cancelButton.Click += delegate (object sender, RoutedEventArgs args)
+            {
+                selectedDXView = currentlySelectedDXView;
+
+                try
+                {
+                    window.Close();
+                }
+                catch
+                { }
+            };
+
+            Grid.SetRow(cancelButton, 2);
+            grid.Children.Add(cancelButton);
+
+
+            window.Content = grid;
+            window.ShowDialog();
+
+            return selectedDXView;
+        }
+
+        private string GetDXViewDescription(DXView dxView, Window mainWindow)
+        {
+            string positionText = "";
+            string parentWindowTitle = "";
+
+            try
+            {
+                var parentWindow = Window.GetWindow(dxView);
+                if (mainWindow != null && parentWindow != null && parentWindow != mainWindow)
+                    parentWindowTitle = string.Format("; Parent window title: \"{0}\"", parentWindow.Title ?? "");
+
+                if (dxView.IsVisible)
+                {
+                    var position = dxView.PointToScreen(new System.Windows.Point(0, 0));
+                    positionText = string.Format(" Position: {0:0} {1:0};", position.X, position.Y);
+                }
+            }
+            catch
+            {
+            }
+
+            string dxViewDescription = string.Format("Name: \"{0}\";{1} Size: {2:0} x {3:0}{4}{5}{6}",
+                dxView.Name ?? "",
+                positionText,
+                dxView.ActualWidth, dxView.ActualHeight,
+                dxView.IsVisible ? "" : " (IsVisible == false)",
+                dxView.ChildDXViews != null ? " (Master)" : "",
+                parentWindowTitle);
+
+            return dxViewDescription;
         }
     }
 }

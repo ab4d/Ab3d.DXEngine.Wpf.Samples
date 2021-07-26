@@ -98,7 +98,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
             if (ColumnsCount > 1)
             {
-                for (int i = 0; i < ColumnsCount; i++)
+                for (int i = 0; i < ColumnsCount - 1; i++)
                 {
                     var gridSplitter = new GridSplitter()
                     {
@@ -122,7 +122,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
             if (RowsCount > 1)
             {
-                for (int i = 0; i < RowsCount; i++)
+                for (int i = 0; i < RowsCount - 1; i++)
                 {
                     _horizontalGridSplitter = new GridSplitter()
                     {
@@ -242,7 +242,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                     Margin              = new Thickness(5, 5, 0, 0)
                 };
 
-                textBlock.Text = masterDXViewportView == null ? "Master DXScene:" : "Child DXScene:";
+                textBlock.Text = masterDXViewportView == null ? "Master DXViewportView:" : "Child DXViewportView:";
                 viewRootGrid.Children.Add(textBlock);
 
 
@@ -280,7 +280,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
         {
             Viewport3D viewport3D = new Viewport3D();
 
-            DXViewportView createDXViewportView;
+            DXViewportView createdDXViewportView;
             if (masterDXViewportView != null)
             {
                 // Create a child DXViewportView with using a constructor that takes a masterDXViewportView.
@@ -289,20 +289,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
                 bool useMasterRenderingSteps = renderingType == RenderingTypes.Standard;
 
-                createDXViewportView = new DXViewportView(masterDXViewportView, viewport3D, useMasterRenderingSteps);
+                createdDXViewportView = new DXViewportView(masterDXViewportView, viewport3D, useMasterRenderingSteps);
             }
             else
             {
                 // Create master DXViewportView with using constructor that takes only Viewport3D.
-                createDXViewportView = new DXViewportView(viewport3D);
+                createdDXViewportView = new DXViewportView(viewport3D);
             }
 
-            createDXViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs e)
+            createdDXViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs e)
             {
                 // Enable transparency sorting for each View (this way transparent objects are correctly rendered for each child view camera).
-                createDXViewportView.DXScene.IsTransparencySortingEnabled = true;
+                createdDXViewportView.DXScene.IsTransparencySortingEnabled = true;
 
-                SetSpecialRenderingType(createDXViewportView, renderingType);
+                SetSpecialRenderingType(createdDXViewportView, renderingType);
             };
 
 
@@ -327,7 +327,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                 MoveCameraConditions = MouseCameraController.MouseAndKeyboardConditions.ControlKey | MouseCameraController.MouseAndKeyboardConditions.LeftMouseButtonPressed
             };
 
-            return createDXViewportView;
+            return createdDXViewportView;
         }
 
         private void SetSpecialRenderingType(DXViewportView dxViewportView, RenderingTypes renderingType)
@@ -339,6 +339,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.OverrideEffect = null;
             dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterObjectsFunction = null;
             dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = null;
+            dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.OverrideRasterizerState = null;
 
 
             if (renderingType == RenderingTypes.Wireframe)
@@ -352,6 +353,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                 }
 
                 dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.OverrideEffect = _modelColorLineEffect;
+
+                // We could also force wireframe rendering overriding rasterizer state and force DirectX to render objects are wireframe
+                // This would be faster but you would not be able to specify line thickness (it is always 1 pixel): 
+                //dxViewportView.DXScene.DefaultRenderObjectsRenderingStep.OverrideRasterizerState = dxViewportView.DXScene.DXDevice.CommonStates.WireframeCullNone;
             }
             else if (renderingType == RenderingTypes.FilterByObjects)
             {

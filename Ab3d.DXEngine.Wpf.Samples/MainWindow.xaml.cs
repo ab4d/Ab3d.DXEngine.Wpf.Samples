@@ -27,7 +27,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string _startupPage = "DXEngineVisuals/TwoDimensionalCameraLineEditor.xaml";
+        //private string _startupPage = "DXEngineOther/MultiDXViewportViewsSample.xaml";
         private string _startupPage = null;
 
         private DXViewportView _lastShownDXViewportView;
@@ -120,6 +120,10 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
                 // Find DXViewportView
                 var foundDXViewportView = FindDXViewportView(ContentFrame.Content);
+
+                if (foundDXViewportView != null && foundDXViewportView.MasterDXView is DXViewportView)
+                    foundDXViewportView = (DXViewportView)foundDXViewportView.MasterDXView; // Show diagnostics for MasterDXView when a child DXViewportView was found
+
                 SubscribeDXViewportView(foundDXViewportView);
             };
 
@@ -198,13 +202,16 @@ namespace Ab3d.DXEngine.Wpf.Samples
         {
             if (_lastShownDXViewportView == null || _lastShownDXViewportView.IsDisposed)
             {
-                _lastShownDXViewportView = FindDXViewportView(ContentFrame.Content);
+                var dxViewportView = FindDXViewportView(ContentFrame.Content);
 
-                if (_lastShownDXViewportView == null)
-                    return;
+                if (dxViewportView != null && dxViewportView.MasterDXView is DXViewportView)
+                    dxViewportView = (DXViewportView)dxViewportView.MasterDXView; // Show diagnostics for MasterDXView when a child DXViewportView was found
+
+                _lastShownDXViewportView = dxViewportView;
             }
 
-            OpenDiagnosticsWindow();
+            if (_lastShownDXViewportView != null)
+                OpenDiagnosticsWindow();
         }
 
         private void RightSideBorder_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

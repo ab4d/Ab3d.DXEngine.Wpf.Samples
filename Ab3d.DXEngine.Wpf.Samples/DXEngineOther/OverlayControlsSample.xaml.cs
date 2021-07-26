@@ -68,7 +68,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // Create a title TextBlock that will be shown by WpfElementOverlay
             var titleTextBlock = new TextBlock()
             {
-                Text = "WPF controls shown by using sprites on a 3D scene rendered by DirectXOverlay presentation type",
+                Text = "Using sprites to render WPF controls on a 3D scene rendered by DirectXOverlay presentation type",
                 FontSize = 20,
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 60)),

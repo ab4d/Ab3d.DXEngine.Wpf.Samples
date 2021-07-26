@@ -280,7 +280,14 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private void DXViewOnDisposing(object sender, EventArgs eventArgs)
         {
-            this.Text = "DXSceneView is disposed";
+            try
+            {
+                this.Text = "DXSceneView is disposed";
+            }
+            catch (InvalidOperationException)
+            {
+                // In case DXView was disposed in background thread
+            }
         }
 
         private void DxViewOnDXRenderSizeChanged(object sender, DXViewSizeChangedEventArgs e)

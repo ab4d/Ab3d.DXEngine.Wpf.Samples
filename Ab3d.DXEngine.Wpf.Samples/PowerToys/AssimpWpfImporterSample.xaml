@@ -22,12 +22,7 @@
                                                WireframeType="Wireframe" 
                                                UseModelColor="False"
                                                LineColor="Black" 
-                                               LineThickness="{Binding ElementName=LineThicknessComboBox, Path=SelectedValue}" />       
-                    <ModelVisual3D>
-                        <ModelVisual3D.Content>
-                            <AmbientLight Color="#444" />
-                        </ModelVisual3D.Content>
-                    </ModelVisual3D>
+                                               LineThickness="{Binding ElementName=LineThicknessComboBox, Path=SelectedValue}" />                
                 </Viewport3D>
             </dxControls:DXViewportView>
         </Border>

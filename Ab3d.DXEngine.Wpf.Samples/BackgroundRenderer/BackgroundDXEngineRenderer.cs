@@ -146,8 +146,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
             if (clientWindowHeight <= 0) clientWindowHeight = 1;
 
             dxScene.InitializeSwapChain(_hWnd,
-                                        (int) (clientWindowWidth * dpiScaleX),
-                                        (int) (clientWindowHeight * dpiScaleY),
+                                        clientWindowWidth,
+                                        clientWindowHeight,
                                         preferedMultisamplingCount,
                                         supersamplingCount,
                                         (float) dpiScaleX,
@@ -159,9 +159,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
             dxViewportView = new DXViewportView(dxScene, wpfViewport3D);
 
 
-            // Because _dxViewportView is not shown in the UI, the DXEngineShoop (DXEngine's diagnostics tool) cannot find it
-            // To enable using DXEngineSnoop in such cases, we can set the Application's Property:
+            // Because _dxViewportView is not shown in the UI, the DXEngineShoop (DXEngine's diagnostics tool) cannot find it.
+            // To enable using DXEngineSnoop in such cases, we can set the static DXDiagnostics.CurrentDXView.
+            // Note that CurrentDXView is using WeakReference to prevent rooting the _dxViewportView by a static filed.
+
             Application.Current.Properties["DXView"] = new WeakReference(dxViewportView);
+
+            DXDiagnostics.CurrentDXView = dxViewportView;
 
             OnDXViewportViewInitialized();
         }
