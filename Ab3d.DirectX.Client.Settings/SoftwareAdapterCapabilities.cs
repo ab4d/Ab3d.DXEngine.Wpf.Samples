@@ -71,6 +71,7 @@ namespace Ab3d.DirectX.Client.Settings
                     return GraphicsProfile.NormalQualitySoftwareRendering;
                     
                 case RenderQualityTypes.High:
+                case RenderQualityTypes.Ultra:
                     return GraphicsProfile.HighQualitySoftwareRendering;
                     
                 case RenderQualityTypes.Custom:
