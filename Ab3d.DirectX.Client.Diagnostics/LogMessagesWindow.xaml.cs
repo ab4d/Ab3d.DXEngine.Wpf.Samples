@@ -75,5 +75,13 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
             this.Close();
         }
+
+        private void OnWordWrapCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            InfoTextBox.TextWrapping = (WordWrapCheckBox.IsChecked ?? false) ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        }
     }
 }

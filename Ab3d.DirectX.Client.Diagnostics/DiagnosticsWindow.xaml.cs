@@ -2,33 +2,22 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
-using Ab3d.Common;
-using Ab3d.DirectX.Cameras;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Lights;
-using Ab3d.DirectX.Models;
-using Microsoft.Win32;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Color = System.Windows.Media.Color;
@@ -48,6 +37,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
             {
                 if (ReferenceEquals(_dxView, value))
                     return;
+
+                ClearLogMessages(); // Clear log messages and warnings from previous DXView
 
                 RegisterDxView(value);
                 _dxView = value;
@@ -272,6 +263,22 @@ namespace Ab3d.DirectX.Client.Diagnostics
             }
         }
 
+        private void ClearLogMessages()
+        {
+            if (_logMessages != null)
+                _logMessages.Clear();
+            
+            _deletedLogMessagesCount = 0;
+
+            if (_logMessagesWindow != null)
+            {
+                _logMessagesWindow.MessageStartIndex = 0;
+                _logMessagesWindow.UpdateLogMessages();
+            }
+
+            LogWarningsPanel.Visibility = Visibility.Hidden;
+        }
+
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
         {
             if (_performanceAnalyzer != null)
@@ -372,6 +379,62 @@ namespace Ab3d.DirectX.Client.Diagnostics
             }
 
             UpdateEnabledMenuItems();
+
+            // If DXEngine is using non-default adapter, show warning
+            CheckNonDefaultAdapter();
+
+            // If DXEngine is using a adapter that is not the best, show warning
+            CheckBestAdapter();
+        }
+
+        private void CheckNonDefaultAdapter()
+        {
+            if (DXView != null && 
+                DXView.DXScene != null && 
+                DXView.DXScene.IsInitialized &&
+                DXView.DXScene.DXDevice.Configuration != null &&
+                DXView.PresentationType == DXView.PresentationTypes.DirectXImage)
+            {
+                if ((DXView.DXScene.UseSharedWpfTexture ?? true) == false) // warning when not using a shared texture (if value is not yet set, then consider as true for now - we have subscribed to LogActions and will catch the waring in case this will be set to false)
+                {
+                    var defaultAdapter = DXDevice.GetAllSystemAdapters().FirstOrDefault();
+                    var usedAdapter = DXView.DXScene.DXDevice.Adapter;
+
+                    string warningText;
+
+                    if (defaultAdapter != null && usedAdapter != null && usedAdapter.Description.Luid != defaultAdapter.Description.Luid)
+                        warningText = string.Format("Ab3d.DXEngine is using a non-default adapter (graphics card). This means that it is using a different adapter as WPF is using (Ab3d.DXEngine: '{0}'; WPF: '{1}'). In this case the rendered image cannot be shared with WPF (rendered image cannot stay in graphics card's memory) but needs to be copied from the graphics card that Ab3d.DXEngine is using to the main CPU memory. Then the image needs to be sent by WPF to the graphics card's memory of the WPF's adapter. This can significantly reduce performance (CompleteRenderTime is high). Consider using a default adapter for Ab3d.DXEngine or set the currently used adapter as the default adapter - on laptop computers with Optimus or similar technology you may try to start the application with another graphics card. If DXScene.UseSharedWpfTexture was intentionally set to false, then this warning can be discarded.", usedAdapter.Description.Description, defaultAdapter.Description.Description);
+                    else // this should not happen
+                        warningText = "Ab3d.DXEngine is not using a shared texture. This means that the rendered image needs to be copied to the main CPU memory. This usually happens when Ab3d.DXEngine is using a non-default adapter (different adapter then WPF). If DXScene.UseSharedWpfTexture was intentionally set to false, then this warning can be discarded.";
+
+                    DXEngineLogAction(DXDiagnostics.LogLevels.Warn, warningText);
+                }
+            }
+        }
+        
+        private void CheckBestAdapter()
+        {
+            if (DXView != null && 
+                DXView.DXScene != null && 
+                DXView.DXScene.IsInitialized &&
+                DXView.DXScene.DXDevice.Configuration != null)
+            {
+                var usedAdapter = DXView.DXScene.DXDevice.Configuration.Adapter;
+
+                if (usedAdapter != null)
+                {
+                    var allAdapters = DXDevice.GetAllSystemAdapters();
+
+                    // Sort by DedicatedVideoMemory - we assume that more RAM means better card - so pick the one with most RAM (DedicatedVideoMemory is of type PointerSize - to be able to compare by it we need to convert it to long)
+                    var bestAdapter = allAdapters.OrderByDescending(a => (long)a.Description.DedicatedVideoMemory)  
+                                                 .FirstOrDefault();
+
+                    if (bestAdapter != null && usedAdapter.Description.Luid != bestAdapter.Description.Luid)
+                    {
+                        DXEngineLogAction(DXDiagnostics.LogLevels.Warn, string.Format("The Ab3d.DXEngine is using an adapter (graphics card) that is not the best adapter on this computer - using: '{0}'; best: '{1}'. On laptop computers with Optimus or similar technology you may try to start the application with using the best graphics card.", usedAdapter.Description.Description, bestAdapter.Description.Description));
+                    }
+                }
+            }
         }
 
         private void OnDXViewDisposing(object sender, EventArgs args)
@@ -1113,6 +1176,24 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
         private void UpdateStatistics(RenderingStatistics renderingStatistics)
         {
+            double frameTime = renderingStatistics.UpdateTimeMs + renderingStatistics.TotalRenderTimeMs;
+            double fps       = 1000 / frameTime;
+
+
+            // Update average fps
+            int averageResultsCount = 2000 / UpdateStatisticsInterval; // 2 seconds for default update interval (100) => averageResultsCount = 20 - every 20 statistical results we calculate an average
+            if (averageResultsCount <= 1)
+                averageResultsCount = 1;
+
+            if (_fpsQueue == null)
+                _fpsQueue = new Queue<double>(averageResultsCount);
+
+            if (_fpsQueue.Count == averageResultsCount)
+                _fpsQueue.Dequeue(); // dump the result that is farthest away
+
+            _fpsQueue.Enqueue(fps);
+
+
             var now = DateTime.Now;
 
             if (UpdateStatisticsInterval > 0 && _lastStatisticsUpdate != DateTime.MinValue)
@@ -1128,7 +1209,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             if (_showRenderingStatistics)
             {
-                statisticsText = GetRenderingStatisticsText(renderingStatistics, now);
+                statisticsText = GetRenderingStatisticsText(renderingStatistics, now, fps);
             }
             else
             {
@@ -1159,25 +1240,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
             StatisticsTextBlock.Visibility = Visibility.Visible;
         }
 
-        private string GetRenderingStatisticsText(RenderingStatistics renderingStatistics, DateTime now)
+        private string GetRenderingStatisticsText(RenderingStatistics renderingStatistics, DateTime now, double fps)
         {
-            double frameTime = renderingStatistics.UpdateTimeMs + renderingStatistics.TotalRenderTimeMs;
-            double fps       = 1000 / frameTime;
-
-
-            // Update average fps
-            int averageResultsCount = 2000 / UpdateStatisticsInterval; // 2 seconds for default update interval (100) => averageResultsCount = 20 - every 20 statistical results we calculate an average
-            if (averageResultsCount <= 1)
-                averageResultsCount = 1;
-
-            if (_fpsQueue == null)
-                _fpsQueue = new Queue<double>(averageResultsCount);
-
-            if (_fpsQueue.Count == averageResultsCount)
-                _fpsQueue.Dequeue(); // dump the result that is farthest away
-
-            _fpsQueue.Enqueue(fps);
-
             string averageFpsText;
 
             if (_fpsQueue.Count >= 10)

@@ -83,7 +83,7 @@
         <StackPanel Name="LogWarningsPanel" Grid.Row="1"  Margin="0 0 10 0" HorizontalAlignment="Right" Orientation="Horizontal" Background="White" Visibility="Collapsed"
                     Cursor="Hand" MouseLeftButtonDown="LogWarningsPanel_OnMouseLeftButtonDown">
             <Image Name="WarningIcon" Source="warningIcon.png" Width="16" Height="16" Margin="3 0 2 0"/>
-            <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0"></TextBlock>
+            <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0" VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10" Visibility="Collapsed">
