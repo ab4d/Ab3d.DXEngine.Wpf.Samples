@@ -40,7 +40,7 @@
                                     TargetCamera="{Binding ElementName=Camera1}"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
         
-        <Button Name="CameraRotationButton" Content="Camera rotation" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10 5" Margin="5"
+        <Button Name="CameraRotationButton" Content="Rotate camera" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10 5" Margin="5"
                 Click="CameraRotationButton_OnClick" />
 
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="Silver" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 

@@ -197,7 +197,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                         //
                         //tubePathVisual3D.Transform = new TranslateTransform3D(x * circleRadius * 3 + xStart, y * circleRadius * 3 + yStart, 0);
 
-
                         _disposables.Add(tubePathMesh); // We did not add that in the background thread (we would need locking for that) so we need to do that now
                         _disposables.Add(meshObjectNode);
 
@@ -244,7 +243,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                         var tubePathVisual3D = new SceneNodeVisual3D(meshObjectNode);
                         //tubePathVisual3D.Transform = new TranslateTransform3D(x * circleRadius * 3 + xStart, y * circleRadius * 3 + yStart, 0);
 
-                        _disposables.Add(meshObjectNode);
+                        lock (this)
+                            _disposables.Add(meshObjectNode);
 
                         MainViewport.Children.Add(tubePathVisual3D);
                     }
@@ -334,7 +334,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             simpleMesh.Bounds = new Bounds(new Vector3(positionsBoundingBox.Minimum.X - radius, positionsBoundingBox.Minimum.Y - radius, positionsBoundingBox.Minimum.Z - radius),
                                            new Vector3(positionsBoundingBox.Maximum.X + radius, positionsBoundingBox.Maximum.Y + radius, positionsBoundingBox.Maximum.Z + radius));
 
-            _disposables.Add(simpleMesh);
+
+            // lock access to _disposables because this method may be executed in multiple threads
+            lock (this)
+            {
+                _disposables.Add(simpleMesh);
+            }
 
             return simpleMesh;
         }
@@ -342,22 +347,29 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         private void AddTubePathMesh(Vector3[] pathPositions, float radius, int segmentsCount, bool isTubeClosed, PositionNormal[] vertexBuffer, int[] indexBuffer, int vertexBufferStartIndex, int indexBufferStartIndex)
         {
             if (_lastSegmentsCount != segmentsCount)
-            {
-                _sinuses = new float[segmentsCount];
-                _cosines = new float[segmentsCount];
-
-                double angle     = 0;
-                double angleStep = 2 * Math.PI / segmentsCount;
-
-                for (int i = 0; i < segmentsCount; i++)
+            { 
+                // lock because this method may be executed in multiple threads 
+                lock (this)
                 {
-                    _sinuses[i] = (float) Math.Sin(angle) * radius;
-                    _cosines[i] = (float) Math.Cos(angle) * radius;
+                    if (_lastSegmentsCount != segmentsCount)
+                    {
+                        _sinuses = new float[segmentsCount];
+                        _cosines = new float[segmentsCount];
 
-                    angle += angleStep;
+                        double angle = 0;
+                        double angleStep = 2 * Math.PI / segmentsCount;
+
+                        for (int i = 0; i < segmentsCount; i++)
+                        {
+                            _sinuses[i] = (float)Math.Sin(angle) * radius;
+                            _cosines[i] = (float)Math.Cos(angle) * radius;
+
+                            angle += angleStep;
+                        }
+
+                        _lastSegmentsCount = segmentsCount;
+                    }
                 }
-
-                _lastSegmentsCount = segmentsCount;
             }
 
 
