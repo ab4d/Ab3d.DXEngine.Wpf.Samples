@@ -194,11 +194,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             var alphaClipThreshold = (AlphaClipCheckBox.IsChecked ?? false) ? UsedAlphaClipThreshold : 0f;
             _dxTestScene.SetDXEngineSettings(UseSolidColorEffectCheckBox.IsChecked ?? false, alphaClipThreshold);
 
-            if (MainDXViewportView.DXScene != null)
-            {
-                // Enable / disable highly efficient sorting by camera distance
-                MainDXViewportView.DXScene.IsTransparencySortingEnabled = DXEngineSortByCameraDistanceEffectCheckBox.IsChecked ?? false;
-            }
+            // Enable / disable highly efficient sorting by camera distance
+            MainDXViewportView.IsTransparencySortingEnabled = DXEngineSortByCameraDistanceEffectCheckBox.IsChecked ?? false;
         }
     }
 }

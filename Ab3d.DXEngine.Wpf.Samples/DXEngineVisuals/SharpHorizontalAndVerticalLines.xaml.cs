@@ -63,7 +63,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             MainDXViewportView.DXSceneInitialized += delegate(object sender, EventArgs args)
             {
                 // Do we need to show warning - it is shown when using super-sampling
-                if (MainDXViewportView.DXScene.SupersamplingCount > 1)
+                if (MainDXViewportView.DXScene != null && MainDXViewportView.DXScene.SupersamplingCount > 1)
                     SupersamplingWarningTextBlock.Visibility = Visibility.Visible;
 
                 // NOTE:

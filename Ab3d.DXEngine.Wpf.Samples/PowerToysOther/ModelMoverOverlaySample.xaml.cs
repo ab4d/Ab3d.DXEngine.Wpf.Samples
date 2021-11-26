@@ -149,5 +149,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             // When the 3D models are organized into hierarchy of models with using different ModelVisual3D or Model3DGroup objects, 
             // you also need to so specify the SelectedModelDecorator.RootModelVisual3D in order to get the correct position of the TargetModel3D
         }
+
+        private void OnRotateModelMoverCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            if (RotateModelMoverCheckBox.IsChecked ?? false)
+                ModelMover.SetRotation(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 45)));
+            else
+                ModelMover.SetRotation(null);
+        }
     }
 }

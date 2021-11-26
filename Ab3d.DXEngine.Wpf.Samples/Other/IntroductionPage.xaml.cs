@@ -87,7 +87,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
             return false;
         }
-        
+
         private void CarEngineImage_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!this.IsLoaded)
@@ -95,6 +95,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
             if (CarEngineImage.ActualHeight < 200)
                 CarEngineImage.Visibility = Visibility.Collapsed;
-        }        
+        }
     }
 }

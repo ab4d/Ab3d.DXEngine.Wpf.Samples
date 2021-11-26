@@ -1,0 +1,1038 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ab3d.PowerToys.Assimp</name>
+    </assembly>
+    <members>
+        <member name="T:Ab3d.Assimp.AssimpDumper">
+            <summary>
+            Dumper class is a helper class that contains method that can show detailed information about Assimp Scene.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpDumper.Dump(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Dumps the detailed information about Assimp Scene into the Visual Studio Output window
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpDumper.GetDumpString(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Gets a string with detailed information about Assimp Scene.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+            <returns>string with detailed information about Assimp Scene</returns>
+        </member>
+        <member name="T:Ab3d.Assimp.AssimpExtensions">
+            <summary>
+            AssimpExtensions contains extension methods that can convert Assimp structs to WPF structs.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfPoint(Assimp.Vector2D)">
+            <summary>
+            Converts Assimp Vector2D to WPF Point
+            </summary>
+            <param name="value">Vector2D</param>
+            <returns>Point</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfPoint3D(Assimp.Vector3D)">
+            <summary>
+            Converts Assimp Vector3D to WPF Point3D
+            </summary>
+            <param name="value">Assimp Vector3D</param>
+            <returns>WPF Point3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfVector3D(Assimp.Vector3D)">
+            <summary>
+            Converts Assimp Vector3D to WPF Vector3D
+            </summary>
+            <param name="value">Assimp Vector3D</param>
+            <returns>WPF Point3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfColor(Assimp.Color4D)">
+            <summary>
+            Converts Assimp Color4D to WPF Color
+            </summary>
+            <param name="value">Color4D</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfColor(Assimp.Color4D,System.Single)">
+            <summary>
+            Converts Assimp Color4D to WPF Color
+            </summary>
+            <param name="value">Color4D</param>
+            <param name="alpha">alpha</param>
+            <returns>Color</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfMatrix3D(Assimp.Matrix4x4)">
+            <summary>
+            Converts Assimp Matrix4x4 (row-major) to WPF Matrix3D (column-major)
+            </summary>
+            <param name="m">Matrix4x4</param>
+            <returns>Matrix3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToAssimpColor(System.Windows.Media.Color)">
+            <summary>
+            Converts WPF Color to Assimp Color4D
+            </summary>
+            <param name="value">WPF Color</param>
+            <returns>Assimp Color4D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToAssimpVector3D(System.Windows.Media.Media3D.Point3D)">
+            <summary>
+            Converts WPF Point3D to Assimp Vector3D
+            </summary>
+            <param name="value">WPF Point3D</param>
+            <returns>Assimp Vector3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToAssimpVector3D(System.Windows.Media.Media3D.Vector3D)">
+            <summary>
+            Converts WPF Vector3D to Assimp Vector3D
+            </summary>
+            <param name="value">WPF Vector3D</param>
+            <returns>Assimp Vector3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.Dump(Assimp.Scene,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Dumps the detailed information about Assimp Scene into the Visual Studio Output window
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="dumpMeshes">dumpMeshes</param>
+            <param name="dumpSceneNodes">dumpSceneNodes</param>
+            <param name="dumpMaterials">dumpMaterials</param>
+            <param name="dumpCameras">dumpCameras</param>
+            <param name="dumpLights">dumpLights</param>
+            <param name="dumpTransformations">dumpTransformations</param>
+            <param name="dumpAnimations">dumpAnimations</param>
+            <param name="dumpBones">dumpBones</param>
+        </member>
+        <member name="T:Ab3d.Assimp.AssimpWpfConverter">
+            <summary>
+            AssimpWpfConverter can convert Assimp Scene object to WPF Model3D object.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.LoggerCallback">
+            <summary>
+            Callback action that can be used to log Assimp and AssimpWpfConverter log messages
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.WpfMaterials">
+            <summary>
+            Gets a list of WPF Materials from Assimp Scene object.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.ObjectNames">
+            <summary>
+            Gets a Dictionary of objects as keys and names as values. Can be used to quickly get the object name.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.DefaultMaterial">
+            <summary>
+            Gets or sets a material that is used as default material (when material is not specified in the model file)
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.ForceConvertToRightHandedCoordinateSystem">
+            <summary>
+            Gets or sets a Boolean that specifies if we always do a conversion from left to right handed coordinate system.
+            </summary>
+            <remarks>
+            <para>
+            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a conversion from left to right handed coordinate system.
+            </para>
+            <para>
+            WPF uses right handed coordinate system - the Z axis points away from the screen. DirectX uses left handed coordinate system - there the Z axis points into the screen.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.ReadPolygonIndices">
+            <summary>
+            Gets or sets a Boolean that specifies if PolygonIndicesProperty is set to the created MeshGeometry3D objects. 
+            This property defines the indexes of positions that define mesh polygons.
+            This property is used only when the assimp scene was not read with Triangulation post process and when the Ab3d.PowerToys library is referenced.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.UseSimpleTriangulation">
+            <summary>
+            Gets or sets a Boolean that specifies if simple triangle fan triangulation is used instead of standard triangulation. 
+            This property is used only when the 3D model is not triangulated by assimp importer (when Triangulate PostProcessSteps is not used).
+            Default value is false.
+            </summary>
+            <remarks>
+            <para>
+            <b>UseSimpleTriangulation</b> gets or sets a Boolean that specifies if simple triangle fan triangulation is used instead of standard triangulation.
+            </para>
+            <para>
+            Simple triangle fan triangulation is much faster, but can correctly triangulate only convex polygons.
+            Standard triangulation is much slower but can triangulate convex and concave polygons.
+            </para>
+            <para>
+            This property is used only when the 3D model is not triangulated by assimp importer (when Triangulate PostProcessSteps is not used).
+            </para>
+            <para>
+            By default standard triangulation is used but if you know that the read models use only convex polygons, you can speed up reading 3D models with setting UseSimpleTriangulation to true.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.TriangulatorFunc">
+            <summary>
+            TriangulatorFunc is a static property that can be set to a Func that takes list of 2D positions, triangulates them and returns a list of triangle indices (list of int values).
+            When this property is not set, then the triangulator from Ab3d.PowerToys will be used (loaded by Reflection).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.BitmapCacheOption">
+            <summary>
+            Gets or sets a BitmapCacheOption that is used when creating bitmaps from files. Default value is OnLoad that caches the image in memory at load time (this does not lock the image file name).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.RemoveEmptyModel3DGroups">
+            <summary>
+            Gets or sets a Boolean that specifies if Model3DGroups without any child objects are removed from the imported scene. Default value is true. 
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.ConvertAssimpModel(Assimp.Scene,System.String,System.Func{System.String,System.IO.Stream},Assimp.PostProcessSteps)">
+            <summary>
+            ConvertAssimpModel converts the assimpScene into WPF Model3D that is retuned.
+            </summary>
+            <param name="assimpScene">Assimp scene</param>
+            <param name="texturesPath">path to the textures (optional)</param>
+            <param name="resolveResourceFunc">function that can resolve resource names (textures and other related files)</param>
+            <param name="assimpPostProcessSteps">post process steps that were used to create assimpScene</param>
+            <returns>WPF Model3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.GetGeometryModel3DForAssimpMesh(Assimp.Mesh)">
+            <summary>
+            Returns the GeometryModel3D that was created from the specified assimp mesh object.
+            </summary>
+            <param name="mesh">assimp mesh object</param>
+            <returns>GeometryModel3D that was created from the specified assimp mesh object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.GetAssimpMeshForGeometryModel3D(System.Windows.Media.Media3D.GeometryModel3D)">
+            <summary>
+            Returns the Assimp's Mesh object that was used to create the specified GeometryModel3D.
+            </summary>
+            <param name="geometryModel3D">GeometryModel3D created from assimp importer</param>
+            <returns>Assimp's Mesh object that was used to create the specified GeometryModel3D</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.GetWpfMaterialForAssimpMaterial(Assimp.Material)">
+            <summary>
+            Returns the WPF Material that was created from the specified assimp material.
+            </summary>
+            <param name="assimpMaterial">assimp material</param>
+            <returns>WPF Material that was created from the specified assimp material</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.GetAssimpMaterialForWpfMaterial(System.Windows.Media.Media3D.Material)">
+            <summary>
+            Returns the Assimp's Material for the created WPF Material.
+            </summary>
+            <param name="wpfMaterial">WPF Material created with assimp importer</param>
+            <returns>Assimp's Material for the created WPF Material</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.CreateWpfTextureMaterial(System.String,System.String,System.Func{System.String,System.IO.Stream})">
+            <summary>
+            CreateWpfTextureMaterial method creates a DiffuseMaterial from texture file name.
+            </summary>
+            <param name="textureFileName">textureFileName as written in model file</param>
+            <param name="texturesFilePath">textures path as specified to the AssimpWpfConverter (can be null)</param>
+            <param name="resolveResourceFunc">callback function to resolve textureFileName to stream (can be null)</param>
+            <returns>DiffuseMaterial with ImageBrush</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.CreateWpfBitmap(System.String)">
+            <summary>
+            Creates BitmapSource from textureFileName.
+            </summary>
+            <param name="textureFileName">texture file name and its full path</param>
+            <returns>BitmapSource</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.CreateWpfBitmap(System.IO.Stream)">
+            <summary>
+            Creates BitmapSource from file stream.
+            </summary>
+            <param name="fileStream">file stream</param>
+            <returns>BitmapSource</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.CreateTextureMaterial(System.Windows.Media.Imaging.BitmapSource,System.String)">
+            <summary>
+            Creates DiffuseMaterial from bitmap (textureFileName is provided as a reference)
+            </summary>
+            <param name="bitmap">BitmapSource</param>
+            <param name="textureFileName">textureFileName as written in model file</param>
+            <returns>DiffuseMaterial</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfConverter.CheckTextureFileName(System.String)">
+            <summary>
+            CheckTextureFileName checks the texture file name and if file does not exist or is not in supported file format tries to find another file that can be used instead.
+            Returns the file name that can be used to create WPF texture. If no file can be found, null is returned.
+            The method can be overridden.
+            </summary>
+            <remarks>
+            <para>
+            <b>CheckTextureFileName</b> checks the texture file name and if file does not exist or is not in supported file format tries to find another file that can be used instead.
+            Returns the file name that can be used to create WPF texture. If no file can be found, null is returned.
+            </para>
+            <para>
+            The method first checks if file extension is supported image format for WPF.
+            </para>
+            <para>
+            If file format is supported, then method checks if file exist on disk. If it exists then we can use this file and the original textureFileName is returned.
+            If file does not exist, then it is checked if the file name was written in old 8.3 file name format, but on disk a file with longer name exist. In this case the existing file name is returned.
+            </para>
+            <para>
+            If file format is not supported, then it is checked if there is another file on disk with supported file format. In that case the supported file name is returned.
+            </para>
+            </remarks>
+            <param name="textureFileName">full path and file name for texture file</param>
+            <returns>file name that can be used to create WPF texture or null if no file can be found</returns>
+        </member>
+        <member name="T:Ab3d.Assimp.AssimpWpfExporter">
+            <summary>
+            AssimpWpfExporter class can be used to export the WPF 3D scene to many different file formats.
+            </summary>
+            <remarks>
+            <para>
+            <b>AssimpWpfExporter</b> class can be used to export the WPF 3D scene to many different file formats.
+            </para>
+            <para>
+            The AssimpWpfExporter uses an open source assimp library to do the export. 
+            Therefore in the current step the WPF 3D objects are converted into Assimp Scene object. 
+            Then the export method on assimp scene is called.
+            </para>
+            <para>
+            To get a list of supported file formats check the <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions">
+            <summary>
+            Gets an array of ExportFormatDescription structs that define possible export file formats.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.LoggerCallback">
+            <summary>
+            Gets or sets a logger callback action that takes two strings (message and data).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.IsVerboseLoggingEnabled">
+            <summary>
+            Gets or sets a boolean that specifies if verbose logging is enabled. Default value is false.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.ObjectNames">
+            <summary>
+            Gets or sets a Dictionary where keys are objects and values are object names.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.NamedObjects">
+            <summary>
+            Gets or sets a Dictionary where keys are object names and values are objects.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.ExportFullTexturePaths">
+            <summary>
+            Gets or sets a Boolean that specifies if full texture file path is exported when writing textures.
+            If false (by default), then only file name is exported (and a custom texture path that can be specified by <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportedTexturePath"/>.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.ExportedTexturePath">
+            <summary>
+            Gets or sets a string that specifies the custom textures paths that is added to the texture file name. Default value is null (no textures path).
+            This property is used only when <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFullTexturePaths"/> is false.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.AssimpScene">
+            <summary>
+            Gets an Assimp Scene object that is generated from the WPF 3D objects
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.#ctor">
+            <summary>
+            Initializes a new instance of the AssimpWpfExporter class.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.Export(System.String,System.String)">
+            <summary>
+            Exports the 3D objects that were added to this AssimpWpfExporter to the specified file name and specific file format.
+            </summary>
+            <param name="fileName">output file name</param>
+            <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
+            <returns>true if file was successfully exported</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.ExportViewport3D(System.Windows.Controls.Viewport3D,System.String,System.String)">
+            <summary>
+            ExportViewport3D exports the 3D objects from the viewport3D to the specified file name and specific file format.
+            </summary>
+            <param name="viewport3D">Viewport3D's Children will be added to this AssimpWpfExporter</param>
+            <param name="fileName">output file name</param>
+            <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
+            <returns>true if file was successfully exported</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.ExportAssimpScene(Assimp.Scene,System.String,System.String)">
+            <summary>
+            ExportAssimpScene exports the Assimp scene to the specified file name and specific file format.
+            </summary>
+            <param name="assimpScene">Assimp scene</param>
+            <param name="fileName">output file name</param>
+            <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
+            <returns>true if file was successfully exported</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.AddViewport3D(System.Windows.Controls.Viewport3D)">
+            <summary>
+            AddViewport3D adds 3D objects from the viewport3D to this AssimpWpfExporter.
+            </summary>
+            <param name="viewport3D">Viewport3D's Children will be added to this AssimpWpfExporter</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.AddVisual3D(System.Windows.Media.Media3D.Visual3D)">
+            <summary>
+            AddVisual3D adds 3D objects from the WPF's Visual3D to this AssimpWpfExporter.
+            </summary>
+            <param name="visual3D">WPF's Visual3D</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.AddModel(System.Windows.Media.Media3D.Model3D)">
+            <summary>
+            AddModel adds 3D objects from the WPF's Model3D to this AssimpWpfExporter.
+            </summary>
+            <param name="wpfModel">WPF's Model3D</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.Dispose">
+            <summary>
+            Disposes the unmanaged assimp resources
+            </summary>
+        </member>
+        <member name="T:Ab3d.Assimp.AssimpWpfImporter">
+            <summary>
+            AssimpWpfImporter class uses Assimp importer library to read WPF 3D models from many 3D files.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Assimp.AssimpWpfImporter.Assimp32FileName">
+            <summary>
+            File name of the 32-bit assimp library
+            </summary>
+        </member>
+        <member name="F:Ab3d.Assimp.AssimpWpfImporter.Assimp64FileName">
+            <summary>
+            File name of the 64-bit assimp library
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpVersion">
+            <summary>
+            Gets the version of the native Assimp library.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpPostProcessSteps">
+            <summary>
+            Gets or sets Assimp PostProcessSteps (see assimp documentation for more information).
+            Default value is FlipUVs | GenerateSmoothNormals | Triangulate.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.ReadPolygonIndices">
+            <summary>
+            Gets or sets a Boolean that specifies if PolygonIndicesProperty is set to the created MeshGeometry3D objects. 
+            This property defines the indexes of positions that define mesh polygons.
+            This property is used only when the assimp scene was not read with Triangulation post process and when the Ab3d.PowerToys library is referenced.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.DefaultMaterial">
+            <summary>
+            Gets or sets a default material that is used when no other material is specified.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.ForceConvertToRightHandedCoordinateSystem">
+            <summary>
+            Gets or sets a Boolean that specifies if we always do a convertion from left to right handed coordinate system.
+            </summary>
+            <remarks>
+            <para>
+            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a convertion from left to right handed coordinate system.
+            </para>
+            <para>
+            WPF uses right handed coordinate system - the Z axis points away from the screen. DirectX uses left handed coordinate system - there the Z axis points into the screen.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.NamedObjects">
+            <summary>
+            Gets a dictionary that can be used to get a 3D object by its name (key = name, value = object)
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.ObjectNames">
+            <summary>
+            Gets a dictionary that can be used to get a name of a 3D object (key = object, value = name)
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.ImportedAssimpScene">
+            <summary>
+            Gets the Assimp's Scene object that was created when the 3D file was read.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.IsDisposed">
+            <summary>
+            Gets or sets a Boolean that specifies if this instance of AssimpWpfImporter has been disposed.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.LoggerCallback">
+            <summary>
+            Gets or sets a logger callback action that takes two strings (message and data).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.IsVerboseLoggingEnabled">
+            <summary>
+            Gets or sets a boolean that specifies if verbose logging is enabled. Default value is false.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.SupportedImportFormats">
+            <summary>
+            Gets a string array of file extensions that are supported for import by Assimp.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.#ctor">
+            <summary>
+            Initializes a new instance of the AssimpWpfImporter class.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadModel3D(System.String,System.String)">
+            <summary>
+            ReadModel3D method reads 3D models from specified file and returns the 3D models as Model3DGroup or GeomentryModel3D.
+            </summary>
+            <param name="fileName">file name</param>
+            <param name="texturesPath">optional: directory name where the textures files are; if null than the same path as fileName is used</param>
+            <returns>WPF Model3D object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadModel3D(System.IO.Stream,System.String,System.Func{System.String,System.IO.Stream})">
+            <summary>
+            ReadModel3D method reads 3D models from stream and returns the 3D models as Model3DGroup or GeomentryModel3D.
+            When the model have additional textures, the resolveResourceFunc must be set to a method that converts the resource name into a Stream.
+            </summary>
+            <param name="fileStream">file stream</param>
+            <param name="formatHint">file extension to serve as a hint to Assimp to choose which importer to use - for example ".dae"</param>
+            <param name="resolveResourceFunc">method that converts the resource name into Stream - used to read additional resources (materials and textures)</param>
+            <returns>WPF Model3D object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.GetGeometryModel3DForAssimpMesh(Assimp.Mesh)">
+            <summary>
+            Returns the GeometryModel3D that was created from the specified assimp mesh object.
+            </summary>
+            <param name="mesh">assimp mesh object</param>
+            <returns>GeometryModel3D that was created from the specified assimp mesh object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadFileToAssimpScene(System.IO.Stream,System.String)">
+            <summary>
+            ReadFileToAssimpScene reads the specified file stream and returns Assimp's Scene object.
+            Assimp's Scene object can be manually converted into WPF's object with AssimpWpfConverter class.
+            </summary>
+            <param name="fileStream">file stream</param>
+            <param name="formatHint">file extension to serve as a hint to Assimp to choose which importer to use - for example ".dae"</param>
+            <returns>Assimp's Scene object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadFileToAssimpScene(System.String)">
+            <summary>
+            ReadFileToAssimpScene reads the specifed file and returns Assimp's Scene object.
+            Assimp's Scene object can be manually converted into WPF's object with AssimpWpfConverter class.
+            </summary>
+            <param name="fileName">file name</param>
+            <returns>Assimp's Scene object</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.IsImportFormatSupported(System.String)">
+            <summary>
+            Checks if the file extension (e.g. ".dae" or ".obj") is supported for import.
+            </summary>
+            <param name="fileExtension">file extension</param>
+            <returns>
+            True if the file extension is supported, false otherwise
+            </returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.LoadAssimpNativeLibrary(System.String)">
+            <summary>
+            Loads assimp native library from the specified folder. If folder is not specified than the folder when the managed Assimp wrapper library (AssimpNet.dll) is located is used.
+            </summary>
+            <param name="assimpLibraryFolder">folder when the native assimp libraries are located. If folder is not specified than the folder when the managed Assimp wrapper library (AssimpNet.dll) is located is used.</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.LoadAssimpNativeLibrary(System.String,System.String)">
+            <summary>
+            Loads assimp native library from the specified folder or full file path. If folder is not specified than the folder when the managed Assimp wrapper library (AssimpNet.dll) is located is used.
+            </summary>
+            <param name="assimp32BitLibrary">folder or full file path of the 32 bit native assimp library.</param>
+            <param name="assimp64BitLibrary">folder or full file path of the 64 bit native assimp library.</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.Dispose">
+            <summary>
+            Disposes all unmanaged and managed resources. After calling Dispose, user cannot call any methods on this instace of AssimpWpfImporter.
+            </summary>
+        </member>
+        <member name="T:Ab3d.Visuals.AssimpModelVisual3D">
+            <summary>
+            AssimpModelVisual3D is a Visual3D class that shows 3D models that are read from almost any 3D file format with Assimp library.
+            </summary>
+            <remarks>
+            <para>
+            AssimpModelVisual3D is a Visual3D class that shows 3D models that are read from almost any 3D file format with Assimp library.
+            </para>
+            <para>
+            The source of the obj file is specified with <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.Source"/> property.
+            </para>
+            <para>
+            The read 3D model is positioned according to the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.Position"/> and <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PositionType"/> properties.
+            </para>
+            <para>
+            If the PositionType is set to Center (default), the 3D model will be position so that its center will be at the Position coordinates.
+            If the PositionType is set to BottomCenter, the 3D model will be positioned above the Position coordinates.
+            </para>
+            <para>
+            The size of the shown object is controlled by the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeX"/>, <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeY"/>, <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeZ"/> and <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio"/> properties.
+            </para>
+            <para>
+            By default all the SizeX, SizeY and SizeZ are set to -1. This means that the original size of the object is used. But if the SizeX is set to let's say 100, the object would be scaled so its SizeX would be 100.
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is true (default), than the aspect ratio of the 3D model is preserved. This means that the model is stretched to one side mode than to the other - the scale is evenly set to all the axis. This also means that if all SizeX, SizeY and SizeZ are defined, the object will be scaled so it will not exceed and of the specified sizes. 
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is false, than the aspect ration of the 3D model will not be preserved. In this case the SizeX, SizeY and SizeZ will be applied so the object will be exactly the size of the specified sizes.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            Before using AssimpModelVisual3D the following namespace declaration has to be added to the root xaml element:
+            </para>
+            <code>
+            xmlns:assimpVisuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys.Assimp"
+            </code>
+            <para>
+            Now the AssimpModelVisual3D can be used in XAML. The following example shown a 3D model from ab3d.dae file. The model's center is positioned at (-250, 0, 0) and its size is set so its SizeX is 80:
+            </para>
+            <code lang="xaml">
+            &lt;assimpVisuals:AssimpModelVisual3D Source="/Resources/ab3d.dae" 
+                           SizeX="80"
+                           Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            <para>
+            The following code shows the same mode, but this time it is custom sized:
+            </para>
+            <code lang="xaml">
+            &lt;assimpVisuals:AssimpModelVisual3D Source="/Resources/ab3d.dae" 
+                           SizeX="50" SizeY="30" SizeZ="40"
+                           PreserveScaleAspectRatio="False"
+                           Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            </example>
+        </member>
+        <member name="T:Ab3d.Visuals.AssimpModelVisual3D.VisualPositionType">
+            <summary>
+            VisualPositionType defines the type of Position that is used in AssimpModelVisual3D.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.VisualPositionType.Center">
+            <summary>
+            Objects center is used to position the 3D model.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.VisualPositionType.BottomCenter">
+            <summary>
+            The 3D models will be placed above the Position coordinates.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.modelTransformGroup">
+            <summary>
+            Transform3DGroup that is used to scale and position the model
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.modelTranslate">
+            <summary>
+            TranslateTransform3D that is used to position the model
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.modelScale">
+            <summary>
+            ScaleTransform3D that is used to scale the model
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.savedHiddenContent">
+            <summary>
+            savedHiddenContent stored the content of this model when it is hidden by setting IsVisible to false.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.UsedAssimpWpfImporter">
+            <summary>
+            Gets a Ab3d.AssimpWpfImporter instance that is used to read the model file.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.IsVisibleProperty">
+            <summary>
+            IsVisibleProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.IsVisible">
+            <summary>
+            Gets or sets a Boolean that specify if the object is visible.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.OnIsVisiblePropertyChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            OnIsVisiblePropertyChanged
+            </summary>
+            <param name="obj">DependencyObject</param>
+            <param name="args">DependencyPropertyChangedEventArgs</param>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.OnIsVisibleChanged(System.Boolean)">
+            <summary>
+            OnIsVisibleChanged is called when the IsVisible property is changed
+            </summary>
+            <param name="newIsVisibleValue">newIsVisibleValue as bool</param>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.Source">
+            <summary>
+            Gets or sets the Source of the obj file
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.SourceProperty">
+            <summary>
+            SourceProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.TexturesPath">
+            <summary>
+            Gets or sets the path where the textures are located. If null or "" the path of the obj file is used.
+            It is also possible to set TexturesPath to url of the textures (http://...) or to the application resources ("pack://application:,,,/XAMLBrowserApplication1;component/models")
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.TexturesPathProperty">
+            <summary>
+            TexturesPathProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.Position">
+            <summary>
+            Gets or sets the Position of the read obj model. The type of position is determined by <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PositionType"/> property.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.PositionProperty">
+            <summary>
+            PositionProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.PositionType">
+            <summary>
+            Gets or sets the <see cref="T:Ab3d.Visuals.AssimpModelVisual3D.VisualPositionType"/> value that specifies the type of the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.Position"/>
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.PositionTypeProperty">
+            <summary>
+            PositionTypeProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.SizeX">
+            <summary>
+            Gets or sets the size in of the 3D model in X dimension.
+            </summary>
+            <remarks>
+            <para>
+            The default value of SizeX is -1. This means that the original X Size of the object is preserved.
+            </para>
+            <para>
+            How the SizeX is applied to the shown model depends on the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio"/> property.
+            </para>
+            <para>
+            If it is false, than the x size of the shown object will be the same as the specified SizeX (if -1 than the original object x size is used).
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is true (by default), than the aspect ratio of the 3D model is preserved. This means that the model is stretched to one side mode than to the other - the scale is evenly set to all the axis. This also means that if all SizeX, SizeY and SizeZ are defined, the object will be scaled so it will not exceed and of the specified sizes.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            The following example shown a 3D model from ab3d.obj file. The model's center is positioned at (-250, 0, 0) and its size is set so its SizeX is 80. Note that by default the PreserveScaleAspectRatio is set to true.
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="80"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            <para>
+            The following code shows the same mode, but this time it is custom sized:
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="50" SizeY="30" SizeZ="40"
+                               PreserveScaleAspectRatio="False"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            </example>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.SizeXProperty">
+            <summary>
+            SizeXProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.SizeY">
+            <summary>
+            Gets or sets the size in of the 3D model in Y dimension.
+            </summary>
+            <remarks>
+            <para>
+            The default value of SizeY is -1. This means that the original Y Size of the object is preserved.
+            </para>
+            <para>
+            How the SizeY is applied to the shown model depends on the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio"/> property.
+            </para>
+            <para>
+            If it is false, than the y size of the shown object will be the same as the specified SizeY (if -1 than the original object y size is used).
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is true (by default), than the aspect ratio of the 3D model is preserved. This means that the model is stretched to one side mode than to the other - the scale is evenly set to all the axis. This also means that if all SizeX, SizeY and SizeZ are defined, the object will be scaled so it will not exceed and of the specified sizes.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            The following example shown a 3D model from ab3d.obj file. The model's center is positioned at (-250, 0, 0) and its size is set so its SizeX is 80. Note that by default the PreserveScaleAspectRatio is set to true.
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="80"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            <para>
+            The following code shows the same mode, but this time it is custom sized:
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="50" SizeY="30" SizeZ="40"
+                               PreserveScaleAspectRatio="False"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            </example>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.SizeYProperty">
+            <summary>
+            SizeYProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.SizeZ">
+            <summary>
+            Gets or sets the size in of the 3D model in Z dimension.
+            </summary>
+            <remarks>
+            <para>
+            The default value of SizeZ is -1. This means that the original Z Size of the object is preserved.
+            </para>
+            <para>
+            How the SizeZ is applied to the shown model depends on the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio"/> property.
+            </para>
+            <para>
+            If it is false, than the z size of the shown object will be the same as the specified SizeZ (if -1 than the original object z size is used).
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is true (by default), than the aspect ratio of the 3D model is preserved. This means that the model is stretched to one side mode than to the other - the scale is evenly set to all the axis. This also means that if all SizeX, SizeY and SizeZ are defined, the object will be scaled so it will not exceed and of the specified sizes.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            The following example shown a 3D model from ab3d.obj file. The model's center is positioned at (-250, 0, 0) and its size is set so its SizeX is 80. Note that by default the PreserveScaleAspectRatio is set to true.
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="80"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            <para>
+            The following code shows the same mode, but this time it is custom sized:
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="50" SizeY="30" SizeZ="40"
+                               PreserveScaleAspectRatio="False"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            </example>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.SizeZProperty">
+            <summary>
+            SizeZProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio">
+            <summary>
+            Gets or sets a Boolean that specifies if the 3D model is scaled so its aspect ratio is preserved (the ratio between width, height and depth of the object).
+            </summary>
+            <remarks>
+            <para>
+            The size of the shown object is controlled by the <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeX"/>, <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeY"/>, <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.SizeZ"/> and <see cref="P:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatio"/> properties.
+            </para>
+            <para>
+            By default all the SizeX, SizeY and SizeZ are set to -1. This means that the original size of the object is used. But if the SizeX is set to let's say 100, the object would be scaled so its SizeX would be 100.
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is true (default), than the aspect ratio of the 3D model is preserved. This means that the model is stretched to one side mode than to the other - the scale is evenly set to all the axis. This also means that if all SizeX, SizeY and SizeZ are defined, the object will be scaled so it will not exceed and of the specified sizes. 
+            </para>
+            <para>
+            If PreserveScaleAspectRatio is false, than the aspect ration of the 3D model will not be preserved. In this case the SizeX, SizeY and SizeZ will be applied so the object will be exactly the size of the specified sizes.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            The following example shown a 3D model from ab3d.obj file. The model's center is positioned at (-250, 0, 0) and its size is set so its SizeX is 80. Note that by default the PreserveScaleAspectRatio is set to true.
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="80"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            <para>
+            The following code shows the same mode, but this time it is custom sized:
+            </para>
+            <code lang="xaml">
+            &lt;AssimpModelVisual3D:AssimpModelVisual3D Source="/Resources/ab3d.obj" 
+                               SizeX="50" SizeY="30" SizeZ="40"
+                               PreserveScaleAspectRatio="False"
+                               Position="0 40 0" PositionType="Center"/&gt;
+            </code>
+            </example>        
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.PreserveScaleAspectRatioProperty">
+            <summary>
+            PreserveScaleAspectRatioProperty
+            </summary>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.DefaultMaterialProperty">
+            <summary>
+            DefaultMaterialProperty
+            </summary>
+        </member>
+        <member name="P:Ab3d.Visuals.AssimpModelVisual3D.DefaultMaterial">
+            <summary>
+            Gets or sets the default material that is used when the material is not defined in obj file. The property must be set before the file is read.
+            </summary>
+        </member>
+        <member name="E:Ab3d.Visuals.AssimpModelVisual3D.BeforeReadingFile">
+            <summary>
+            BeforeReadingFile event occurs after the UsedAssimpWpfImporter has been created and before the actual file has been read.
+            </summary>
+            <remarks>
+            <para>
+            The BeforeReadingFile is useful if you want to set some special properties on the <see cref="T:Ab3d.Assimp.AssimpWpfImporter"/> object before it reads the file.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.Reload">
+            <summary>
+            Forces a reload of the model file
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.CreateModel">
+            <summary>
+            Creates this Model3D
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.SetModelTranslate">
+            <summary>
+            SetModelTranslate sets the modelTranslate as TranslateTransform3D. It is used to position the model. The method can be overridden to provide custom positioning.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.SetModel(System.Windows.Media.Media3D.Model3D)">
+            <summary>
+            Sets the Content of the Visual3D
+            </summary>
+            <param name="model">new Model3D</param>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.SetModelScale">
+            <summary>
+            SetModelScale set the modelScale as ScaleTransform3D. It is used to scale the model. The method can be overridden to provide custom scaling.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.OnBeforeReadingFile">
+            <summary>
+            OnBeforeReadingFile
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.OnPropertyChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            OnPropertyChanged method calls UpdateContentIfNotInitializing that recreates the model is visible (IsVisible is true) and if not initializing (between BeginInit and EndInit).
+            </summary>
+            <param name="obj">DependencyObject</param>
+            <param name="args">DependencyPropertyChangedEventArgs</param>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.UpdateContentIfNotInitializing">
+            <summary>
+            Recreates the models if the Visual3D is visible (IsVisible is true) and it is not initializing (between BeginInit and EndInit)
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.OnVisualParentChanged(System.Windows.DependencyObject)">
+            <summary>
+            OnVisualParentChanged
+            </summary>
+            <param name="oldParent">oldParent</param>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.ValidateDoublePropertyValue(System.Object)">
+            <summary>
+            Returns true if value is valid double
+            </summary>
+            <param name="value">value</param>
+            <returns>true if value is valid double</returns>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.ValidatePositiveDoublePropertyValue(System.Object)">
+            <summary>
+            Returns true if value is valid double and is positive
+            </summary>
+            <param name="value">value</param>
+            <returns>true if value is valid double and is positive</returns>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.ValidatePositiveIntPropertyValue(System.Object)">
+            <summary>
+            Returns true if value is positive integer
+            </summary>
+            <param name="value">value</param>
+            <returns>true if value is positive integer</returns>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.ValidateSize3DPropertyValue(System.Object)">
+            <summary>
+            Returns true if the value is a valid Size3D object
+            </summary>
+            <param name="value">value</param>
+            <returns>true if the value is a valid Size3D object</returns>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.ValidateSizePropertyValue(System.Object)">
+            <summary>
+            Returns true if the value is a valid Size object
+            </summary>
+            <param name="value">value</param>
+            <returns>true if the value is a valid Size object</returns>
+        </member>
+        <member name="F:Ab3d.Visuals.AssimpModelVisual3D.isInitializing">
+            <summary>
+            if true the Visual3D is initializing (between BeginInit and EndInit)
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.BeginInit">
+            <summary>
+            Signals the line 3D that initialization is starting.
+            </summary>
+        </member>
+        <member name="M:Ab3d.Visuals.AssimpModelVisual3D.EndInit">
+            <summary>
+            Signals the line 3D that initialization is complete.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -175,9 +175,14 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 DumpRenderingQueuesMenuItem,
                 DumpRenderingStepsMenuItem,
                 DumpBackBufferChangesMenuItem,
+                DumpDXEngineSettingsMenuItem,
+                EditDXEngineSettingsMenuItem,
+                RenderObjectIdMenuItem,
+                RenderingFilterMenuItem,
                 SaveToBitmapMenuItem,
+                CaptureFrameMenuItem,
                 StartPerformanceAnalyzerMenuItem,
-                DumpResourcesMenuItem
+                DumpResourcesMenuItem,
             };
 
             if (DXView != null && DXView.DXScene != null)
@@ -2203,6 +2208,20 @@ StateChangesCount: {16:#,##0}{17}{18}",
                         }
 
                         AppendDumpText("Scene nodes:", sceneNodesText);
+
+
+                        string lightDumpText = "";
+                        foreach (var light in _dxView.DXScene.Lights)
+                        {
+                            lightDumpText += "  " + light.ToString();
+                            var shadowCastingLight = light as IShadowCastingLight;
+                            if (shadowCastingLight != null && shadowCastingLight.IsCastingShadow)
+                                lightDumpText += " IsCastingShadow: True";
+
+                            lightDumpText += Environment.NewLine;
+                        }
+
+                        AppendDumpText("Lights:", lightDumpText);
 
 
                         string renderingQueuesText;

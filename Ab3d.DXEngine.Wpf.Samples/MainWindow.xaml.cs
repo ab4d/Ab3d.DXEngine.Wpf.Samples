@@ -83,6 +83,16 @@ namespace Ab3d.DXEngine.Wpf.Samples
             };
 
 
+            // Setup writing DXEngine Waring and Error log messages to VS output
+            Ab3d.DirectX.DXDiagnostics.LogLevel  = DXDiagnostics.LogLevels.Warn;
+            Ab3d.DirectX.DXDiagnostics.LogAction = delegate(DXDiagnostics.LogLevels logLevel, string message)
+            {
+                // This will write to VS Output only in DEBUG build
+                System.Diagnostics.Debug.WriteLine($"Ab3d.DXEngine {logLevel}: {message}");
+            };
+
+
+
             // Initialize the DXEngineSettings helper class
             // First create DXEngineSettingsStorage that is used to read and save user settings and can read overridden settings from application config file
             // After the DXEngineSettings is initialized we can use the DXEngineSettings.Current property

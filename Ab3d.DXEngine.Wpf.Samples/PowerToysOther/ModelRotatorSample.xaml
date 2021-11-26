@@ -44,6 +44,9 @@
             <CheckBox Name="IsXAxisRotationCircleShownCheckBox" Content="IsXAxisRotationCircleShown" IsChecked="true" />
             <CheckBox Name="IsYAxisRotationCircleShownCheckBox" Content="IsYAxisRotationCircleShown" IsChecked="true" />
             <CheckBox Name="IsZAxisRotationCircleShownCheckBox" Content="IsZAxisRotationCircleShown" IsChecked="true" />
+
+            <CheckBox Name="RotateModelRotatorCheckBox" Content="Rotate model scalar" IsChecked="False" Margin="0 10 0 0"
+                      Checked="OnRotateModelRotatorCheckBoxCheckedChanged" Unchecked="OnRotateModelRotatorCheckBoxCheckedChanged"/>
         </StackPanel>
     </Grid>
 </Page>

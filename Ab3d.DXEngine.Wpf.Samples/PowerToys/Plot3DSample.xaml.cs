@@ -130,10 +130,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 
             ContourLinesVisual3D.Positions = contourLinePositions;
 
-            // With DXEngine it is possible to offset the 3D lines from the 3D models in the geometry shader
-            // so that lines are always positioned towards the camera.
-            // This efficiently prevents that lines or parts of lines are hidden by the 3D objects.
-            ContourLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.5f);
+            // Use line depth bias to move the lines closer to the camera so the lines are rendered on top of solid model and are not partially occluded by it.
+            // See DXEngineVisuals/LineDepthBiasSample for more info.
+            ContourLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+            ContourLinesVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
 
 
             BottomContourLinesVisual3D.Children.Clear();

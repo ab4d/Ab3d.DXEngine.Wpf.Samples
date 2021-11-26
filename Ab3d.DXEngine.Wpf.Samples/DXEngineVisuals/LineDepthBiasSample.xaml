@@ -13,40 +13,41 @@
       Title="LineDepthBiasSample">
 
     <Grid Name="RootGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="200" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <Grid Name="ViewportsGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+        </Grid>
 
-        <Border Name="SettingsBorder" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" BorderBrush="Black" BorderThickness="2" 
-                Background="#44000000" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5" Panel.ZIndex="2">
+        <Border Name="SettingsBorder" BorderBrush="Black" BorderThickness="2" 
+                Background="#AAFFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5">
 
-            <StackPanel Orientation="Vertical" Margin="10 5">
+            <StackPanel Orientation="Vertical" Margin="10 8">
 
                 <TextBlock Text="Depth bias:" FontWeight="Bold" Margin="0 0 0 0"/>
-                <ComboBox Name="DepthBiasComboBox" Width="100" SelectionChanged="DepthBiasComboBox_OnSelectionChanged"></ComboBox>
+                <ComboBox Name="DepthBiasComboBox" Width="130" HorizontalAlignment="Left" SelectionChanged="DepthBiasComboBox_OnSelectionChanged" />
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Sphere radius:" FontWeight="Bold" Margin="0 10 0 0"/>
-                    <localControls:InfoControl x:Name="RadiusInfoControl" ShowDuration="600000" Margin="5 10 0 0" />
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <CheckBox Name="UseDynamicBiasCheckBox" Content="Use dynamic bias" IsChecked="True" Checked="OnUseDynamicBiasCheckBoxCheckedChanged" Unchecked="OnUseDynamicBiasCheckBoxCheckedChanged" />
+                    <localControls:InfoControl x:Name="DynamicBiasInfoControl" ShowDuration="600000" Margin="5 0 0 0" />
                 </StackPanel>
-                <ComboBox Name="SphereRadiusComboBox" Width="100" SelectionChanged="SphereRadiusComboBox_OnSelectionChanged"></ComboBox>
-                
-                <RadioButton Name="ShowSphereRadioButton" Content="Show Sphere" IsChecked="True" GroupName="ObjectType" Margin="0 10 0 0" Checked="ShowSphereRadioButton_OnChecked" />
-                <RadioButton Name="ShowTeapotRadioButton" Content="Show Teapot" GroupName="ObjectType" Margin="0 2 0 0" Checked="ShowTeapotRadioButton_OnChecked" />
+
+                <TextBlock Text="Line thickness:" FontWeight="Bold" Margin="0 15 0 0"/>
+                <ComboBox Name="LineThicknessComboBox" Width="130" HorizontalAlignment="Left" SelectionChanged="LineThicknessComboBox_OnSelectionChanged" />
             </StackPanel>
         </Border>
 
-        <StackPanel Grid.Column="0" Grid.Row="0"  Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="17" Foreground="#444" Panel.ZIndex="3" TextWrapping="Wrap"
-                       Text="Line depth bias can prevent depth z-fighting of lines and solid object" />
-            <TextBlock Text="DepthBias moves line closer to the camera for the specified amount" FontSize="14" TextWrapping="Wrap" Margin="0 5 0 0" />
+        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="17" Foreground="#444" Background="#AAFFFFFF" TextWrapping="Wrap"
+                       Text="Line depth bias can prevent depth z-fighting of lines and solid objects" />
+            <TextBlock Text="DepthBias moves 3D lines closer to the camera for the specified depth bias.&#x0a;This prevents rendering lines and solid objects at the same depth (distance from camera)." FontSize="14" Background="#AAFFFFFF" TextWrapping="Wrap" Margin="0 0 0 0" />
         </StackPanel>
     </Grid>
 </Page>

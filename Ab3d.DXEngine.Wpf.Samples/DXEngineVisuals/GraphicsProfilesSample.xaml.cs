@@ -14,71 +14,131 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
+using Ab3d.Controls;
 using Ab3d.DirectX;
+using Ab3d.DirectX.Client.Settings;
 using Ab3d.DirectX.Controls;
+using Ab3d.DirectX.Effects;
 using Ab3d.DXEngine.Wpf.Samples.Common;
+using Ab3d.DXEngine.Wpf.Samples.Controls;
 using Ab3d.Visuals;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
+
+    // GraphicsProfiles array defined GraphicsProfiles that are used to initialized the DXEngine.
+    // First NormalQualityHardwareRendering is used.
+    // If the hardware DirectX device cannot be created, then software rendering is used (using DirectX Warp).
+    // If this is also not supported, then WPF 3D rendering is used.
+    //
+    // It is possible to change the GraphicsProfiles array to use better quality.
+    // The following is the default array:
+    // MainDXViewportView.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.NormalQualityHardwareRendering,
+    //                                                               GraphicsProfile.NormalQualitySoftwareRendering,
+    //                                                               GraphicsProfile.Wpf3D };
+
     /// <summary>
-    /// Interaction logic for PerPixelRenderingSample.xaml
+    /// Interaction logic for GraphicsProfilesSample.xaml
     /// </summary>
-    public partial class PerPixelRenderingSample : Page
+    public partial class GraphicsProfilesSample : Page
     {
-        public PerPixelRenderingSample()
+        private TestScene[] _testScenes;
+
+        public GraphicsProfilesSample()
         {
             InitializeComponent();
 
-            // If possible use UltraQualityHardwareRendering settings (software rendering or WPF 3D will be used in case a hardware rendering cannot be used)
-            // This will use supersampling and improve rendering quality.
-            MainViewportView.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.UltraQualityHardwareRendering,
-                                                                        GraphicsProfile.HighQualitySoftwareRendering,
-                                                                        GraphicsProfile.Wpf3D, };
+            CreateDemoScenes();
 
-            var dxTestScene = new TestScene(DXViewport3D);
-            dxTestScene.CreatesTestScene();
-            dxTestScene.StartAnimation();
-
-            var wpfTestScene = new TestScene(WpfViewport3D);
-            wpfTestScene.CreatesTestScene();
-            wpfTestScene.StartAnimation();
-
-            CopyWpfCamera(); // Copy settings from WpfCamera to DXCamera
-
-            this.Unloaded += (sender, args) => MainViewportView.Dispose();
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
+            {
+                if (_testScenes != null)
+                {
+                    foreach (var testScene in _testScenes)
+                        testScene.Dispose();
+                }
+            };
         }
 
-        private void DXCamera_OnCameraChanged(object sender, CameraChangedRoutedEventArgs e)
+        private void CreateDemoScenes()
         {
-            CopyDXCamera();
+            var demonstratedGraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.HighQualityHardwareRendering,
+                                                                       GraphicsProfile.NormalQualityHardwareRendering,
+                                                                       GraphicsProfile.HighSpeedNormalQualityHardwareRendering,
+                                                                       GraphicsProfile.Wpf3D };
+
+            var descriptions = new string[]
+            {
+@"High quality hardware rendering is recommended for best visual quality with super-smooth 3D lines:
++ per-pixel rendering
++ 4xSSAA: 4 times super-sampling
++ 4xMSAA: 4 times multi-sampling
+- slower and requires more memory",
+
+@"Normal quality hardware rendering is the default GraphicsProfile. It is recommended for very good visual quality and for 3D scene that do not require super-smooth lines:
++ per-pixel rendering
++ 4xMSAA: 4 times multi-sampling",
+
+@"HighSpeedNormalQualityHardwareRendering is using low quality shaders and can be used for very complex scenes or on slower computers for faster rendering. Use LowQualityHardwareRendering for even faster rendering but without anti-aliasing.
++ faster rendering because of per-vertex rendering
++ 4xMSAA: 4 times multi-sampling
+- per-vertex rendering (worse render quality)",
+
+@"Using WPF to render 3D graphics. This is by default the fallback GraphicsProfile that is used when DirectX 11 rendering is not supported on the computer:
+- per-vertex rendering (worse render quality)
+- line rendering is not hardware accelerated
+- much slower rendering with DirectX 9"
+            };
+            
+
+            _testScenes = new TestScene[demonstratedGraphicsProfiles.Length];
+
+            for (int i = 0; i < demonstratedGraphicsProfiles.Length; i++)
+            {
+                _testScenes[i] = new TestScene(demonstratedGraphicsProfiles[i], descriptions[i]);
+
+                var sceneFrameworkElement = _testScenes[i].CreateScene();
+                Grid.SetRow(sceneFrameworkElement, (int)(i / 2) + 1);
+                Grid.SetColumn(sceneFrameworkElement, (i % 2));
+
+                RootGrid.Children.Add(sceneFrameworkElement);
+
+                _testScenes[i].CameraChanged += OnCameraChanged;
+
+                _testScenes[i].StartAnimation();
+            }
         }
 
-        private void WpfCamera_OnCameraChanged(object sender, CameraChangedRoutedEventArgs e)
+        private void OnCameraChanged(object sender, CameraChangedRoutedEventArgs e)
         {
-            CopyWpfCamera();
-        }
+            var testScene = sender as TestScene;
 
-        private void CopyDXCamera()
-        {
-            WpfCamera.Heading = DXCamera.Heading;
-            WpfCamera.Attitude = DXCamera.Attitude;
-            WpfCamera.Distance = DXCamera.Distance;
-            WpfCamera.Offset = DXCamera.Offset;
-        }
+            if (testScene == null)
+                return;
 
-        private void CopyWpfCamera()
-        {
-            DXCamera.Heading = WpfCamera.Heading;
-            DXCamera.Attitude = WpfCamera.Attitude;
-            DXCamera.Distance = WpfCamera.Distance;
-            DXCamera.Offset = WpfCamera.Offset;
-        }
+            var changedCamera = testScene.MainCamera;
 
+            for (var i = 0; i < _testScenes.Length; i++)
+            {
+                if (_testScenes[i] == testScene)
+                    continue;
+
+                _testScenes[i].SyncCamera(changedCamera);
+            }
+        }
 
         class TestScene
         {
+            private readonly string _title;
+            private readonly GraphicsProfile _graphicsProfile;
+            private readonly string _subtitle;
+
+            private bool _isSyncingCamera;
+            private DXViewportView _dxViewportView;
+            private MouseCameraController _mouseCameraController;
+
             private PointLight _pointLight;
             private SpotLight _spotLight;
 
@@ -86,21 +146,128 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             private DateTime _animationStartTime;
             private TimeSpan _lastRenderTime;
 
-            public readonly Viewport3D TargetViewport3D;
-
             public ModelVisual3D TestObjectsVisual3D { get; private set; }
             public ModelVisual3D LightModelsVisual3D { get; private set; }
             public Model3DGroup Lights { get; private set; }
 
-            public TestScene(Viewport3D targetViewport3D)
+
+            public Viewport3D MainViewport3D { get; private set; }
+
+            public TargetPositionCamera MainCamera { get; private set; }
+
+            public event BaseCamera.CameraChangedRoutedEventHandler CameraChanged;
+
+            public TestScene(GraphicsProfile graphicsProfile, string subtitle = null)
             {
-                if (targetViewport3D == null) throw new ArgumentNullException("targetViewport3D");
+                _graphicsProfile = graphicsProfile;
 
-                TargetViewport3D = targetViewport3D;
+                _title = graphicsProfile.Name;
 
-                targetViewport3D.Unloaded += (sender, args) => StopAnimation();
+                _subtitle = subtitle;
             }
 
+            public Grid CreateScene()
+            {
+                var rootGrid = new Grid();
+
+                var textBlock = new TextBlock()
+                {
+                    Text = _title,
+                    FontSize = 16,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = Brushes.White,
+                    Margin = new Thickness(10, 5, 10, 10),
+                    VerticalAlignment = VerticalAlignment.Top,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+
+                var rootBorder = new Border()
+                {
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(2, 2, 2, 2),
+                    Margin = new Thickness(2, 2, 2, 2),
+                    SnapsToDevicePixels = true,
+                    UseLayoutRounding = true
+                };
+
+                MainViewport3D = new Viewport3D();
+
+                MainCamera = new TargetPositionCamera()
+                {
+                    TargetViewport3D = MainViewport3D,
+                    TargetPosition = new Point3D(-130, 150, 0),
+                    Heading = 30,
+                    Attitude = -20,
+                    Distance = 800,
+                    ShowCameraLight = ShowCameraLightType.Always
+                };
+
+                MainCamera.CameraChanged += OnMainCameraChanged;
+
+
+                _mouseCameraController = new MouseCameraController()
+                {
+                    TargetCamera = MainCamera,
+                    EventsSourceElement = rootBorder,
+                    RotateCameraConditions = MouseCameraController.MouseAndKeyboardConditions.LeftMouseButtonPressed,
+                    MoveCameraConditions = MouseCameraController.MouseAndKeyboardConditions.Disabled // disable mouse move
+                };
+
+                _dxViewportView = new DXViewportView(MainViewport3D)
+                {
+                    BackgroundColor = Colors.Black,
+                    GraphicsProfiles = new GraphicsProfile[] { _graphicsProfile } // Use only specified graphics profile. By default this array is set to: NormalQualityHardwareRendering, NormalQualitySoftwareRendering, Wpf3D (if first profile cannot be used, then the next one is created)
+                };
+
+                _dxViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
+                {
+                    CreatesTestScene();
+                };
+
+                rootBorder.Child = _dxViewportView;
+
+                MainCamera.Refresh();
+
+                rootGrid.Children.Add(rootBorder);
+                rootGrid.Children.Add(textBlock);
+
+
+                if (_subtitle != null)
+                {
+                    var subtitleTextBlock = new TextBlockEx()
+                    {
+                        Text = _subtitle,
+                        FontSize = 12,
+                        Foreground = Brushes.White,
+                        Margin = new Thickness(10, 30, 10, 10),
+                        VerticalAlignment = VerticalAlignment.Top,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        TextWrapping = TextWrapping.Wrap
+                    };
+
+                    rootGrid.Children.Add(subtitleTextBlock);
+                }
+
+                return rootGrid;
+            }
+
+            public void SyncCamera(TargetPositionCamera sourceCamera)
+            {
+                _isSyncingCamera = true; // Do not trigger CameraChanged event
+
+                MainCamera.BeginInit();
+
+                MainCamera.Heading = sourceCamera.Heading;
+                MainCamera.Attitude = sourceCamera.Attitude;
+                MainCamera.Distance = sourceCamera.Distance;
+                MainCamera.Offset = sourceCamera.Offset;
+
+                MainCamera.EndInit();
+
+                _isSyncingCamera = false;
+            }
+   
             public void StartAnimation()
             {
                 if (_isAnimating)
@@ -178,10 +345,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 LightModelsVisual3D = CreateLightModels(Lights.Children);
 
 
-                TargetViewport3D.Children.Clear();
-                TargetViewport3D.Children.Add(TestObjectsVisual3D);
-                TargetViewport3D.Children.Add(LightModelsVisual3D);
-                TargetViewport3D.Children.Add(lightVisual);
+                MainViewport3D.Children.Clear();
+                MainViewport3D.Children.Add(TestObjectsVisual3D);
+                MainViewport3D.Children.Add(LightModelsVisual3D);
+                MainViewport3D.Children.Add(lightVisual);
             }
 
             private ModelVisual3D CreateTestObjects()
@@ -207,22 +374,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 var wireGridVisual3D = new WireGridVisual3D()
                 {
-                    CenterPosition      = new Point3D(0, 0.1, 0),
-                    Size                = new Size(2000, 2000),
-                    WidthDirection      = new Vector3D(1, 0, 0),
-                    HeightDirection     = new Vector3D(0, 0, -1),
-                    WidthCellsCount     = 100,
-                    HeightCellsCount    = 100,
+                    CenterPosition = new Point3D(0, 0.1, 0),
+                    Size = new Size(2000, 2000),
+                    WidthDirection = new Vector3D(1, 0, 0),
+                    HeightDirection = new Vector3D(0, 0, -1),
+                    WidthCellsCount = 100,
+                    HeightCellsCount = 100,
                     MajorLinesFrequency = 5,
                     IsClosed = true,
                     MajorLineThickness = 1.5,
-                    MajorLineColor     = Colors.DimGray,
+                    MajorLineColor = Color.FromRgb(0, 0, 0),
 
                     LineThickness = 0.8,
-                    LineColor     = Colors.Gray,
-
-                    RenderingTechnique = WireGridVisual3D.WireGridRenderingTechniques.FixedMesh3DLines, // Use fixed MeshGeometry3D to render wire grid instead of dynamic 3D lines
-                    IsEmissiveMaterial = false                                                          // This also allows us to use standard material instead of emissive material - this means that the lines will be visible only where they are illuminated by the light.
+                    LineColor = Color.FromRgb(30, 30, 30),
                 };
 
                 modelVisual3D.Children.Add(wireGridVisual3D);
@@ -255,7 +419,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     {
                         CenterPosition = new Point3D(x, 25, z),
                         Radius = 25,
-                        Segments = 10, // Intentially lowered from default 30 to make the rendering difference bigger (between per vertex (WPF) and per pixel (DXEngine) rendering)
+                        Segments = 15, // Intentionally lowered from default 30 to make the rendering difference bigger (between per vertex (WPF) and per pixel (DXEngine) rendering)
                         Material = blueSpecularMaterial
                     };
 
@@ -291,8 +455,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 _spotLight = new SpotLight(Colors.White, spotLightPosition, spotLightVector, outerConeAngle: 40, innerConeAngle: 30);
                 _spotLight.Range = 1000;
-                _spotLight.ConstantAttenuation  = 0;
-                _spotLight.LinearAttenuation    = 0.01;
+                _spotLight.ConstantAttenuation = 0;
+                _spotLight.LinearAttenuation = 0.01;
                 _spotLight.QuadraticAttenuation = 0;
                 lightsModelGroup.Children.Add(_spotLight);
 
@@ -368,6 +532,32 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 }
 
                 return lightModelsVisual;
+            }
+
+
+
+
+            private void OnMainCameraChanged(object sender, CameraChangedRoutedEventArgs e)
+            {
+                if (_isSyncingCamera)
+                    return;
+
+                OnCameraChanged(e);
+            }
+
+            protected void OnCameraChanged(CameraChangedRoutedEventArgs e)
+            {
+                if (CameraChanged != null)
+                    CameraChanged(this, e);
+            }
+
+            public void Dispose()
+            {
+                if (_dxViewportView != null)
+                {
+                    _dxViewportView.Dispose();
+                    _dxViewportView = null;
+                }
             }
         }
     }

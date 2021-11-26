@@ -118,11 +118,11 @@ objects to be sorted (and rendered) from those that are farthest away to those t
 
             AlphaClippingThresholdComboBox.SelectedIndex = 4; // = "0.1"
 
+            MainDXViewportView.IsTransparencySortingEnabled = false; // Disable sorting by camera distance
+
             MainDXViewportView.DXSceneDeviceCreated += delegate(object sender, EventArgs args)
             {
                 CreateTestSemiTransparentObjects();
-
-                MainDXViewportView.DXScene.IsTransparencySortingEnabled = false; // Disable sorting by camera distance
             };
 
 
@@ -533,7 +533,7 @@ objects to be sorted (and rendered) from those that are farthest away to those t
 
             bool isSortingEnabled = IsCameraDistanceSortingEnabledCheckBox.IsChecked ?? false;
 
-            MainDXViewportView.DXScene.IsTransparencySortingEnabled = isSortingEnabled;
+            MainDXViewportView.IsTransparencySortingEnabled = isSortingEnabled;
 
             if (!isSortingEnabled)
                 MainDXViewportView.Refresh(); // If we check the sorting CheckBox then render the scene again to sort the objects

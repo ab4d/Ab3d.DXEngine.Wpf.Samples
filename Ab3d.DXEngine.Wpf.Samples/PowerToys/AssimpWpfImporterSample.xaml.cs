@@ -168,16 +168,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             ContentWireframeVisual.OriginalModel = model3D;
             ContentWireframeVisual.EndInit();
 
-            if (AddLineDepthBiasCheckBox.IsChecked ?? false)
-            {
-                // To specify line depth bias to the Ab3d.PowerToys line Visual3D objects,
-                // we use SetDXAttribute extension method and use LineDepthBias as DXAttributeType
-                // NOTE: This can be used only before the Visual3D is created by DXEngine.
-                // If you want to change the line bias after the object has been rendered, use the SetDepthBias method (see OnAddLineDepthBiasCheckBoxCheckedChanged)
-                //
-                // See DXEngineVisuals/LineDepthBiasSample for more info.
-                ContentWireframeVisual.SetDXAttribute(DXAttributeType.LineDepthBias, model3D.Bounds.GetDiagonalLength() * 0.001);
-            }
+            UpdateLineDepthBias();
 
             // Calculate the center of the model and its size
             // This will be used to position the camera
@@ -208,6 +199,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             ShowInfoButton.IsEnabled = true;
         }
 
+        private void UpdateLineDepthBias()
+        {
+            if (AddLineDepthBiasCheckBox.IsChecked ?? false)
+            {
+                // To specify line depth bias to the Ab3d.PowerToys line Visual3D objects,
+                // we use SetDXAttribute extension method and use LineDepthBias and LineDynamicDepthBiasFactor as DXAttributeType
+                // See DXEngineVisuals/LineDepthBiasSample for more info.
+                ContentWireframeVisual.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+                ContentWireframeVisual.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
+            }
+            else
+            {
+                ContentWireframeVisual.ClearDXAttribute(DXAttributeType.LineDepthBias);
+                ContentWireframeVisual.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
+            }
+        }
 
         private void LoadButton_OnClick(object sender, RoutedEventArgs e)
         {
@@ -237,28 +244,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             if (ContentWireframeVisual == null || ContentWireframeVisual.OriginalModel == null)
                 return;
 
-            double depthBiasValue;
-            if (AddLineDepthBiasCheckBox.IsChecked ?? false)
-            {
-                depthBiasValue = ContentWireframeVisual.OriginalModel.Bounds.GetDiagonalLength() * 0.001;
-                
-
-                // To specify line depth bias to the Ab3d.PowerToys line Visual3D objects,
-                // we use SetDXAttribute extension method and use LineDepthBias as DXAttributeType
-                // NOTE: This can be used only before the Visual3D is created by DXEngine.
-                // If you want to change the line bias after the object has been rendered, use the SetDepthBias method (defined below)
-                //
-                // See DXEngineVisuals/LineDepthBiasSample for more info.
-                
-                //ContentWireframeVisual.SetDXAttribute(DXAttributeType.LineDepthBias, depthBiasValue);
-            }
-            else
-            {
-                depthBiasValue = 0;
-                //ContentWireframeVisual.ClearDXAttribute(DXAttributeType.LineDepthBias);
-            }
-
-            LineDepthBiasSample.SetDepthBias(MainDXViewportView, ContentWireframeVisual, depthBiasValue);
+            UpdateLineDepthBias();
         }
 
         private void OnReadPolygonIndicesCheckBoxCheckedChanged(object sender, RoutedEventArgs e)

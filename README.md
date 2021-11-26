@@ -18,6 +18,7 @@ The Ab3d.DXEngine.Wpf.Samples repository contains two Visual Studio solutions:
 * Ab3d.DXEngine MAIN SAMPLES.sln (**.NET Framework 4.5**)
 * Ab3d.DXEngine MAIN SAMPLES core31.sln (**.NET Core 3.1**)
 * Ab3d.DXEngine MAIN SAMPLES net50.sln (**.NET 5.0**)
+* Ab3d.DXEngine MAIN SAMPLES net60.sln (**.NET 6.0**)
 
 ## Dependencies
 

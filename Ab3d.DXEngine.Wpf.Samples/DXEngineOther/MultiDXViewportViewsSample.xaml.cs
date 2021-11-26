@@ -297,11 +297,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                 createdDXViewportView = new DXViewportView(viewport3D);
             }
 
+            // Enable transparency sorting for each View (this way transparent objects are correctly rendered for each child view camera).
+            createdDXViewportView.IsTransparencySortingEnabled = true;
+
             createdDXViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs e)
             {
-                // Enable transparency sorting for each View (this way transparent objects are correctly rendered for each child view camera).
-                createdDXViewportView.DXScene.IsTransparencySortingEnabled = true;
-
                 SetSpecialRenderingType(createdDXViewportView, renderingType);
             };
 

@@ -101,7 +101,7 @@ namespace Ab3d.DirectX.Client.Settings
             _settingsStorage = settingsStorage;
             
             // Start by using default GraphicsProfile array (used by default in DXView)
-            GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.NormalQualityHardwareRendering,
+            GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.HighQualityHardwareRendering,
                                                        GraphicsProfile.NormalQualitySoftwareRendering,
                                                        GraphicsProfile.Wpf3D };
         }

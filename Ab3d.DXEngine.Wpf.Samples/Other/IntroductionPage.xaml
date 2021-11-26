@@ -40,7 +40,7 @@
         
         <Image Name="CarEngineImage" Grid.Row="1" Source="/Resources/DXEngine-car_engine.png" HorizontalAlignment="Left" Margin="60 0 0 0" 
                SizeChanged="CarEngineImage_OnSizeChanged"/>
-               
+
         <common:TextBlockEx Grid.Row="2" Margin="20 0 20 0" Style="{StaticResource InfoContent}" FontSize="14">
             The 3D scene can be defined by using easy to use WPF 3D objects and by using many helper objects from the \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| library (the ultimate 3D toolkit). For advanced scenarios it is possible to define low-level objects (see Advanced usage section).\n
             \n

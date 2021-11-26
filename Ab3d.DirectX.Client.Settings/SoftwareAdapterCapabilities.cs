@@ -73,7 +73,7 @@ namespace Ab3d.DirectX.Client.Settings
                 case RenderQualityTypes.High:
                 case RenderQualityTypes.Ultra:
                     return GraphicsProfile.HighQualitySoftwareRendering;
-                    
+
                 case RenderQualityTypes.Custom:
                 default:
                     throw new ArgumentOutOfRangeException("quality");

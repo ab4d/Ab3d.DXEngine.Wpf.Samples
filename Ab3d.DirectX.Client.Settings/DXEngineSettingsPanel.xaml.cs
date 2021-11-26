@@ -289,9 +289,11 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
 
         private void ChangeSelectedAdapter(AdapterCapabilitiesBase newSelectedAdapter)
         {
-            if (_selectedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D && _selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Low)
+            if (newSelectedAdapter.Adapter != null && newSelectedAdapter.AdapterDescription1.DedicatedVideoMemory >= 4000000000L) // if we have a hardware device with more then 4 GB (approximately) dedicated memory, then we can use High rendering quality (this will use 4xSSAA)
+                _selectedRenderQuality = AdapterCapabilitiesBase.RenderQualityTypes.High;
+            else
                 _selectedRenderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Normal;
-            
+
             _selectedAdapterCapabilities = newSelectedAdapter;
 
             if (_selectedRenderQuality == AdapterCapabilitiesBase.RenderQualityTypes.Custom)

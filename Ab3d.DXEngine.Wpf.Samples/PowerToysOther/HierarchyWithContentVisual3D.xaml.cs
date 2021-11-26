@@ -38,16 +38,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
         private void AddContentVisual3DObjects()
         {
-            var rootContentVisual3D = new ContentVisual3D();
+            var rootContentVisual3D = new ContentVisual3D("Root_ContentVisual3D");
             rootContentVisual3D.Transform = new TranslateTransform3D(-200, 0, 0);
-            rootContentVisual3D.SetName("Root_ContentVisual3D");
 
             MainViewport.Children.Add(rootContentVisual3D);
 
 
             
-            var bottomContentVisual3D = new ContentVisual3D();
-            bottomContentVisual3D.SetName("Bottom_ContentVisual3D");
+            var bottomContentVisual3D = new ContentVisual3D("Bottom_ContentVisual3D");
 
             var bottomBox3D = new BoxVisual3D() { CenterPosition = new Point3D(0, 0, 0), Size = new Size3D(200, 20, 120), Material = new DiffuseMaterial(Brushes.Green) };
             bottomContentVisual3D.Children.Add(bottomBox3D);
@@ -56,15 +54,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             rootContentVisual3D.Children.Add(bottomContentVisual3D);
 
 
-            var left1ContentVisual3D = new ContentVisual3D();
-            left1ContentVisual3D.SetName("Left_1_ContentVisual3D");
+            var left1ContentVisual3D = new ContentVisual3D("Left_1_ContentVisual3D");
 
             var left1Box3D = new BoxVisual3D() { CenterPosition = new Point3D(-50, 50, 0), Size = new Size3D(80, 60, 100), Material = new DiffuseMaterial(Brushes.LimeGreen) };
             left1ContentVisual3D.Children.Add(left1Box3D);
 
 
-            var right1ContentVisual3D = new ContentVisual3D();
-            right1ContentVisual3D.SetName("Right_1_ContentVisual3D");
+            var right1ContentVisual3D = new ContentVisual3D("Right_1_ContentVisual3D");
 
             var right1Box3D = new BoxVisual3D() { CenterPosition = new Point3D(50, 40, 0), Size = new Size3D(80, 20, 100), Material = new DiffuseMaterial(Brushes.LimeGreen) };
             right1ContentVisual3D.Children.Add(right1Box3D);
@@ -74,15 +70,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             bottomContentVisual3D.Children.Add(right1ContentVisual3D);
 
 
-            var right21ContentVisual3D = new ContentVisual3D();
-            right21ContentVisual3D.SetName("Right_2_1_ContentVisual3D");
+            var right21ContentVisual3D = new ContentVisual3D("Right_2_1_ContentVisual3D");
 
             var right2_1Box3D = new BoxVisual3D() { CenterPosition = new Point3D(30, 70, 0), Size = new Size3D(30, 20, 80), Material = new DiffuseMaterial(Brushes.PaleGreen) };
             right21ContentVisual3D.Children.Add(right2_1Box3D);
 
 
-            var right22ContentVisual3D = new ContentVisual3D();
-            right22ContentVisual3D.SetName("Right_2_2_ContentVisual3D");
+            var right22ContentVisual3D = new ContentVisual3D("Right_2_2_ContentVisual3D");
 
             // With ContentVisual3D we can also show Model3D (GeometryModel3D or Model3DGroup) objects.
             // To do that we set it to ContentVisual3D.Content property or specify it in the constructor.
@@ -110,7 +104,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             transform3DGroup.Children.Add(new TranslateTransform3D(0, 0, 200));
             rootModelVisual3D.Transform = transform3DGroup;
 
-            rootModelVisual3D.SetName("Root_ModelVisual3D");
+            rootModelVisual3D.SetName("Root_ModelVisual3D"); // ModelVisual3D is not defined in Ab3d.PowerToys and therefore does not define the Name property and does not take name as a constructor's parameter. Therefore we need to use SetName extension method.
 
             MainViewport.Children.Add(rootModelVisual3D);
 

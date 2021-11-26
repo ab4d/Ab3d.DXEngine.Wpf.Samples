@@ -25,7 +25,7 @@
         <cameras:TargetPositionCamera Name="Camera1" 
                                       TargetPosition="0 0 0" 
                                       Heading="10" Attitude="-20" Bank="0" 
-                                      Distance="450" 
+                                      Distance="500" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 

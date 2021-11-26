@@ -158,10 +158,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                     DepthFailOperation = StencilOperation.Keep,
                     FailOperation      = StencilOperation.Keep,
                     PassOperation      = StencilOperation.Replace // The value that is set as reference is set in the ContextStateManger when _deviceContext.OutputMerger.SetDepthStencilState is called - the value is set to 1.
+                },
+                BackFace = { // same for backface
+                    Comparison         = Comparison.Always,
+                    DepthFailOperation = StencilOperation.Keep,
+                    FailOperation      = StencilOperation.Keep,
+                    PassOperation      = StencilOperation.Replace
                 }
             };
-
-            stencilSetToOneDescription.BackFace = stencilSetToOneDescription.FrontFace;
 
             _stencilSetToOneDepthStencilState = new DepthStencilState(MainDXViewportView.DXScene.Device, stencilSetToOneDescription);
 
@@ -185,10 +189,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                     DepthFailOperation = StencilOperation.Keep,
                     FailOperation      = StencilOperation.Keep,
                     PassOperation      = StencilOperation.Keep
+                },
+                BackFace = {                                 // same for backface
+                    Comparison         = Comparison.Greater, 
+                    DepthFailOperation = StencilOperation.Keep,
+                    FailOperation      = StencilOperation.Keep,
+                    PassOperation      = StencilOperation.Keep
                 }
             };
-
-            renderWhenStencilIsNotOneDescription.BackFace = stencilSetToOneDescription.FrontFace;
 
             _renderWhenStencilIsNotOneState = new DepthStencilState(MainDXViewportView.DXScene.Device, renderWhenStencilIsNotOneDescription);
 
@@ -276,11 +284,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             _disposables.Add(_horizontalExpandPostProcess);
             _disposables.Add(_verticalExpandPostProcess);
 
-            var expandPostProcesses = new PostProcessBase[]
-            {
-                _horizontalExpandPostProcess,
-                _verticalExpandPostProcess
-            };
+            var expandPostProcesses = new List<PostProcessBase>();
+            expandPostProcesses.Add(_horizontalExpandPostProcess);
+            expandPostProcesses.Add(_verticalExpandPostProcess);
 
             // We could also blur the outline to make it bigger, but Expand creates better results
             //var horizontalBlurPostProcess = new Ab3d.DirectX.PostProcessing.SimpleBlurPostProcess(isVerticalBlur: false, filterWidth: 5);

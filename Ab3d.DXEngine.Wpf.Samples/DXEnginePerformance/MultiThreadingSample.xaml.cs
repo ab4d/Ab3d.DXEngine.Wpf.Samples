@@ -783,6 +783,13 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
 
         private void StartStopTestButton_OnClick(object sender, RoutedEventArgs e)
         {
+            if (IsCachingCommandListsCheckBox.IsChecked ?? false)
+            {
+                var result = MessageBox.Show("Uncheck the 'IsCachingCommandLists' CheckBox before starting the benchmark?\r\n\r\nIf this is not done, then there is almost no work to be done by DXEngine and the benchmark will not show any interesting results.", "Starting benchmark", MessageBoxButton.YesNo, MessageBoxImage.Stop);
+                if (result == MessageBoxResult.Yes)
+                    IsCachingCommandListsCheckBox.IsChecked = false;
+            }
+
             if (_performanceAnalyzer == null)
             {
                 if (OptionsGrid.Visibility == Visibility.Visible)
@@ -826,7 +833,9 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             // get only system info
             string systemInfo = _performanceAnalyzer.GetResultsText(addSystemInfo: true, addDXEngineInfo: true, addGarbageCollectionsInfo: false, addTotals: false, addStateChangesStatistics: false, addFirstFrameStatisticsWhenAvailable: false, addRenderingStatistics: false, addMultiThreadingStatistics: false);
 
-            InfoTextBlock.Text = $"Starting benchmark ({_mainDXViewportView.PresentationType} with {_objectsCount} objects)\r\nwith changing MaxBackgroundThreadsCount from 0 to {ThreadsCountSlider.Maximum:0}.\r\n\r\n{systemInfo}\r\n====================\r\n\r\nRendering with MaxBackgroundThreadsCount = 0\r\n\r\n";
+            int maxThreadsCount = (int)ThreadsCountSlider.Maximum;
+            InfoTextBlock.Text = $"Starting benchmark ({_mainDXViewportView.PresentationType} with {_objectsCount} objects)\r\nwith changing MaxBackgroundThreadsCount from 0 to {ThreadsCountSlider.Maximum:0}.\r\n\r\n{systemInfo}\r\n====================\r\nStarted benchmark 1/{maxThreadsCount+1} with disabled multi-threading ...\r\n\r\n";
+
             InfoTextBlock.UpdateLayout();
             InfoTextBlock.ScrollToEnd();
 
@@ -837,7 +846,7 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             _benchmarkResults = new StringBuilder();
             _benchmarkTotalRenderTimes = new List<double>();
 
-            _benchmarkStepFramesCount = 1;
+            _benchmarkStepFramesCount = 0;
             _mainDXViewportView.SceneRendered += OnBenchmarkSceneRendered;
         }
 
@@ -881,7 +890,7 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
         {
             var now = DateTime.Now;
 
-            if (_benchmarkStepFramesCount == 1)
+            if (_benchmarkStepFramesCount == 0)
             {
                 // Starting one benchmark step
                 _performanceAnalyzer.StartCollectingStatistics();
@@ -894,8 +903,8 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
             }
 
 
-            // Complete one benchmark step after 5 seconds or after 200 frames
-            if ((now - _benchmarkStepStartTime).TotalSeconds > 5 || _benchmarkStepFramesCount > 200)
+            // Complete one benchmark step after 3 seconds or after 100 frames
+            if ((now - _benchmarkStepStartTime).TotalSeconds > 3 || _benchmarkStepFramesCount > 100)
             {
                 _performanceAnalyzer.StopCollectingStatistics();
 
@@ -925,19 +934,20 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
                                                                          addMultiThreadingStatistics: true);
 
                 AddInfoText(resultsText);
-                
+
+                _benchmarkStepFramesCount = 0;
 
                 if (ThreadsCountSlider.Value < ThreadsCountSlider.Maximum)
                 {
+                    int maxThreadsCount = (int)ThreadsCountSlider.Maximum;
+
+                    AddInfoText(string.Format("====================\r\nStarted benchmark {0}/{1} with MaxBackgroundThreadsCount = {2} ...\r\n", threadsCount + 2, maxThreadsCount + 1, threadsCount + 1));
                     ThreadsCountSlider.Value += 1; // Increase threads count
-                    AddInfoText(string.Format("====================\r\n\r\nRendering with MaxBackgroundThreadsCount = {0}\r\n", threadsCount + 1));
                 }
                 else
                 {
                     StopBenchmark();
                 }
-
-                _benchmarkStepFramesCount = 0;
             }
 
             _benchmarkStepFramesCount++;

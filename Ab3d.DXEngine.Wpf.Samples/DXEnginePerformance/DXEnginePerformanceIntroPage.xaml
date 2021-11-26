@@ -6,7 +6,7 @@
       xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="Lines3DIntroPage"
       mc:Ignorable="d" 
-      d:DesignHeight="500" d:DesignWidth="900">
+      d:DesignHeight="600" d:DesignWidth="900">
 
     <Page.Background>
         <LinearGradientBrush  StartPoint="0,1" EndPoint="0,0">
@@ -29,7 +29,9 @@
                     To see how to improve performance of objects initialization and changing the objects see also samples in the "Advanced DXEngine usage".\n
                     \n
                     \n
-                    To get an insight into the performance of your application, it is highly recommended to use the \!DXEngineSnoop\! tool that is installed into the Tools folder. It can connect to your application and provide real time performance statistics in the same way as what is shown when you click on "Diagnostics" button in this sample application.
+                    To get an insight into the performance of your application, it is highly recommended to use the \!DXEngineSnoop\! tool that is installed into the Tools folder. It can connect to your application and provide real time performance statistics in the same way as what is shown when you click on "Diagnostics" button in this sample application.\n
+                    \n
+                    To download DXEngineSnoop tool and see more information see the \@Ab3d.DXEngine Diagnostics:https://www.ab4d.com/DirectX/3D/Diagnostics.aspx| section in the online Users Guide.
                 </controls:TextBlockEx>
             </StackPanel>
         </ScrollViewer>

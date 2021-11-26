@@ -41,17 +41,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             InitializeComponent();
 
-            this.Loaded += delegate(object sender, RoutedEventArgs args)
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
+            Mouse.OverrideCursor = Cursors.Wait;
 
-                try
+            try
+            {
+                CreateScenes();
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
+            {
+                if (_testScenes != null)
                 {
-                    CreateScenes();
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
+                    foreach (var testScene in _testScenes)
+                        testScene.Dispose();
                 }
             };
         }
@@ -121,6 +127,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             private DXViewportView _dxViewportView;
             private TextBlock _reportTextBlock;
 
+            private MouseCameraController _mouseCameraController;
+
 
             public Viewport3D MainViewport3D { get; private set; }
             public TargetPositionCamera MainCamera { get; private set; }
@@ -185,7 +193,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 MainCamera.CameraChanged += OnMainCameraChanged;
 
 
-                var mouseCameraController = new MouseCameraController()
+                _mouseCameraController = new MouseCameraController()
                 {
                     TargetCamera           = MainCamera,
                     EventsSourceElement    = rootBorder,
@@ -200,14 +208,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                     rootBorder.Child = _dxViewportView;
 
-                    
-                    _dxViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs e)
-                    {
-                        // Always disable transparency sorting on start
-                        // If _useDXEngineSorting the IsTransparencySortingEnabled will be set to true after 
-                        // the first rendering statistics will be collected (see CollectStatistics method for more info)
-                        _dxViewportView.DXScene.IsTransparencySortingEnabled = false;
-                    };
+
+                    // Always disable transparency sorting on start
+                    // If _useDXEngineSorting the IsTransparencySortingEnabled will be set to true after 
+                    // the first rendering statistics will be collected (see CollectStatistics method for more info)
+                    _dxViewportView.IsTransparencySortingEnabled = false;
+
+                    // In the versions before v4.5 the IsTransparencySortingEnabled was available only on DXScene,
+                    // so you need to subscribe to DXSceneDeviceCreated to get access to the created DXScene:
+                    //_dxViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs e)
+                    //{
+                    //    _dxViewportView.DXScene.IsTransparencySortingEnabled = false;
+                    //};
 
                     _dxViewportView.SceneRendered += delegate(object sender, EventArgs e)
                     {
@@ -390,6 +402,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 if (CameraChanged != null)
                     CameraChanged(this, e);
+            }
+
+            public void Dispose()
+            {
+                if (_dxViewportView != null)
+                {
+                    _dxViewportView.Dispose();
+                    _dxViewportView = null;
+                }
             }
         }
     }

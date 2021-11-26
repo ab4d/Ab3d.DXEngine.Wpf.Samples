@@ -91,6 +91,8 @@ But this time the rendering will be done with only 100 draw calls and this will 
 The point to remember is when trying to improve the performance it is usually good to try to reduce the number of draw calls.
 When rendering 3D lines this can be achieved with using MultiLineVisual3D or PolyLineVisual3D or even MultiPolyLineVisual3D instead of many LineVisual3D objects.
 
+If you need to render multiple lines with different colors in one draw call, then you can use ScreenSpaceLineNode and PositionColoredLineMaterial (see DXEngineAdvanced / ScreenSpaceLineNodeSample sample to see how to do that).
+
 NOTE:
 You can get rendering statistics (including number of draw calls) with setting Ab3d.DirectX.DXDiagnostics.IsCollectingStatistics to true. Then you can subscribe to MainViewportView.DXScene.AfterFrameRendered event and there read date from the MainViewportView.DXScene.Statistics object.";
 

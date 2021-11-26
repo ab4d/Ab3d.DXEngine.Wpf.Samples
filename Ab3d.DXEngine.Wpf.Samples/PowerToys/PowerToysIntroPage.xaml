@@ -21,7 +21,7 @@
 
                 <controls:TextBlockEx Style="{StaticResource InfoContent}" Margin="20 16 20 0">
                     The Ab3d.PowerToys is the ultimate 3D toolkit library with many helper objects for 3D graphics. By default the Ab3d.PowerToys uses WPF 3D rendering engine (DirectX 9). 
-                    But when the \!WPF's Viewport3D\! objects is included into the \!EXEngine's DXViewportView\! object, then the 3D scene that is defined by WPF 3D and Ab3d.PowerToys objects is rendered 
+                    But when the \!WPF's Viewport3D\! objects is included into the \!DXEngine's DXViewportView\! object, then the 3D scene that is defined by WPF 3D and Ab3d.PowerToys objects is rendered 
                     by the Ab3d.DXEngine rendering engine (DirectX 11). This way you can reuse all the helper objects from Ab3d.PowerToys library.\n
                     \n
                     The samples in the Ab3d.PowerToys section are the same samples as in the samples project for the Ab3d.PowerToys library.\n

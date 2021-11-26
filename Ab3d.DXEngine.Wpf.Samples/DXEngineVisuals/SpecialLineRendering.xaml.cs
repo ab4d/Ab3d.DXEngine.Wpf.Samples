@@ -431,6 +431,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // Set LineDepthBias to prevent rendering wireframe at the same depth as the 3D objects.
             // This creates much nicer 3D lines. See the LineDepthBiasSample for more information.
             wireBoxVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+            wireBoxVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
 
             TestObjectsModelVisual3D.Children.Add(wireBoxVisual3D);
         }

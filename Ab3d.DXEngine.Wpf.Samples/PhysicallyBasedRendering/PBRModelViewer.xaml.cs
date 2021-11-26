@@ -337,6 +337,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                     // This will tell DXEngine to use the diffuseSpecularNormalMapMaterial instead of creating a standard WpfMaterial.
                     if (wpfMaterial.GetUsedDXMaterial(MainDXViewportView.DXScene.DXDevice) == null)
                         wpfMaterial.SetUsedDXMaterial(physicallyBasedMaterial);
+
+                    // Test TwoSided materials:
+                    //physicallyBasedMaterial.BaseColor = new Color4(1, 1, 1, 0.5f);
+                    //physicallyBasedMaterial.HasTransparency = true;
+                    //physicallyBasedMaterial.IsTwoSided = true;
                 }
                 else
                 {

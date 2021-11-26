@@ -45,8 +45,39 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-
             CreateInstances();
+
+
+            // To render instanced objects by using wireframe rendering, uncomment the following code:
+            //MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
+            //{
+            //    // Create a new RenderObjectsRenderingStep that will render only wireframe instanced objects.
+            //    //
+            //    // If you are not rendering any other objects or want to render all objects as wireframe, then you do not need to add this new RenderObjectsRenderingStep
+            //    // and can just set the OverrideRasterizerState on the DefaultRenderObjectsRenderingStep.
+
+            //    var renderWireframeInstancesRenderingStep = new RenderObjectsRenderingStep("RenderWireframeInstances");
+
+            //    // Override RasterizerState to render objects are wireframe instead of solid objects (not that line thickness is always 1 in this case)
+            //    renderWireframeInstancesRenderingStep.OverrideRasterizerState = MainDXViewportView.DXScene.DXDevice.CommonStates.WireframeMultisampleCullNone;
+
+            //    // Render only objects in the ComplexGeometryRenderingQueue (instanced objects are always put into this rendering queue).
+            //    // Note that if you use multiple instanced objects or some other complex objects with many positions or lines
+            //    // (defined by DXScene.MeshTriangleIndicesCountRequiredForComplexGeometry and DXScene.LinesCountRequiredForComplexGeometry -
+            //    // you can also increase those two numbers to prevent putting other objects into ComplexGeometryRenderingQueue)
+            //    // then you will need to create another RenderObjectsRenderingStep and also set the FilterObjectsFunction (one will show only instances with wireframe and the other other complex objects).
+            //    renderWireframeInstancesRenderingStep.FilterRenderingQueuesFunction = queue => queue == MainDXViewportView.DXScene.ComplexGeometryRenderingQueue;
+
+            //    MainDXViewportView.DXScene.RenderingSteps.AddBefore(MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep, renderWireframeInstancesRenderingStep);
+
+
+            //    // Update the DefaultRenderObjectsRenderingStep to prevent rendering ComplexGeometryRenderingQueue
+            //    // This will render other objects normally.
+            //    MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue != MainDXViewportView.DXScene.ComplexGeometryRenderingQueue;
+
+
+            //    // To render wireframe with solid color (without shading the lines) also set the "_instancedMeshGeometryVisual3D.IsSolidColorMaterial = true;" in the code below.
+            //};
 
 
             // IMPORTANT:
@@ -103,6 +134,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             // When we use transparency, we also need to set UseAlphaBlend to true
             _instancedMeshGeometryVisual3D.UseAlphaBlend = useTransparency;
+
+            //_instancedMeshGeometryVisual3D.IsSolidColorMaterial = true; // uncommenting this line will render the objects with solid color (without any shading based on lighting and camera position).
 
             // If we would only change the InstancedData we would need to call Update method (but here this is not needed because we have set the data for the first time)
             //_instancedGeometryVisual3D.Update();

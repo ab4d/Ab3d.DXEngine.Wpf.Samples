@@ -249,7 +249,8 @@ namespace Ab3d.DirectX.Client.Settings
                 // Found the best dedicated graphics card
                 // If the card is 11.0 feature level and has at least 1 GB RAM use High quality, else use Normal quality
                 if ((int)bestAdapterCapabilities.DeviceCapabilities.FeatureLevel >= (int)FeatureLevel.Level_11_0 &&
-                    bestAdapterCapabilities.AdapterDescription1.DedicatedVideoMemory >= 1000000000L)
+                    (bestAdapterCapabilities.AdapterDescription1.DedicatedVideoMemory >= 1000000000L || 
+                    (bestAdapterCapabilities.AdapterDescription1.DedicatedVideoMemory < 0 && IntPtr.Size == 4))) // When running in 32 bit, the DedicatedVideoMemory has only 4 bytes to store memory size - in case of 8 GB, this means this is converted into negaitve number
                 {
                     renderQuality = AdapterCapabilitiesBase.RenderQualityTypes.High;
                 }

@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=4.4.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.4.4.7848\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=5.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.5.0.8000\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=4.4.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.4.4.7848\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.0.8000\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=9.6.7848.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.9.6.7848\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=10.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.10.0.8000\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -271,6 +271,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DXEngineVisuals\GlobalLineThicknessFactorSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\GraphicsProfilesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineVisuals\LinesWithPatternSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -294,6 +302,22 @@
     <Page Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\TrianglesSortingSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\TwoSidedMaterialsSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\WireframeRenderingSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Other\ModelViewerSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="PowerToysOther\ImprovedTextBlockVisual3D.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -613,8 +637,26 @@
     <Compile Include="DXEngineVisuals\ColoredLinesSample.xaml.cs">
       <DependentUpon>ColoredLinesSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineVisuals\GlobalLineThicknessFactorSample.xaml.cs">
+      <DependentUpon>GlobalLineThicknessFactorSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\GraphicsProfilesSample.xaml.cs">
+      <DependentUpon>GraphicsProfilesSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml.cs">
       <DependentUpon>ObjectOutlinesRenderingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\TrianglesSortingSample.xaml.cs">
+      <DependentUpon>TrianglesSortingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\TwoSidedMaterialsSample.xaml.cs">
+      <DependentUpon>TwoSidedMaterialsSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\WireframeRenderingSample.xaml.cs">
+      <DependentUpon>WireframeRenderingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Other\ModelViewerSample.xaml.cs">
+      <DependentUpon>ModelViewerSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToysOther\ImprovedTextBlockVisual3D.xaml.cs">
       <DependentUpon>ImprovedTextBlockVisual3D.xaml</DependentUpon>
@@ -759,10 +801,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DXEngineVisuals\PerPixelRenderingSample.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="DXEngineOther\SampleSceneUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -856,9 +894,6 @@
     <Compile Include="DXEnginePerformance\InstancedMeshGeometry3DTest.xaml.cs">
       <DependentUpon>InstancedMeshGeometry3DTest.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DXEngineVisuals\PerPixelRenderingSample.xaml.cs">
-      <DependentUpon>PerPixelRenderingSample.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DXEngineOther\SampleSceneUserControl.xaml.cs">
       <DependentUpon>SampleSceneUserControl.xaml</DependentUpon>
     </Compile>
@@ -951,9 +986,14 @@
     </Content>
     <Resource Include="Resources\DXEngineSnoop.PNG" />
     <Resource Include="Resources\info_orange_icon.png" />
+    <Resource Include="Resources\animation.png" />
+    <Resource Include="Resources\cameras.png" />
+    <Resource Include="Resources\lights.png" />
     <Content Include="Resources\Models\planetary-gear source.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\objects.png" />
+    <Resource Include="Resources\options.png" />
     <Content Include="Resources\TreeTexture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

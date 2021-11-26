@@ -49,8 +49,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private DXViewportView _mainDXViewportView;
         private Viewport3D _mainViewport3D;
 
-        private static readonly double[] PossibleEdgeLineDepthBiases = new double[] { 0, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 20.0 };
-
 
         public AdvancedEdgeLinesSample()
         {
@@ -72,10 +70,6 @@ What is more, as shown in this sample, the following additional features are ava
 2) It is possible to render object's outlines. Here a technique is used that first renders the scene with black color and with expanded geometry. Then the scene is rendered normally on top of the black scene. For other techniques to render object outlines see the 'Object outlines rendering' sample.
 
 3) To reduce anti-aliasing the WPF 3D can use multi-sampling (MSAA). With Ab3d.DXEngine it is possible to further reduce the aliasing and produce super-smooth 3D lines with using super-sampling (SSAA). This renders the scene to a higher resolution (4 times higher when 4xSSAA is used). Then the rendered image is down-sampled to the final resolution with using a smart filter. This can be combined with multi-sampling to produce much better results that using multi-sampling alone." ;
-
-
-            DepthBiasComboBox.ItemsSource  = PossibleEdgeLineDepthBiases;
-            DepthBiasComboBox.SelectedItem = 0.05;
 
 
             AssimpLoader.LoadAssimpNativeLibrary();
@@ -210,12 +204,7 @@ What is more, as shown in this sample, the following additional features are ava
                 IsVisible     = ShowEdgeLinesCheckBox.IsChecked ?? false
             };
 
-            if (LineDepthBiasCheckBox.IsChecked ?? false)
-            {
-                // Use line depth bias to move the line closer to the camera so the line is rendered on top of solid model and is not partially occluded by it.
-                double depthBias = (double) DepthBiasComboBox.SelectedItem;
-                _edgeLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, depthBias);
-            }
+            UpdateLineDepthBias();
 
             _mainViewport3D.Children.Add(_edgeLinesVisual3D);
 
@@ -231,23 +220,6 @@ What is more, as shown in this sample, the following additional features are ava
                 Camera1.CameraWidth = readModel3D.Bounds.SizeX * 2;
 
                 Camera1.TargetPosition = readModel3D.Bounds.GetCenterPosition() + new Vector3D(0, readModel3D.Bounds.SizeY * 0.15, 0); // slightly move the object down so that the object is not shown over the title
-
-                // Find best EdgeLine DepthBias
-                double idealDepthBias = Camera1.Distance / 3000;
-
-                double bestDistance = double.MaxValue;
-                int    bestIndex    = -1;
-                for (int i = 0; i < PossibleEdgeLineDepthBiases.Length; i++)
-                {
-                    double distance = Math.Abs(idealDepthBias - PossibleEdgeLineDepthBiases[i]);
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        bestIndex    = i;
-                    }
-                }
-
-                DepthBiasComboBox.SelectedIndex = bestIndex;
             }
 
             // Add ambient light
@@ -297,6 +269,25 @@ What is more, as shown in this sample, the following additional features are ava
             //MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.IsEnabled = false;
         }
 
+        private void UpdateLineDepthBias()
+        {
+            if (_edgeLinesVisual3D == null)
+                return;
+
+            if (LineDepthBiasCheckBox.IsChecked ?? false)
+            {
+                // Use line depth bias to move the lines closer to the camera so the lines are rendered on top of solid model and are not partially occluded by it.
+                // See DXEngineVisuals/LineDepthBiasSample for more info.
+                _edgeLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+                _edgeLinesVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
+            }
+            else
+            {
+                _edgeLinesVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
+                _edgeLinesVisual3D.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
+            }
+        }
+
 
         private void OnShowEdgeLinesCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -344,26 +335,10 @@ What is more, as shown in this sample, the following additional features are ava
 
         private void OnLineDepthBiasSettingsChanged(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded || _edgeLinesVisual3D == null)
+            if (!this.IsLoaded)
                 return;
 
-            double depthBias;
-
-            if (LineDepthBiasCheckBox.IsChecked ?? false)
-                depthBias = (double) DepthBiasComboBox.SelectedItem;
-            else
-                depthBias = 0;
-
-            if (depthBias > 0)
-            {
-                // To specify line depth bias to the WireframeVisual3D,
-                // we use SetDXAttribute extension method and use LineDepthBias as DXAttributeType
-                _edgeLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, depthBias);
-            }
-            else
-            {
-                _edgeLinesVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
-            }
+            UpdateLineDepthBias();
         }
 
         private void OnCameraTypeRadioButtonCheckedChanged(object sender, RoutedEventArgs e)

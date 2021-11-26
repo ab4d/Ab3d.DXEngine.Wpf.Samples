@@ -165,6 +165,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         private void LoadShaderText()
         {
             string shadersFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\Resources\Shaders\MeshNormalShader.hlsl");
+
+            if (!System.IO.File.Exists(shadersFileName))
+                shadersFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Resources\Shaders\MeshNormalShader.hlsl"); // Path for .Net Core+ frameworks
+
+
             if (System.IO.File.Exists(shadersFileName))
             {
                 string shaderContent = System.IO.File.ReadAllText(shadersFileName);
