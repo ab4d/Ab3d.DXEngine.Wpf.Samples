@@ -458,8 +458,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void ResetCameraButton_OnClick(object sender, RoutedEventArgs e)
         {
-            _twoDimensionalCamera.ZoomFactor = 2;
-            //_twoDimensionalCamera.Reset();
+            _twoDimensionalCamera.Reset();
         }
     }
 }
