@@ -58,6 +58,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 UpdateSceneInfo();
             };
 
+            this.SizeChanged += delegate(object sender, SizeChangedEventArgs args)
+            {
+                UpdateSceneInfo();
+            };
+
 
             // You can access the create TargetPositionCamera with UsedCamera property 
             // and MouseCameraController with UsedMouseCameraController property.
@@ -73,6 +78,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 MainDXViewportView.Dispose();
             };
+
+            Application.Current.MainWindow.Width = 1314;
         }
 
         private void UpdateSceneInfo()
@@ -80,16 +87,36 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             var visibleRect = _twoDimensionalCamera.VisibleRect;
 
             SceneInfoTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture,
-                "Zoom factor: {0:0.00}\r\nOffset: {1:0.0} {2:0.0}\r\nVisible Rect: {3:0} {4:0} {5:0} {6:0}\r\nView size: {7} x {8}",
+                "Zoom factor: {0:0.00}\r\nOffset: {1:0.0} {2:0.0}\r\nVisible Rect: {3:0} {4:0} => {5:0} {6:0}\r\nView size: {7} x {8}",
                 _twoDimensionalCamera.ZoomFactor, _twoDimensionalCamera.Offset.X, _twoDimensionalCamera.Offset.Y,
-                visibleRect.X, visibleRect.Y, visibleRect.Width, visibleRect.Height,
+                visibleRect.X, visibleRect.Y, visibleRect.X + visibleRect.Width, visibleRect.Y + visibleRect.Height,
                 _twoDimensionalCamera.ViewSize.Width, _twoDimensionalCamera.ViewSize.Height);
         }
 
         private void CreateShapesSample()
         {
             //
-            // First create a few lines
+            // Mark coordinate origin (0, 0)
+            //
+            var centerPositions = new Point3DCollection(new Point3D[]
+            {
+                new Point3D(-10,  0, 0),
+                new Point3D(10, 0, 0),
+                new Point3D(0, -10,  0),
+                new Point3D(0,  10,  0),
+            });
+
+            var centerMultiLineVisual3D = new MultiLineVisual3D()
+            {
+                Positions = centerPositions,
+                LineColor = Colors.Red,
+                LineThickness = 1,
+            };
+
+            RootLinesVisual3D.Children.Add(centerMultiLineVisual3D);
+
+            //
+            // Create a few lines
             //
             for (int i = 0; i < 5; i++)
             {
@@ -431,7 +458,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void ResetCameraButton_OnClick(object sender, RoutedEventArgs e)
         {
-            _twoDimensionalCamera.Reset();
+            _twoDimensionalCamera.ZoomFactor = 2;
+            //_twoDimensionalCamera.Reset();
         }
     }
 }

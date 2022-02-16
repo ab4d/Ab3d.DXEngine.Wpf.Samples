@@ -39,10 +39,11 @@ namespace Ab3d.DirectX
             /// </summary>
             CenterOfViewOrigin = 0,
 
-            /// <summary>
-            /// Coordinate system and axis origin (0, 0) start at the bottom left corner of the view. Y axis points up.
-            /// </summary>
-            LowerLeftCornerOrigin = 1
+            // Currently unsupported:
+            ///// <summary>
+            ///// Coordinate system and axis origin (0, 0) start at the bottom left corner of the view. Y axis points up.
+            ///// </summary>
+            //LowerLeftCornerOrigin = 1
         }
 
         /// <summary>
@@ -187,16 +188,22 @@ namespace Ab3d.DirectX
             {
                 var offset = this.Offset;
 
-                double x = -offset.X;
-                double y = offset.X;
+                double width = ViewSize.Width;
+                double height = ViewSize.Height;
 
-                if (this.CoordinateSystemType == CoordinateSystemTypes.CenterOfViewOrigin)
-                {
-                    x -= -ViewSize.Width * 0.5;
-                    y = ViewSize.Height * 0.5;
-                }
+                double centerX = offset.X;
+                double centerY = offset.Y;
 
-                return new Rect(x, y, ViewSize.Width, ViewSize.Height);
+                //if (this.CoordinateSystemType == CoordinateSystemTypes.LowerLeftCornerOrigin)
+                //{
+                //    centerX += width * 0.5;
+                //    centerY += height * 0.5;
+                //}
+
+                width /= ZoomFactor;
+                height /= ZoomFactor;
+
+                return new Rect(centerX - width * 0.5, centerY - height * 0.5, width, height);
             }
         }
 

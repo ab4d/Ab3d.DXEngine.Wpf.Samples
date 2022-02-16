@@ -49,7 +49,7 @@
                    Text="Showing 2D lines with Ab3d.DXEngine and TwoDimensionalCamera"/>
 
         <Border BorderBrush="Black" BorderThickness="1" Background="#AAFFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
-            <StackPanel Orientation="Vertical" Margin="10 5" Width="130">
+            <StackPanel Orientation="Vertical" Margin="10 5" Width="200">
                 <!--<StackPanel.LayoutTransform>
                     <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
                 </StackPanel.LayoutTransform>-->
