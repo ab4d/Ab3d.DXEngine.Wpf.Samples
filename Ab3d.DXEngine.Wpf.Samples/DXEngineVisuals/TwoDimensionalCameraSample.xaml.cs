@@ -78,8 +78,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             {
                 MainDXViewportView.Dispose();
             };
-
-            Application.Current.MainWindow.Width = 1314;
         }
 
         private void UpdateSceneInfo()

@@ -186,24 +186,16 @@ namespace Ab3d.DirectX
         {
             get
             {
-                var offset = this.Offset;
+                double width = ViewSize.Width / ZoomFactor;
+                double height = ViewSize.Height / ZoomFactor;
 
-                double width = ViewSize.Width;
-                double height = ViewSize.Height;
+                var centerX = UsedCamera.CurrentCamera.Position.X;
+                var centerY = UsedCamera.CurrentCamera.Position.Y;
 
-                double centerX = offset.X;
-                double centerY = offset.Y;
+                var x1 = centerX - width * 0.5;
+                var y1 = centerY - height * 0.5;
 
-                //if (this.CoordinateSystemType == CoordinateSystemTypes.LowerLeftCornerOrigin)
-                //{
-                //    centerX += width * 0.5;
-                //    centerY += height * 0.5;
-                //}
-
-                width /= ZoomFactor;
-                height /= ZoomFactor;
-
-                return new Rect(centerX - width * 0.5, centerY - height * 0.5, width, height);
+                return new Rect(x1, y1, width, height);
             }
         }
 
