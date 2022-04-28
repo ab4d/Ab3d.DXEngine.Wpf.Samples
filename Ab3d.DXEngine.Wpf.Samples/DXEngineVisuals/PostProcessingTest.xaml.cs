@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.Common;
 using Ab3d.DirectX;
 using Ab3d.DirectX.PostProcessing;
 using Ab3d.Visuals;
@@ -38,6 +40,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private ExpandPostProcess _expandVerticalPostProcess;
         private SoberEdgeDetectionPostProcess _edgeDetectionPostProcess;
         private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
+        private ColorOverlayPostProcess _colorOverlayPostProcess;
 
         public PostProcessingTest()
         {
@@ -165,6 +168,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 MainDXViewportView.DXScene.PostProcesses.Add(_gammaCorrectionPostProcess);
                 _createdPostProcesses.Add(_gammaCorrectionPostProcess);
+            }
+            
+            if (ColorOverlayCheckBox.IsChecked ?? false)
+            {
+                _colorOverlayPostProcess = new Ab3d.DirectX.PostProcessing.ColorOverlayPostProcess();
+
+                // Added Color is added to each pixel's color.
+                // Note that AddedColor color is Color3 and can also have negative values (to remove color components)
+                _colorOverlayPostProcess.AddedColor = ParseColor(AddedColorTextBlock.Text, fallbackColor: Color4.Black).ToColor3();
+
+                // After adding the AddedColor the pixel's color is multiplied by the ColorMultiplier
+                // ColorMultiplier is Color4 and also allows multiplying alpha component 
+                _colorOverlayPostProcess.ColorMultiplier = ParseColor(ColorMultiplierTextBlock.Text, fallbackColor: Color4.White);
+
+                MainDXViewportView.DXScene.PostProcesses.Add(_colorOverlayPostProcess);
+                _createdPostProcesses.Add(_colorOverlayPostProcess);
             }
         }
 
@@ -339,6 +358,71 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _gammaCorrectionPostProcess.Gamma = GetSelectedComboBoxFloatValue(GammaCorrectionComboBox);
 
             MainDXViewportView.Refresh(); // Render the scene again
+        }
+
+        private void ColorMultiplierTextBlock_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            var color = ParseColor(ColorMultiplierTextBlock.Text, fallbackColor: Color4.White);
+            ColorMultiplierRectangle.Fill = new SolidColorBrush(color.ToWpfColor());
+
+            if (_colorOverlayPostProcess != null)
+            {
+                _colorOverlayPostProcess.ColorMultiplier = color;
+                MainDXViewportView.Refresh(); // Render the scene again
+            }
+        }
+
+        private void AddedColorTextBlock_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            var color = ParseColor(AddedColorTextBlock.Text, fallbackColor: Color4.Black).ToColor3();
+            AddedColorRectangle.Fill = new SolidColorBrush(color.ToWpfColor());
+
+            if (_colorOverlayPostProcess != null)
+            {
+                _colorOverlayPostProcess.AddedColor = color;
+                MainDXViewportView.Refresh(); // Render the scene again
+            }
+        }
+
+        private Color4 ParseColor(string colorText, Color4 fallbackColor)
+        {
+            if (colorText == null || !colorText.StartsWith("#") || (colorText.Length != 7 && colorText.Length != 9))
+                return fallbackColor;
+
+            // We do not use ColorConverter (TypeDescriptor.GetConverter(typeof(System.Windows.Media.Color))) because it throws exception in case of invalid string
+            // and we do not want to break into the debugger when user is typing the color text
+            try
+            {
+                int startIndex;
+                int a;
+
+                if (colorText.Length == 9)
+                {
+                    a = int.Parse(colorText.Substring(1, 2), NumberStyles.HexNumber);
+                    startIndex = 2;
+                }
+                else
+                {
+                    a = 255;
+                    startIndex = 0;
+                }
+
+                int r = int.Parse(colorText.Substring(startIndex + 1, 2), System.Globalization.NumberStyles.HexNumber);
+                int g = int.Parse(colorText.Substring(startIndex + 3, 2), System.Globalization.NumberStyles.HexNumber);
+                int b = int.Parse(colorText.Substring(startIndex + 5, 2), System.Globalization.NumberStyles.HexNumber);
+
+                return new Color4((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f);
+            }
+            catch
+            {
+                return fallbackColor;
+            }
         }
     }
 }

@@ -48,7 +48,6 @@
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
-        <!-- EventsSourceElement is set to ViewportBorder - this means that the ViewportBorder's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
         <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Row="0"
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
@@ -57,18 +56,19 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 5">
             <StackPanel.LayoutTransform>
-                <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
+                <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
             </StackPanel.LayoutTransform>
 
             <TextBlock Text="Used hit testing:" VerticalAlignment="Center" />
 
-            <RadioButton Name="DXEngineTestingRadioButton" Content="DXEngine hit testing" Margin="5 0" IsChecked="True" GroupName="HitTestingType" VerticalAlignment="Center" Click="DXEngineTestingRadioButton_OnClick" />
-            <RadioButton Name="WpfHitTestingRadioButton" Content="WPF hit testing" GroupName="HitTestingType" VerticalAlignment="Center" Click="WpfHitTestingRadioButton_OnClick" />
+            <RadioButton Name="DXEngineTestingRadioButton" Content="DXEngine hit testing" Margin="5 0 0 0" IsChecked="True" GroupName="HitTestingType" VerticalAlignment="Center" Click="DXEngineTestingRadioButton_OnClick" />
+            <RadioButton Name="WpfHitTestingRadioButton" Content="WPF hit testing" GroupName="HitTestingType" Margin="5 0 0 0" VerticalAlignment="Center" Click="WpfHitTestingRadioButton_OnClick" />
+            <RadioButton Name="InstanceIdBitmapRadioButton" Content="InstanceId bitmap (see next sample)" Margin="5 0 0 0" GroupName="HitTestingType" IsEnabled="False" VerticalAlignment="Center" />
         </StackPanel>
 
         <TextBlock Name="InfoTextBlock" Grid.Row="1" Margin="0 6 0 5" VerticalAlignment="Center" HorizontalAlignment="Right">
             <TextBlock.LayoutTransform>
-                <ScaleTransform ScaleX="1.6" ScaleY="1.6" />
+                <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
             </TextBlock.LayoutTransform>
         </TextBlock>
         <Rectangle Grid.Row="1" Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Fill="Gray" SnapsToDevicePixels="True" />

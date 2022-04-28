@@ -31,6 +31,9 @@
                     <visuals:ConeVisual3D BottomCenterPosition="0 0 -30" BottomRadius="10" TopRadius="5" Height="20" Material="{StaticResource ObjectsMaterial}"/>
                     <visuals:ConeVisual3D BottomCenterPosition="30 0 -30" BottomRadius="10" TopRadius="5" Height="20" Segments="6" IsSmooth="False" Material="{StaticResource ObjectsMaterial}"/>
 
+                    <!-- NOTE: To create trapezoid with custom TopCenterPosition or custom direction see the Ab3d.Models.Model3DFactory.CreateTrapezoid method -->
+                    <visuals:TrapezoidVisual3D BottomCenterPosition="60 0 -30" BottomSize="20 15" TopSize="10 5" Height="20" Material="{StaticResource ObjectsMaterial}" />
+
                     <visuals:ArrowVisual3D StartPosition="-30 0 0" EndPosition="-30 20 0" Radius="3" Material="{StaticResource ObjectsMaterial}"/>
                     <visuals:SphereVisual3D CenterPosition="0 10 0" Radius="10" Material="{StaticResource ObjectsMaterial}"/>
                     <visuals:CylinderVisual3D BottomCenterPosition="30 0 0" Radius="10" Height="20" Material="{StaticResource ObjectsMaterial}"/>

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ab3d.Common.Models;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
@@ -172,6 +173,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             MainDXViewportView.Viewport3D.Children.Add(grayCylinder);
 
+           
 
             for (int x = -300; x < 500; x += 100)
             {
@@ -182,6 +184,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 MainDXViewportView.Viewport3D.Children.Add(yellowBox);
             }
+
+
+            var imageBrush = new ImageBrush();
+            imageBrush.ImageSource = new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/GrassTexture.jpg")));
+            var grassMaterial = new DiffuseMaterial(imageBrush);
+
+            _greenBox3D = new BoxVisual3D();
+            _greenBox3D.CenterPosition = new Point3D(0, -2, 0);
+            _greenBox3D.Size = new Size3D(SceneSize, 4, SceneSize);
+            _greenBox3D.Material = grassMaterial;
+
+            MainDXViewportView.Viewport3D.Children.Add(_greenBox3D);
+
 
 
             var readerObj = new Ab3d.ReaderObj();
@@ -195,19 +210,48 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             var teapotVisual3D = new ModelVisual3D();
             teapotVisual3D.Content = _teapotModel;
 
+
+            // To prevent rendering shadow or receiving shadow, you can use IsCastingShadow and IsReceivingShadow DXAttribute.
+            // You can also set the IsCastingShadow and IsReceivingShadow properties on the DXEngine's WpfGeometryModel3DNode (see below and comments in the OnObjectsFilterValueChanged method)
+            //
+            // IMPORTANT:
+            // The IsCastingShadow and IsReceivingShadow must be set on the GeometryModel3D (setting it to a Visual3D will not work).
+            // To set the IsCastingShadow on the Visual3D object, you can use the commented code below.
+            //
+            //_teapotModel.SetDXAttribute(DXAttributeType.IsCastingShadow, false);
+            //_teapotModel.SetDXAttribute(DXAttributeType.IsReceivingShadow, false);
+            //teapotVisual3D.SetDXAttribute(DXAttributeType.IsCastingShadow, false); // THIS WILL NOT WORK !!! You need to set the attribute to the GeometryModel3D
+
             MainDXViewportView.Viewport3D.Children.Add(teapotVisual3D);
 
 
-            var imageBrush = new ImageBrush();
-            imageBrush.ImageSource = new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/GrassTexture.jpg")));
-            var grassMaterial = new DiffuseMaterial(imageBrush);
+            // The following commented code shows how to set IsCastingShadow on a Visual3D object:
+            //var lineWithTextVisual3D = new Ab3d.Visuals.LineWithTextVisual3D()
+            //{
+            //    StartPosition = new Point3D(-100, 30, -150),
+            //    EndPosition = new Point3D(100, 30, -150),
+            //    Text = "TEST12345",
+            //    TextUpDirection = new Vector3D(0, 0, 1),
+            //    LineThickness = 5,
+            //    LineColor = Colors.Orange,
+            //    FontSize = 30,
+            //    UseTextBlockVisual3D = true,
+            //    StartLineCap = LineCap.ArrowAnchor,
+            //    EndLineCap = LineCap.ArrowAnchor
+            //};
 
-            _greenBox3D = new BoxVisual3D();
-            _greenBox3D.CenterPosition = new Point3D(0, -2, 0);
-            _greenBox3D.Size = new Size3D(SceneSize, 4, SceneSize);
-            _greenBox3D.Material = grassMaterial;
+            // Just for this sample add another ModelVisual3D to make the hierarchy of Visual3D objects more complicated
+            //var modelVisual = new ModelVisual3D();
+            //modelVisual.Children.Add(lineWithTextVisual3D);
 
-            MainDXViewportView.Viewport3D.Children.Add(_greenBox3D);
+            //// Call an action when the DXEngine's SceneNode is initialized (and all child SceneNodes are created):
+            //modelVisual.SetDXAttribute(DXAttributeType.OnDXResourcesInitializedAction, new Action<SceneNode>(delegate (SceneNode newSceneNode)
+            //{
+            //    // for each child node of type WpfGeometryModel3DNode set the IsCastingShadow to false
+            //    newSceneNode.ForEachChildNode((WpfGeometryModel3DNode node) => node.IsCastingShadow = false, enumerateOnlyOneChildrenLevel: false);
+            //}));
+
+            //MainDXViewportView.Viewport3D.Children.Add(modelVisual);
         }
 
         // Create a yellow sphere that will represent the light
@@ -486,6 +530,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // - WpfGeometryModel3DNode and WpfOptimizedModel3DGroupNode (the later is used for frozen Model3DGroups) implements both IShadowCastingNode and IShadowReceivingNode (note that when only IsReceivingShadow is true but IsCastingShadow is false this can produce some artifacts)
             // - InstancedMeshGeometry3DNode and InstancedModel3DGroupNode implement only IShadowCastingNode - by default IShadowCastingNode is set to true, but you can disable that.
             // - ScreenSpaceLineNode implements only IShadowCastingNode - by default it is set to false so hardware accelerated 3D lines by default do not cast a shadow.
+            //
+            // See also the comments at the end to CreateCustomScene method to see how to use DXAttributes to set IsCastingShadow and IsReceivingShadow
+            // or to use OnDXResourcesInitializedAction to set IsCastingShadow and IsReceivingShadow properties after the SceneNodes have been created.
 
 
             _teapotSceneNode.IsCastingShadow   = TeapotIsCastingShadowCheckBox.IsChecked ?? false;

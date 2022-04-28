@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=5.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.5.0.8000\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=5.1.8153.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.5.1.8153\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.0.8000\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.1.8153.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.1.8153\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=10.0.8000.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.10.0.8000\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=10.1.8147.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.10.1.8147\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -112,6 +112,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DXEngineAdvanced\InstancedMeshNodeSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineHitTesting\InstancedIdBitmapHitTesting.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -315,7 +319,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Other\ModelViewerSample.xaml">
+    <Page Include="DXEngineVisuals\XRayMaterialSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ModelViewer\ModelViewerSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -508,6 +516,9 @@
     </Compile>
     <Compile Include="DXEngineAdvanced\MeshNormalEffect.cs" />
     <Compile Include="DXEngineAdvanced\MeshNormalMaterial.cs" />
+    <Compile Include="DXEngineHitTesting\InstancedIdBitmapHitTesting.xaml.cs">
+      <DependentUpon>InstancedIdBitmapHitTesting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineHitTesting\LinesSelector.xaml.cs">
       <DependentUpon>LinesSelector.xaml</DependentUpon>
     </Compile>
@@ -655,7 +666,10 @@
     <Compile Include="DXEngineVisuals\WireframeRenderingSample.xaml.cs">
       <DependentUpon>WireframeRenderingSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Other\ModelViewerSample.xaml.cs">
+    <Compile Include="DXEngineVisuals\XRayMaterialSample.xaml.cs">
+      <DependentUpon>XRayMaterialSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelViewer\ModelViewerSample.xaml.cs">
       <DependentUpon>ModelViewerSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToysOther\ImprovedTextBlockVisual3D.xaml.cs">

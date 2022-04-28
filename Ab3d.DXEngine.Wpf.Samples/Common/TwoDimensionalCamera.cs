@@ -191,7 +191,7 @@ namespace Ab3d.DirectX
 
                 var centerX = UsedCamera.CurrentCamera.Position.X;
                 var centerY = UsedCamera.CurrentCamera.Position.Y;
-
+                
                 var x1 = centerX - width * 0.5;
                 var y1 = centerY - height * 0.5;
 

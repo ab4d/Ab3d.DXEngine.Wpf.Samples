@@ -13,18 +13,6 @@
              SnapsToDevicePixels="True">
     <Grid>
         <Border Name="ViewportBorder" Grid.Column="0" Background="White" BorderThickness="2" BorderBrush="Black">
-
-            <!--<dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
-
-                <Viewport3D Name="MainViewport" IsHitTestVisible="False">
-                    <visuals:WireGridVisual3D Size="100 100" WidthCellsCount="10" HeightCellsCount="10"/>
-
-                    <visuals:WireframeVisual3D x:Name="WireframeVisual" 
-                                               WireframeType="OriginalSolidModel"
-                                               LineThickness="2" LineColor="Black" SolidModelColor="White" />
-                </Viewport3D>
-                
-            </dxControls:DXViewportView>-->
         </Border>
 
         <cameras:TargetPositionCamera Name="Camera1" 
@@ -45,7 +33,7 @@
 
         <StackPanel Name="SettingsPanel" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2">
             <Button Name="SettingsButton" PreviewMouseLeftButtonDown="SettingsButton_OnMouseDown" ContextMenuService.IsEnabled="false">
-                <TextBlock Text="Setting" />
+                <Image Source="/Resources/Settings.png" Height="16" />
                 <Button.ContextMenu>
                     <ContextMenu Name="SettingsMenu">
                         <RadioButton Name="PerspectiveCameraCheckBox" Content="Perspective camera" IsChecked="True" GroupName="CameraType" Checked="CameraTypeCheckedChanged"/>

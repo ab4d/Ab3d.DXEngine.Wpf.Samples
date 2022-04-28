@@ -50,10 +50,13 @@ Default value is 0.15.
 
 See 'Improved visuals / Alpha clipping' sample and comments in its code for more info.";
 
-            CreateSimpleDemoScene();
-
             var coloredAxisVisual3D = new ColoredAxisVisual3D();
             MainViewport.Children.Add(coloredAxisVisual3D);
+
+            this.Loaded += delegate(object sender, RoutedEventArgs args)
+            {
+                ShowCurrentDemo();
+            };
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
             {
@@ -244,7 +247,11 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             if (!this.IsLoaded)
                 return;
 
+            ShowCurrentDemo();
+        }
 
+        private void ShowCurrentDemo()
+        {
             MainViewport.Children.Clear();
             DisposeInstancedTextNodes();
 

@@ -581,22 +581,39 @@ namespace Ab3d.DirectX.Client.Diagnostics
             }
 
             // When do not render we still need to update cpu usage statistics - do that every seconds
+            SetupUpdateStatisticsTimer(1000);
+        }
+
+        private void SetupUpdateStatisticsTimer(double milliseconds)
+        {
             if (_updateStatisticsTimer == null)
             {
                 _updateStatisticsTimer = new DispatcherTimer();
-                _updateStatisticsTimer.Interval = TimeSpan.FromSeconds(1);
                 _updateStatisticsTimer.Tick += CheckToUpdateStatistics;
-                _updateStatisticsTimer.Start();
             }
+
+            _updateStatisticsTimer.Interval = TimeSpan.FromMilliseconds(milliseconds);
+            _updateStatisticsTimer.Start();
         }
 
-        private void DisposePerformanceCounters()
+        private void StopUpdateStatisticsTimer()
+        {
+            if (_updateStatisticsTimer != null)
+                _updateStatisticsTimer.Stop();
+        }
+        
+        private void DisposeUpdateStatisticsTimer()
         {
             if (_updateStatisticsTimer != null)
             {
                 _updateStatisticsTimer.Stop();
                 _updateStatisticsTimer = null;
             }
+        }
+
+        private void DisposePerformanceCounters()
+        {
+            DisposeUpdateStatisticsTimer();
 
             if (_cpuCounter != null)
             {
@@ -615,8 +632,11 @@ namespace Ab3d.DirectX.Client.Diagnostics
         {
             var elapsed = (DateTime.Now - _lastStatisticsUpdate).TotalMilliseconds;
 
-            if (elapsed > 950 && DXView != null && DXView.DXScene != null && DXView.DXScene.Statistics != null)
+            if (elapsed > (_updateStatisticsTimer.Interval.TotalMilliseconds * 0.9) && 
+                DXView != null && DXView.DXScene != null && DXView.DXScene.Statistics != null)
+            {
                 UpdateStatistics(DXView.DXScene.Statistics);
+            }
         }
 
         private void DXViewOnSceneRendered(object sender, EventArgs eventArgs)
@@ -1181,6 +1201,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
         private void UpdateStatistics(RenderingStatistics renderingStatistics)
         {
+            StopUpdateStatisticsTimer();
+
             double frameTime = renderingStatistics.UpdateTimeMs + renderingStatistics.TotalRenderTimeMs;
             double fps       = 1000 / frameTime;
 
@@ -1206,10 +1228,16 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 double elapsed = (now - _lastStatisticsUpdate).TotalMilliseconds;
 
                 if (elapsed < UpdateStatisticsInterval) // Check if the required elapsed time has already passed
+                {
+                    // We skip showing the result for this frame, but set up timer so if there will no 
+                    // additional frame rendered then we will show this frame info after the timer kick in.
+                    SetupUpdateStatisticsTimer(UpdateStatisticsInterval * 3);
+
                     return;
+                }
             }
 
-
+            
             string statisticsText;
 
             if (_showRenderingStatistics)
@@ -2925,6 +2953,9 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 AppendCameraPropertyValue(powerToysCamera, "IsDistancePercent", sb, formatString);
                 AppendCameraPropertyValue(powerToysCamera, "ShowCameraLights", sb, formatString);
 
+                if (powerToysCamera.GetType().Name == "FreeCamera")
+                    AppendCameraPropertyValue(powerToysCamera, "UpDirection", sb, formatString);
+                
                 var cameraTypeString = AppendCameraPropertyValue(powerToysCamera, "CameraType", sb, formatString);
                 if (cameraTypeString == "OrthographicCamera")
                     AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, formatString);

@@ -1,0 +1,97 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.XRayMaterialSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="PlanarShadows">
+
+    <Grid>
+        <Border Name="ViewportBorder">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Black">
+
+                <Viewport3D Name="MainViewport">
+
+                    <ModelVisual3D x:Name="ShadowPlanePlaceholder" />
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup x:Name="LightsModel3DGroup" />
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" Heading="15" Attitude="-20" Bank="0" Distance="800" TargetPosition="15 10 0"
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    ShowRotationCenterMarker="True"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" >
+            <TextBlock Text="XRay effect" FontWeight="Bold" FontSize="22" Foreground="Silver" />
+            <TextBlock Text="(drag and drop a file here to load it)" FontWeight="Bold" FontSize="14" Foreground="Silver" Margin="0 5 0 0" />
+        </StackPanel>
+
+        <Border BorderBrush="Black" BorderThickness="2" Background="#88FFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
+            <StackPanel Orientation="Vertical" Margin="10">
+
+                <TextBlock Text="XRay settings" FontWeight="Bold" FontSize="13" TextDecorations="Underline"/>
+
+                <CheckBox Name="UseModelColorCheckBox" Content="Use model's color" IsChecked="False" Margin="0 10 0 0"
+                          Checked="OnXRaySettingsChanged" Unchecked="OnXRaySettingsChanged" />
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <TextBlock Name="SingleColorTextBlock" Text="Single color:" Foreground="DimGray" VerticalAlignment="Center" Margin="0 0 3 0"/>
+                    <ComboBox Name="ColorCombobox" SelectedIndex="1" IsEnabled="False" SelectionChanged="OnXRaySettingsChanged">
+                        <ComboBoxItem Background="White">White</ComboBoxItem>
+                        <ComboBoxItem Background="#a5f6ff">LightBlue</ComboBoxItem>
+                        <ComboBoxItem Background="Green">Green</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+
+                <TextBlock Text="{Binding ElementName=FalloffSlider, Path=Value, StringFormat='Falloff: {0:0.00}'}" FontSize="13" Margin="0 10 0 0"/>
+                <Slider Name="FalloffSlider"
+                        Minimum="0" Maximum="2" Value="1" Width="150"
+                        TickFrequency="0.1" TickPlacement="BottomRight" SmallChange="0.1" LargeChange="0.2"
+                        ValueChanged="OnXRaySettingsChanged"/>
+
+
+                <CheckBox Name="TwoSidedMaterialCheckBox" Content="Use TwoSided material" IsChecked="True" Margin="0 10 0 0"
+                          Checked="OnXRaySettingsChanged" Unchecked="OnXRaySettingsChanged" />
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="ReadZBufferCheckBox" Content="ReadZBuffer" IsChecked="True" Margin="0 10 0 0"
+                              Checked="OnXRaySettingsChanged" Unchecked="OnXRaySettingsChanged" />
+                    <controls:InfoControl Margin="5 0 0 0" InfoWidth="400"
+                                          InfoText="When unchecked then objects that are rendered by XRay effect are rendered regardless of their depth (distance to the camera). This means that can be rendered over the objects that are closer to the camera."/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="WriteZBufferCheckBox" Content="WriteZBuffer" IsChecked="False" Margin="0 5 0 0"
+                              Checked="OnXRaySettingsChanged" Unchecked="OnXRaySettingsChanged" />
+                    <controls:InfoControl Margin="5 0 0 0" InfoWidth="400"
+                                          InfoText="When unchecked then objects that are rendered by XRay effect do not write to the depth buffer. This means that they do not block rendering objects that are farther away from the camera."/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>

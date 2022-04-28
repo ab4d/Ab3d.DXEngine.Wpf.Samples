@@ -125,6 +125,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             if (useDXEngineHitTesting)
             {
                 // Use DXEventManager3D from Ab3d.DXEngine - it has optimized hit testing for instanced objects
+                // It is also possible to use DXScene.GetClosestHitObject and DXScene.GetAllHitObjects methods.
                 _dxEventManager3D = new Ab3d.DirectX.Utilities.DXEventManager3D(MainDXViewportView);
 
                 var visualEventSource3D = new Ab3d.DirectX.Utilities.VisualEventSource3D(_instancedMeshGeometryVisual3D);
@@ -306,8 +307,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         }
 
 
-
-        private InstanceData[] CreateInstancesData(Point3D center, Size3D size, int xCount, int yCount, int zCount)
+        public static InstanceData[] CreateInstancesData(Point3D center, Size3D size, int xCount, int yCount, int zCount)
         {
             var instancedData = new InstanceData[xCount * yCount * zCount];
 

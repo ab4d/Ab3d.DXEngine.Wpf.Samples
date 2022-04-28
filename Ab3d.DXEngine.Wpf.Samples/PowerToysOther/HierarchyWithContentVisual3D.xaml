@@ -18,7 +18,7 @@
 
                 <Viewport3D Name="MainViewport">
                     <!-- Content for ContentVisual3D is set in code behind -->
-                    <visuals:ContentVisual3D x:Name="MainContentVisual3D" IsVisible="{Binding ElementName=IsVisibleCheckBox, Path=IsChecked}"/>
+                    <visuals:ContentVisual3D x:Name="MainContentVisual3D" />
                 </Viewport3D>
 
             </dxControls:DXViewportView>

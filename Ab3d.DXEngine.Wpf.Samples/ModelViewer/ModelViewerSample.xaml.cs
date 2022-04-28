@@ -15,6 +15,7 @@ using Ab3d.Common.Cameras;
 using Ab3d.Common.Models;
 using Ab3d.Controls;
 using Ab3d.DirectX;
+using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Models;
@@ -22,7 +23,7 @@ using Ab3d.Utilities;
 using Ab3d.Visuals;
 using Assimp;
 
-namespace Ab3d.DXEngine.Wpf.Samples.Other
+namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 {
     /// <summary>
     /// Interaction logic for ModelViewerSample.xaml
@@ -156,6 +157,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
                 // Note: to get the original Assimp's Scene object, check the assimpWpfImporter.ImportedAssimpScene
 
+
+                if (TwoSidedMaterialsCheckBox.IsChecked ?? false)
+                    SetTwoSidedMaterial(readModel3D);
+
+
                 // Show the model
                 ShowModel(readModel3D, updateCamera: isNewFile); // If we just reloaded the previous file, we preserve the current camera TargetPosition and Distance
 
@@ -175,6 +181,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
                 Mouse.OverrideCursor = null;
             }
+        }
+
+        private void SetTwoSidedMaterial(Model3D readModel3D)
+        {
+            Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(readModel3D, null, delegate(GeometryModel3D geometryModel3D, Transform3D transform3D)
+            {
+                if (geometryModel3D.BackMaterial == null)
+                    geometryModel3D.BackMaterial = geometryModel3D.Material;
+            });
         }
 
         private void ShowModel(Model3D model3D, bool updateCamera)
@@ -291,7 +306,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
         {
             if (_selectedModel3D != null && (TransparentNonSelectedObjectsCheckBox.IsChecked ?? false))
             {
-                UseTransparentMaterials(excludedModel3D: _selectedModel3D);
+                var isTwoSidedTransparentMaterial = TwoSidedTransparentMaterialCheckBox.IsChecked ?? false;
+                var isXRayMaterial = UseXRayMaterialCheckBox.IsChecked ?? false;
+
+                UseTransparentMaterials(excludedModel3D: _selectedModel3D, isTwoSidedTransparentMaterial, isXRayMaterial);
                 UseOriginalMaterials(selectedModel3D: _selectedModel3D);
             }
             else
@@ -527,13 +545,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
             });
         }
 
-        private void UseTransparentMaterials(Model3D excludedModel3D)
+        private void UseTransparentMaterials(Model3D excludedModel3D, bool isTwoSidedMaterial, bool isXRayMaterial)
         {
             if (_savedMaterials == null || _savedMaterials.Count == 0)
                 SaveOriginalModelMaterials();
 
             if (_transparentModels == null)
                 _transparentModels = new HashSet<GeometryModel3D>();
+            else
+                _transparentModels.Clear();
 
 
             Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(
@@ -544,24 +564,73 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
                     if (geometryModel3D == excludedModel3D)
                         return;
 
-                    if (_transparentModels.Contains(geometryModel3D))
-                        return; // Already set as transparent
+                    //if (_transparentModels.Contains(geometryModel3D))
+                    //{
+                    //    // Already set as transparent
+
+                    //    if (isTwoSidedMaterial && geometryModel3D.BackMaterial == null)
+                    //        geometryModel3D.BackMaterial = geometryModel3D.Material;
+                    //    else if (!isTwoSidedMaterial && geometryModel3D.BackMaterial == geometryModel3D.Material)
+                    //        geometryModel3D.BackMaterial = null;
+
+                    //    return; 
+                    //}
+
+                    DiffuseMaterial newMaterial;
 
                     System.Windows.Media.Media3D.Material material;
                     if (_savedMaterials.TryGetValue(geometryModel3D, out material))
                     {
                         var materialColor = Ab3d.Utilities.ModelUtils.GetMaterialDiffuseColor(material, Colors.White);
-                        var newDiffuseMaterial = new DiffuseMaterial(new SolidColorBrush(materialColor) { Opacity = 0.4 });
+                        newMaterial = new DiffuseMaterial(new SolidColorBrush(materialColor) { Opacity = 0.4 });
 
-                        geometryModel3D.Material = newDiffuseMaterial;
+                        if (isXRayMaterial)
+                        {
+                            // Create XRayMaterial with the material's color and default falloff setting
+                            var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 1);
+                            xRayMaterial.IsTwoSided = isTwoSidedMaterial;
+
+                            // To tell DXEngine to use the XRayMaterial instead of a material that is created from WPF's material,
+                            // we can use the SetUsedDXMaterial extension method.
+                            newMaterial.SetUsedDXMaterial(xRayMaterial);
+                        }
+                        
+                        geometryModel3D.Material = newMaterial;
                     }
-                    
-                    if (_savedBackMaterials.TryGetValue(geometryModel3D, out material))
+                    else
                     {
-                        var materialColor = Ab3d.Utilities.ModelUtils.GetMaterialDiffuseColor(material, Colors.White);
-                        var newDiffuseMaterial = new DiffuseMaterial(new SolidColorBrush(materialColor) { Opacity = 0.4 });
+                        newMaterial = null;
+                    }
 
-                        geometryModel3D.BackMaterial = newDiffuseMaterial;
+                    if (isTwoSidedMaterial && newMaterial != null)
+                    {
+                        // When using two sided material then we always set the BackMaterial
+                        geometryModel3D.BackMaterial = newMaterial;
+                    }
+                    else
+                    {
+                        if (_savedBackMaterials.TryGetValue(geometryModel3D, out material))
+                        {
+                            var materialColor = Ab3d.Utilities.ModelUtils.GetMaterialDiffuseColor(material, Colors.White);
+                            var newBackMaterial = new DiffuseMaterial(new SolidColorBrush(materialColor) { Opacity = 0.4 });
+
+                            if (isXRayMaterial)
+                            {
+                                // Create XRayMaterial with the material's color and default falloff setting
+                                var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 1);
+                                xRayMaterial.IsTwoSided = isTwoSidedMaterial;
+
+                                // To tell DXEngine to use the XRayMaterial instead of a material that is created from WPF's material,
+                                // we can use the SetUsedDXMaterial extension method.
+                                newBackMaterial.SetUsedDXMaterial(xRayMaterial);
+                            }
+
+                            geometryModel3D.BackMaterial = newBackMaterial;
+                        }
+                        else
+                        {
+                            geometryModel3D.BackMaterial = null; // reset BackMaterial in case before we used two-sided material
+                        }
                     }
 
                     _transparentModels.Add(geometryModel3D);
@@ -585,6 +654,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
                 if (_savedBackMaterials.TryGetValue(geometryModel3D, out material))
                     geometryModel3D.BackMaterial = material;
+                else
+                    geometryModel3D.BackMaterial = null; // BackMaterial may be set when using TwoSided materials
             });
 
             _transparentModels.Clear();
@@ -597,17 +668,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
             Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(selectedModel3D, null, (geometryModel3D, transform3D) =>
             {
-                bool isRemoved = _transparentModels.Remove(geometryModel3D);
-
-                if (!isRemoved)
-                    return; // model is not transparent
-
                 System.Windows.Media.Media3D.Material material;
                 if (_savedMaterials.TryGetValue(geometryModel3D, out material))
                     geometryModel3D.Material = material;
 
                 if (_savedBackMaterials.TryGetValue(geometryModel3D, out material))
                     geometryModel3D.BackMaterial = material;
+                else
+                    geometryModel3D.BackMaterial = null; // BackMaterial may be set when using TwoSided materials
+
+                // remove moved from list of transparent models (if it was in the list)
+                _transparentModels.Remove(geometryModel3D);
             });
         }
 

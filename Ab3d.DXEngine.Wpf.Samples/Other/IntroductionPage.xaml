@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20 0 20 0">
@@ -42,14 +43,15 @@
                SizeChanged="CarEngineImage_OnSizeChanged"/>
 
         <common:TextBlockEx Grid.Row="2" Margin="20 0 20 0" Style="{StaticResource InfoContent}" FontSize="14">
-            The 3D scene can be defined by using easy to use WPF 3D objects and by using many helper objects from the \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| library (the ultimate 3D toolkit). For advanced scenarios it is possible to define low-level objects (see Advanced usage section).\n
-            \n
-            This sample project demonstrates many features of the Ab3d.DXEngine. It also shows the advantages of its usage compared to using only Ab3d.PowerToys and WPF 3D (see description of the next section for more info).\n
+            \!IMPORTANT:\!\n
+            The Ab3d.DXEngine license does not include the license for Ab3d.PowerToys library. 
+            This sample project heavily uses the Ab3d.PowerToys library. When purchasing Ab3d.DXEngine library it is highly recommended to also purchase the Ab3d.PowerToys library. 
+            Otherwise you will need to provide camera controls and many other helper objects from Ab3d.PowerToys by yourself.\n
         </common:TextBlockEx>
-        <common:TextBlockEx x:Name="NuGetVersionInfoTextBlockEx" Grid.Row="3" Margin="20 0 20 0" Style="{StaticResource InfoContent}" Foreground="Black" FontSize="12" LineHeight="18">
+        <common:TextBlockEx x:Name="NuGetVersionInfoTextBlockEx" Grid.Row="4" Margin="20 0 20 0" Style="{StaticResource InfoContent}" Foreground="Black" FontSize="12" LineHeight="18">
             NOTE: You are using a version of Ab3d.PowerToys that is build for .Net Framework v4.0 - v4.8 (this version was installed by an evaluation or commercial installer). This version can be also used in the .Net Core or .Net 5.0+, but when using .Net Core or .Net 5.0+, it is recommended to use the version from \@NuGet:https://www.nuget.org/packages/Ab3d.DXEngine| that is build for the newer versions of .Net.\n
         </common:TextBlockEx>
-        <common:TextBlockEx Grid.Row="4" Margin="20 0 20 10" Style="{StaticResource InfoContent}" FontSize="12" LineHeight="18">
+        <common:TextBlockEx Grid.Row="5" Margin="20 0 20 10" Style="{StaticResource InfoContent}" FontSize="12" LineHeight="18">
             Additional information:\n
             \*\@Online Users Guide:https://www.ab4d.com/DirectX/3D/Introduction.aspx|\n
             \*Reference help: \@Online:https://www.ab4d.com/help/DXEngine/html/R_Project_Ab3d_DXEngine_Help.htm| or in "Ab3d.DXEngine Help.chm" help file (available only when using installer - installed into the root Ab3d.DXEngine folder)\n

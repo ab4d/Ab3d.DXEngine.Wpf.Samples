@@ -30,10 +30,18 @@ namespace Ab3d.DirectX.Client.Settings
             try
             {
                 DeviceCapabilities = DeviceCapabilities.QueryAdapter(adapter);
-                
-                DeviceInfoText = string.Format("Feature level: {0}; Video memory: {1:#,##0} MB",
+
+                long videoMemory = (long)AdapterDescription1.DedicatedVideoMemory;
+
+                string videoMemoryText;
+                if (videoMemory > (1024 * 1024 * 1024))
+                    videoMemoryText = string.Format("{0:0.#} GB", videoMemory / (1024 * 1024 * 1024.0));
+                else
+                    videoMemoryText = string.Format("{0:0} MB", videoMemory / (1024 * 1024));
+
+                DeviceInfoText = string.Format("Feature level: {0}; Video memory: {1}",
                     GetFeatureLevelText(DeviceCapabilities.FeatureLevel),
-                    AdapterDescription1.DedicatedVideoMemory / (1024 * 1024));
+                    videoMemoryText);
 
 
                 IsSupported = this.DeviceCapabilities.FeatureLevel >= FeatureLevel.Level_10_0;

@@ -1,4 +1,4 @@
-﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.Other.ModelViewerSample"
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.ModelViewer.ModelViewerSample"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -92,7 +92,7 @@
                                     QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
                                     ShowRotationCenterMarker="True"
                                     ZoomMode="MousePosition"
-                                    MouseMoveThreshold="2"
+                                    MouseMoveThreshold="4"
                                     RotationCursor="Hand"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
@@ -176,8 +176,10 @@
                         <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 20 0 0" />
 
                         <CheckBox Name="TransparentNonSelectedObjectsCheckBox" Content="Transparent not selected objects" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
+                        <CheckBox Name="TwoSidedTransparentMaterialCheckBox" Content="Use two-sided transparent material" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
+                        <CheckBox Name="UseXRayMaterialCheckBox" Content="Use X-Ray material" IsChecked="False" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
                         
-                        <CheckBox Name="ShowNormalsCheckBox" Content="Show Normals" IsChecked="False" Margin="0 5 0 0" Checked="OnShowNormalsCheckBoxChanged" Unchecked="OnShowNormalsCheckBoxChanged" />
+                        <CheckBox Name="ShowNormalsCheckBox" Content="Show Normals" IsChecked="False" Margin="0 10 0 0" Checked="OnShowNormalsCheckBoxChanged" Unchecked="OnShowNormalsCheckBoxChanged" />
 
                         <CheckBox Name="ShowMeshInspectorCheckBox" Content="Show MeshInspectorOverlay" IsChecked="False" Margin="0 5 0 0" Checked="OnShowMeshInspectorCheckBoxCheckedChanged" Unchecked="OnShowMeshInspectorCheckBoxCheckedChanged" />
 
@@ -227,10 +229,13 @@
                         <TextBlock Text="File load settings:" FontWeight="Bold" Margin="0 0 0 0" />
 
                         <CheckBox Name="ReadPolygonIndicesCheckBox" Content="Read PolygonIndices" Margin="0 5 0 0" IsChecked="True" Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged"
-                                  ToolTip="When checked the Assimp importer will read PolygonIndices collection that can be used to show polygons instead of triangles. Object need to be shown with wireframe to see the difference."/>
+                                  ToolTip="When checked the Assimp importer will read PolygonIndices collection that can be used&#x0a;to show polygons instead of triangles. Object need to be shown with wireframe to see the difference."/>
 
                         <CheckBox Name="ScaleLargeModelsCheckBox" Content="Scale down large models" IsChecked="True" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
-                                  ToolTip="Some imported files may define the models in actual units (meters or millimeters) and this may make the objects very big (for example, objects bounds are bigger than 100000). For such big models the camera rotation may become irregular (not smooth) because of floating point precision errors on the graphics card."/>
+                                  ToolTip="Some imported files may define the models in actual units (meters or millimeters) and&#x0a;this may make the objects very big (for example, objects bounds are bigger than 100000).&#x0a;For such big models the camera rotation may become irregular (not smooth)&#x0a;because of floating point precision errors on the graphics card."/>
+
+                        <CheckBox Name="TwoSidedMaterialsCheckBox" Content="Force two sided materials" IsChecked="False" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
+                                  ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided."/>
 
 
                         <TextBlock Text="Other:" FontWeight="Bold" Margin="0 20 0 0" />

@@ -31,7 +31,7 @@
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
         <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Row="0"
-                                    RotateAroundMousePosition="{Binding ElementName=RotateAroundMouseCheckBox, Path=IsChecked}"
+                                    RotateAroundMousePosition="True"
                                     ShowRotationCenterMarker="True"
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"

@@ -5,9 +5,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DirectX.Client.Settings</AssemblyName>
     <RootNamespace>Ab3d.DirectX.Client.Settings</RootNamespace>
-    <Version>5.0.8000</Version>
-    <AssemblyVersion>5.0.8000.2050</AssemblyVersion>
-    <FileVersion>5.0.8000.2050</FileVersion>
+    <Version>5.1.8153</Version>
+    <AssemblyVersion>5.1.8153.2050</AssemblyVersion>
+    <FileVersion>5.1.8153.2050</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="5.0.8000" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.0.8000" />  
+    <PackageReference Include="Ab3d.DXEngine" Version="5.1.8153" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.1.8153" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>

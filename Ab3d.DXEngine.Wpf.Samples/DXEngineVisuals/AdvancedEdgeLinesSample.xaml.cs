@@ -219,6 +219,7 @@ What is more, as shown in this sample, the following additional features are ava
                 Camera1.Distance = readModel3D.Bounds.GetDiagonalLength() * 1.3; 
                 Camera1.CameraWidth = readModel3D.Bounds.SizeX * 2;
 
+                Camera1.Offset         = new Vector3D(0, 0, 0); // Reset offset
                 Camera1.TargetPosition = readModel3D.Bounds.GetCenterPosition() + new Vector3D(0, readModel3D.Bounds.SizeY * 0.15, 0); // slightly move the object down so that the object is not shown over the title
             }
 

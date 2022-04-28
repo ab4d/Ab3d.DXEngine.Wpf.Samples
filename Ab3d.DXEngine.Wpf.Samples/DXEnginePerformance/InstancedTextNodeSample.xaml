@@ -63,7 +63,7 @@
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0 8 0 0">
                 <TextBlock Text="Scene type:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-                <ComboBox Name="SceneTypeComboBox" Width="150" SelectedIndex="0" SelectionChanged="SceneTypeComboBox_OnSelectionChanged">
+                <ComboBox Name="SceneTypeComboBox" Width="150" SelectedIndex="1" SelectionChanged="SceneTypeComboBox_OnSelectionChanged">
                     <ComboBoxItem>Simple demo scene</ComboBoxItem>
                     <ComboBoxItem>8,000 coordinates</ComboBoxItem>
                     <ComboBoxItem>200,000 coordinates</ComboBoxItem>

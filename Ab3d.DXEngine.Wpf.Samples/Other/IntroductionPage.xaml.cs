@@ -30,6 +30,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
 
             // Show info that for .Net Core and .Net 5.0+ it is recommended to use versions from NuGet
             NuGetVersionInfoTextBlockEx.Visibility = isNuGetVersion ? Visibility.Collapsed : Visibility.Visible;
+
+            this.Loaded += delegate(object sender, RoutedEventArgs args)
+            {
+                UpdateCarEngineImage();
+            };
         }
 
         private static bool IsRunningInVirtualMachine()
@@ -93,6 +98,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.Other
             if (!this.IsLoaded)
                 return;
 
+            UpdateCarEngineImage();
+        }
+
+        private void UpdateCarEngineImage()
+        {
             if (CarEngineImage.ActualHeight < 200)
                 CarEngineImage.Visibility = Visibility.Collapsed;
         }

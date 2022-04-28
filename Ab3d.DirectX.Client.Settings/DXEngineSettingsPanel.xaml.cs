@@ -276,7 +276,15 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
                 radioButton.IsEnabled = oneAdapterCapabilities.IsSupported;
                 radioButton.Tag = oneAdapterCapabilities;
 
-                radioButton.IsChecked = _selectedAdapterCapabilities.DisplayName == oneAdapterCapabilities.DisplayName;
+                
+                // Check if this is the selected adapter
+                // If the Adapter object exists, then check the Luid (because there may be multiple adapters with the same DisplayName in the system - in case of connecting through Remote Desktop there are two same adapters)
+                // If Adapter is null, than compare by DisplayName (WPF 3D or Software rendering)
+                bool isSelectedAdapter = (_selectedAdapterCapabilities.Adapter != null && _selectedAdapterCapabilities.AdapterDescription1.Luid == oneAdapterCapabilities.AdapterDescription1.Luid) ||
+                                         (_selectedAdapterCapabilities.Adapter == null && _selectedAdapterCapabilities.DisplayName == oneAdapterCapabilities.DisplayName);
+                
+                radioButton.IsChecked = isSelectedAdapter;
+
 
                 radioButton.Checked += (sender, e) => ChangeSelectedAdapter((AdapterCapabilitiesBase) ((RadioButton) sender).Tag);
 

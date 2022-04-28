@@ -7,9 +7,10 @@
       xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
       xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="PostProcessingTest"
       mc:Ignorable="d" 
-      d:DesignHeight="400" d:DesignWidth="600">
+      d:DesignHeight="500" d:DesignWidth="800">
     <Page.Resources>
         <DiffuseMaterial x:Key="ObjectsMaterial" Brush="#247589"/>
     </Page.Resources>    
@@ -135,6 +136,19 @@
                         <ComboBoxItem Content="3.0" />
                     </ComboBox>
                 </StackPanel>
+
+                <CheckBox Name="ColorOverlayCheckBox" Content="Color overlay" FontWeight="Bold" IsChecked="False" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
+                <controls:SimpleGrid ColumnsCount="3" ColumnSpacing="3" RowSpacing="2" Margin="20 0 0 0">
+
+                    <TextBlock Text="AddedColor:" />
+                    <TextBox Name="AddedColorTextBlock" Text="#000000" VerticalAlignment="Center" TextChanged="AddedColorTextBlock_OnTextChanged" />
+                    <Rectangle Name="AddedColorRectangle" Width="16" Height="16" Fill="Black" VerticalAlignment="Center" />
+
+                    <TextBlock Text="ColorMultiplier:" />
+                    <TextBox Name="ColorMultiplierTextBlock" Text="#FFFF00FF" VerticalAlignment="Center" TextChanged="ColorMultiplierTextBlock_OnTextChanged"/>
+                    <Rectangle Name="ColorMultiplierRectangle" Width="16" Height="16" Fill="#FF00FFFF" VerticalAlignment="Center" />
+
+                </controls:SimpleGrid>
 
             </StackPanel>
         </Border>

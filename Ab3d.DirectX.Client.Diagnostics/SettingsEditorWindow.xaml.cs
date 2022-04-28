@@ -45,7 +45,8 @@ OptimizeNearAndFarCameraPlanes";
         
         private static readonly string _dxViewPropertiesList =
 @"IsAutomaticallyUpdatingDXScene
-IsWaitingInBackgroundUntilRendered";
+IsWaitingInBackgroundUntilRendered
+UseTwoSidedMaterialsForSolidObjects";
         
 
         public SettingsEditorWindow(DXView dxView)
@@ -93,10 +94,21 @@ IsWaitingInBackgroundUntilRendered";
                 }
 
                 var propertyInfo = targetObject.GetType().GetProperty(onePropertyName);
+                FieldInfo fieldInfo;
+
                 if (propertyInfo == null)
                 {
-                    MessageBox.Show($"SettingsEditorWindow:\r\nCannot find {onePropertyName} in {targetObject.GetType().Name}");
-                    continue;
+                    fieldInfo = targetObject.GetType().GetField(onePropertyName); // This is required for DXViewportView.UseTwoSidedMaterialsForSolidObjects
+
+                    if (fieldInfo == null)
+                    {
+                        MessageBox.Show($"SettingsEditorWindow:\r\nCannot find {onePropertyName} in {targetObject.GetType().Name}");
+                        continue;
+                    }
+                }
+                else
+                {
+                    fieldInfo = null;
                 }
 
                 targetGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
@@ -109,7 +121,15 @@ IsWaitingInBackgroundUntilRendered";
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var editorControl = CreateEditorControl(propertyInfo, targetObject);
+                FrameworkElement editorControl;
+
+                if (propertyInfo != null)
+                    editorControl = CreateEditorControl(propertyInfo, targetObject);
+                else if (fieldInfo != null)
+                    editorControl = CreateEditorControl(fieldInfo, targetObject);
+                else
+                    editorControl = null;
+
                 if (editorControl == null)
                     continue; // Not supported type
 
@@ -196,6 +216,87 @@ IsWaitingInBackgroundUntilRendered";
                 {
                     textBox.ClearValue(ForegroundProperty);
                     propertyInfo.SetValue(targetObject, newValue, null);
+
+                    OnValueChanged();
+                }
+                else
+                {
+                    textBox.Foreground = Brushes.Red;
+                }
+            };
+
+            return textBox;
+        }
+        
+        private FrameworkElement CreateEditorControl(FieldInfo fieldInfo, object targetObject)
+        {
+            FrameworkElement editorControl;
+
+            if (fieldInfo.IsStatic)
+                targetObject = null;
+
+            var propertyValue = fieldInfo.GetValue(targetObject);
+
+            if (fieldInfo.FieldType == typeof(Boolean))
+            {
+                editorControl = CreateBooleanEditorControl(fieldInfo, targetObject, propertyValue);
+            }
+            else if (fieldInfo.FieldType == typeof(Int32))
+            {
+                editorControl = CreateInt32EditorControl(fieldInfo, targetObject, propertyValue);
+            }
+            else
+            {
+                // Not supported type
+                editorControl = null;
+            }
+
+            return editorControl;
+        }
+
+        private FrameworkElement CreateBooleanEditorControl(FieldInfo fieldInfo, object targetObject, object propertyValue)
+        {
+            var checkBox = new CheckBox();
+            checkBox.IsChecked = (bool) propertyValue;
+
+            checkBox.Checked += delegate(object sender, RoutedEventArgs args)
+            {
+                fieldInfo.SetValue(targetObject, true);
+                OnValueChanged();
+            };
+
+
+            checkBox.Unchecked += delegate (object sender, RoutedEventArgs args)
+            {
+                fieldInfo.SetValue(targetObject, false);
+                OnValueChanged();
+            };
+
+            return checkBox;
+        }
+
+        private FrameworkElement CreateInt32EditorControl(FieldInfo fieldInfo, object targetObject, object propertyValue)
+        {
+            var textBox = new TextBox()
+            {
+                Text = propertyValue.ToString(),
+                Width = 40,
+            };
+
+            textBox.TextChanged += delegate(object sender, TextChangedEventArgs args)
+            {
+                string valueText = textBox.Text;
+
+                if (valueText.Trim().Length == 0)
+                    return;
+
+
+                int newValue;
+
+                if (Int32.TryParse(valueText, out newValue))
+                {
+                    textBox.ClearValue(ForegroundProperty);
+                    fieldInfo.SetValue(targetObject, newValue);
 
                     OnValueChanged();
                 }

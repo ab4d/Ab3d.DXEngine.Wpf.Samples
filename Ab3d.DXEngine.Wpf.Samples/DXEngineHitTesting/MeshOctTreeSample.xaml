@@ -31,7 +31,7 @@
                                       Distance="500" 
                                       TargetViewport3D="{Binding ElementName=Viewport3D1}"/>
 
-        <cameraContoller:MouseCameraController Grid.Row="0" RotateCameraConditions="LeftMouseButtonPressed"
+        <cameraContoller:MouseCameraController Name="MouseCameraController1" Grid.Row="0" RotateCameraConditions="LeftMouseButtonPressed"
                                                MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                                TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
 
