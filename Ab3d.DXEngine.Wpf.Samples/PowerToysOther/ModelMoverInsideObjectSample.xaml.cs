@@ -15,6 +15,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ab3d.Common.EventManager3D;
+using Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 
@@ -32,23 +33,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
         //
         // When ModelMoverVisual3D is used inside DXEngine, the mouse events on UIElement3D objects that are used inside ModelMoverVisual3D will not work.
         // Therefore ModelMoverVisual3D also supports using Ab3d.Utilities.EventManager3D that can process mouse events when inside Ab3d.DXEngine.
+        // What is more, it is also possible to use DXEventManager3DWrapper that is much faster because it uses DXEngine's hit testing.
         // 
         // To make ModelMoverVisual3D work inside DXEngine, the following code changes need to be done:
         // 1) EventManager3D needs to be created and its CustomEventsSourceElement must be set the DXViewportView
-        //    or a parent Border or some other parent element that has Background property set(see line 69)
+        //    or a parent Border or some other parent element that has Background property set (see line 71)
         // 
         // 2) When ModelMoverVisual3D is created, we need to call the SubscribeWithEventManager3D method
-        //    on the created ModelMoverVisual3D and pass the EventManager3D as a parameter(see line 84)
+        //    on the created ModelMoverVisual3D and pass the EventManager3D as a parameter (see line 92)
         // 
         // 3) To allow the user to click on arrows that are inside the selected model, we need to exclude the selected
-        //    model from being processed by EventManager3D.This can be done by calling RegisterExcludedVisual3D on EventManager3D(see line 226)
+        //    model from being processed by EventManager3D.This can be done by calling RegisterExcludedVisual3D on EventManager3D (see line 236)
         // 
-        // 4) Because we called RegisterExcludedVisual3D, we need to call RemoveExcludedVisual3D after the mouse moving is completed(see line 207)
+        // 4) Because we called RegisterExcludedVisual3D, we need to call RemoveExcludedVisual3D after the mouse moving is completed (see line 217)
         //
 
         private static Random _rnd = new Random();
 
-        private readonly Ab3d.Utilities.EventManager3D _eventManager;
+        private readonly DXEventManager3DWrapper _eventManager;
 
         private readonly DiffuseMaterial _normalMaterial;
         private readonly DiffuseMaterial _selectedMaterial;
@@ -66,7 +68,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             _normalMaterial = new DiffuseMaterial(Brushes.Silver);
             _selectedMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(150, 192, 192, 192))); // semi-transparent Silver
 
-            _eventManager = new Ab3d.Utilities.EventManager3D(MainViewport);
+            _eventManager = new DXEventManager3DWrapper(MainDXViewportView); // It would be also possible to create Ab3d.Utilities.EventManager3D, but using DXEventManager3DWrapper is faster because it uses DXEngine's hit testing
             _eventManager.CustomEventsSourceElement = ViewportBorder;
 
             CreateRandomScene();
