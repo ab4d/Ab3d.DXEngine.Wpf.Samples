@@ -80,6 +80,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                                     return DXHitTestOptions.HitTestFilterResult.ContinueSkipSelfAndChildren;
                             }
                         }
+                        else
+                        {
+                            var wpfUiElement3DNode = node as WpfUIElement3DNode;
+                            if (wpfUiElement3DNode != null)
+                            {
+                                for (var i = 0; i < excludedVisuals.Count; i++)
+                                {
+                                    if (ReferenceEquals(wpfUiElement3DNode.UIElement3D, excludedVisuals[i]))
+                                        return DXHitTestOptions.HitTestFilterResult.ContinueSkipSelfAndChildren;
+                                }
+                            }
+                        }
 
                         return DXHitTestOptions.HitTestFilterResult.Continue;
                     };
@@ -286,16 +298,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             }
 
             SceneNode currentNode = dxRayHitTestResult.HitSceneNode;
-            while (currentNode != null && !(currentNode is WpfModelVisual3DNode))
+            while (currentNode != null && !(currentNode is WpfModelVisual3DNode) &&  !(currentNode is WpfUIElement3DNode))
             {
                 currentNode = currentNode.ParentNode;
             }
 
             var wpfModelVisual3DNode = currentNode as WpfModelVisual3DNode;
             if (wpfModelVisual3DNode != null)
+            {
                 visualHit = wpfModelVisual3DNode.ModelVisual3D;
+            }
             else
-                visualHit = null;
+            {
+                var wpfUiElement3DNode = currentNode as WpfUIElement3DNode;
+
+                if (wpfUiElement3DNode != null)
+                    visualHit = wpfUiElement3DNode.UIElement3D;
+                else
+                    visualHit = null;
+            }
 
             var rayMeshGeometry3DHitTestResult = CreateRayMeshGeometry3DHitTestResult(
                     visualHit,
