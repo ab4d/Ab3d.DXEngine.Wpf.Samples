@@ -81,7 +81,7 @@
     
     <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="275"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 

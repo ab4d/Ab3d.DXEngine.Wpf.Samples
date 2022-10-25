@@ -7,9 +7,9 @@
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>5.1.8153</Version>
-    <AssemblyVersion>5.1.8153.2300</AssemblyVersion>
-    <FileVersion>5.1.8153.2300</FileVersion>  
+    <Version>5.2.8332</Version>
+    <AssemblyVersion>5.2.8332.2300</AssemblyVersion>
+    <FileVersion>5.2.8332.2300</FileVersion>  
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -57,11 +57,13 @@
     <None Remove="Resources\ab4d-logo.png" />
     <None Remove="Resources\AlphaTextures\tree0.dds" />
     <None Remove="Resources\AlphaTextures\WireFence.dds" />
+    <None Remove="Resources\animation.png" />
     <None Remove="Resources\BricksMaps\bricks.png" />
     <None Remove="Resources\BricksMaps\bricks_ao.png" />
     <None Remove="Resources\BricksMaps\bricks_normal.png" />
     <None Remove="Resources\BricksMaps\bricks_specular.png" />
     <None Remove="Resources\BricksMaps\readme.txt" />
+    <None Remove="Resources\cameras.png" />
     <None Remove="Resources\Diagnostics-gray.png" />
     <None Remove="Resources\Diagnostics.png" />
     <None Remove="Resources\DXEngine-car_engine.png" />
@@ -79,6 +81,7 @@
     <None Remove="Resources\HeightMaps\world.topo.200407.3x500x250.png" />
     <None Remove="Resources\info_icon.png" />
     <None Remove="Resources\info_orange_icon.png" />
+    <None Remove="Resources\lights.png" />
     <None Remove="Resources\Models\bun_zipper_res3.obj" />
     <None Remove="Resources\Models\bun_zipper_res3.obj.mtl" />
     <None Remove="Resources\Models\bun_zipper_res3_readme.txt" />
@@ -101,6 +104,8 @@
     <None Remove="Resources\Models\Teapot.mtl" />
     <None Remove="Resources\Models\Teapot.obj" />
     <None Remove="Resources\new_icon.png" />
+    <None Remove="Resources\objects.png" />
+    <None Remove="Resources\options.png" />
     <None Remove="Resources\palazz_sport.bin" />
     <None Remove="Resources\PowerToysTexture.png" />
     <None Remove="Resources\RobotModel\get 4k textures.txt" />
@@ -440,6 +445,12 @@
     </Resource>
     <Resource Include="Resources\Ab3dPowerToysSamples.png" />
     <Resource Include="Resources\ab4d-logo.png" />
+    <Resource Include="Resources\animation.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\cameras.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Diagnostics-gray.png" />
     <Resource Include="Resources\Diagnostics.png" />
     <Resource Include="Resources\DXEngine-car_engine.png" />
@@ -452,7 +463,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\info_orange_icon.png" />
+    <Resource Include="Resources\lights.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\new_icon.png" />
+    <Resource Include="Resources\objects.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\options.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\PowerToysTexture.png" />
     <Resource Include="Resources\Settings.png" />
     <Resource Include="Resources\ShaderFactoryScreenshot.PNG" />

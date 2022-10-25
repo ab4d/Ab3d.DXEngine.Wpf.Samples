@@ -377,9 +377,10 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         public static string GetAllAdaptersInfo(int indent = 0)
         {
+            var sb = new StringBuilder();
+
             Adapter1[] allSystemAdapters = null;
 
-            var sb = new StringBuilder();
 
             try
             {
@@ -395,6 +396,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
                         sb.Append(adapterDetailsText);
                     }
+
+                    oneSystemAdapter.Dispose();
                 }
             }
             catch (Exception ex)

@@ -27,7 +27,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string _startupPage = "DXEngineOther/MultiDXViewportViewsSample.xaml";
+        //private string _startupPage = "ModelViewer/ModelViewerSample.xaml";
         private string _startupPage = null;
 
         private DXViewportView _lastShownDXViewportView;
@@ -75,7 +75,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
                     // Here we just show a MessageBox with some exception info.
                     // In a real application it is recommended to report or store full exception and system info (fullSystemInfo)
-                    MessageBox.Show(string.Format("Unhandled {0} occured while running the sample:\r\n{1}\r\n\r\nIf this is not expected, please report that to support@ab4d.com.", 
+                    MessageBox.Show(string.Format("Unhandled {0} occurred while running the sample:\r\n{1}\r\n\r\nIf this is not expected, please report that to support@ab4d.com.", 
                         e.ExceptionObject.GetType().Name,
                         ((Exception) e.ExceptionObject).Message),
                         "Ab3d.DXEngine exception", MessageBoxButton.OK, MessageBoxImage.Error);

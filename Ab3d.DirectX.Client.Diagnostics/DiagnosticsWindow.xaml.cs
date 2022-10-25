@@ -402,7 +402,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
             {
                 if ((DXView.DXScene.UseSharedWpfTexture ?? true) == false) // warning when not using a shared texture (if value is not yet set, then consider as true for now - we have subscribed to LogActions and will catch the waring in case this will be set to false)
                 {
-                    var defaultAdapter = DXDevice.GetAllSystemAdapters().FirstOrDefault();
+                    var allAdapters = DXDevice.GetAllSystemAdapters();
+                    var defaultAdapter = allAdapters[0];
                     var usedAdapter = DXView.DXScene.DXDevice.Adapter;
 
                     string warningText;
@@ -413,6 +414,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
                         warningText = "Ab3d.DXEngine is not using a shared texture. This means that the rendered image needs to be copied to the main CPU memory. This usually happens when Ab3d.DXEngine is using a non-default adapter (different adapter then WPF). If DXScene.UseSharedWpfTexture was intentionally set to false, then this warning can be discarded.";
 
                     DXEngineLogAction(DXDiagnostics.LogLevels.Warn, warningText);
+
+                    foreach (var adapter in allAdapters)
+                        adapter.Dispose();
                 }
             }
         }
@@ -438,6 +442,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
                     {
                         DXEngineLogAction(DXDiagnostics.LogLevels.Warn, string.Format("The Ab3d.DXEngine is using an adapter (graphics card) that is not the best adapter on this computer - using: '{0}'; best: '{1}'. On laptop computers with Optimus or similar technology you may try to start the application with using the best graphics card.", usedAdapter.Description.Description, bestAdapter.Description.Description));
                     }
+
+                    foreach (var adapter in allAdapters)
+                        adapter.Dispose();
                 }
             }
         }
@@ -764,28 +771,8 @@ namespace Ab3d.DirectX.Client.Diagnostics
             if (DXView.DXScene == null || DXView.DXScene.RenderingContext == null)
                 return;
 
-            DXView.DXScene.RenderingContext.RegisterBackBufferMapping(StagingBackBufferMappedCallback);
-
-            // After we have subscribed to capture next frame, we can force rendering that frame
-            DXView.Refresh();
-        }
-
-        private void StagingBackBufferMappedCallback(object s, BackBufferReadyEventArgs e)
-        {
-            try
-            {
-                var renderedBitmap = CreatedRenderedBitmap(e);
-
-                DXView.DXScene.RenderingContext.UnregisterBackBufferMapping(StagingBackBufferMappedCallback);
-
-                // We do not want to show SaveFileDialog inside a rendering pipeline.
-                // So once we have the image in main memory in WriteableBitmap, we delay the invoke of saving bitmap and exit this callback 
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => { SaveRenderedBitmap(renderedBitmap); }));
-            }
-            catch
-            {
-                // Do not crash DXEngine in case of exception
-            }
+            var renderToBitmap = DXView.RenderToBitmap();
+            SaveRenderedBitmap(renderToBitmap);
         }
 
         private void DumpSceneNodesMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -2301,19 +2288,10 @@ StateChangesCount: {16:#,##0}{17}{18}",
                         string renderedBitmapBase64String = null;
 
                         // To get a copy of next rendered scene, we can use the RegisterBackBufferMapping method that is called when the rendered scene's bitmap is ready to be copied to main memory
-                        dxView.DXScene.RenderingContext.RegisterBackBufferMapping(delegate(object s, BackBufferReadyEventArgs args)
-                        {
-                            try
-                            {
-                                var renderedBitmap = CreatedRenderedBitmap(args);
-                                renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
-                            }
-                            catch
-                            {
-                                // Do not crash DXEngine in case of exception
-                            }
-                        });
-
+                    
+                        var renderedBitmap = dxView.RenderToBitmap();
+                        renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
+                
                         // After we have subscribed to capture next frame, we can force rendering that frame
                         try
                         {
@@ -2569,7 +2547,7 @@ StateChangesCount: {16:#,##0}{17}{18}",
             System.IO.File.AppendAllText(DumpFileName, title + "\r\n\r\n" + content + "\r\n##########################\r\n\r\n");
         }
 
-        private string GetRenderedBitmapBase64String(WriteableBitmap renderedBitmap)
+        private string GetRenderedBitmapBase64String(BitmapSource renderedBitmap)
         {
             if (renderedBitmap == null)
                 return "RenderedBitmap is null";

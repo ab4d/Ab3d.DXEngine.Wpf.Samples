@@ -5,9 +5,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DirectX.Client.Settings</AssemblyName>
     <RootNamespace>Ab3d.DirectX.Client.Settings</RootNamespace>
-    <Version>5.1.8153</Version>
-    <AssemblyVersion>5.1.8153.2300</AssemblyVersion>
-    <FileVersion>5.1.8153.2300</FileVersion>
+    <Version>5.2.8332</Version>
+    <AssemblyVersion>5.2.8332.2300</AssemblyVersion>
+    <FileVersion>5.2.8332.2300</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

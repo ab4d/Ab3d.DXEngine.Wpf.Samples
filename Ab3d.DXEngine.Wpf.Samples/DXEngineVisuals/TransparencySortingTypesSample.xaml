@@ -1,0 +1,86 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.TransparencySortingTypesSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      Title="StandardXaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="800">
+    <Grid Name="RootGrid">
+        <Border Name="ViewportBorder" Background="Transparent">
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="White">
+
+                <Viewport3D Name="MainViewport">
+
+                    <visuals:PlaneVisual3D x:Name="BackgroundPlaneVisual3D" CenterPosition="0 -10 0" Size="2000 1200" Material="DimGray" BackMaterial="Black" />
+
+                    <ModelVisual3D x:Name="SemiTransparentRootVisual3D"></ModelVisual3D>
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup>
+                                <AmbientLight Color="#333333"/>
+                            </Model3DGroup>
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                      TargetPosition="0 0 0" 
+                                      Heading="0" Attitude="-42" Bank="0" 
+                                      Distance="1800" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    ShowRotationCenterMarker="True"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+
+        <Border  Margin="5 10" VerticalAlignment="Bottom" HorizontalAlignment="Right" BorderBrush="Black" BorderThickness="2" Background="#DDFFFFFF">
+            <StackPanel Orientation="Vertical" Margin="10 10">
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="NoSortingRadioButton" Content="No transparency sorting" GroupName="SortingType" Checked="NoSortingRadioButton_OnChecked" />
+                    <controls:InfoControl x:Name="NoSortingInfoControl" InfoWidth="400" Margin="5 0 0 0" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <RadioButton Name="CenterSortingRadioButton" Content="Transparency sorting by center of bounding box" GroupName="SortingType" VerticalAlignment="Center" Checked="CenterSortingRadioButton_OnChecked" />
+                    <controls:InfoControl x:Name="CenterSortingInfoControl" InfoWidth="400" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <RadioButton Name="AllCornersRadioButton" Content="Transparency sorting of all bounding box corners" IsChecked="True" GroupName="SortingType" Checked="AllCornersRadioButton_OnChecked" />
+                    <controls:InfoControl x:Name="AllCornersInfoControl" InfoWidth="400" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="NoDepthCheckBox" Content="Prevent writing to depth for transparent objects" Margin="0 10 0 0" 
+                              Checked="NoDepthCheckBoxCheckedChanged" Unchecked="NoDepthCheckBoxCheckedChanged"/>
+                    <controls:InfoControl x:Name="NoDepthInfoControl" InfoWidth="400" Margin="5 0 0 0" />
+                </StackPanel>
+                
+                <Button Name="StartStopObjectRotationButton" Content="Stop object rotation" Margin="0 10 0 0" HorizontalAlignment="Left" Padding="8 2" Click="StartStopObjectRotationButton_OnClick" />
+
+            </StackPanel>
+        </Border>
+
+        <TextBlock FontWeight="Bold" FontSize="20" Foreground="#444" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                   Text="Transparency sorting"/>
+
+    </Grid>
+</Page>

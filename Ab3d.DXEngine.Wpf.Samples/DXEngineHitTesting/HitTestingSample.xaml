@@ -3,14 +3,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
     xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
-    xmlns:cameraContoller="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"
+    xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"
     xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
     MinHeight="300" MinWidth="500"
     Title="EventManagerDragSample">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="270" />
         </Grid.ColumnDefinitions>
 
         <Border Name="ViewportBorder" Grid.Column="0" Background="Transparent">
@@ -22,7 +22,7 @@
             </dxControls:DXViewportView>
         </Border>
 
-        <Ellipse Name="OverlayEllipse" Grid.Column="0" Width="10" Height="10" Stroke="Blue" StrokeThickness="1" 
+        <Ellipse Name="OverlayEllipse" Grid.Column="0" Width="12" Height="12" Stroke="Red" StrokeThickness="2" 
                  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-5 -5 0 0" IsHitTestVisible="False" />
 
         <TextBlock Grid.Column="0" FontWeight="Bold" FontSize="20" Foreground="Gray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
@@ -34,14 +34,13 @@
                                       Distance="500" 
                                       TargetViewport3D="{Binding ElementName=Viewport3D1}"/>
 
-        <cameraContoller:MouseCameraController x:Name="MouseCameraController1" Grid.Column="0"
+        <ab3d:MouseCameraController x:Name="MouseCameraController1" Grid.Column="0"
                                                RotateCameraConditions="LeftMouseButtonPressed"
                                                MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                                TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
 
-        <cameraContoller:MouseCameraControllerInfo Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <ab3d:MouseCameraControllerInfo Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                                                    MouseCameraController="{Binding ElementName=MouseCameraController1}" />
-
         
         <Grid Grid.Column="1" Margin="3 0 0 0">
             <Grid.RowDefinitions>
@@ -53,13 +52,18 @@
                 <Button Name="GetAllHitObjectsButton" Content="Get all hit objects" IsDefault="True" Click="GetAllHitObjectsButton_OnClick" Margin="0 5" Padding="0 5" />
                 <Button Name="GetClosestObjectButton" Content="Get closes hit object" Click="GetClosestObjectButton_OnClick" Padding="0 5"/>
 
-                <CheckBox Name="OnlyFrontTrianglesCheckBox" Content="GetOnlyFrontFacingTriangles" IsChecked="False" Margin="0 15 0 0" 
+                <CheckBox Name="GenerateOctTreeCheckBox" Content="Automatically generate OctTree" IsChecked="True" Margin="0 15 0 0" Checked="OnGenerateOctTreeCheckBoxCheckedChanged" Unchecked="OnGenerateOctTreeCheckBoxCheckedChanged"
+                          ToolTip="When checked, then OctTree is generated to improve hit testing performance&#x0a;by significantly reducing the number of tested triangles.&#x0a;See OctTree sample for more info how OctTree works."/>
+                
+                <CheckBox Name="OnlyFrontTrianglesCheckBox" Content="GetOnlyFrontFacingTriangles" IsChecked="False" Margin="0 3 0 0" 
                           ToolTip="When GetOnlyFrontFacingTriangles is true, then only triangles that are facing the camera will be hit."/>
 
-                <CheckBox Name="SphereIsHitTestVisibleCheckBox" Content="Sphere.IsHitTestVisible" IsChecked="True" Margin="0 10 0 0" Checked="OnSphereIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnSphereIsHitTestVisibleCheckBoxCheckedChanged" />
-                <CheckBox Name="TeapotIsHitTestVisibleCheckBox" Content="Teapot.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnTeapotIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnTeapotIsHitTestVisibleCheckBoxCheckedChanged" />
+                <CheckBox Name="SphereIsHitTestVisibleCheckBox" Content="Sphere.IsHitTestVisible" IsChecked="True" Margin="0 15 0 0" Checked="OnSphereIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnSphereIsHitTestVisibleCheckBoxCheckedChanged" />
+                <CheckBox Name="GrayTeapotIsHitTestVisibleCheckBox" Content="GrayTeapot.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnGrayTeapotIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnGrayTeapotIsHitTestVisibleCheckBoxCheckedChanged" />
                 <CheckBox Name="PyramidIsHitTestVisibleCheckBox" Content="Pyramid.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnPyramidIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnPyramidIsHitTestVisibleCheckBoxCheckedChanged" />
                 <CheckBox Name="BoxesIsHitTestVisibleCheckBox" Content="Boxes.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnBoxesIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnBoxesIsHitTestVisibleCheckBoxCheckedChanged" />
+                <CheckBox Name="BlueTeapotIsHitTestVisibleCheckBox" Content="BlueTeapot.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnBlueTeapotIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnBlueTeapotIsHitTestVisibleCheckBoxCheckedChanged" />
+                <CheckBox Name="GreenTeapotIsHitTestVisibleCheckBox" Content="GreenTeapot.IsHitTestVisible" IsChecked="True" Margin="0 3 0 0" Checked="OnGreenTeapotIsHitTestVisibleCheckBoxCheckedChanged" Unchecked="OnGreenTeapotIsHitTestVisibleCheckBoxCheckedChanged" />
             </StackPanel>
             
             <TextBox Name="ResultTextBox" Grid.Row="1" Margin="0 15 0 0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />

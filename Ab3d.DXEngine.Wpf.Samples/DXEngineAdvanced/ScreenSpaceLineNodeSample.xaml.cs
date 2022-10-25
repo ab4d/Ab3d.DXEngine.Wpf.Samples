@@ -59,6 +59,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         private ScreenSpaceLineNode _screenSpaceLineNode3;
         private ScreenSpaceLineNode _screenSpaceLineNode4;
         private ScreenSpaceLineNode _screenSpaceLineNode5;
+        private ScreenSpaceLineNode _screenSpaceLineNode6;
         private ScreenSpaceLineMesh _screenSpaceLineMesh;
         
         private Random _rnd = new Random();
@@ -79,14 +80,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             _screenSpaceLineNode3 = CreateLinesWithPositions(linePositions, isLineStrip: true, isPolyLine: true, isLineClosed: false, lineColor: Colors.Red, xOffset: 0);
             AddTextBlockVisual3D(xOffset: 0, isLineStrip: true, isPolyLine: true);
-
-            _screenSpaceLineNode4 = CreateLinesWithLineMesh(linePositions, isLineStrip: false, isLineClosed: false, isPolyLine: false, lineColor: Colors.Orange, xOffset: 60, screenSpaceLineMesh: out _screenSpaceLineMesh);
-            AddTextBlockVisual3D(xOffset: 60, "using\r\nScreenSpaceLineMesh", new Size(50, 20));
             
-            _screenSpaceLineNode5 = CreateLinesWithPositions(linePositions, isLineStrip: false, isPolyLine: false, isLineClosed: false, lineColor: Colors.Red, xOffset: 120);
+            _screenSpaceLineNode4 = CreateMultiPolyLines(linePositions, isLineStrip: true, isPolyLine: true, isLineClosed: false, lineColor: Colors.DarkGray, xOffset: 60);
+            AddTextBlockVisual3D(xOffset: 60, "multi poly-lines with\r\none ScreenSpaceLineNode", new Size(60, 20));
+
+            _screenSpaceLineNode5 = CreateLinesWithLineMesh(linePositions, isLineStrip: false, isLineClosed: false, isPolyLine: false, lineColor: Colors.Orange, xOffset: 120, screenSpaceLineMesh: out _screenSpaceLineMesh);
+            AddTextBlockVisual3D(xOffset: 120, "using\r\nScreenSpaceLineMesh", new Size(50, 20));
+            
+            _screenSpaceLineNode6 = CreateLinesWithPositions(linePositions, isLineStrip: false, isPolyLine: false, isLineClosed: false, lineColor: Colors.Red, xOffset: 180);
             // To render multiple lines with different line colors with a single draw call we need to use PositionColoredLineMaterial
             SetPositionColoredLineMaterialColors();
-            AddTextBlockVisual3D(xOffset: 120, "using\r\nPositionColoredLineMaterial", new Size(60, 20));
+            AddTextBlockVisual3D(xOffset: 180, "using\r\nPositionColoredLineMaterial", new Size(60, 20));
 
             Unloaded += delegate
             {
@@ -127,7 +131,46 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         {
             var lineMaterial = CreateLineMaterial(isPolyLine, lineColor);
 
-            var screenSpaceLineNode = new ScreenSpaceLineNode(linePositions, isLineStrip, isLineClosed, lineMaterial);
+            var linePositionsCopy = linePositions.ToArray(); // make a copy so that when changing the positions we change the positions on each individual LineNode
+
+            var screenSpaceLineNode = new ScreenSpaceLineNode(linePositionsCopy, isLineStrip, isLineClosed, lineMaterial);
+            screenSpaceLineNode.Transform = new Transformation(SharpDX.Matrix.Translation(xOffset, 0, 0));
+
+            // To show ScreenSpaceLineNode in DXViewportView we need to put it inside a SceneNodeVisual3D
+            var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
+            MainViewport.Children.Add(sceneNodeVisual3D);
+
+            _disposables.Add(screenSpaceLineNode);
+            _disposables.Add(lineMaterial);
+
+            return screenSpaceLineNode;
+        }
+        
+        private ScreenSpaceLineNode CreateMultiPolyLines(Vector3[] linePositions, bool isLineStrip, bool isPolyLine, bool isLineClosed, Color lineColor, float xOffset)
+        {
+            var lineMaterial = CreateLineMaterial(isPolyLine, lineColor);
+
+            // Convert single positions array into multiple array each with 4 positions
+            var allPolylines = new List<Vector3[]>();
+            Vector3[] onePolylinePositions = null;
+
+            int posIndex = 0;
+            for (int i = 0; i < linePositions.Length; i++)
+            {
+                if (i % 4 == 0)
+                {
+                    onePolylinePositions = new Vector3[4];
+                    allPolylines.Add(onePolylinePositions);
+                    
+                    posIndex = 0;
+                }
+
+                onePolylinePositions[posIndex] = linePositions[i];
+                posIndex++;
+            }
+
+            // Use ScreenSpaceLineNode that takes ICollection<Vector3[]> as first parameter
+            var screenSpaceLineNode = new ScreenSpaceLineNode(allPolylines, isLineStrip, isLineClosed, lineMaterial);
             screenSpaceLineNode.Transform = new Transformation(SharpDX.Matrix.Translation(xOffset, 0, 0));
 
             // To show ScreenSpaceLineNode in DXViewportView we need to put it inside a SceneNodeVisual3D
@@ -169,6 +212,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             // When the line positions are changed many times, it is recommended to set CreateDynamicVertexBuffer to true.
             screenSpaceLineMesh.CreateDynamicVertexBuffer = true;
 
+            // To render multiple poly-lines with one draw call, set the screenSpaceLineMesh.LineIndices to an array of indices (set -1 as index to cut a line strip).
+            // Note that to render multiple poly-lines the positions need to define adjacency positions for each polyline
+            // (this can be automatically generated by ScreenSpaceLineNode when it is created by passing ICollection<Vector3[]> as first parameter).
+
             var lineMaterial = CreateLineMaterial(isPolyLine, lineColor);
 
             var screenSpaceLineNode = new ScreenSpaceLineNode(screenSpaceLineMesh, lineMaterial);
@@ -199,7 +246,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void SetPositionColoredLineMaterialColors()
         {
-            int positionsCount = _screenSpaceLineNode5.Positions.Length;
+            int positionsCount = _screenSpaceLineNode6.Positions.Length;
 
             var positionColors = new Color4[positionsCount];
 
@@ -215,11 +262,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             var positionColoredLineMaterial = new PositionColoredLineMaterial()
             {
-                LineThickness = _screenSpaceLineNode5.LineMaterial.LineThickness,
+                LineThickness = _screenSpaceLineNode6.LineMaterial.LineThickness,
                 PositionColors = positionColors,
             };
 
-            _screenSpaceLineNode5.LineMaterial = positionColoredLineMaterial;
+            _screenSpaceLineNode6.LineMaterial = positionColoredLineMaterial;
 
             _disposables.Add(positionColoredLineMaterial);
         }
@@ -254,7 +301,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void ChangePositions(ScreenSpaceLineNode screenSpaceLineNode)
         {
-            ChangePositions(screenSpaceLineNode.Positions);
+            if (screenSpaceLineNode.Positions != null)
+            {
+                ChangePositions(screenSpaceLineNode.Positions); 
+            }
+            else if (screenSpaceLineNode.MultiPositions != null)
+            {
+                foreach (var multiPosition in screenSpaceLineNode.MultiPositions)
+                    ChangePositions(multiPosition);
+            }
 
             screenSpaceLineNode.UpdatePositions();
             screenSpaceLineNode.UpdateBounds();
@@ -294,8 +349,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             ChangePositions(_screenSpaceLineNode1);
             ChangePositions(_screenSpaceLineNode2);
             ChangePositions(_screenSpaceLineNode3);
-            ChangePositions(_screenSpaceLineNode4, _screenSpaceLineMesh);
-            ChangePositions(_screenSpaceLineNode5);
+            ChangePositions(_screenSpaceLineNode4);
+            ChangePositions(_screenSpaceLineNode5, _screenSpaceLineMesh);
+            ChangePositions(_screenSpaceLineNode6);
         }
 
         private void ChangeColorButton_OnClick(object sender, RoutedEventArgs e)
@@ -307,8 +363,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             ((LineMaterial)_screenSpaceLineNode1.LineMaterial).LineColor = randomColor;
             ((LineMaterial)_screenSpaceLineNode2.LineMaterial).LineColor = randomColor;
-            ((LineMaterial)_screenSpaceLineNode3.LineMaterial).LineColor = randomColor;
             ((LineMaterial)_screenSpaceLineNode4.LineMaterial).LineColor = randomColor;
+            ((LineMaterial)_screenSpaceLineNode3.LineMaterial).LineColor = randomColor;
+            ((LineMaterial)_screenSpaceLineNode5.LineMaterial).LineColor = randomColor;
 
             SetPositionColoredLineMaterialColors();
 
@@ -325,6 +382,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             ((LineMaterial) _screenSpaceLineNode3.LineMaterial).LineThickness += 2;
             ((LineMaterial) _screenSpaceLineNode4.LineMaterial).LineThickness += 2;
             ((LineMaterial) _screenSpaceLineNode5.LineMaterial).LineThickness += 2;
+            ((LineMaterial) _screenSpaceLineNode6.LineMaterial).LineThickness += 2;
 
             _screenSpaceLineNode1.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
         }

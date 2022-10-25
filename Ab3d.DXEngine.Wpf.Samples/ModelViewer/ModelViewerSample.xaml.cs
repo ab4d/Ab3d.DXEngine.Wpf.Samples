@@ -34,6 +34,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
         private Model3D _loadedModel3D;
 
+        private DisposeList _modelDisposeList;
+
         private Model3D _selectedModel3D;
         private Transform3D _selectedModelParentTransform3D;
         private Transform3D _selectedModelFullTransform3D;
@@ -81,12 +83,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.3DS");
             LoadModel(startUpFileName);
 
-            this.Loaded += delegate(object sender, RoutedEventArgs args)
-            {
-                UpdateAmbientLight();
-                UpdateNormalsAndMeshInspectorColors();
-            };
-
             // To allow using left mouse button for camera rotation and for object selection, we need to subscribe to PreviewMouse events.
             // We also need to set the MouseMoveThreshold in the MouseCameraController to prevent starting a rotation on mouse down.
             ViewportBorder.PreviewMouseLeftButtonDown += OnMouseLeftButtonDown;
@@ -96,6 +92,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             this.Focusable = true; // by default Page is not focusable and therefore does not receive keyDown event
             this.PreviewKeyDown += OnPreviewKeyDown;
             this.Focus();
+
+
+            this.Loaded += delegate (object sender, RoutedEventArgs args)
+            {
+                UpdateAmbientLight();
+                UpdateNormalsAndMeshInspectorColors();
+            };
+
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
+            {
+                if (_modelDisposeList != null)
+                {
+                    _modelDisposeList.Dispose();
+                    _modelDisposeList = null;
+                }
+
+                MainDXViewportView.Dispose();
+            };
         }
 
 
@@ -117,6 +131,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 MessageBox.Show("Assimp does not support importing files file extension: " + fileExtension);
                 return;
             }
+
+
+            if (_modelDisposeList != null)
+                _modelDisposeList.Dispose();
+
+            _modelDisposeList = new DisposeList();
+
 
             try
             {
@@ -236,7 +257,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
 
             if (updateCamera)
-                Camera1.FitIntoView(FitIntoViewType.CheckBounds, adjustTargetPosition: true, adjustmentFactor: 1, waitUntilCameraIsValid: true); // if camera is not valid (for example when the size of Viewport3D is not set yet), then wait until camera is valid and then automatically call FitIntoView
+            {
+                // Adjust the camera so the bounding box of the loaded model will fit into view
+                // if camera is not valid (for example when the size of Viewport3D is not set yet), then wait until camera is valid and then automatically call FitIntoView
+                Camera1.FitIntoView(model3D.Bounds, adjustTargetPosition: true, adjustmentFactor: 1, waitUntilCameraIsValid: true); 
+            }
 
 
             FillTreeView(model3D);
@@ -245,6 +270,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private void ClearCurrentModel()
         {
             _loadedModel3D = null;
+            _selectedModel3D = null;
             ContentVisual.Content = null;
 
             if (_transparentModels != null)
@@ -586,13 +612,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                         if (isXRayMaterial)
                         {
-                            // Create XRayMaterial with the material's color and default falloff setting
-                            var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 1);
+                            // Create XRayMaterial with the material's color and falloff set to 0.3 that will lower the amount of color xray will produce
+                            var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 0.3f);
                             xRayMaterial.IsTwoSided = isTwoSidedMaterial;
 
                             // To tell DXEngine to use the XRayMaterial instead of a material that is created from WPF's material,
                             // we can use the SetUsedDXMaterial extension method.
                             newMaterial.SetUsedDXMaterial(xRayMaterial);
+
+
+                            // We need to manually dispose all DXEngine's resources that are created by us
+                            _modelDisposeList.Add(xRayMaterial);
                         }
                         
                         geometryModel3D.Material = newMaterial;
@@ -616,8 +646,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                             if (isXRayMaterial)
                             {
-                                // Create XRayMaterial with the material's color and default falloff setting
-                                var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 1);
+                                // Create XRayMaterial with the material's color and falloff set to 0.3 that will lower the amount of color xray will produce
+                                var xRayMaterial = new XRayMaterial(materialColor.ToColor3(), falloff: 0.3f);
                                 xRayMaterial.IsTwoSided = isTwoSidedMaterial;
 
                                 // To tell DXEngine to use the XRayMaterial instead of a material that is created from WPF's material,
@@ -937,7 +967,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 AllWireframesLineVisual3D.LineThickness = GetDoubleFromComboBox(LineThicknessComboBox, fallbackValue: 0.5);
 
                 SelectedModelWireframeVisual3D.LineColor = AllWireframesLineVisual3D.LineColor;
-                SelectedModelWireframeVisual3D.LineColor = AllWireframesLineVisual3D.LineColor;
+                SelectedModelWireframeVisual3D.LineThickness = AllWireframesLineVisual3D.LineThickness;
 
                 if (AddLineDepthBiasCheckBox.IsChecked ?? false)
                 {

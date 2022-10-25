@@ -25,6 +25,8 @@ using Ab3d.Utilities;
 using Ab3d.Visuals;
 using SharpDX;
 using Material = System.Windows.Media.Media3D.Material;
+using Matrix = SharpDX.Matrix;
+using MeshUtils = Ab3d.Utilities.MeshUtils;
 using Point = System.Windows.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
@@ -39,8 +41,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         private ModelVisual3D _rootModelVisual3D;
         private ModelVisual3D _hitLinesModelVisual3D;
         private SphereVisual3D _sphereVisual3D;
-        private ModelVisual3D _teapotModelVisual3D;
+        private ModelVisual3D _grayTeapotModelVisual3D;
         private MeshObjectNode _pyramidMeshObjectNode;
+        private MeshObjectNode _blueTeapotMeshObjectNode;
+        private MeshObjectNode _greenTeapotMeshObjectNode;
         private InstancedMeshGeometryVisual3D _instancedMeshGeometryVisual3D;
 
         public HitTestingSample()
@@ -54,7 +58,29 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
 
             CreateTestModels();
-            
+
+            MainDXViewportView.DXSceneDeviceCreated += delegate(object sender, EventArgs args)
+            {
+                // Display settings from DXHitTestOptions.GenerateOctTreeOnMeshInitialization and DXHitTestOptions.MeshPositionsCountForOctTreeGeneration
+                //
+                // DXHitTestOptions.GenerateOctTreeOnMeshInitialization documentation:
+                // Gets or sets an integer value that specifies number of positions in a mesh (DXMeshGeometry3D) at which a OctTree is generated to speed up hit testing
+                // (e.g. if mesh has more positions then a value specified with this property, then OctTree will be generated for the mesh).
+                // Default value is 512.
+                //
+                // 
+                // DXHitTestOptions.GenerateOctTreeOnMeshInitialization documentation:
+                // When true and when mesh has more positions than MeshPositionsCountForOctTreeGeneration, then the OctTree is generated at mesh initialization time.
+                // When false and when mesh has more positions than MeshPositionsCountForOctTreeGeneration, then the OctTree is generated when first HitTest method is called on the mesh.
+                // Default value is false.
+
+                string hitTestingOptionsInfo = string.Format("DXScene.DXHitTestOptions:\r\nMeshPositionsCountForOctTreeGeneration: {0}\r\nGenerateOctTreeOnMeshInitialization: {1}\r\n\r\n",
+                    MainDXViewportView.DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration,
+                    MainDXViewportView.DXScene.DXHitTestOptions.GenerateOctTreeOnMeshInitialization);
+
+                AddMessage(hitTestingOptionsInfo);
+            };
+
             MainDXViewportView.SceneRendered += MainDXViewportViewOnSceneRendered;
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
@@ -197,7 +223,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             else
             {
                 var sb = new StringBuilder();
-                sb.AppendFormat("Ray.Start: {0:0.0}; Ray.Direction: {1:0.00}\r\n{2} hit results:\r\n",
+                sb.AppendFormat("Ray.Start: {0:0.0};\r\nRay.Direction: {1:0.00}\r\n{2} hit results:\r\n",
                     pickRay.Position, pickRay.Direction, allHitTests.Count);
 
                 for (var i = 0; i < allHitTests.Count; i++)
@@ -233,7 +259,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                         Position = hitTest.HitPosition.ToWpfPoint3D(),
                         LineColor = Colors.Red,
                         LineThickness = 1,
-                        LinesLength = 5
+                        LinesLength = 10
                     };
 
                     _hitLinesModelVisual3D.Children.Add(wireCrossVisual3D);
@@ -241,6 +267,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 }
 
                 sb.AppendLine();
+
+                // Count how many meshes have OctTree objects generated
+                sb.AppendFormat("OctTrees count: {0}\r\n", CountOctTrees(MainDXViewportView.DXScene.RootNode));
 
                 AddMessage(sb.ToString());
             }
@@ -284,15 +313,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             
             Ab3d.Utilities.ModelUtils.CenterAndScaleModel3D(teapotModel, centerPosition: new Point3D(50, 0, -50), finalSize: new Size3D(80, 80, 80), preserveAspectRatio: true);
 
-            _teapotModelVisual3D = new ModelVisual3D()
+            _grayTeapotModelVisual3D = new ModelVisual3D()
             {
                 Content = teapotModel
             };
 
             teapotModel.SetName("teapot Model3D");
-            _teapotModelVisual3D.SetName("teapot ModelVisual3D");
+            _grayTeapotModelVisual3D.SetName("teapot ModelVisual3D");
 
-            _rootModelVisual3D.Children.Add(_teapotModelVisual3D);
+            _rootModelVisual3D.Children.Add(_grayTeapotModelVisual3D);
 
 
             // InstancedMeshGeometryVisual3D
@@ -318,6 +347,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             var meshGeometry3D = new Ab3d.Meshes.PyramidMesh3D(new Point3D(50, -20, 50), new Size3D(80, 40, 80)).Geometry;
             var dxMeshGeometry3D = new Ab3d.DirectX.Models.DXMeshGeometry3D(meshGeometry3D);
 
+            // We could manually generate OctTree here (but we wait until OctTree is generated when needed in hit-testing)
+            //dxMeshGeometry3D.OctTree = dxMeshGeometry3D.CreateOctTree(maxNodeLevel: 4, expandChildBoundingBoxes: 0.2f);
+
             var standardMaterial = new StandardMaterial()
             {
                 DiffuseColor = Colors.Gold.ToColor3()
@@ -331,6 +363,85 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             var sceneNodeVisual3D = new SceneNodeVisual3D(_pyramidMeshObjectNode);
             sceneNodeVisual3D.SetName("SceneNodeVisual3D");
             _rootModelVisual3D.Children.Add(sceneNodeVisual3D);
+
+
+            var geometryTeapotModel3D = teapotModel as GeometryModel3D;
+            if (geometryTeapotModel3D != null)
+            {
+                // Use teapot mesh to generate DXEngine's GeometryMesh and SimpleMesh<PositionNormalTexture>.
+                // First copy mesh data into arrays that can be used to generate GeometryMesh and SimpleMesh.
+                var teapotMeshGeometry3D = (MeshGeometry3D)geometryTeapotModel3D.Geometry;
+
+                var wpfPositions = teapotMeshGeometry3D.Positions;
+                var wpfNormals = teapotMeshGeometry3D.Normals;
+                var wpfTextureCoordinates = teapotMeshGeometry3D.TextureCoordinates;
+
+                var positionsCount = wpfPositions.Count;
+
+                if (wpfNormals == null || wpfNormals.Count == 0)
+                    wpfNormals = MeshUtils.CalculateNormals(teapotMeshGeometry3D);
+                
+
+                var dxPositions          = new Vector3[positionsCount];
+                var dxNormals            = new Vector3[positionsCount];
+                var dxTextureCoordinates = new Vector2[positionsCount];
+                var dxVertexBufferArray  = new PositionNormalTexture[positionsCount];
+
+                for (int i = 0; i < positionsCount; i++)
+                {
+                    var position          = wpfPositions[i].ToVector3();
+                    var normal            = wpfNormals[i].ToVector3();
+                    var textureCoordinate = wpfTextureCoordinates[i].ToVector2();
+
+                    dxPositions[i]          = position;
+                    dxNormals[i]            = normal;
+                    dxTextureCoordinates[i] = textureCoordinate;
+
+                    dxVertexBufferArray[i] = new PositionNormalTexture(position, normal, textureCoordinate);
+                }
+
+                var wpfTriangleIndices = teapotMeshGeometry3D.TriangleIndices;
+                var triangleIndicesCount = wpfTriangleIndices.Count;
+
+                var dxTriangleIndices = new int[triangleIndicesCount];
+                for (int i = 0; i < triangleIndicesCount; i++)
+                    dxTriangleIndices[i] = wpfTriangleIndices[i];
+
+
+                // Add MeshObjectNode with GeometryMesh
+                var teapotGeometryMesh = new GeometryMesh(dxPositions, dxNormals, dxTextureCoordinates, dxTriangleIndices, "TeapotGeometryMesh");
+                _disposables.Add(teapotGeometryMesh);
+
+                // We could manually generate OctTree here (but we wait until OctTree is generated when needed in hit-testing)
+                //teapotGeometryMesh.OctTree = teapotGeometryMesh.CreateOctTree(maxNodeLevel: 4, expandChildBoundingBoxes: 0.2f);
+
+                _blueTeapotMeshObjectNode = new Ab3d.DirectX.MeshObjectNode(teapotGeometryMesh, new StandardMaterial(Colors.LightBlue.ToColor3()));
+                _blueTeapotMeshObjectNode.Transform = new Transformation(Matrix.Translation(150, -30, 60));
+                _disposables.Add(_blueTeapotMeshObjectNode);
+
+                var teapot1SceneNodeVisual3D = new SceneNodeVisual3D(_blueTeapotMeshObjectNode);
+                teapot1SceneNodeVisual3D.SetName("Teapot1SceneNodeVisual3D");
+                _rootModelVisual3D.Children.Add(teapot1SceneNodeVisual3D);
+
+
+                // Add MeshObjectNode with SimpleMesh<PositionNormalTexture>
+                var teapotSimpleMesh = new SimpleMesh<PositionNormalTexture>(dxVertexBufferArray, 
+                                                                             dxTriangleIndices,
+                                                                             inputLayoutType: InputLayoutType.Position | InputLayoutType.Normal | InputLayoutType.TextureCoordinate,
+                                                                             name: "TeapotSimpleMesh");
+                _disposables.Add(teapotSimpleMesh);
+
+                // We could manually generate OctTree here (but we wait until OctTree is generated when needed in hit-testing)
+                //teapotSimpleMesh.OctTree = teapotSimpleMesh.CreateOctTree(maxNodeLevel: 4, expandChildBoundingBoxes: 0.2f);
+
+                _greenTeapotMeshObjectNode = new Ab3d.DirectX.MeshObjectNode(teapotSimpleMesh, new StandardMaterial(Colors.LightGreen.ToColor3()));
+                _greenTeapotMeshObjectNode.Transform = new Transformation(Matrix.Translation(150, -30, -30));
+                _disposables.Add(_greenTeapotMeshObjectNode);
+
+                var teapot2SceneNodeVisual3D = new SceneNodeVisual3D(_greenTeapotMeshObjectNode);
+                teapot1SceneNodeVisual3D.SetName("Teapot2SceneNodeVisual3D");
+                _rootModelVisual3D.Children.Add(teapot2SceneNodeVisual3D);
+            }
         }
 
         private void AddMessage(string message)
@@ -407,13 +518,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             SetIsHitTestVisible(_sphereVisual3D, isHitTestVisible);
         }
         
-        private void OnTeapotIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        private void OnGrayTeapotIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
         {
             if (!this.IsLoaded)
                 return;
 
-            bool isHitTestVisible = TeapotIsHitTestVisibleCheckBox.IsChecked ?? false;
-            SetIsHitTestVisible(_teapotModelVisual3D, isHitTestVisible);
+            bool isHitTestVisible = GrayTeapotIsHitTestVisibleCheckBox.IsChecked ?? false;
+            SetIsHitTestVisible(_grayTeapotModelVisual3D, isHitTestVisible);
         }
         
         private void OnPyramidIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
@@ -433,6 +544,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             SetIsHitTestVisible(_instancedMeshGeometryVisual3D, isHitTestVisible);
         }
 
+        private void OnBlueTeapotIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            _blueTeapotMeshObjectNode.IsHitTestVisible = BlueTeapotIsHitTestVisibleCheckBox.IsChecked ?? false;
+        }
+
+        private void OnGreenTeapotIsHitTestVisibleCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            _greenTeapotMeshObjectNode.IsHitTestVisible = GreenTeapotIsHitTestVisibleCheckBox.IsChecked ?? false;
+        }
+
         private void SetIsHitTestVisible(ModelVisual3D modelVisual3D, bool isHitTestVisible)
         {
             var sceneNode = MainDXViewportView.GetSceneNodeForWpfObject(modelVisual3D);
@@ -441,6 +568,107 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 return;
 
             sceneNode.IsHitTestVisible = isHitTestVisible;
+        }
+
+        private void OnGenerateOctTreeCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            if (GenerateOctTreeCheckBox.IsChecked ?? false)
+            {
+                MainDXViewportView.DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration = 512; // default value
+
+                // We could manually generate all OctTrees by the code below.
+                // But this is not needed because OcTree will be automatically generated when object will be hit tested (when ray will cross the object's bounding box)
+                //int count = 0;
+                //GenerateOctTree(MainDXViewportView.DXScene.RootNode, ref count);
+            }
+            else
+            {
+                MainDXViewportView.DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration = int.MaxValue; // never generate OctTree
+
+                int count = 0;
+                ClearOctTree(MainDXViewportView.DXScene.RootNode, ref count);
+
+                AddMessage(string.Format("Removed {0} OctTree objects\r\n", count));
+            }
+        }
+
+        private void ClearOctTree(SceneNode sceneNode, ref int count)
+        {
+            var meshObjectNode = sceneNode as MeshObjectNode;
+            if (meshObjectNode != null)
+            {
+                var octTreeMesh = meshObjectNode.Mesh as IOctTreeMesh;
+                if (octTreeMesh != null && octTreeMesh.OctTree != null)
+                {
+                    octTreeMesh.OctTree = null;
+                    count++;
+                }
+            }
+            else
+            {
+                var wpfGeometryModel3DNode = sceneNode as WpfGeometryModel3DNode;
+                if (wpfGeometryModel3DNode != null && wpfGeometryModel3DNode.DXMesh != null && wpfGeometryModel3DNode.DXMesh.OctTree != null)
+                {
+                    wpfGeometryModel3DNode.DXMesh.OctTree = null;
+                    count++;
+                }
+            }
+
+            foreach (var childNode in sceneNode.ChildNodes)
+                ClearOctTree(childNode, ref count);
+        }
+        
+        private void GenerateOctTree(SceneNode sceneNode, ref int count)
+        {
+            var meshObjectNode = sceneNode as MeshObjectNode;
+            if (meshObjectNode != null)
+            {
+                var octTreeMesh = meshObjectNode.Mesh as IOctTreeMesh;
+                if (octTreeMesh != null && octTreeMesh.OctTree == null)
+                {
+                    octTreeMesh.OctTree = octTreeMesh.CreateOctTree(MainDXViewportView.DXScene.DXHitTestOptions.OctTreeMaxNodeLevel, MainDXViewportView.DXScene.DXHitTestOptions.OctTreeExpandChildBoundingBoxes);
+                    count++;
+                }
+            }
+            else
+            {
+                var wpfGeometryModel3DNode = sceneNode as WpfGeometryModel3DNode;
+                if (wpfGeometryModel3DNode != null && wpfGeometryModel3DNode.DXMesh != null && wpfGeometryModel3DNode.DXMesh.OctTree == null)
+                {
+                    wpfGeometryModel3DNode.DXMesh.OctTree = wpfGeometryModel3DNode.DXMesh.CreateOctTree(MainDXViewportView.DXScene.DXHitTestOptions.OctTreeMaxNodeLevel, MainDXViewportView.DXScene.DXHitTestOptions.OctTreeExpandChildBoundingBoxes);
+                    count++;
+                }
+            }
+
+            foreach (var childNode in sceneNode.ChildNodes)
+                GenerateOctTree(childNode, ref count);
+        }
+        
+        private int CountOctTrees(SceneNode sceneNode)
+        {
+            int count = 0;
+
+            var meshObjectNode = sceneNode as MeshObjectNode;
+            if (meshObjectNode != null)
+            {
+                var octTreeMesh = meshObjectNode.Mesh as IOctTreeMesh;
+                if (octTreeMesh != null && octTreeMesh.OctTree != null)
+                    count = 1;
+            }
+            else
+            {
+                var wpfGeometryModel3DNode = sceneNode as WpfGeometryModel3DNode;
+                if (wpfGeometryModel3DNode != null && wpfGeometryModel3DNode.DXMesh != null && wpfGeometryModel3DNode.DXMesh.OctTree != null)
+                    count = 1;
+            }
+
+            foreach (var childNode in sceneNode.ChildNodes)
+                count += CountOctTrees(childNode);
+
+            return count;
         }
     }
 }

@@ -155,6 +155,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEngineOther\ClosestDistanceSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineOther\MeshColliderSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineOther\MultiDXViewportViewsSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -275,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DXEngineVisuals\FaceColorRenderingSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineVisuals\GlobalLineThicknessFactorSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -306,6 +318,14 @@
     <Page Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEngineVisuals\TransparencySortingPerformanceSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\TransparencySortingTypesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineVisuals\TrianglesSortingSample.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -548,6 +568,12 @@
     <Compile Include="DXEngineAdvanced\AdvancedInstanceRendering.xaml.cs">
       <DependentUpon>AdvancedInstanceRendering.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineOther\ClosestDistanceSample.xaml.cs">
+      <DependentUpon>ClosestDistanceSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineOther\MeshColliderSample.xaml.cs">
+      <DependentUpon>MeshColliderSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineOther\MultiDXViewportViewsSample.xaml.cs">
       <DependentUpon>MultiDXViewportViewsSample.xaml</DependentUpon>
     </Compile>
@@ -648,6 +674,9 @@
     <Compile Include="DXEngineVisuals\ColoredLinesSample.xaml.cs">
       <DependentUpon>ColoredLinesSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineVisuals\FaceColorRenderingSample.xaml.cs">
+      <DependentUpon>FaceColorRenderingSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineVisuals\GlobalLineThicknessFactorSample.xaml.cs">
       <DependentUpon>GlobalLineThicknessFactorSample.xaml</DependentUpon>
     </Compile>
@@ -656,6 +685,12 @@
     </Compile>
     <Compile Include="DXEngineVisuals\ObjectOutlinesRenderingSample.xaml.cs">
       <DependentUpon>ObjectOutlinesRenderingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\TransparencySortingPerformanceSample.xaml.cs">
+      <DependentUpon>TransparencySortingPerformanceSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\TransparencySortingTypesSample.xaml.cs">
+      <DependentUpon>TransparencySortingTypesSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\TrianglesSortingSample.xaml.cs">
       <DependentUpon>TrianglesSortingSample.xaml</DependentUpon>

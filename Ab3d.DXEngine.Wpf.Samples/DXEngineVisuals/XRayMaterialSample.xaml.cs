@@ -13,7 +13,6 @@ using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 using SharpDX;
-using Material = Ab3d.DirectX.Material;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {

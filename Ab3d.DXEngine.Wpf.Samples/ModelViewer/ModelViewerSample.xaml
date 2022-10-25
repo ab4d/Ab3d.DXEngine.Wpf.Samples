@@ -10,8 +10,9 @@
       xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       mc:Ignorable="d" 
       Title="TemplatePage"
-      d:DesignHeight="400" d:DesignWidth="800">
+      d:DesignHeight="700" d:DesignWidth="1000">
     <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibilityOfBool" />
         <SolidColorBrush x:Key="OptionsPanelBackground" Color="White"/>
         <LinearGradientBrush x:Key="SelectedTabBrush" StartPoint="0.5,0" EndPoint="0.5,1">
             <GradientStop Color="Transparent" Offset="0.0" />
@@ -97,14 +98,17 @@
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
 
-        <ab3d:CameraAxisPanel TargetCamera="{Binding ElementName=Camera1}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+        <ab3d:CameraAxisPanel TargetCamera="{Binding ElementName=Camera1}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                              Visibility="{Binding ElementName=ShowCameraAxisPanelCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
 
         <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo1" Grid.Column="0"
                                         HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}"
-                                        ShowRotateInfo="True" ShowMoveInfo="True" ShowQuickZoomInfo="True" />
+                                        ShowRotateInfo="True" ShowMoveInfo="True" ShowQuickZoomInfo="True"
+                                        Visibility="{Binding ElementName=ShowMouseCameraControllerInfoCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}"/>
 
-        <ab3d:ViewCubeCameraController Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 0 0 0" TargetCamera="{Binding ElementName=Camera1}" />
+        <ab3d:ViewCubeCameraController Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 0 0 0" TargetCamera="{Binding ElementName=Camera1}"
+                                       Visibility="{Binding ElementName=ShowViewCubeCameraControllerCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
 
         <TabControl Name="OptionsTabControl" Grid.Column="1" Background="{StaticResource OptionsPanelBackground}" BorderThickness="0 1 0 0">
             <TabItem>
@@ -145,78 +149,80 @@
                     <Image Source="../Resources/cameras.png" ToolTip="View" Width="25" Height="25" />
                 </TabItem.Header>
                 <TabItem.Content>
-                    <StackPanel Orientation="Vertical" Margin="5 5 0 5">
-                        <TextBlock Text="Scene view settings:" FontWeight="Bold" Margin="0 0 0 0" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Orientation="Vertical" Margin="5 5 0 5">
+                            <TextBlock Text="Scene view settings:" FontWeight="Bold" Margin="0 0 0 0" />
 
-                        <CheckBox Name="ShowSolidObjectsCheckBox" Content="Show solid objects" Margin="0 10 0 0" IsChecked="True" />
-                        <CheckBox Name="ShowWireframeCheckBox" Content="Show wireframe" Margin="0 5 0 0" IsChecked="True" Checked="OnShowWireframeCheckBoxCheckedChanged" Unchecked="OnShowWireframeCheckBoxCheckedChanged" />
+                            <CheckBox Name="ShowSolidObjectsCheckBox" Content="Show solid objects" Margin="0 10 0 0" IsChecked="True" />
+                            <CheckBox Name="ShowWireframeCheckBox" Content="Show wireframe" Margin="0 5 0 0" IsChecked="True" Checked="OnShowWireframeCheckBoxCheckedChanged" Unchecked="OnShowWireframeCheckBoxCheckedChanged" />
 
 
-                        <TextBlock Text="Wireframe line settings:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Text="Wireframe line settings:" FontWeight="Bold" Margin="0 20 0 0" />
 
-                        <controls:SimpleGrid ColumnsCount="2" RowSpacing="3" Margin="0 5 0 0">
-                            <TextBlock Text="LineThickness:" VerticalAlignment="Center" Margin="0 0 10 0" />
-                            <ComboBox Name="LineThicknessComboBox" SelectionChanged="OnWireframeLineSettingsChanged" />
+                            <controls:SimpleGrid ColumnsCount="2" RowSpacing="3" Margin="0 5 0 0">
+                                <TextBlock Text="LineThickness:" VerticalAlignment="Center" Margin="0 0 10 0" />
+                                <ComboBox Name="LineThicknessComboBox" SelectionChanged="OnWireframeLineSettingsChanged" />
 
-                            <TextBlock Text="LineColor:" VerticalAlignment="Center" Margin="0 0 10 0" />
-                            <ComboBox Name="LineColorComboBox" Width="100" SelectedIndex="1" SelectionChanged="OnWireframeLineSettingsChanged" >
-                                <ComboBoxItem>(from object)</ComboBoxItem>
-                                <ComboBoxItem>Black</ComboBoxItem>
-                                <ComboBoxItem>White</ComboBoxItem>
-                                <ComboBoxItem>Yellow</ComboBoxItem>
-                                <ComboBoxItem>Orange</ComboBoxItem>
-                                <ComboBoxItem>Red</ComboBoxItem>
+                                <TextBlock Text="LineColor:" VerticalAlignment="Center" Margin="0 0 10 0" />
+                                <ComboBox Name="LineColorComboBox" Width="100" SelectedIndex="1" SelectionChanged="OnWireframeLineSettingsChanged" >
+                                    <ComboBoxItem>(from object)</ComboBoxItem>
+                                    <ComboBoxItem>Black</ComboBoxItem>
+                                    <ComboBoxItem>White</ComboBoxItem>
+                                    <ComboBoxItem>Yellow</ComboBoxItem>
+                                    <ComboBoxItem>Orange</ComboBoxItem>
+                                    <ComboBoxItem>Red</ComboBoxItem>
+                                </ComboBox>
+                            </controls:SimpleGrid>
+
+                            <CheckBox Name="AddLineDepthBiasCheckBox" Content="Add line depth bias" Margin="0 5 0 0" IsChecked="True"
+                                      Checked="OnWireframeLineSettingsChanged" Unchecked="OnWireframeLineSettingsChanged" />
+
+
+                            <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 20 0 0" />
+
+                            <CheckBox Name="TransparentNonSelectedObjectsCheckBox" Content="Transparent not selected objects" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
+                            <CheckBox Name="TwoSidedTransparentMaterialCheckBox" Content="Use two-sided transparent material" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
+                            <CheckBox Name="UseXRayMaterialCheckBox" Content="Use X-Ray material" IsChecked="False" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
+                            
+                            <CheckBox Name="ShowNormalsCheckBox" Content="Show Normals" IsChecked="False" Margin="0 10 0 0" Checked="OnShowNormalsCheckBoxChanged" Unchecked="OnShowNormalsCheckBoxChanged" />
+
+                            <CheckBox Name="ShowMeshInspectorCheckBox" Content="Show MeshInspectorOverlay" IsChecked="False" Margin="0 5 0 0" Checked="OnShowMeshInspectorCheckBoxCheckedChanged" Unchecked="OnShowMeshInspectorCheckBoxCheckedChanged" />
+
+                            <TextBlock Text="Colors (normals / positions / triangles):" Margin="0 5 0 0" />
+                            <ComboBox Name="SelectedObjectColorSettingsComboBox" SelectedIndex="0" SelectionChanged="SelectedObjectColorSettingsComboBox_OnSelectionChanged">
+                                <ComboBoxItem>Red / Yellow / Orange</ComboBoxItem>
+                                <ComboBoxItem>Blue / Aqua / LightBlue</ComboBoxItem>
+                                <ComboBoxItem>White / LightGray / Gray</ComboBoxItem>
+                                <ComboBoxItem>Black / Gray / LightGray</ComboBoxItem>
                             </ComboBox>
-                        </controls:SimpleGrid>
-
-                        <CheckBox Name="AddLineDepthBiasCheckBox" Content="Add line depth bias" Margin="0 5 0 0" IsChecked="True"
-                                  Checked="OnWireframeLineSettingsChanged" Unchecked="OnWireframeLineSettingsChanged" />
 
 
-                        <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 20 0 0" />
-
-                        <CheckBox Name="TransparentNonSelectedObjectsCheckBox" Content="Transparent not selected objects" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
-                        <CheckBox Name="TwoSidedTransparentMaterialCheckBox" Content="Use two-sided transparent material" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
-                        <CheckBox Name="UseXRayMaterialCheckBox" Content="Use X-Ray material" IsChecked="False" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
-                        
-                        <CheckBox Name="ShowNormalsCheckBox" Content="Show Normals" IsChecked="False" Margin="0 10 0 0" Checked="OnShowNormalsCheckBoxChanged" Unchecked="OnShowNormalsCheckBoxChanged" />
-
-                        <CheckBox Name="ShowMeshInspectorCheckBox" Content="Show MeshInspectorOverlay" IsChecked="False" Margin="0 5 0 0" Checked="OnShowMeshInspectorCheckBoxCheckedChanged" Unchecked="OnShowMeshInspectorCheckBoxCheckedChanged" />
-
-                        <TextBlock Text="Colors (normals / positions / triangles):" Margin="0 5 0 0" />
-                        <ComboBox Name="SelectedObjectColorSettingsComboBox" SelectedIndex="0" SelectionChanged="SelectedObjectColorSettingsComboBox_OnSelectionChanged">
-                            <ComboBoxItem>Red / Yellow / Orange</ComboBoxItem>
-                            <ComboBoxItem>Blue / Aqua / LightBlue</ComboBoxItem>
-                            <ComboBoxItem>White / LightGray / Gray</ComboBoxItem>
-                            <ComboBoxItem>Black / Gray / LightGray</ComboBoxItem>
-                        </ComboBox>
+                            <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Camera type:" VerticalAlignment="Center"/>
+                                <ComboBox Name="CameraTypeComboBox" SelectedIndex="0" Width="110" Margin="5 0 0 0" SelectionChanged="CameraTypeComboBox_OnSelectionChanged">
+                                    <ComboBoxItem>Perspective</ComboBoxItem>
+                                    <ComboBoxItem>Orthographic</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
 
 
-                        <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 20 0 0" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Camera type:" VerticalAlignment="Center"/>
-                            <ComboBox Name="CameraTypeComboBox" SelectedIndex="0" Width="110" Margin="5 0 0 0" SelectionChanged="CameraTypeComboBox_OnSelectionChanged">
-                                <ComboBoxItem>Perspective</ComboBoxItem>
-                                <ComboBoxItem>Orthographic</ComboBoxItem>
-                            </ComboBox>
+                            <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 20 0 0" />
+
+                            <CheckBox Name="CameraLightCheckBox" Content="Camera light" IsChecked="True" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                            <CheckBox Name="TopDownLightCheckBox" Content="Top down light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                            <CheckBox Name="SideLightCheckBox" Content="Side light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+
+                            <Grid Margin="0 5 0 0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding ElementName=AmbientLightSlider, Path=Value, StringFormat='Ambient light: {0:0}%'}" Width="110" VerticalAlignment="Center"/>
+                                <Slider Name="AmbientLightSlider" Grid.Column="1" Value="30" Minimum="0" Maximum="100" ValueChanged="AmbientLightSlider_OnValueChanged"/>
+                            </Grid>
                         </StackPanel>
-
-
-                        <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 20 0 0" />
-
-                        <CheckBox Name="CameraLightCheckBox" Content="Camera light" IsChecked="True" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
-                        <CheckBox Name="TopDownLightCheckBox" Content="Top down light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
-                        <CheckBox Name="SideLightCheckBox" Content="Side light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
-
-                        <Grid Margin="0 5 0 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding ElementName=AmbientLightSlider, Path=Value, StringFormat='Ambient light: {0:0}%'}" Width="110" VerticalAlignment="Center"/>
-                            <Slider Name="AmbientLightSlider" Grid.Column="1" Value="30" Minimum="0" Maximum="100" ValueChanged="AmbientLightSlider_OnValueChanged"/>
-                        </Grid>
-                    </StackPanel>
+                    </ScrollViewer>
                 </TabItem.Content>
             </TabItem>
 
@@ -236,6 +242,12 @@
 
                         <CheckBox Name="TwoSidedMaterialsCheckBox" Content="Force two sided materials" IsChecked="False" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
                                   ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided."/>
+
+
+                        <TextBlock Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />
+                        <CheckBox Name="ShowViewCubeCameraControllerCheckBox" Content="Show ViewCubeCameraController" IsChecked="True" Margin="0 5 0 0" />
+                        <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="True" Margin="0 5 0 0" />
+                        <CheckBox Name="ShowMouseCameraControllerInfoCheckBox" Content="Show MouseCameraControllerInfo" IsChecked="True" Margin="0 5 0 0" />
 
 
                         <TextBlock Text="Other:" FontWeight="Bold" Margin="0 20 0 0" />

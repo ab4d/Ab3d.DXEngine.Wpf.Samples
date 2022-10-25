@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Security;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 using System.Xml;
 
 namespace Ab3d.DXEngine.Wpf.Samples.Common
@@ -20,34 +16,26 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
             object parameter,
             CultureInfo culture)
         {
-            XmlElement str = value as XmlElement;
-            if (str != null)
+            var xmlElement = value as XmlElement;
+            if (xmlElement != null)
             {
-                XmlAttribute attribute = str.Attributes["Description"];
-                if (attribute != null)
+                var descriptionAttribute = xmlElement.Attributes["Description"];
+                if (descriptionAttribute != null)
                 {
-                    string foo = attribute.Value;
-                    if (foo != null && foo.Length > 0)
+                    if (!string.IsNullOrEmpty(descriptionAttribute.Value))
                     {
                         if (targetType == typeof(Visibility))
-                        {
                             return Visibility.Visible;
-                        }
-                        else
-                        {
-                            return true;
-                        }
+
+                        return true;
                     }
                 }
             }
+
             if (targetType == typeof(Visibility))
-            {
                 return Visibility.Collapsed;
-            }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public object ConvertBack(
