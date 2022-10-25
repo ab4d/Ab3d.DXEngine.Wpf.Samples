@@ -100,6 +100,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // To subscribe to DeviceRemoved we need to wait until DXScene is created
             MainDXViewportView.DXSceneDeviceCreated += delegate(object sender, EventArgs args)
             {
+                MainDXViewportView.DXScene.Name = "DeviceRemovedDemoScene";
                 MainDXViewportView.DXScene.DeviceRemoved += DXSceneOnDeviceRemoved;
             };
 

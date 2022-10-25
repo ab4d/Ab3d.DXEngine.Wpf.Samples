@@ -17,6 +17,7 @@ using System.Windows.Threading;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Diagnostics;
 using Ab3d.DirectX.Client.Settings;
+using Ab3d.DirectX.Common;
 using Ab3d.DirectX.Controls;
 
 namespace Ab3d.DXEngine.Wpf.Samples
@@ -315,7 +316,13 @@ namespace Ab3d.DXEngine.Wpf.Samples
             if (_lastShownDXViewportView.DXScene != null && MaxBackgroundThreadsCount >= 0)
                 _lastShownDXViewportView.DXScene.MaxBackgroundThreadsCount = MaxBackgroundThreadsCount;
 
-            
+            if (_lastShownDXViewportView.DXScene != null && _lastShownDXViewportView.DXScene.Name != "DeviceRemovedDemoScene") // do not show message box for DeviceRemovedHandlerSample
+            {
+                _lastShownDXViewportView.DXScene.DeviceRemoved += delegate(object o, DeviceRemovedEventArgs args)
+                {
+                    MessageBox.Show("The DirectX device that is used by Ab3d.DXEngine has been removed!\r\n\r\nThis usually happens if user updates graphics driver while the application is running. This can also happen in case of a bug in the DirectX driver.\r\n\r\nTo recover from that situation, you need to subscribe to the DeviceRemoved event and then in the handler save the state, dispose the DXViewportView and create a new DXViewportView.", "DirectX device removed", MessageBoxButton.OK, MessageBoxImage.Stop);
+                };
+            }
 
             if (_lastShownDXViewportView != null && _lastShownDXViewportView.UsedGraphicsProfile != null)
             {
@@ -435,13 +442,18 @@ namespace Ab3d.DXEngine.Wpf.Samples
             if (DXEngineSettings.Current.UseDirectXOverlay)
                 dxViewportView.PresentationType = DXView.PresentationTypes.DirectXOverlay;
 
+            _rejectedGraphicProfilesReasons = null;
+            _lastShownDXViewportView = dxViewportView;
+
             // Subscribe events that will save any rejected GraphicsProfile and the used GraphicsProfile
             dxViewportView.GraphicsProfileRejected += OnGraphicsProfileRejected;
             dxViewportView.DXSceneInitialized += OnDXSceneInitialized;
             dxViewportView.Unloaded += OnDXViewportViewUnloaded;
 
-            _rejectedGraphicProfilesReasons = null;
-            _lastShownDXViewportView = dxViewportView;
+            dxViewportView.DefaultSystemAdapterChanged += delegate(object sender, EventArgs args)
+            {
+                MessageBox.Show("Primary system graphics card has changed!\r\n\r\nAb3d.DXEngine cannot use a shared texture anymore (sharing rendered image with WPF) and has switched to using WritableBitmap (this is much slower).\r\n\r\nIt is recommended that in the DefaultSystemAdapterChanged event handler you save the state, dispose the DXViewportView and create a new DXViewportView that will be able to use shared texture again.", "Primary graphics card changed", MessageBoxButton.OK, MessageBoxImage.Stop);
+            };
 
             // We are now showing "Used graphics profile:" instead of "Selected graphics profile:"
             GraphicsProfileTypeTextBlock.Text = "Used graphics profile:";
