@@ -497,9 +497,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
             sb.AppendFormat("{0}DeviceId=\"0x{1:X}\" VendorId=\"0x{2:X}\" SubSysId=\"0x{3:X}\" AdapterLuid=\"0x{4:X}\" Revision=\"{5}\" Flags=\"{6}\"\r\n{0}DedicatedVideoMemory=\"{7}\" DedicatedSystemMemory=\"{8}\" SharedSystemMemory=\"{9}\" >\r\n",
                 new String(' ', indent + 9),
                 adapter.Description.DeviceId, adapter.Description.VendorId, adapter.Description.SubsystemId, adapter.Description.Luid, adapter.Description.Revision, adapter.Description1.Flags,
-                adapter.Description.DedicatedVideoMemory,
-                adapter.Description.DedicatedSystemMemory,
-                adapter.Description.SharedSystemMemory);
+                (uint)adapter.Description.DedicatedVideoMemory,
+                (uint)adapter.Description.DedicatedSystemMemory,
+                (uint)adapter.Description.SharedSystemMemory);
 
             // According to http://msdn.microsoft.com/en-us/library/windows/desktop/bb174524%28v=vs.85%29.aspx
             // If you try to use CheckInterfaceSupport to check whether a Direct3D 11.x and later version interface is supported, CheckInterfaceSupport returns DXGI_ERROR_UNSUPPORTED. 

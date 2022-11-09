@@ -2,18 +2,18 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows7.0</TargetFramework>
+    <TargetFramework>net7.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>5.2.8332</Version>
-    <AssemblyVersion>5.2.8332.2050</AssemblyVersion>
-    <FileVersion>5.2.8332.2050</FileVersion> 
+    <Version>5.2.8348</Version>
+    <AssemblyVersion>5.2.8348.2070</AssemblyVersion>
+    <FileVersion>5.2.8348.2070</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;CORE3</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   
@@ -23,9 +23,9 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="5.2.8332-beta" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.2.8332-beta" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="10.1.8147" />  
+    <PackageReference Include="Ab3d.DXEngine" Version="5.2.8348" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.2.8348" />    
+    <PackageReference Include="Ab3d.PowerToys" Version="10.2.8348" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>

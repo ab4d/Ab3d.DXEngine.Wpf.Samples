@@ -109,7 +109,7 @@
   <Sample IsSeparator="True" />
   <Sample Page="PowerToysOther/ModelMoverOverlaySample.xaml" Title="ModelMover Overlay" Description="This sample shows how to use ModelMoverVisual3D in a Viewport3D over the 3D scene shown by Ab3d.DXEngine.\nThis is done with rendering the content models (boxes in this sample) with DXEngine and rendering the overlay Viewport3D (ModelMoverVisual3D) with WPF 3D.\nThe overlay Viewport3D should be rendered by WPF 3D because ModelMoverVisual3D requires mouse event support on UIElement3D objects. This is not supported when UIElement3D objects are rendered with DXEngine."/>
   <Sample Page="PowerToysOther/ModelMoverInsideObjectSample.xaml" Title="ModelMover inside object" Description="The sample shows how to use ModelMoverVisual3D inside Ab3d.DXEngine.\nTo make mouse events work with ModelMoverVisual3D, the ModelMoverVisual3D must use EventManager3D for events processing. See comments in code for more information."/>
-  <Sample Page="PowerToysOther/ModelRotatorSample.xaml" Title="ModelRotatorSample" Description=""/>
+  <Sample Page="PowerToysOther/ModelRotatorSample.xaml" Title="ModelRotatorSample" IsUpdated="True" UpdateInfo="Fixed insert position of new rotations" Description=""/>
   <Sample IsSeparator="True" />
   <Sample Page="PowerToysOther/MultipleSceneViewSample.xaml" Title="Multiple SceneViews" Description="This sample shows how to render the same 3D objects with multiple DXViewportViews."/>
   <Sample IsSeparator="True" />

@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=5.2.8332.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.5.2.8332-beta\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=5.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.5.2.8348\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.2.8332.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.2.8332-beta\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.2.8348\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=10.1.8147.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.10.1.8147\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=10.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.10.2.8348\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -378,10 +378,6 @@
     <Page Include="DXEngineVisuals\AdvancedEdgeLinesSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="DXEngineVisuals\TransparencySortingSample.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Other\DXEngineSnoopTool.xaml">
       <SubType>Designer</SubType>
@@ -730,9 +726,6 @@
     </Compile>
     <Compile Include="DXEngineVisuals\AdvancedEdgeLinesSample.xaml.cs">
       <DependentUpon>AdvancedEdgeLinesSample.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DXEngineVisuals\TransparencySortingSample.xaml.cs">
-      <DependentUpon>TransparencySortingSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="Other\DXEngineSnoopTool.xaml.cs">
       <DependentUpon>DXEngineSnoopTool.xaml</DependentUpon>

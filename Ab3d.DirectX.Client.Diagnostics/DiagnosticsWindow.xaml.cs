@@ -20,6 +20,7 @@ using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Lights;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 using Color = System.Windows.Media.Color;
 using Exception = System.Exception;
 
@@ -434,8 +435,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
                 {
                     var allAdapters = DXDevice.GetAllSystemAdapters();
 
-                    // Sort by DedicatedVideoMemory - we assume that more RAM means better card - so pick the one with most RAM (DedicatedVideoMemory is of type PointerSize - to be able to compare by it we need to convert it to long)
-                    var bestAdapter = allAdapters.OrderByDescending(a => (long)a.Description.DedicatedVideoMemory)  
+                    // Sort by DedicatedVideoMemory - we assume that more RAM means better card - so pick the one with most RAM (DedicatedVideoMemory is of type PointerSize - to be able to compare by it we need to convert it to uint)
+                    var bestAdapter = allAdapters.Where(a => a.Description1.Flags == AdapterFlags.None) // skip software and remote devices
+                                                 .OrderByDescending(a => (uint)a.Description.DedicatedVideoMemory)  
                                                  .FirstOrDefault();
 
                     if (bestAdapter != null && usedAdapter.Description.Luid != bestAdapter.Description.Luid)
