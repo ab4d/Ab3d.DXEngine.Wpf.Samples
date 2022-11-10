@@ -94,7 +94,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             DXDiagnostics.IsCollectingStatistics = true; // Collect rendering time and other statistics
 
-            MainDXViewportView.SceneRendered += delegate(object sender, EventArgs args)
+            MainDXViewportView.SceneRendered += delegate (object sender, EventArgs args)
             {
                 if (MainDXViewportView.DXScene != null)
                     _totalRenderingTime = MainDXViewportView.DXScene.Statistics.TotalRenderTimeMs;
@@ -103,7 +103,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             };
 
 
-            this.Loaded += delegate(object o, RoutedEventArgs args)
+            this.Loaded += delegate (object o, RoutedEventArgs args)
             {
                 CreateArrows();
 
@@ -132,7 +132,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Update statistics only once per second
             if (DateTime.Now.Second != _lastSecond)
             {
-                double averageUpdateTime = _updateDataSamplesCount > 0 ? _totalUpdateDataTime / (double) _updateDataSamplesCount : 0;
+                double averageUpdateTime = _updateDataSamplesCount > 0 ? _totalUpdateDataTime / (double)_updateDataSamplesCount : 0;
                 double averageRenderTime = _renderingTimeSamplesCount > 0 ? _totalRenderingTime / (double)_renderingTimeSamplesCount : 0;
 
                 RenderingStatsTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture,
@@ -150,7 +150,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             }
             else
             {
-                _framesPerSecond ++;
+                _framesPerSecond++;
             }
 
             if (!(RunAnimationCheckBox.IsChecked ?? false))
@@ -169,12 +169,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Rotate on xy plane
             x += Math.Sin(elapsedSeconds) * _xSize * 0.2;
             y += Math.Cos(elapsedSeconds) * 90;
-            
+
             // Rotate on yz plane
             y += Math.Sin(elapsedSeconds * 5) * 50;
             z += Math.Cos(elapsedSeconds * 0.3) * _ySize * 0.2;
 
-            
+
             _sphereTranslate.OffsetX = x;
             _sphereTranslate.OffsetY = y;
             _sphereTranslate.OffsetZ = z;
@@ -182,7 +182,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             _spherePosition = new Vector3((float)x, (float)y, (float)z);
 
             // After we have a new sphere position, we can update the instances data
-            UpdateInstanceData();
+            if (OptimizedCheckBox.IsChecked ?? false)
+                UpdateInstanceData();
+            else
+                UpdateInstanceData_Unoptimized();
 
             _instancedMeshGeometryVisual3D.Update(0, _instanceData.Length, updateBounds: false);
         }
@@ -209,11 +212,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 var sphereVisual3D = new SphereVisual3D()
                 {
                     CenterPosition = new Point3D(0, 0, 0),
-                    Radius         = 10,
-                    Material       = new DiffuseMaterial(Brushes.Gold)
+                    Radius = 10,
+                    Material = new DiffuseMaterial(Brushes.Gold)
                 };
 
-                _sphereTranslate         = new TranslateTransform3D(_sphereStartPosition.ToWpfVector3D());
+                _sphereTranslate = new TranslateTransform3D(_sphereStartPosition.ToWpfVector3D());
                 sphereVisual3D.Transform = _sphereTranslate;
 
 
@@ -227,7 +230,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 var arrowMesh3D = new Ab3d.Meshes.ArrowMesh3D(new Point3D(0, 0, 0), new Point3D(1, 0, 0), 1.0 / 15.0, 2.0 / 15.0, 45, 10, false).Geometry;
 
-                _instancedMeshGeometryVisual3D               = new InstancedMeshGeometryVisual3D(arrowMesh3D);
+                _instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(arrowMesh3D);
                 _instancedMeshGeometryVisual3D.InstancesData = _instanceData;
 
                 MainViewport.Children.Add(_instancedMeshGeometryVisual3D);
@@ -252,7 +255,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             float yStep = _ySize / _yCount;
 
             var instancedData = _instanceData;
-            
+
 
             if (_stopwatch == null)
                 _stopwatch = new Stopwatch();
@@ -261,29 +264,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
 
             // The following is the initial (unoptimized) code to update the matrices:
-
-            //float x = -(_xSize / 2);
-            //for (int xi = 0; xi < _xCount; xi++)
-            //{
-            //    float y = -(_ySize / 2);
-
-            //    for (int yi = 0; yi < _yCount; yi++)
-            //    {
-            //        var arrowDirection     = GetArrowDirection(x, y);
-            //        var arrowStartPosition = new Vector3(x, 0, y);
-
-            //        instancedData[instanceIndex].World = GetMatrixFromDirection(arrowDirection, arrowStartPosition, arrowScale);
-
-            //        double distance = GetDistance(x, y);
-            //        instancedData[instanceIndex].DiffuseColor = GetColorForDistance(distance);
-
-            //        y += yStep;
-            //        instanceIndex++;
-            //    }
-
-            //    x += xStep;
-            //}
-
 
             // Below is fully optimized code:
 
@@ -311,7 +291,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             //for (int xi = 0; xi < _xCount; xi++)
             Parallel.For(0, _xCount, xi =>
             {
-                float x = xi * xStep -(_xSize / 2);
+                float x = xi * xStep - (_xSize / 2);
                 float y = -(_ySize / 2);
 
                 int instanceIndex = xi * _yCount;
@@ -336,7 +316,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                         dz *= denum;
                     }
 
- 
+
                     //var arrowStartPosition = new Vector3(x, 0, y);
 
                     //instancedData[instanceIndex].World = GetMatrixFromDirection(arrowDirection, arrowStartPosition, arrowScale);
@@ -389,7 +369,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     //    arrowDirection.X * horizontalVector.Y - arrowDirection.Y * horizontalVector.X);
 
                     // horizontalVector.Y is always 0
-                    var yAxis = new Vector3(dy * hz, 
+                    var yAxis = new Vector3(dy * hz,
                                             dz * hx - dx * hz,
                                             -dy * hx);
 
@@ -402,10 +382,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                     // For more info see comments in GetRotationMatrixFromDirection
                     // NOTE: The following math works only for uniform scale (scale factor for x, y and z is the same - arrowsLength in our case)
-                    instancedData[instanceIndex].World = new SharpDX.Matrix(dx * arrowsLength,               dy * arrowsLength,               dz * arrowsLength,      0,
-                                                                            yAxis.X * arrowsLength,          yAxis.Y * arrowsLength,          yAxis.Z * arrowsLength, 0,
-                                                                            zAxis.X * arrowsLength,          zAxis.Y * arrowsLength,          zAxis.Z * arrowsLength, 0,
-                                                                            x,                               0,                               y,                      1);
+                    instancedData[instanceIndex].World = new SharpDX.Matrix(dx * arrowsLength, dy * arrowsLength, dz * arrowsLength, 0,
+                                                                            yAxis.X * arrowsLength, yAxis.Y * arrowsLength, yAxis.Z * arrowsLength, 0,
+                                                                            zAxis.X * arrowsLength, zAxis.Y * arrowsLength, zAxis.Z * arrowsLength, 0,
+                                                                            x, 0, y, 1);
 
 
 
@@ -431,8 +411,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     y += yStep;
                     instanceIndex++;
                 }
-            } );
-
+            });
 
             _stopwatch.Stop();
             _totalUpdateDataTime += _stopwatch.Elapsed.TotalMilliseconds;
@@ -517,7 +496,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             if (!this.IsLoaded)
                 return;
-            
+
             CreateArrows();
         }
 
@@ -559,11 +538,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 case 4:
                     Camera1.BeginInit();
-                    Camera1.Heading        = -0.57;
-                    Camera1.Attitude       = -89;
-                    Camera1.Distance       = 4275;
+                    Camera1.Heading = -0.57;
+                    Camera1.Attitude = -89;
+                    Camera1.Distance = 4275;
                     Camera1.TargetPosition = new Point3D(0, 60, 0);
-                    Camera1.Offset         = new Vector3D(-16, -109, 37);
+                    Camera1.Offset = new Vector3D(-16, -109, 37);
                     Camera1.EndInit();
                     break;
 
@@ -580,5 +559,137 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     break;
             }
         }
+
+
+        #region Unoptimized code        
+        private void UpdateInstanceData_Unoptimized()
+        {
+            float xStep = _xSize / _xCount;
+            float yStep = _ySize / _yCount;
+
+            var instancedData = _instanceData;
+
+
+            if (_stopwatch == null)
+                _stopwatch = new Stopwatch();
+
+            _stopwatch.Restart();
+
+
+            // The following is the initial (unoptimized) code to update the matrices:
+
+            var arrowScale = new Vector3(_arrowsLength, _arrowsLength, _arrowsLength);
+
+            float x = -(_xSize / 2);
+            for (int xi = 0; xi < _xCount; xi++)
+            {
+                float y = -(_ySize / 2);
+
+                int instanceIndex = xi * _yCount;
+
+                for (int yi = 0; yi < _yCount; yi++)
+                {
+                    var arrowDirection = GetArrowDirection(x, y);
+                    var arrowStartPosition = new Vector3(x, 0, y);
+
+                    instancedData[instanceIndex].World = GetMatrixFromDirection(arrowDirection, arrowStartPosition, arrowScale);
+
+                    double distance = GetDistance(x, y);
+                    instancedData[instanceIndex].DiffuseColor = GetColorForDistance(distance);
+
+                    y += yStep;
+                    instanceIndex++;
+                }
+
+                x += xStep;
+            }
+
+            _stopwatch.Stop();
+            _totalUpdateDataTime += _stopwatch.Elapsed.TotalMilliseconds;
+            _updateDataSamplesCount++;
+        }
+
+
+
+        // directionVector must be normalized
+        public static SharpDX.Matrix GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector)
+        {
+            // The first three rows in the upper left 3x3 part of the matrix represents the axes of the coordinate system defined by the matrix.
+            // For example in the identity matrix the xAxis is 1,0,0; yAxis is 0,1,0; zAxis is 0,0,1
+            // With this knowledge we can create a matrix that will orient the transformed positions based on the specified direction vector.
+            // The direction vector represents the xAxis in the new coordinate system.
+            // To get the full matrix, we need to calculate the other two axes.
+
+            //var xAxis = normalizedDirectionVector;
+            var yAxis = CalculateUpDirectionFromNormalizeDirection(normalizedDirectionVector);
+
+            // Once we have the direction and up axis, we can get the zAxis with calculating the perpendicular axis to those two
+            var zAxis = SharpDX.Vector3.Cross(normalizedDirectionVector, yAxis);
+
+            var rotationMatrix = new SharpDX.Matrix(normalizedDirectionVector.X, normalizedDirectionVector.Y, normalizedDirectionVector.Z, 0,
+                                                    yAxis.X, yAxis.Y, yAxis.Z, 0,
+                                                    zAxis.X, zAxis.Y, zAxis.Z, 0,
+                                                    0, 0, 0, 1);
+
+            return rotationMatrix;
+        }
+
+        public static SharpDX.Matrix GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector, SharpDX.Vector3 position, SharpDX.Vector3 scale)
+        {
+            SharpDX.Matrix orientationMatrix;
+            GetMatrixFromDirection(normalizedDirectionVector, position, scale, out orientationMatrix);
+            return orientationMatrix;
+        }
+
+        public static void GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector, SharpDX.Vector3 position, SharpDX.Vector3 scale, out SharpDX.Matrix orientationMatrix)
+        {
+            //var xAxis = normalizedDirectionVector;
+            var yAxis = CalculateUpDirection(normalizedDirectionVector);
+            var zAxis = SharpDX.Vector3.Cross(normalizedDirectionVector, yAxis);
+
+            // For more info see comments in GetRotationMatrixFromDirection
+            orientationMatrix = new SharpDX.Matrix(normalizedDirectionVector.X * scale.X, normalizedDirectionVector.Y * scale.Y, normalizedDirectionVector.Z * scale.Z, 0,
+                                                   yAxis.X * scale.X, yAxis.Y * scale.Y, yAxis.Z * scale.Z, 0,
+                                                   zAxis.X * scale.X, zAxis.Y * scale.Y, zAxis.Z * scale.Z, 0,
+                                                   position.X, position.Y, position.Z, 1);
+        }
+
+        public static SharpDX.Vector3 CalculateUpDirectionFromNormalizeDirection(SharpDX.Vector3 normalizedLookDirection)
+        {
+            // To get the up direction we need to find a vector that lies on the xz plane (horizontal plane) and is perpendicular to Up vector and lookDirection.
+            // Than we just create a perpendicular vector to lookDirection and the found vector on xz plane.
+
+            var horizontalVector = SharpDX.Vector3.Cross(SharpDX.Vector3.Up, normalizedLookDirection);
+
+            // First we need to check for edge case - the look direction is in the UpVector direction - the length of horizontalVector is 0 (or almost zero)
+
+            if (horizontalVector.LengthSquared() < 0.0001) // we can use LengthSquared to avoid costly sqrt
+                return SharpDX.Vector3.UnitZ;              // Any vector on xz plane could be used
+
+
+            var upDirection = SharpDX.Vector3.Cross(normalizedLookDirection, horizontalVector);
+
+            return upDirection;
+        }
+
+        public static SharpDX.Vector3 CalculateUpDirection(SharpDX.Vector3 lookDirection)
+        {
+            // To get the up direction we need to find a vector that lies on the xz plane (horizontal plane) and is perpendicular to Up vector and lookDirection.
+            // Than we just create a perpendicular vector to lookDirection and the found vector on xz plane.
+
+            var horizontalVector = SharpDX.Vector3.Cross(SharpDX.Vector3.Up, lookDirection);
+
+            // First we need to check for edge case - the look direction is in the UpVector direction - the length of horizontalVector is 0 (or almost zero)
+
+            if (horizontalVector.LengthSquared() < 0.0001) // we can use LengthSquared to avoid costly sqrt
+                return SharpDX.Vector3.UnitZ;              // Any vector on xz plane could be used
+
+
+            var upDirection = SharpDX.Vector3.Cross(lookDirection, horizontalVector);
+            upDirection.Normalize();
+
+            return upDirection;
+        }
+        #endregion
     }
 }

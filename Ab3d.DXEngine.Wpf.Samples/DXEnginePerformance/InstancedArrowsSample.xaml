@@ -74,6 +74,7 @@
                 <TextBlock Name="TotalTextBlock" Text="Total positions: 12.345.678" Margin="10 0 30 0" FontWeight="Normal" VerticalAlignment="Center" />
 
                 <CheckBox x:Name="RunAnimationCheckBox" Content="Animation" IsChecked="True" VerticalAlignment="Center" />
+                <CheckBox x:Name="OptimizedCheckBox" Content="Use optimized code" IsChecked="True" Margin="10 0 0 0" VerticalAlignment="Center" />
             </StackPanel>
 
             <Button Name="ChangeCameraButton" Grid.Row="0" Content="Change camera" Padding="10 2" HorizontalAlignment="Right" Click="ChangeCameraButton_OnClick" />
