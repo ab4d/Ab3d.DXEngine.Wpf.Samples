@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net50.csproj" />
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net50.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net70.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net70.csproj" />
   </ItemGroup>
 
   <ItemGroup>    
