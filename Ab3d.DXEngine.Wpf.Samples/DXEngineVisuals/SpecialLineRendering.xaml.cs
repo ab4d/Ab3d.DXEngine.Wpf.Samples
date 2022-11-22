@@ -51,8 +51,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _dxLineMaterial = new LineMaterial()
             {
                 LineThickness = 1,
-                LineColor     = Colors.Yellow.ToColor4(),
-                DepthBias     = 0.1f
+                LineColor = Colors.Yellow.ToColor4(),
+                DepthBias = 0.1f
                 // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
             };
 
@@ -155,7 +155,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             // After adding new WPF objects to the scene, we need to manually call Update to create DXEngine's SceneNode objects that will be needed later
             MainDXViewportView.Update();
-            
+
             // We need to update the _sceneNodesDictionary because we have changed the scene
             CreateSceneNodesDictionary();
 
@@ -248,6 +248,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // This way the DXEngine can read the value when creating the SceneNode object from WPF object.
                 // The DXAttributes also support change notifications, so when the value is changed, the SceneNode object is notified about that.
                 lineVisual3D.SetDXAttribute(DXAttributeType.ReadZBuffer, false);
+
+                // We also need to set CustomRenderingQueue to OverlayRenderingQueue. This renders the line after other objects are rendered.
+                // This is not needed when there are no transparent objects in the scene (because lines are rendered after standard objects;
+                // but transparent objects are rendered after the lines so we need to make sure that this line is rendered even after transparent objects.
+                // Run MainDXViewportView.DXScene.DumpRenderingQueues() in Immediate window to see the order of rendering queues and their objects.
+                lineVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
             }
 
             // If we would be using WireframeVisual3D, we could just use SetDXAttribute the set ReadZBuffer to false:
@@ -265,7 +271,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             _sceneNodesDictionary = new Dictionary<object, SceneNode>();
 
-            MainDXViewportView.DXScene.RootNode.ForEachChildNode<SceneNode>(delegate(SceneNode sceneNode)
+            MainDXViewportView.DXScene.RootNode.ForEachChildNode<SceneNode>(delegate (SceneNode sceneNode)
             {
                 if (sceneNode is WpfModelVisual3DNode)
                     _sceneNodesDictionary.Add(((WpfModelVisual3DNode)sceneNode).ModelVisual3D, sceneNode);
@@ -335,10 +341,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // We just set the ReadZBuffer to false on the _dxLineMaterial
             _dxLineMaterial.ReadZBuffer = false;
 
-            // We also need to notify the change on the object that is using this material
-            var sceneNode = GetSceneNodeForWpfObject(_wireframeGeometryModel3D);
-            if (sceneNode != null)
-                sceneNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+            var wpfGeometryModel3DNode = GetSceneNodeForWpfObject(_wireframeGeometryModel3D) as WpfGeometryModel3DNode;
+            if (wpfGeometryModel3DNode != null)
+            {
+                // We also need to set CustomRenderingQueue to OverlayRenderingQueue. This renders the line after other objects are rendered.
+                // This is not needed when there are no transparent objects in the scene (because lines are rendered after standard objects;
+                // but transparent objects are rendered after the lines so we need to make sure that this line is rendered even after transparent objects.
+                // Run MainDXViewportView.DXScene.DumpRenderingQueues() in Immediate window to see the order of rendering queues and their objects.
+                wpfGeometryModel3DNode.CustomRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
+
+                // We also need to notify the change on the object that is using this material
+                wpfGeometryModel3DNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+            }
         }
 
 
@@ -354,6 +368,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             var objectMaterial = new DiffuseMaterial(Brushes.Silver);
 
+            // Uncomment to test with using transparent objects
+            //objectMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Silver) { Opacity = 0.95f });
+
             // Uncomment the following line to test drawing hidden lines behind transparent objects:
             //objectMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(230, 100, 100, 100)));
 
@@ -368,7 +385,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // The following code shows how to create a DXEngine's ScreenSpaceLineNode directly (see DXEngineAdvanced/ScreenSpaceLineNodeSample for more info):
             var positions = new Vector3[2];
             positions[0] = new Vector3(-70, -3, 60);
-            positions[1] = new Vector3( 70, -3, 60);
+            positions[1] = new Vector3(70, -3, 60);
 
             _screenSpaceLineNode = new ScreenSpaceLineNode(positions, isLineStrip: false, isLineClosed: false, lineMaterial: _dxLineMaterial);
 
@@ -611,6 +628,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 if (screenSpaceLineNode != null)
                 {
+                    // We also need to set CustomRenderingQueue to OverlayRenderingQueue. This renders the line after other objects are rendered.
+                    // This is not needed when there are no transparent objects in the scene (because lines are rendered after standard objects;
+                    // but transparent objects are rendered after the lines so we need to make sure that this line is rendered even after transparent objects.
+                    // Run MainDXViewportView.DXScene.DumpRenderingQueues() in Immediate window to see the order of rendering queues and their objects.
+                    screenSpaceLineNode.CustomRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
+
                     // Once we have the ScreenSpaceLineNode, we can get the used LineMaterial that has ReadZBuffer
                     var lineMaterial = screenSpaceLineNode.LineMaterial as LineMaterial;
                     if (lineMaterial != null)
