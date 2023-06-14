@@ -1,0 +1,153 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance.LinePerformanceSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+    xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+    xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+    xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+    xmlns:dxModels="clr-namespace:Ab3d.DirectX.Models;assembly=Ab3d.DXEngine.Wpf"
+    xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+    Title="PolyLinesSample">
+    <Grid Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+
+        <Border Name="ViewportBorder" Grid.Row="1" Grid.Column="0" Background="Black" >
+            
+            <dxControls:DXViewportView Name="MainViewportView" PresentationType="DirectXOverlay">
+
+                <Viewport3D Name="MainViewport">
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+            
+        </Border>
+        <cameras:TargetPositionCamera Name="Camera1" Grid.Row="1" Grid.Column="0" Heading="15" Attitude="7" Bank="0" Distance="350" TargetPosition="0 0 0"
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <!-- EventsSourceElement is set to ViewportBorder - this means that the ViewportBorder's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <ab3d:MouseCameraController Name="MouseCameraController1" Grid.Row="1" Grid.Column="0" 
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <ab3d:CameraControlPanel VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"
+                                 HorizontalAlignment="Left" Margin="5" Width="225" Height="75" ShowMoveButtons="True"
+                                 TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <ScrollViewer Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10 0">
+
+                <TextBlock Text="Line type:" FontWeight="Bold" TextDecorations="Underline" Margin="0 0 0 3"/>
+                
+                <RadioButton Name="MultiLinesRadioButton" Content="LineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultiPolyLinesRadioButton" Content="PolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultiMultiLinesRadioButton" Content="MultiLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="SinglePolyLinesRadioButton" Content="MultiPolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+
+                <RadioButton Name="MultiScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode" GroupName="LineTypes" Margin="0 5 0 0" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultiScreenSpaceLineNodePolylinesRadioButton" Content="ScreenSpaceLineNode (polylines)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="SingleScreenSpaceLineNodePolylinesRadioButton" Content="ScreenSpaceLineNode (combined lines)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="ReusedMeshScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode (reused mesh)" IsChecked="True" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultihreadedScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode (multi-threaded)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+
+
+                <TextBlock Text="Lines count settings:" FontWeight="Bold" Margin="0 15 0 3" TextDecorations="Underline"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                    <TextBlock Margin="0 3 0 0" Text="No. lines in one spiral:"/>
+                    <TextBlock Name="SpiralLengthTextBlock" Margin="5 3 0 0" Text="5000"/>
+                    <!-- text is set in code behind because the value from slider is multiplied by 1000 -->
+                </StackPanel>
+                <Slider Name="SpiralLengthSlider"  Width="200"
+                        Minimum="0" Maximum="50" Value="5"  HorizontalAlignment="Left"
+                        TickFrequency="1" TickPlacement="None" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="True"
+                        ValueChanged="OnSpiralLengthSliderValueChanged"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                    <TextBlock Margin="0 3 0 0" Text="X spirals count:"/>
+                    <TextBlock Name="XCountTextBlock" Margin="5 3 0 0" Text="{Binding ElementName=XCountSlider, Path=Value, StringFormat={}{0:0}}"/>
+                </StackPanel>
+                <Slider Name="XCountSlider"  Width="200"
+                        Minimum="0" Maximum="100" Value="10"  HorizontalAlignment="Left"
+                        TickFrequency="10" TickPlacement="None" SmallChange="1" LargeChange="10"
+                        ValueChanged="OnSpiralsCountSliderValueChanged"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                    <TextBlock Margin="0 3 0 0" Text="Y spirals count:"/>
+                    <TextBlock Name="YCountTextBlock" Margin="5 3 0 0" Text="{Binding ElementName=YCountSlider, Path=Value, StringFormat={}{0:0}}"/>
+                </StackPanel>
+                <Slider Name="YCountSlider"  Width="200"
+                        Minimum="0" Maximum="100" Value="5" HorizontalAlignment="Left"
+                        TickFrequency="10" TickPlacement="None" SmallChange="1" LargeChange="10"
+                        ValueChanged="OnSpiralsCountSliderValueChanged"/>
+
+
+                <Expander Header="Rendering settings" IsExpanded="False" Margin="0 15 0 0">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                            <TextBlock Text="PresentationType:"/>
+                            <TextBlock Name="PresentationTypeTextBlock" Text="DirectXOverlay" Margin="5 0 0 0" FontWeight="Bold" />
+                            <controls:InfoControl x:Name="PresentationTypeInfoControl" ShowDuration="600000" InfoWidth="600" Margin="5 0 0 0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0 6 0 0">
+                            <CheckBox Name="HardwareAccelerate3DLinesCheckBox" Content="Hardware accelerate 3D lines" IsChecked="True" Checked="OnRenderSettingsCheckboxChanged" Unchecked="OnRenderSettingsCheckboxChanged" />
+                            <controls:InfoControl x:Name="HardwareAccelerate3DLinesInfoControl" ShowDuration="600000" InfoWidth="600" Margin="5 0 0 0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                            <CheckBox Name="UseGeometryShaderCheckBox" Content="Use geometry shader" IsChecked="True" Checked="OnRenderSettingsCheckboxChanged" Unchecked="OnRenderSettingsCheckboxChanged" />
+                            <controls:InfoControl x:Name="UseGeometryShaderInfoControl" ShowDuration="600000" InfoWidth="600" Margin="5 0 0 0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                            <CheckBox Name="Antialias3DLinesCheckBox" Content="Antialiased 3D lines" IsEnabled="False" IsChecked="True" Checked="OnRenderSettingsCheckboxChanged" Unchecked="OnRenderSettingsCheckboxChanged" />
+                            <controls:InfoControl x:Name="Antialias3DLinesInfoControl" ShowDuration="600000" InfoWidth="600" Margin="5 0 0 0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
+
+
+                <TextBlock Text="Statistics:" FontWeight="Bold" Margin="0 15 0 3" TextDecorations="Underline"/>
+
+                <controls:DXFpsMeter DXView="{Binding ElementName=MainViewportView}" Margin="0 0 0 0"/>
+
+                <TextBlock Text="3D line segments count:" Margin="0 10 0 0"/>
+                <TextBlock Name="LinesCountTextBlock" FontWeight="Bold" Margin="0 0 0 0" Text="100 x 100 x 1000 = 10.000.000"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
+                    <TextBlock Text="Draw calls / line objects count:"/>
+                    <controls:InfoControl x:Name="DrawCallsCountInfoControl" ShowDuration="1200000" InfoWidth="600" Margin="5 0 0 0"/>
+                    <Image Name="WarningImage" Source="pack://application:,,,/Resources/warningIcon.png" Width="12" Height="12" VerticalAlignment="Center" Margin="3 0 0 0" ToolTipService.ShowDuration="120000" 
+                           ToolTip="More than 1000 individual lines objects shown.&#10;This will require more then 1000 draw calls and&#10;can decrease performance.&#10;Consider using MultiPolyLineVisual3D to&#10;reduce number of line objects."/>
+                </StackPanel>
+                <TextBlock Name="DrawCallsCountTextBlock" FontWeight="Bold" Margin="0 0 0 0" Text="100 x 100 = 10.000"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
+                    <TextBlock Text="Initialization time:"/>
+                    <TextBlock Name="InitializationTimeTextBlock" FontWeight="Bold" Margin="5 0 5 0" Text="123.45 ms"/>
+                    <controls:InfoControl x:Name="InitializationTimeInfoControl" ShowDuration="1200000" InfoWidth="600" Margin="5 0 0 0"/>
+                </StackPanel>
+
+                <Button Name="RecreateLinesButton" Content="Recreate lines" Margin="0 5 0 5" Width="160" HorizontalAlignment="Left" Click="RecreateLinesButton_OnClick" />
+
+                <Button Name="AnimationButton" Content="Start camera animation" Margin="0 5 0 0" Width="160" HorizontalAlignment="Left" Click="AnimationButton_Click" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="0" Grid.Column="0" Background="Black" >
+            <TextBlock Name="TitleTextBlock" FontWeight="Bold" FontSize="20" Margin="10 10 10 0" Foreground="Silver" TextWrapping="Wrap"
+                       Text="3D lines performance test"/>
+        </Border>
+    </Grid>
+</Page>

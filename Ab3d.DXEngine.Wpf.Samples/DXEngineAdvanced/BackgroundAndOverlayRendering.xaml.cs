@@ -18,7 +18,9 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
 using SharpDX;
+using SharpDX.Direct3D11;
 using Color = System.Windows.Media.Color;
+using RenderingEventArgs = Ab3d.DirectX.RenderingEventArgs;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -28,6 +30,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     public partial class BackgroundAndOverlayRendering : Page
     {
         private DisposeList _disposables;
+        private RenderObjectsRenderingStep _backgroundRenderObjectsRenderingStep;
+        private RenderObjectsRenderingStep _alwaysOnTopRenderObjectsRenderingStep;
 
         public BackgroundAndOverlayRendering()
         {
@@ -35,14 +39,49 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             _disposables = new DisposeList();
 
+            ClearDepthBufferInfoControl.InfoText =
+@"The most easy to use and correct method to render objects in background and in overlay is to clear the depth buffer. Depth buffer is used to determine the distance of the object to the camera. This prevents rendering object that are farther away from the camera. When depth buffer is cleared, then the objects that are rendered after clearing the depth buffer will be always rendered and will not be hidden by the objects rendered before.
+
+To render background objects, we set ClearDepthStencilBufferAfterRendering to true on the BackgroundRenderingQueue.
+To render overlay objects, we set ClearDepthStencilBufferBeforeRendering to true on the OverlayRenderingQueue.
+
+Note that 3D lines can rendered as background or overlay just by setting the ReadZBuffer and WriteZBuffer and do not require clearing depth buffer.";
+
+            DisableDepthReadInfoControl.InfoText =
+@"Another option to always render objects (overlay objects) is to prevent reading the depth values from depth buffer. Similarly, it is possible to render background objects by preventing writing their depth values to depth buffer. To achieve that new RenderingSteps need to be added. See the SetupDisabledDepthRead method for more information.
+
+A drawback of this technique is that all triangles are always rendered - even the triangles that should be hidden (see the dragon model).
+Therefor this method should be used only when rendering simple 3D objects.
+This method is faster then clearing depth buffer because the clearing step is not needed.";
+
+            OverlayHitTestingInfoControl.InfoText =
+@"When getting the closest hit object (object under the mouse), the hit objects are sorted by their distance to the camera. When rendering overlay objects, it is possible to prioritize those objects, so that they will be always considered closer to the camera than other objects.
+
+This is done by setting the DXScene.DXHitTestOptions.OverlayRenderingQueue to the OverlayRenderingQueue.
+
+To demonstrate that, rotate the camera around the red dragon model - even if some yellow boxes are closer to the camera, the rotation will be done around the dragon model.";
+
+            BackgroundHitTestingInfoControl.InfoText =
+@"When getting the closest hit object (object under the mouse), the hit objects are sorted by their distance to the camera. When rendering background objects, it is possible to lower the priority of those objects, so that they will be always considered farther from to the camera than other objects.
+
+This is done by setting the DXScene.DXHitTestOptions.BackgroundRenderingQueue to the BackgroundRenderingQueue.
+
+To demonstrate that, rotate the camera around the yellow boxes that are in 3D space behind the blue dragon model - even if the blue dragon is closer to the camera, the rotation will be done around the yellow boxes.";
+
+
             MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
             {
                 if (MainDXViewportView.DXScene == null)
                     return; // Probably WPF 3D rendering
 
+
+                SetupClearingDepthBuffer();
+                UpdateHitTestingOverlay();
+                UpdateHitTestingBackground();
+
                 AddStandardRenderedObjects();
 
-                PrepareAlwaysOnTopRendering();
+                //PrepareAlwaysOnTopRendering();
                 AddCustomRenderedObjects();
 
                 AddCustomRenderedLines();
@@ -245,35 +284,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             MainViewport.Children.Add(modelVisual3D);
         }
 
-        private void PrepareAlwaysOnTopRendering()
-        {
-            if (MainDXViewportView.DXScene == null)
-                throw new Exception("PrepareAlwaysOnTopRendering can be called only after the DXScene has been initialized");
-
-
-            var backgroundRenderObjectsRenderingStep = new RenderObjectsRenderingStep("BackgroundRenderingStep");
-            backgroundRenderObjectsRenderingStep.OverrideDepthStencilState = MainDXViewportView.DXScene.DXDevice.CommonStates.DepthNone; // Default state is DepthReadWrite
-
-            // This RenderObjectsRenderingStep will render only objects inside ForegroundRenderingQueue
-            backgroundRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue == MainDXViewportView.DXScene.BackgroundRenderingQueue;
-
-            MainDXViewportView.DXScene.RenderingSteps.AddBefore(MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep, backgroundRenderObjectsRenderingStep);
-
-
-            var alwaysOnTopRenderObjectsRenderingStep = new RenderObjectsRenderingStep("AlwaysOnTopRenderingStep");
-            alwaysOnTopRenderObjectsRenderingStep.OverrideDepthStencilState = MainDXViewportView.DXScene.DXDevice.CommonStates.DepthNone; // Default state is DepthReadWrite
-
-            // This RenderObjectsRenderingStep will render only objects inside ForegroundRenderingQueue
-            alwaysOnTopRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue == MainDXViewportView.DXScene.OverlayRenderingQueue;
-
-            MainDXViewportView.DXScene.RenderingSteps.AddAfter(MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep, alwaysOnTopRenderObjectsRenderingStep);
-
-
-            MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue != MainDXViewportView.DXScene.BackgroundRenderingQueue &&
-                                                                                                                  queue != MainDXViewportView.DXScene.OverlayRenderingQueue;
-        }
-
-
         private void AddStandardRenderedObjects()
         {
             for (int x = -3; x <= 3; x++)
@@ -283,13 +293,155 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                     var boxVisual3D = new BoxVisual3D()
                     {
                         CenterPosition = new Point3D(x * 30, 0, y * 30),
-                        Size           = new Size3D(10, 10, 10),
-                        Material       = new DiffuseMaterial(Brushes.Yellow)
+                        Size = new Size3D(10, 10, 10),
+                        Material = new DiffuseMaterial(Brushes.Yellow)
                     };
 
                     MainViewport.Children.Add(boxVisual3D);
                 }
             }
+        }
+
+
+        private void SetupClearingDepthBuffer()
+        {
+            var dxScene = MainDXViewportView.DXScene;
+
+            dxScene.BackgroundRenderingQueue.ClearDepthStencilBufferAfterRendering = true;
+            dxScene.OverlayRenderingQueue.ClearDepthStencilBufferBeforeRendering = true;
+
+            // Instead of using ClearDepthStencilBufferAfterRendering and ClearDepthStencilBufferBeforeRendering
+            // the same can be also achieved by adding new RenderingSteps (see SetupDisabledDepthRead)
+            // and then using the following AfterRunningStep and BeforeRunningStep:
+
+            //_backgroundRenderObjectsRenderingStep.AfterRunningStep += delegate (object sender, RenderingEventArgs args)
+            //{
+            //    var renderingContext = args.RenderingContext;
+
+            //    if (renderingContext.DXScene.BackgroundRenderingQueue.Count > 0) // Only clear depth buffer when we have actually render any objects
+            //        renderingContext.DeviceContext.ClearDepthStencilView(renderingContext.CurrentDepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+            //};
+
+            //_alwaysOnTopRenderObjectsRenderingStep.BeforeRunningStep += delegate (object sender, RenderingEventArgs args)
+            //{
+            //    var renderingContext = args.RenderingContext;
+
+            //    if (renderingContext.DXScene.OverlayRenderingQueue.Count > 0) // Only clear depth buffer when we will actually render any objects
+            //        renderingContext.DeviceContext.ClearDepthStencilView(renderingContext.CurrentDepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+            //};
+
+            DisableDisabledDepthRead();
+        }
+        
+        private void DisableClearingDepthBuffer()
+        {
+            var dxScene = MainDXViewportView.DXScene;
+
+            dxScene.BackgroundRenderingQueue.ClearDepthStencilBufferAfterRendering = false;
+            dxScene.OverlayRenderingQueue.ClearDepthStencilBufferBeforeRendering = false;
+        }
+
+        private void SetupDisabledDepthRead()
+        {
+            var dxScene = MainDXViewportView.DXScene;
+
+            if (_backgroundRenderObjectsRenderingStep == null)
+            {
+                _backgroundRenderObjectsRenderingStep = new RenderObjectsRenderingStep("BackgroundRenderingStep");
+                _backgroundRenderObjectsRenderingStep.OverrideDepthStencilState = MainDXViewportView.DXScene.DXDevice.CommonStates.DepthNone; // Default state is DepthReadWrite
+
+                // This RenderObjectsRenderingStep will render only objects inside ForegroundRenderingQueue
+                _backgroundRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue == dxScene.BackgroundRenderingQueue;
+
+                dxScene.RenderingSteps.AddBefore(dxScene.DefaultRenderObjectsRenderingStep, _backgroundRenderObjectsRenderingStep);
+            }
+
+            if (_alwaysOnTopRenderObjectsRenderingStep == null)
+            {
+                _alwaysOnTopRenderObjectsRenderingStep = new RenderObjectsRenderingStep("AlwaysOnTopRenderingStep");
+                _alwaysOnTopRenderObjectsRenderingStep.OverrideDepthStencilState = MainDXViewportView.DXScene.DXDevice.CommonStates.DepthNone; // Default state is DepthReadWrite
+
+                // This RenderObjectsRenderingStep will render only objects inside ForegroundRenderingQueue
+                _alwaysOnTopRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue == dxScene.OverlayRenderingQueue;
+
+                dxScene.RenderingSteps.AddAfter(dxScene.DefaultRenderObjectsRenderingStep, _alwaysOnTopRenderObjectsRenderingStep);
+            }
+
+            dxScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = queue => queue != dxScene.BackgroundRenderingQueue &&
+                                                                                               queue != dxScene.OverlayRenderingQueue;
+
+
+            DisableClearingDepthBuffer();
+        }
+        
+        private void DisableDisabledDepthRead()
+        {
+            var dxScene = MainDXViewportView.DXScene;
+
+            if (_backgroundRenderObjectsRenderingStep != null)
+            {
+                dxScene.RenderingSteps.Remove(_backgroundRenderObjectsRenderingStep);
+                _backgroundRenderObjectsRenderingStep = null;
+            }
+
+            if (_alwaysOnTopRenderObjectsRenderingStep != null)
+            {
+                dxScene.RenderingSteps.Remove(_alwaysOnTopRenderObjectsRenderingStep);
+                _alwaysOnTopRenderObjectsRenderingStep = null;
+            }
+
+            dxScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = null;
+        }
+
+        private void UpdateHitTestingOverlay()
+        {
+            if (OverlayHitTestingCheckBox.IsChecked ?? false)
+                MainDXViewportView.DXScene.DXHitTestOptions.OverlayRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
+            else
+                MainDXViewportView.DXScene.DXHitTestOptions.OverlayRenderingQueue = null;
+        }
+        
+        private void UpdateHitTestingBackground()
+        {
+            if (BackgroundHitTestingCheckBox.IsChecked ?? false)
+                MainDXViewportView.DXScene.DXHitTestOptions.BackgroundRenderingQueue = MainDXViewportView.DXScene.BackgroundRenderingQueue;
+            else
+                MainDXViewportView.DXScene.DXHitTestOptions.BackgroundRenderingQueue = null;
+        }
+
+
+        private void ClearDepthBufferRadioButton_OnChecked(object sender, RoutedEventArgs e)
+        {
+            if (MainDXViewportView.DXScene == null)
+                return;
+
+            SetupClearingDepthBuffer();
+            MainDXViewportView.Refresh();
+        }
+        
+        private void DisableDepthReadRadioButton_OnChecked(object sender, RoutedEventArgs e)
+        {
+            if (MainDXViewportView.DXScene == null)
+                return;
+
+            SetupDisabledDepthRead();
+            MainDXViewportView.Refresh();
+        }
+
+        private void OnOverlayHitTestingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (MainDXViewportView.DXScene == null)
+                return;
+
+            UpdateHitTestingOverlay();
+        }
+        
+        private void OnBackgroundHitTestingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (MainDXViewportView.DXScene == null)
+                return;
+
+            UpdateHitTestingBackground();
         }
     }
 }

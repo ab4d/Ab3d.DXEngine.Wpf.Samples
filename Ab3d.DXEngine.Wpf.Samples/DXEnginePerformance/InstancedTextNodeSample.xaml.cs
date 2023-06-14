@@ -21,6 +21,8 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Models;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
+using SharpDX;
+using Color = System.Windows.Media.Color;
 
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
@@ -34,6 +36,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private InstancedTextNode _instancedTextNode2;
         
         private InstancedText _instancedText;
+
+        private Matrix3D _instancedTextInitialWorldMatrix;
+        private int _rotationsCount;
 
         private List<InstancedText> _addedTexts;
 
@@ -136,6 +141,7 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             // Note that to be able to show text from the back side, we need to set hasBackSide to true (this rendered twice as many objects).
             // AddText method returns an instance of InstancedText object that can be used to change the color, position, show or hide text.
             _instancedText = _instancedTextNode.AddText("Ab3d.DXEngine", Colors.Orange, new Point3D(-210, 0, 0), size: 25, hasBackSide: true);
+            _instancedTextInitialWorldMatrix = _instancedText.WorldMatrix;
 
             /*
             // To change direction and orientation of text, we can call the SetTextDirection method.
@@ -180,7 +186,7 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             // Note that MainDXViewportView.DXScene must not be null (this can be called in MainDXViewportView.DXSceneDeviceCreated or MainDXViewportView.DXSceneInitialized event handler)
             //_instancedTextNode.InitializeResources(MainDXViewportView.DXScene);
             */
-            
+
             // Show the InstancedTextNode as any other DXEngine's SceneNode:
             var sceneNodeVisual1 = new SceneNodeVisual3D(_instancedTextNode);
             MainViewport.Children.Add(sceneNodeVisual1);
@@ -370,6 +376,54 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             _instancedText.Move(new Vector3D(0, 10, 0));
         }
         
+        private void ChangeOrientationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_instancedText == null)
+                return;
+
+            _rotationsCount++;
+            
+            // Create new WorldMatrix
+
+            // Use SharpDX.Matrix.RotationAxis to create new rotation matrix without creating new objects (as below in the commented code)
+            var rotationAxis = SharpDX.Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(_rotationsCount * 30));
+
+            // Multiply the rotation by the initial WorldMatrix for this text
+            var newWorldMatrix = rotationAxis.ToWpfMatrix3D() * _instancedTextInitialWorldMatrix;
+
+            // WPF's way to create rotation matrix (this creates 2 objects each time):
+            //var rotateTransform3D = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), _rotationsCount * 30));
+            //var newWorldMatrix = rotateTransform3D.Value * _instancedTextInitialWorldMatrix;
+            
+            _instancedText.SetWorldMatrix(newWorldMatrix);
+        }
+        
+        private void AlignWithCameraButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // To align text with camera, we first need to get the vectors that define the camera's orientation:
+            Vector3D planeNormalVector3D, widthVector3D, heightVector3D;
+            Camera1.GetCameraPlaneOrientation(out planeNormalVector3D, out widthVector3D, out heightVector3D);
+
+            // Then we can call the SetOrientation method:
+            //_instancedText.SetOrientation(widthVector3D, heightVector3D);
+
+            // If we already have the text normal vector (planeNormalVector3D), it is faster to call the SetOrientation that also takes that.
+            // We will also need textSize. If we do not have it, we can calculate it from the current WorldMatrix:
+            var textSize = _instancedText.GetTextSize();
+
+            // Call SetOrientation
+            _instancedText.SetOrientation(ref widthVector3D, ref heightVector3D, ref planeNormalVector3D, textSize);
+
+            // Here is the full code to set the new WorldMatrix from the orientation vectors and text size:
+            //var currentMatrix = _instancedText.WorldMatrix;
+            //var textSize = new Vector3D(currentMatrix.M11, currentMatrix.M12, currentMatrix.M13).Length;
+
+            //_instancedText.SetWorldMatrix(new Matrix3D(widthVector3D.X * textSize,       widthVector3D.Y * textSize,       widthVector3D.Z * textSize,       0,
+            //                                           heightVector3D.X * textSize,      heightVector3D.Y * textSize,      heightVector3D.Z * textSize,      0,
+            //                                           planeNormalVector3D.X * textSize, planeNormalVector3D.Y * textSize, planeNormalVector3D.Z * textSize, 0,
+            //                                           currentMatrix.OffsetX,            currentMatrix.OffsetY,            currentMatrix.OffsetZ,            1));
+        }
+
         private void ShowHideButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (_instancedText == null)

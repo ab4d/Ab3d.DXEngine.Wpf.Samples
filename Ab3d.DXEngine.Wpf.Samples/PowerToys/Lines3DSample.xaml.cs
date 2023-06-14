@@ -25,13 +25,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
         {
             InitializeComponent();
 
-            ArrowLengthInfoControl.InfoText =
-@"Specifies the maximum arrow length set as fraction of the line length.
-For example: 0.2 means that the maximum arrow length will be 1 / 5 (=0.2) of the line length.
-If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength,
-the arrow is shortened (the arrow angle is increased).";
-
-
             SetUpMultiPolyLineVisual3D();
 
             MainDXViewportView.GraphicsProfiles = DirectX.Client.Settings.DXEngineSettings.Current.GraphicsProfiles;
@@ -77,30 +70,6 @@ the arrow is shortened (the arrow angle is increased).";
 
             // We can also set IsClosed to close (connect first and last point) all the polylines
             MultiPolyLineVisual.IsClosed = true;
-        }
-
-        private void AngleComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (!this.IsLoaded)
-                return;
-
-            var comboBoxItem = AngleComboBox.SelectedItem as ComboBoxItem;
-
-            LinesUpdater.Instance.LineArrowAngle = double.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
-
-            LinesUpdater.Instance.Refresh();
-        }
-
-        private void LengthComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (!this.IsLoaded)
-                return;
-
-            var comboBoxItem = LengthComboBox.SelectedItem as ComboBoxItem;
-
-            LinesUpdater.Instance.MaxLineArrowLength = double.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
-
-            LinesUpdater.Instance.Refresh();
         }
     }
 }

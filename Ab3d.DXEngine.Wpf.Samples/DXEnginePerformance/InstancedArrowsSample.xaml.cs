@@ -94,7 +94,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             DXDiagnostics.IsCollectingStatistics = true; // Collect rendering time and other statistics
 
-            MainDXViewportView.SceneRendered += delegate (object sender, EventArgs args)
+            MainDXViewportView.SceneRendered += delegate(object sender, EventArgs args)
             {
                 if (MainDXViewportView.DXScene != null)
                     _totalRenderingTime = MainDXViewportView.DXScene.Statistics.TotalRenderTimeMs;
@@ -103,7 +103,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             };
 
 
-            this.Loaded += delegate (object o, RoutedEventArgs args)
+            this.Loaded += delegate(object o, RoutedEventArgs args)
             {
                 CreateArrows();
 
@@ -132,7 +132,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Update statistics only once per second
             if (DateTime.Now.Second != _lastSecond)
             {
-                double averageUpdateTime = _updateDataSamplesCount > 0 ? _totalUpdateDataTime / (double)_updateDataSamplesCount : 0;
+                double averageUpdateTime = _updateDataSamplesCount > 0 ? _totalUpdateDataTime / (double) _updateDataSamplesCount : 0;
                 double averageRenderTime = _renderingTimeSamplesCount > 0 ? _totalRenderingTime / (double)_renderingTimeSamplesCount : 0;
 
                 RenderingStatsTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture,
@@ -150,7 +150,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             }
             else
             {
-                _framesPerSecond++;
+                _framesPerSecond ++;
             }
 
             if (!(RunAnimationCheckBox.IsChecked ?? false))
@@ -169,12 +169,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Rotate on xy plane
             x += Math.Sin(elapsedSeconds) * _xSize * 0.2;
             y += Math.Cos(elapsedSeconds) * 90;
-
+            
             // Rotate on yz plane
             y += Math.Sin(elapsedSeconds * 5) * 50;
             z += Math.Cos(elapsedSeconds * 0.3) * _ySize * 0.2;
 
-
+            
             _sphereTranslate.OffsetX = x;
             _sphereTranslate.OffsetY = y;
             _sphereTranslate.OffsetZ = z;
@@ -212,11 +212,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 var sphereVisual3D = new SphereVisual3D()
                 {
                     CenterPosition = new Point3D(0, 0, 0),
-                    Radius = 10,
-                    Material = new DiffuseMaterial(Brushes.Gold)
+                    Radius         = 10,
+                    Material       = new DiffuseMaterial(Brushes.Gold)
                 };
 
-                _sphereTranslate = new TranslateTransform3D(_sphereStartPosition.ToWpfVector3D());
+                _sphereTranslate         = new TranslateTransform3D(_sphereStartPosition.ToWpfVector3D());
                 sphereVisual3D.Transform = _sphereTranslate;
 
 
@@ -230,7 +230,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 var arrowMesh3D = new Ab3d.Meshes.ArrowMesh3D(new Point3D(0, 0, 0), new Point3D(1, 0, 0), 1.0 / 15.0, 2.0 / 15.0, 45, 10, false).Geometry;
 
-                _instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(arrowMesh3D);
+                _instancedMeshGeometryVisual3D               = new InstancedMeshGeometryVisual3D(arrowMesh3D);
                 _instancedMeshGeometryVisual3D.InstancesData = _instanceData;
 
                 MainViewport.Children.Add(_instancedMeshGeometryVisual3D);
@@ -255,7 +255,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             float yStep = _ySize / _yCount;
 
             var instancedData = _instanceData;
-
+            
 
             if (_stopwatch == null)
                 _stopwatch = new Stopwatch();
@@ -283,7 +283,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Paraller.For - inlining first normalize and replaced arrowDirection with dx, dy, dz (also removed the second distance calculation) - 14.37 !!!
             // Paraller.For - converted horizontalVector into hx, hy and hz and inlined its normalization: 14.01 ms
 
-
+            
             var spherePosition = _spherePosition;
             var arrowsLength = _arrowsLength;
             var gradientColors = _gradientColors;
@@ -291,7 +291,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             //for (int xi = 0; xi < _xCount; xi++)
             Parallel.For(0, _xCount, xi =>
             {
-                float x = xi * xStep - (_xSize / 2);
+                float x = xi * xStep -(_xSize / 2);
                 float y = -(_ySize / 2);
 
                 int instanceIndex = xi * _yCount;
@@ -316,7 +316,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                         dz *= denum;
                     }
 
-
+ 
                     //var arrowStartPosition = new Vector3(x, 0, y);
 
                     //instancedData[instanceIndex].World = GetMatrixFromDirection(arrowDirection, arrowStartPosition, arrowScale);
@@ -369,7 +369,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     //    arrowDirection.X * horizontalVector.Y - arrowDirection.Y * horizontalVector.X);
 
                     // horizontalVector.Y is always 0
-                    var yAxis = new Vector3(dy * hz,
+                    var yAxis = new Vector3(dy * hz, 
                                             dz * hx - dx * hz,
                                             -dy * hx);
 
@@ -382,10 +382,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                     // For more info see comments in GetRotationMatrixFromDirection
                     // NOTE: The following math works only for uniform scale (scale factor for x, y and z is the same - arrowsLength in our case)
-                    instancedData[instanceIndex].World = new SharpDX.Matrix(dx * arrowsLength, dy * arrowsLength, dz * arrowsLength, 0,
-                                                                            yAxis.X * arrowsLength, yAxis.Y * arrowsLength, yAxis.Z * arrowsLength, 0,
-                                                                            zAxis.X * arrowsLength, zAxis.Y * arrowsLength, zAxis.Z * arrowsLength, 0,
-                                                                            x, 0, y, 1);
+                    instancedData[instanceIndex].World = new SharpDX.Matrix(dx * arrowsLength,               dy * arrowsLength,               dz * arrowsLength,      0,
+                                                                            yAxis.X * arrowsLength,          yAxis.Y * arrowsLength,          yAxis.Z * arrowsLength, 0,
+                                                                            zAxis.X * arrowsLength,          zAxis.Y * arrowsLength,          zAxis.Z * arrowsLength, 0,
+                                                                            x,                               0,                               y,                      1);
 
 
 
@@ -411,7 +411,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     y += yStep;
                     instanceIndex++;
                 }
-            });
+            } );
 
             _stopwatch.Stop();
             _totalUpdateDataTime += _stopwatch.Elapsed.TotalMilliseconds;
@@ -496,7 +496,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             if (!this.IsLoaded)
                 return;
-
+            
             CreateArrows();
         }
 
@@ -538,11 +538,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 case 4:
                     Camera1.BeginInit();
-                    Camera1.Heading = -0.57;
-                    Camera1.Attitude = -89;
-                    Camera1.Distance = 4275;
+                    Camera1.Heading        = -0.57;
+                    Camera1.Attitude       = -89;
+                    Camera1.Distance       = 4275;
                     Camera1.TargetPosition = new Point3D(0, 60, 0);
-                    Camera1.Offset = new Vector3D(-16, -109, 37);
+                    Camera1.Offset         = new Vector3D(-16, -109, 37);
                     Camera1.EndInit();
                     break;
 

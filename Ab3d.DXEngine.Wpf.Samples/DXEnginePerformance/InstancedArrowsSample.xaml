@@ -8,7 +8,7 @@
       xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"   
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
       mc:Ignorable="d" 
-      d:DesignHeight="500" d:DesignWidth="800"
+      d:DesignHeight="500" d:DesignWidth="900"
 	Title="ArrowsSample">
     <Page.Resources>
         <DiffuseMaterial x:Key="ObjectsMaterial" Brush="#247589"/>

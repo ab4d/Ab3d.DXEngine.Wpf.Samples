@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=5.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.5.2.8348\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=5.3.8564.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.5.3.8564-beta1\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.2.8348\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=5.3.8564.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.5.3.8564-beta1\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=10.2.8348.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.10.2.8348\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=10.3.8564.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.10.3.8564-beta1\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -123,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DXEngineHitTesting\ManualInputEventsSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineHitTesting\RectangularSelectionSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +182,10 @@
     <Page Include="DXEnginePerformance\InstancedTextNodeSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DXEnginePerformance\LinePerformanceSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEnginePerformance\SolidColorInstanceRendering.xaml">
       <SubType>Designer</SubType>
@@ -538,6 +546,9 @@
     <Compile Include="DXEngineHitTesting\LinesSelector.xaml.cs">
       <DependentUpon>LinesSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineHitTesting\ManualInputEventsSample.xaml.cs">
+      <DependentUpon>ManualInputEventsSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineHitTesting\RectangularSelectionSample.xaml.cs">
       <DependentUpon>RectangularSelectionSample.xaml</DependentUpon>
     </Compile>
@@ -583,6 +594,9 @@
     <Compile Include="DXEngineOther\WpfElementOverlay.cs" />
     <Compile Include="DXEnginePerformance\InstancedTextNodeSample.xaml.cs">
       <DependentUpon>InstancedTextNodeSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEnginePerformance\LinePerformanceSample.xaml.cs">
+      <DependentUpon>LinePerformanceSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEnginePerformance\SolidColorInstanceRendering.xaml.cs">
       <DependentUpon>SolidColorInstanceRendering.xaml</DependentUpon>
@@ -883,6 +897,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PowerToys\LineCapsSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PowerToys\Lines3DSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -892,10 +910,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PowerToysOther\ModelMoverOverlaySample.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="DXEnginePerformance\PolyLinesSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -966,6 +980,9 @@
     <Compile Include="PowerToys\DucksLakeDemo.xaml.cs">
       <DependentUpon>DucksLakeDemo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PowerToys\LineCapsSample.xaml.cs">
+      <DependentUpon>LineCapsSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PowerToys\Lines3DSample.xaml.cs">
       <DependentUpon>Lines3DSample.xaml</DependentUpon>
     </Compile>
@@ -974,9 +991,6 @@
     </Compile>
     <Compile Include="PowerToysOther\ModelMoverOverlaySample.xaml.cs">
       <DependentUpon>ModelMoverOverlaySample.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DXEnginePerformance\PolyLinesSample.xaml.cs">
-      <DependentUpon>PolyLinesSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToysOther\ModelRotatorSample.xaml.cs">
       <DependentUpon>ModelRotatorSample.xaml</DependentUpon>
@@ -1324,11 +1338,11 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.csproj">
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net48.csproj">
       <Project>{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}</Project>
       <Name>Ab3d.DirectX.Client.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.csproj">
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net48.csproj">
       <Project>{39512d68-5ad7-4933-81fb-fd603ef611b7}</Project>
       <Name>Ab3d.DirectX.Client.Settings</Name>
     </ProjectReference>

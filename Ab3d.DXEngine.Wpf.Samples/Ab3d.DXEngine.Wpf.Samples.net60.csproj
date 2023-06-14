@@ -7,9 +7,9 @@
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>5.2.8348</Version>
-    <AssemblyVersion>5.2.8348.2060</AssemblyVersion>
-    <FileVersion>5.2.8348.2060</FileVersion> 
+    <Version>5.3.8564</Version>
+    <AssemblyVersion>5.3.8564.2060</AssemblyVersion>
+    <FileVersion>5.3.8564.2060</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,9 +23,9 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="5.2.8348" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.2.8348" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="10.2.8348" /> 
+    <PackageReference Include="Ab3d.DXEngine" Version="5.3.8564-beta1" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="5.3.8564-beta1" />    
+    <PackageReference Include="Ab3d.PowerToys" Version="10.3.8564-beta1" /> 
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>

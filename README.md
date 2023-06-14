@@ -15,10 +15,9 @@ Both Ab3d.DXEngine and Ab3d.PowerToys are commercial libraries. You can start a 
 ## Repository solutions
 
 The Ab3d.DXEngine.Wpf.Samples repository contains the following Visual Studio solutions:
-* Ab3d.DXEngine MAIN SAMPLES.sln (**.NET Framework 4.5**)
-* Ab3d.DXEngine MAIN SAMPLES core31.sln (**.NET Core 3.1**)
-* Ab3d.DXEngine MAIN SAMPLES net50.sln (**.NET 5.0**)
-* Ab3d.DXEngine MAIN SAMPLES net60.sln (**.NET 6.0**)
+* Ab3d.DXEngine WPF Samples net48.sln (**.NET Framework 4.8**)
+* Ab3d.DXEngine WPF Samples net60.sln (**.NET 6.0**)
+* Ab3d.DXEngine WPF Samples net70.sln (**.NET 7.0**)
 
 ## Dependencies
 

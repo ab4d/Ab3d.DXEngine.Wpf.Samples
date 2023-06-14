@@ -90,17 +90,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
                 MainDXViewportView.DXScene.RenderingSteps.AddBefore(MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep, customActionRenderingStep);
             };
-
-            CompositionTarget.Rendering += OnCompositionTargetOnRendering;
-
-            this.Unloaded += delegate { Dispose(); };
-        }
-
-        private void OnCompositionTargetOnRendering(object sender, EventArgs args)
-        {
-            // Because we did not change anything in the MainDXViewportView, the scene will not be automatically rendered again
-            // Therefore we need to manually render it with calling Refresh method
-            MainDXViewportView.Refresh();
         }
 
         private void InitializeSharpDXRendering(DXScene dxScene)

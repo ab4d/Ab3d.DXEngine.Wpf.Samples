@@ -22,6 +22,11 @@ using Ab3d.Models;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 using Assimp;
+using Camera = System.Windows.Media.Media3D.Camera;
+using CheckBox = System.Windows.Controls.CheckBox;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using LineCap = Ab3d.Common.Models.LineCap;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 {
@@ -39,6 +44,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private Model3D _selectedModel3D;
         private Transform3D _selectedModelParentTransform3D;
         private Transform3D _selectedModelFullTransform3D;
+
+        private BaseCamera _currentCamera;
+        private AmbientLight _sceneAmbientLight;
 
         private TypeConverter _colorTypeConverter;
         private MeshGeometry3D _meshGeometryToInspect;
@@ -72,7 +80,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             // This will sort transparent objects so that they are rendered in the correct order - from most distant objects to the closest objects
             MainDXViewportView.IsTransparencySortingEnabled = true;
 
-            
+            SetCurrentCamera(Camera1);
+
+
             // Use helper class (defined in this sample project) to load the native Assimp libraries
             Ab3d.Assimp.AssimpLoader.LoadAssimpNativeLibrary();
 
@@ -187,6 +197,28 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 ShowModel(readModel3D, updateCamera: isNewFile); // If we just reloaded the previous file, we preserve the current camera TargetPosition and Distance
 
 
+                int savedCameraSelectedIndex = CameraComboBox.SelectedIndex;
+
+                bool hasImportedCameras = UpdateAvailableCameras(assimpWpfImporter.Cameras);
+                UpdateLights(assimpWpfImporter.Lights);
+
+
+                if (isNewFile && readModel3D != null)
+                {
+                    // Adjust the camera so the bounding box of the loaded model will fit into view
+                    // if camera is not valid (for example when the size of Viewport3D is not set yet), then wait until camera is valid and then automatically call FitIntoView
+                    Camera1.RotationCenterPosition = null;
+                    Camera1.FitIntoView(readModel3D.Bounds, adjustTargetPosition: true, adjustmentFactor: 1, waitUntilCameraIsValid: true);
+                    
+                    // Select perspective camera
+                    CameraComboBox.SelectedIndex = CameraComboBox.Items.Count - 2;
+                }
+                else
+                {
+                    CameraComboBox.SelectedIndex = savedCameraSelectedIndex;
+                }
+
+
                 // Force garbage collection to clear the previously loaded objects from memory.
                 // Note that sometimes when a lot of objects are created in large objects heap,
                 // it may take two garbage collections to release the memory
@@ -265,6 +297,143 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
 
             FillTreeView(model3D);
+        }
+
+        private bool UpdateAvailableCameras(List<Camera> importedCameras)
+        {
+            CameraComboBox.Items.Clear();
+
+            bool hasImportedCameras = importedCameras != null && importedCameras.Count > 0;
+
+            if (hasImportedCameras)
+            {
+                int cameraIndex = 1;
+                foreach (var importedCamera in importedCameras)
+                {
+                    // Name is stored into NameProperty that can be read by:
+                    var cameraName = (string)importedCamera.GetValue(FrameworkElement.NameProperty);
+
+                    if (string.IsNullOrEmpty(cameraName))
+                    {
+                        cameraName = "Camera_" + cameraIndex.ToString();
+                        cameraIndex++;
+                    }
+
+                    var comboBoxItem = new ComboBoxItem()
+                    {
+                        Content = cameraName,
+                    };
+
+                    // Convert WPF's camera to Ab3d.PowerToys camera
+                    var targetPositionCamera = new TargetPositionCamera();
+                    targetPositionCamera.CreateFrom(importedCamera);
+
+                    // Set that to Tag
+                    comboBoxItem.Tag = targetPositionCamera;
+
+                    CameraComboBox.Items.Add(comboBoxItem);
+                }
+            }
+
+            var customPerspectiveComboBoxItem = new ComboBoxItem()
+            {
+                Content = hasImportedCameras ? "Custom Perspective" : "Perspective",
+                Tag = Camera1
+            };
+
+            CameraComboBox.Items.Add(customPerspectiveComboBoxItem);
+                
+                
+            var customOrthographicComboBoxItem = new ComboBoxItem()
+            {
+                Content = hasImportedCameras ? "Custom Orthographic" : "Orthographic",
+                Tag = Camera1
+            };
+
+            CameraComboBox.Items.Add(customOrthographicComboBoxItem);
+
+            return hasImportedCameras;
+        }
+
+        private void UpdateLights(List<System.Windows.Media.Media3D.Light> importedLights)
+        {
+            LightsModel3DGroup.Children.Clear();
+
+            ImportedLightsPanel.Children.Clear();
+
+            bool hasImportedLights = importedLights != null && importedLights.Count > 0;
+            _sceneAmbientLight = null;
+
+            if (hasImportedLights)
+            {
+                AmbientLightSlider.Value = 0;
+
+                int cameraIndex = 1;
+                foreach (var importedLight in importedLights)
+                {
+                    var importedAmbientLight = importedLight as AmbientLight;
+                    if (importedAmbientLight != null)
+                    {
+                        var ambientAmount = 100f * (float)(importedAmbientLight.Color.R + importedAmbientLight.Color.G + importedAmbientLight.Color.B) / (float)(255 * 3);
+                        AmbientLightSlider.Value = ambientAmount;
+
+                        _sceneAmbientLight = importedAmbientLight;
+                    }
+
+                    // Create CheckBox for lights (except for AmbientLight)
+                    if (importedAmbientLight == null)
+                    {
+                        // Name is stored into NameProperty that can be read by:
+                        var lightName = (string)importedLight.GetValue(FrameworkElement.NameProperty);
+
+                        if (string.IsNullOrEmpty(lightName))
+                        {
+                            lightName = "Light_" + cameraIndex.ToString();
+                            cameraIndex++;
+                        }
+
+                        var checkBox = new CheckBox()
+                        {
+                            Content = lightName,
+                            Tag = importedLight,
+                            IsChecked = true,
+                            Margin = new Thickness(0, 5, 0, 0)
+                        };
+
+                        checkBox.Checked += OnLightSettingsChanged;
+                        checkBox.Unchecked += OnLightSettingsChanged;
+
+                        ImportedLightsPanel.Children.Add(checkBox);
+                    }
+
+                    LightsModel3DGroup.Children.Add(importedLight);
+                }
+
+                // Where there are imported lights, then use them and disable build-in lights
+                CameraLightCheckBox.IsChecked = false;
+                TopDownLightCheckBox.IsChecked = false;
+                SideLightCheckBox.IsChecked = false;
+            }
+            else
+            {
+                AmbientLightSlider.Value = 30;
+
+                // No imported lights - use build-in lights
+                CameraLightCheckBox.IsChecked = true;
+                TopDownLightCheckBox.IsChecked = false;
+                SideLightCheckBox.IsChecked = false;
+            }
+
+            if (_currentCamera != null)
+                _currentCamera.ShowCameraLight = (CameraLightCheckBox.IsChecked ?? false) ? ShowCameraLightType.Always : ShowCameraLightType.Never;
+
+            if (_sceneAmbientLight == null)
+            {
+                _sceneAmbientLight = new AmbientLight();
+                LightsModel3DGroup.Children.Add(_sceneAmbientLight);
+
+                UpdateAmbientLight();
+            }
         }
 
         private void ClearCurrentModel()
@@ -1010,11 +1179,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
         private void UpdateAmbientLight()
         {
-            if (AmbientLightSlider == null || SceneAmbientLight == null)
+            if (AmbientLightSlider == null || _sceneAmbientLight == null)
                 return;
 
             var color = (byte)(2.55 * AmbientLightSlider.Value); // Minimum="0" Maximum="100"
-            SceneAmbientLight.Color = Color.FromRgb(color, color, color);
+            _sceneAmbientLight.Color = Color.FromRgb(color, color, color);
         }
 
         private void OnShowMeshInspectorCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
@@ -1123,14 +1292,77 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 if (_sideLight != null && LightsModel3DGroup.Children.Contains(_sideLight))
                     LightsModel3DGroup.Children.Remove(_sideLight);
             }
+
+
+            var checkBox = sender as CheckBox;
+
+            if (checkBox != null)
+            {
+                var light = (System.Windows.Media.Media3D.Light)checkBox.Tag;
+                if (light != null)
+                {
+                    // If CheckBox has Tag set to Light, then we have clicked on imported light
+                    if (checkBox.IsChecked ?? false)
+                    {
+                        if (!LightsModel3DGroup.Children.Contains(light))
+                            LightsModel3DGroup.Children.Add(light);
+                    }
+                    else
+                    {
+                        if (LightsModel3DGroup.Children.Contains(light))
+                            LightsModel3DGroup.Children.Remove(light);
+                    }
+                }
+            }
         }
 
-        private void CameraTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CameraComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!this.IsLoaded)
                 return;
 
-            Camera1.CameraType = CameraTypeComboBox.SelectedIndex == 0 ? BaseCamera.CameraTypes.PerspectiveCamera : BaseCamera.CameraTypes.OrthographicCamera;
+            var comboBoxItem = CameraComboBox.SelectedItem as ComboBoxItem;
+            
+            if (comboBoxItem == null)
+                return;
+
+            var camera = comboBoxItem.Tag as BaseCamera;
+            if (camera == null)
+                camera = Camera1;
+
+            if (ReferenceEquals(camera, Camera1))
+            {
+                string comboBoxContent = (string)comboBoxItem.Content;
+                if (comboBoxContent.Contains("Orthographic"))
+                    Camera1.CameraType = BaseCamera.CameraTypes.OrthographicCamera;
+                else
+                    Camera1.CameraType = BaseCamera.CameraTypes.PerspectiveCamera;
+            }
+
+            SetCurrentCamera(camera);
+        }
+
+        private void SetCurrentCamera(BaseCamera camera)
+        {
+            if (ReferenceEquals(_currentCamera, camera))
+                return;
+
+            if (_currentCamera != null)
+                _currentCamera.TargetViewport3D = null;
+
+            if (camera != null)
+            {
+                camera.TargetViewport3D = MainViewport;
+                camera.ShowCameraLight = (CameraLightCheckBox.IsChecked ?? false) ? ShowCameraLightType.Always : ShowCameraLightType.Never;
+
+                camera.Refresh();
+            }
+
+            MouseCameraController1.TargetCamera = camera;
+            CameraAxisPanel1.TargetCamera = camera;
+            ViewCubeCameraController1.TargetCamera = camera;
+
+            _currentCamera = camera;
         }
 
 
