@@ -20,14 +20,14 @@
 
 
         <Border Name="ViewportBorder" Grid.Row="1" Grid.Column="0" Background="Black" >
-            
+
             <dxControls:DXViewportView Name="MainViewportView" PresentationType="DirectXOverlay">
 
                 <Viewport3D Name="MainViewport">
                 </Viewport3D>
 
             </dxControls:DXViewportView>
-            
+
         </Border>
         <cameras:TargetPositionCamera Name="Camera1" Grid.Row="1" Grid.Column="0" Heading="15" Attitude="7" Bank="0" Distance="350" TargetPosition="0 0 0"
                                       ShowCameraLight="Always"
@@ -48,8 +48,13 @@
             <StackPanel Margin="10 0">
 
                 <TextBlock Text="Line type:" FontWeight="Bold" TextDecorations="Underline" Margin="0 0 0 3"/>
-                
-                <RadioButton Name="MultiLinesRadioButton" Content="LineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="MultiLinesRadioButton" Content="LineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                    <Image Name="LineVisual3DWarningImage" Source="pack://application:,,,/Resources/warningIcon.png" Width="12" Height="12" VerticalAlignment="Center" Margin="3 -2 0 0" ToolTipService.ShowDuration="120000" 
+                           ToolTip="It make take a few seconds to generate all the LineVisual3D objects&#10;because a new LineVisual3D is generated for each line segment."/>
+                </StackPanel>
+
                 <RadioButton Name="MultiPolyLinesRadioButton" Content="PolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="MultiMultiLinesRadioButton" Content="MultiLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="SinglePolyLinesRadioButton" Content="MultiPolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
