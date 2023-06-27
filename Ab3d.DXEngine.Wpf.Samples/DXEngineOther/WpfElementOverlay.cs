@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Controls;
@@ -18,6 +20,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
         private ShaderResourceView _shaderResourceView;
 
         private double _dpiScaleX, _dpiScaleY;
+        private RenderTargetBitmap _wpfElementBitmap;
+
+        public FrameworkElement ParentElement;
 
         public WpfElementOverlay(FrameworkElement wpfElement, DXViewportView mainDXViewportView)
         {
@@ -36,7 +41,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // When some overlay controls are right or bottom aligned, then we need to update their positions when the size of the view is changed
             _mainDXViewportView.SizeChanged += (sender, args) =>
             {
-                UpdateMouseCameraControllerInfoSprite();
+                UpdateSpriteBatch();
             };
         }
 
@@ -54,38 +59,65 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             var mouseCameraControllerInfo = _wpfElement as MouseCameraControllerInfo;
             if (mouseCameraControllerInfo != null)
                 mouseCameraControllerInfo.Update();
-
+            
 
             // Render to a bigger bitmap when using DPI scale and Super-sampling
             int bitmapDpi = (int)(96 * _dpiScaleX * _mainDXViewportView.DXScene.SupersamplingFactor);
-
-            // CameraControllerInfo does not change so we can render it only once with RenderToBitmap.
-            //
+            
             // IMPORTANT:
             // If the control is changing and you call RenderToBitmap multiple times to render the same control,
             // then pass the previously rendered RenderTargetBitmap as a parameter to reuse the RenderTargetBitmap.
             // Otherwise a significant amount of unmanaged memory may be used by the bitmaps (GC is not aware of that and may not clear it).
-            var cameraControllerInfoBitmap = Ab3d.Utilities.BitmapRendering.RenderToBitmap(_wpfElement, null, bitmapDpi);
+            _wpfElementBitmap = Ab3d.Utilities.BitmapRendering.RenderToBitmap(_wpfElement, null, bitmapDpi);
 
             // Then we convert WPF's bitmap to DirectX ShaderResourceView that can be used as a Sprite's texture
-            _shaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, cameraControllerInfoBitmap);
+            _shaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, _wpfElementBitmap);
 
-            cameraControllerInfoBitmap.Clear(); // This will help release the native memory for the RenderTargetBitmap
+            _wpfElementBitmap.Clear(); // This will help release the native memory for the RenderTargetBitmap
 
 
-            _spriteBatch = dxScene.CreateSpriteBatch("MouseCameraControllerInfoSprite");
+            _spriteBatch = dxScene.CreateSpriteBatch(_wpfElement.GetType().Name + "OverlaySprite");
             _spriteBatch.UseDeviceIndependentUnits = true; // Do not use pixel units but the same units as WPF (pixels scaled by dpi scale) when defining the destination rectangle
 
             // Position and draw the sprite
-            UpdateMouseCameraControllerInfoSprite();
+            UpdateSpriteBatch();
         }
 
-        private void UpdateMouseCameraControllerInfoSprite()
+        public void Update()
+        {
+            var dxScene = _mainDXViewportView.DXScene;
+
+            if (_wpfElementBitmap == null || _shaderResourceView == null || dxScene == null)
+            {
+                SetupOverlay();
+                return;
+            }
+
+
+            // Render to a bigger bitmap when using DPI scale and Super-sampling
+            int bitmapDpi = (int)(96 * _dpiScaleX * _mainDXViewportView.DXScene.SupersamplingFactor);
+            
+            // If we do not call UpdateLayout, then initially CameraNavigationCircles is not visible (only after changing the camera)
+            _wpfElement.UpdateLayout();
+
+            _wpfElementBitmap = Ab3d.Utilities.BitmapRendering.RenderToBitmap(_wpfElement, null, bitmapDpi, renderTargetBitmapToReuse: _wpfElementBitmap);
+
+            _shaderResourceView.Dispose();
+            _shaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, _wpfElementBitmap);
+
+            UpdateSpriteBatch();
+
+            dxScene.NotifyChange(DXScene.ChangeNotifications.SpriteBatchChanged);
+        }
+
+        private void UpdateSpriteBatch()
         {
             if (_spriteBatch == null)
                 return;
 
-            var destinationRectangle = Viewport3DObjectOverlay.GetWpfObjectPosition(_wpfElement, parentWpfElement: _mainDXViewportView);
+            var positionedElement = ParentElement ?? _wpfElement;
+
+            var destinationRectangle = Viewport3DObjectOverlay.GetWpfObjectPosition(positionedElement, parentWpfElement: _mainDXViewportView);
             UpdateSpriteBatch(_spriteBatch, _shaderResourceView, destinationRectangle);
         }
 

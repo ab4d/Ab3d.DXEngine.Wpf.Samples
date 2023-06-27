@@ -1360,7 +1360,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             MouseCameraController1.TargetCamera = camera;
             CameraAxisPanel1.TargetCamera = camera;
-            ViewCubeCameraController1.TargetCamera = camera;
+            CameraNavigationCircles1.TargetCamera = camera;
 
             _currentCamera = camera;
         }

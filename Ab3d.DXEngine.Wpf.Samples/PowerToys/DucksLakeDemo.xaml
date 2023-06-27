@@ -67,7 +67,7 @@
 
 
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
+            <ab3d:CameraNavigationCircles HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
             <ab3d:MouseCameraControllerInfo x:Name="MouseCameraControllerInfo1" Margin="5 0" MouseCameraController="{Binding ElementName=MouseCameraController1}">
                 <ab3d:MouseCameraControllerInfo.LayoutTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
@@ -76,8 +76,6 @@
         </StackPanel>
 
         <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <ab3d:ViewCubeCameraController TargetCamera="{Binding ElementName=Camera1}" HorizontalAlignment="Right"/>
-
             <StackPanel Orientation="Horizontal" Margin="0 5 5 0" HorizontalAlignment="Right">
                 <ToggleButton Name="MoveButton" Content="Move (F1)" IsChecked="True" Margin="0 0 5 0" Padding="5 3" Checked="MoveButton_OnChecked" Unchecked="MoveButton_OnUnchecked" />
                 <ToggleButton Name="RotateButton" Content="Rotate (F2)" Margin="0 0 5 0" Padding="5 3" Checked="RotateButton_OnChecked" Unchecked="RotateButton_OnUnchecked" />

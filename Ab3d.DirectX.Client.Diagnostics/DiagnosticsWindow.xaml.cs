@@ -2859,7 +2859,9 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 
                 AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, formatString, useDynamicValueFormat: true);
                 AppendCameraPropertyValue(viewport3DCamera, "LookDirection", sb, formatString, useDynamicValueFormat: true);
-                //AppendCameraPropertyValue(viewport3DCamera, "UpDirection", sb, directionFormatString, useDynamicValueFormat: true);
+
+                if (powerToysCamera != null && powerToysCamera.GetType().Name == "FreeCamera")
+                    AppendCameraPropertyValue(viewport3DCamera, "UpDirection", sb, formatString, useDynamicValueFormat: true);
             }
 
             var dxViewport3D = GetDXViewportView();
@@ -3053,7 +3055,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
             {
                 var doubleValue = Convert.ToDouble(value);
 
-                if (doubleValue > 100) valueFormatString = "{0:#,###}";
+                if (doubleValue > 100) valueFormatString = "{0:#,##0}";
                 else if (doubleValue > 10) valueFormatString = "{0:0.#}";
                 else if (doubleValue > 1) valueFormatString = "{0:0.##}";
                 else valueFormatString = "{0:0.####}";
@@ -3076,7 +3078,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 
                 var length = vectorValue.Length;
 
-                if (length > 100) valueFormatString = "#,###";
+                if (length > 100) valueFormatString = "#,##0";
                 else if (length > 10) valueFormatString = "0.#";
                 else if (length > 1) valueFormatString = "0.##";
                 else valueFormatString = "0.####";

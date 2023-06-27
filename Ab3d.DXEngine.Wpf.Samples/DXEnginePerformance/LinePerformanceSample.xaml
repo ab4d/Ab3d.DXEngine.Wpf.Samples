@@ -20,14 +20,14 @@
 
 
         <Border Name="ViewportBorder" Grid.Row="1" Grid.Column="0" Background="Black" >
-
+            
             <dxControls:DXViewportView Name="MainViewportView" PresentationType="DirectXOverlay">
 
                 <Viewport3D Name="MainViewport">
                 </Viewport3D>
 
             </dxControls:DXViewportView>
-
+            
         </Border>
         <cameras:TargetPositionCamera Name="Camera1" Grid.Row="1" Grid.Column="0" Heading="15" Attitude="7" Bank="0" Distance="350" TargetPosition="0 0 0"
                                       ShowCameraLight="Always"

@@ -19,13 +19,15 @@ using SharpDX.DXGI;
 // A big disadvantage in this presentation type is that it is not possible to render WPF objects over the 3D scene.
 //
 // But with using sprites, it is possible to render static WPF elements to a texture and show that in a sprite.
-// It is also possible to show dynamic WPF controls that use Viewport3D (like ViewCubeCameraController and CameraAxisPanel)
+// It is also possible to show dynamic WPF controls like CameraNavigationCircles. In this case the control
+// is rendered to a WPF bitmap after each change and then that bitmap is rendered as a sprite by DXViewportView.
+// 
+// It is also possible to show dynamic WPF controls that use Viewport3D (like CameraAxisPanel)
 // with rendering them by DXViewportView that use the same DirectX device as the main DXViewportView.
 //
-// This way, the rendered ViewCubeCameraController and CameraAxisPanel can be shared with the main DXViewportView and shown by using sprites.
+// This way, the rendered CameraAxisPanel can be shared with the main DXViewportView and shown by using sprites.
 // What is more, even though the WPF controls are not shown, the mouse events are still propagated to the controls.
-// This means that the ViewCubeCameraController still gets the mouse events and can be fully functional.
-//
+
 // This sample uses WpfElementOverlay and Viewport3DObjectOverlay classes that greatly simplifies showing
 // WPF controls with DirectXOverlay PresentationType.
 // You only need to create an instance of WpfElementOverlay and Viewport3DObjectOverlay and pass 
@@ -48,13 +50,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             InitializeComponent();
 
 
-            // ViewCubeCameraController1, CameraAxisPanel1 and CameraControllerInfo are defined in XAML.
-            // Because ViewCubeCameraController1 is a dynamic control that requires mouse events,
+            // CameraNavigationCircles1, CameraAxisPanel1 and CameraControllerInfo are defined in XAML.
+            // Because CameraNavigationCircles1 is a dynamic control that requires mouse events,
             // it must be added to the WPF's view tree.
             // Other control could be just defined in the code as the TextBlock below.
 
-            // Use Viewport3DObjectOverlay to render the Viewport3D that is used by ViewCubeCameraController1
-            var viewCubeCameraControllerOverlay = new Viewport3DObjectOverlay(ViewCubeCameraController1, MainDXViewportView);
+            // Use WpfElementOverlay to render the CameraNavigationCircles1
+            // Because CameraNavigationCircles1 is a dynamic control, we need to update it after each change.
+            var cameraNavigationCirclesOverlay = new WpfElementOverlay(CameraNavigationCircles1, MainDXViewportView);
+            cameraNavigationCirclesOverlay.ParentElement = CameraNavigationCirclesParentGrid;
+
+            CameraNavigationCircles1.ControlUpdated += delegate(object sender, EventArgs args)
+            {
+                cameraNavigationCirclesOverlay.Update();
+            };
+
+
 
             // Use Viewport3DObjectOverlay to render the Viewport3D that is used by CameraAxisPanel1
             var cameraAxisPanelOverlay = new Viewport3DObjectOverlay(CameraAxisPanel1, MainDXViewportView);
@@ -86,7 +97,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             this.Unloaded += (sender, args) =>
             {
                 cameraAxisPanelOverlay.Dispose();
-                viewCubeCameraControllerOverlay.Dispose();
+                cameraNavigationCirclesOverlay.Dispose();
                 cameraControllerInfoOverlay.Dispose();
                 titleTextBlockInfoOverlay.Dispose();
 
