@@ -24,6 +24,7 @@ using Ab3d.DirectX.Utilities;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 using SharpDX;
+using LineCap = Ab3d.Common.Models.LineCap;
 using Material = System.Windows.Media.Media3D.Material;
 using Matrix = SharpDX.Matrix;
 using MeshUtils = Ab3d.Utilities.MeshUtils;

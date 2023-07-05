@@ -45,6 +45,13 @@
             <param name="alpha">alpha</param>
             <returns>Color</returns>
         </member>
+        <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfColor(Assimp.Color3D)">
+            <summary>
+            Converts Assimp Color3D to WPF Color
+            </summary>
+            <param name="value">Color3D</param>
+            <returns>Color</returns>
+        </member>
         <member name="M:Ab3d.Assimp.AssimpExtensions.ToWpfMatrix3D(Assimp.Matrix4x4)">
             <summary>
             Converts Assimp Matrix4x4 (row-major) to WPF Matrix3D (column-major)
@@ -142,6 +149,27 @@
             This property is used only when <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFullTexturePaths"/> is false.
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfExporter.IsEmbeddingTextures">
+            <summary>
+            Gets or sets a Boolean that specifies if textures are embedded into the exported file (only when the exported file support that). False by default.
+            When this property is true, then the <see cref="F:Ab3d.Assimp.AssimpWpfExporter.ExportTextureCallback"/> is not called.
+            Note that not all file types support embedded textures. If this is not supported and if IsEmbeddingTextures is true, then the textures will not be exported. 
+            </summary>
+        </member>
+        <member name="T:Ab3d.Assimp.AssimpWpfExporter.ExportTextureDelegate">
+            <summary>
+            Delegate that is used to export the specified bitmap as a texture. The delegate should return file name and relative path that is written to the exported file.
+            If null is returned, then the bitmap is not exported.
+            </summary>
+            <param name="bitmapSource">BitmapSource</param>
+            <returns>file name and path that is written to the exported file</returns>
+        </member>
+        <member name="F:Ab3d.Assimp.AssimpWpfExporter.ExportTextureCallback">
+            <summary>
+            ExportTextureCallback is called for each texture. User should set this delegate to the method that saves the bitmap and then returns the relative path to the saved bitmap.
+            If null is returned, then the bitmap is not exported.
+            </summary>
+        </member>
         <member name="P:Ab3d.Assimp.AssimpWpfExporter.AssimpScene">
             <summary>
             Gets an Assimp Scene object that is generated from the WPF 3D objects
@@ -160,6 +188,13 @@
             <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
             <returns>true if file was successfully exported</returns>
         </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.ExportToDataBlob(System.String)">
+            <summary>
+            Exports the 3D objects that were added to this AssimpWpfExporter into a ExportDataBlob (using the specific file format).
+            </summary>
+            <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
+            <returns>ExportDataBlob</returns>
+        </member>
         <member name="M:Ab3d.Assimp.AssimpWpfExporter.ExportViewport3D(System.Windows.Controls.Viewport3D,System.String,System.String)">
             <summary>
             ExportViewport3D exports the 3D objects from the viewport3D to the specified file name and specific file format.
@@ -177,6 +212,14 @@
             <param name="fileName">output file name</param>
             <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
             <returns>true if file was successfully exported</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfExporter.ExportAssimpSceneToDataBlob(Assimp.Scene,System.String)">
+            <summary>
+            ExportAssimpScene exports the Assimp scene into a ExportDataBlob (using the specific file format).
+            </summary>
+            <param name="assimpScene">Assimp scene</param>
+            <param name="exportFormatId">formatId of the exported file (see FormatId from <see cref="P:Ab3d.Assimp.AssimpWpfExporter.ExportFormatDescriptions"/> for more information)</param>
+            <returns>ExportDataBlob</returns>
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfExporter.AddViewport3D(System.Windows.Controls.Viewport3D)">
             <summary>
@@ -422,6 +465,18 @@
             AssimpWpfImporter class uses Assimp importer library to read WPF 3D models from many 3D files.
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.TransformCamerasAndLights">
+            <summary>
+            Gets or sets a Boolean that specifies if Node transformations are used to transform imported cameras and lights.
+            Default value is true.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.ReadLightAttenuation">
+            <summary>
+            Gets or set a Boolean that specifies if light Attenuation is read from imported file.
+            By default ReadLightAttenuation is set to false because many times light attenuation is not correctly imported.
+            </summary>
+        </member>
         <member name="F:Ab3d.Assimp.AssimpWpfImporter.Assimp32FileName">
             <summary>
             File name of the 32-bit assimp library
@@ -435,6 +490,11 @@
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpVersion">
             <summary>
             Gets the version of the native Assimp library.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.GitCommitHash">
+            <summary>
+            Gets the Git commit hash that was generated from the latest source code commit.
             </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpPostProcessSteps">
@@ -467,6 +527,18 @@
             WPF uses right handed coordinate system - the Z axis points away from the screen. DirectX uses left handed coordinate system - there the Z axis points into the screen.
             </para>
             </remarks>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.Lights">
+            <summary>
+            Gets a list of lights that are defined in the imported file.
+            To get the name of the light, call GetValue(FrameworkElement.NameProperty) on the light.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.Cameras">
+            <summary>
+            Gets a list of cameras that are defined in the imported file.
+            To get the name of the camera, call GetValue(FrameworkElement.NameProperty) on the light.
+            </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.NamedObjects">
             <summary>

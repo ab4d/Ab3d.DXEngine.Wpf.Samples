@@ -1,12 +1,10 @@
-﻿using System;
+﻿//#define USE_GENERIC_MODEL3D // Uncomment define to use the more generic 3D models instead of BoxUIElement3D
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
@@ -14,8 +12,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ab3d.Common.Cameras;
 using Ab3d.Common.EventManager3D;
+using Ab3d.DirectX;
+using Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
+
+// In Ab3d.PowerToys this sample is created by using 2 Viewport3D objects (the second shows ModelMoverVisual3D on top of the first Viewport3D).
+// When using DXEngine we can render ModelMoverVisual3D on top of other objects by using OverlayRenderingQueue.
+// See DXEngineAdvanced/BackgroundAndOverlayRendering sample for more information about that.
 
 namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 {
@@ -24,13 +28,39 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
     /// </summary>
     public partial class ModelMoverOverlaySample : Page
     {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!        IMPORTANT      !!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        // When ModelMoverVisual3D is used inside DXEngine, the mouse events on UIElement3D objects that are used inside ModelMoverVisual3D will not work.
+        // Therefore ModelMoverVisual3D also supports using Ab3d.Utilities.EventManager3D that can process mouse events when inside Ab3d.DXEngine.
+        // What is more, it is also possible to use DXEventManager3DWrapper that is much faster because it uses DXEngine's hit testing.
+        // 
+        // To make ModelMoverVisual3D work inside DXEngine, the following code changes need to be done:
+        // 1) EventManager3D needs to be created and its CustomEventsSourceElement must be set the DXViewportView
+        //    or a parent Border or some other parent element that has Background property set (see line 71)
+        // 
+        // 2) When ModelMoverVisual3D is created, we need to call the SubscribeWithEventManager3D method
+        //    on the created ModelMoverVisual3D and pass the EventManager3D as a parameter (see line 92)
+        // 
+        // 3) To allow the user to click on arrows that are inside the selected model, we need to exclude the selected
+        //    model from being processed by EventManager3D.This can be done by calling RegisterExcludedVisual3D on EventManager3D (see line 236)
+        // 
+        // 4) Because we called RegisterExcludedVisual3D, we need to call RemoveExcludedVisual3D after the mouse moving is completed (see line 217)
+        //
+
         private static Random _rnd = new Random();
 
-        private readonly Ab3d.Utilities.EventManager3D _eventManager;
+        private readonly DXEventManager3DWrapper _eventManager;
 
         private readonly DiffuseMaterial _normalMaterial;
+        private readonly DiffuseMaterial _selectedMaterial;
 
-        private Ab3d.Visuals.BoxVisual3D _selectedBoxModel;
+        private ModelMoverVisual3D _modelMover;
+
+        private WireBoxVisual3D _selectionWireBox;
+
+        private Ab3d.UIElements.BoxUIElement3D _selectedBoxModel;
 
         private Point3D _startMovePosition;
 
@@ -38,32 +68,121 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
         {
             InitializeComponent();
 
-            // We need to synchronize the Camera and Lights in OverlayViewport with the camera in the MainViewport
-            Camera1.CameraChanged += delegate(object s, CameraChangedRoutedEventArgs args)
+            _normalMaterial = new DiffuseMaterial(Brushes.Silver);
+            _selectedMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(150, 192, 192, 192))); // semi-transparent Silver
+
+            _eventManager = new DXEventManager3DWrapper(MainDXViewportView); // It would be also possible to create Ab3d.Utilities.EventManager3D, but using DXEventManager3DWrapper is faster because it uses DXEngine's hit testing
+            _eventManager.CustomEventsSourceElement = ViewportBorder;
+
+            CreateRandomScene();
+
+            //SetupModelMover();
+
+
+            MainDXViewportView.DXSceneDeviceCreated += delegate (object sender, EventArgs args)
             {
-                OverlayViewport.Camera = MainViewport.Camera;
-                OverlayViewportLight.Direction = ((DirectionalLight)Camera1.CameraLight).Direction;
+                if (MainDXViewportView.DXScene == null)
+                    return; // WPF 3D rendering
+
+                // Clear depth buffer before rendering objects in the OverlayRenderingQueue
+                // This way the objects that are rendered before OverlayRenderingQueue will not obstruct the objects in OverlayRenderingQueue
+                MainDXViewportView.DXScene.OverlayRenderingQueue.ClearDepthStencilBufferBeforeRendering = true;
+
+                // Put _modelMover and _selectionWireBox to OverlayRenderingQueue
+                if (_modelMover != null)
+                    _modelMover.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
+
+                // To show _selectionWireBox on top of 3D boxes, uncomment the following line:
+                //if (_selectionWireBox != null)
+                //    _selectionWireBox.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
+
+                // When hit-testing consider objects in OverlayRenderingQueue before all other objects
+                // (DXScene.GetClosestHitObject will return object from OverlayRenderingQueue event if it is farther away from camera than some other object)
+                MainDXViewportView.DXScene.DXHitTestOptions.OverlayRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
             };
 
+            // IMPORTANT:
+            // It is very important to call Dispose method on DXSceneView after the control is not used any more (see help file for more info)
+            this.Unloaded += (sender, args) => MainDXViewportView.Dispose();
+        }
 
-            // NOTE:
-            // To define custom axes directions for ModelMoverVisual3D, define it in code and specify the axes direction it the constructor - for example:
-            // ModelMover = new ModelMoverVisual3D(new Vector3D(-1, 0, 0), new Vector3D(0, -1, 0), new Vector3D(0, 0, -1));
-            //
-            // You can even define angles that are not aligned with coordinate axes:
-            // ModelMover = new ModelMoverVisual3D(new Vector3D(-1, -1, 0), new Vector3D(-1, 1, 0), new Vector3D(0, 0, -1));
+        // Called when a 3D model is selected
+        // It add ModelMover to the scene and sets its event handlers
+        private void SetupModelMover()
+        {
+            // Creat a new ModelMover
+            _modelMover = new ModelMoverVisual3D();
 
+            // IMPORTANT !!!
+            // When ModelMoverVisual3D is used with EventManager3D
+            // we need to call SubscribeWithEventManager3D to use EventManager3D for mouse events processing
+            _modelMover.SubscribeWithEventManager3D(_eventManager);
 
-            // Setup event handlers on ModelMoverVisual3D
-            ModelMover.ModelMoveStarted += delegate(object o, EventArgs eventArgs)
+            // Position ModelMover at the center of selected model
+#if !USE_GENERIC_MODEL3D            
+            _modelMover.Position = _selectedBoxModel.CenterPosition;
+#else
+            _modelMover.Position = GetSelectedModelCenter();
+#endif
+
+            // Calculate axis length from model size
+            var modelBounds = _selectedBoxModel.Model.Bounds; // Because we know that we are using BoxVisual3D, we could also use _selectedBoxVisual3D.Size; But using Bounds is more generic
+            double axisLength = Math.Max(modelBounds.Size.X, Math.Max(modelBounds.Size.Y, modelBounds.Size.Z));
+
+            _modelMover.AxisLength = axisLength;
+
+            // Set AxisRadius and AxisArrowRadius based on axis length
+            _modelMover.AxisRadius = axisLength / 30;
+            _modelMover.AxisArrowRadius = _modelMover.AxisRadius * 3;
+
+            UpdatedShownAxes();
+
+            // Setup event handlers
+            _modelMover.ModelMoveStarted += delegate (object o, EventArgs eventArgs)
             {
                 if (_selectedBoxModel == null)
                     return;
 
+#if !USE_GENERIC_MODEL3D
                 _startMovePosition = _selectedBoxModel.CenterPosition;
+                _modelMover.Position = _startMovePosition;
+#else
+                // When the move starts we create a new TranslateTransform3D that will be used to move the model.
+                _currentTranslateTransform3D = new TranslateTransform3D();
+
+                // The new TranslateTransform3D is added to existing transformations on the object (if they exist)
+
+                var currentTransform = _selectedBoxModel.Transform;
+
+                if (currentTransform == null)
+                {
+                    _selectedBoxModel.Transform = _currentTranslateTransform3D;
+                }
+                else
+                {
+                    // transformation already exist
+
+                    // Check if we already have Transform3DGroup
+                    var currentTransformGroup = currentTransform as Transform3DGroup;
+                    if (currentTransformGroup == null)
+                    {
+                        // Create new Transform3DGroup and add existing Transformation to the new Group
+                        currentTransformGroup = new Transform3DGroup();
+                        currentTransformGroup.Children.Add(_selectedBoxModel.Transform);
+
+                        _selectedBoxModel.Transform = currentTransformGroup;
+                    }
+
+                    currentTransformGroup.Children.Add(_currentTranslateTransform3D);
+                }
+
+                // Move the ModelMover to current model center
+                _startMovePosition = GetSelectedModelCenter();
+                _modelMover.Position = _startMovePosition;
+#endif
             };
 
-            ModelMover.ModelMoved += delegate(object o, Ab3d.Common.ModelMovedEventArgs e)
+            _modelMover.ModelMoved += delegate (object o, Ab3d.Common.ModelMovedEventArgs e)
             {
                 if (_selectedBoxModel == null)
                     return;
@@ -78,26 +197,120 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
                     return;
                 }
 
+#if !USE_GENERIC_MODEL3D
                 _selectedBoxModel.CenterPosition = newCenterPosition;
-                ModelMover.Position = _selectedBoxModel.CenterPosition;
+                _modelMover.Position = newCenterPosition;
+#else
+                // When model is moved we get the updated MoveVector3D
+                // We use MoveVector3D to change the _currentTranslateTransform3D that is used on the currently selected model and on the ModelMover object
+                _currentTranslateTransform3D.OffsetX = moveVector3D.X;
+                _currentTranslateTransform3D.OffsetY = moveVector3D.Y;
+                _currentTranslateTransform3D.OffsetZ = moveVector3D.Z;
+
+                _modelMover.Position = newCenterPosition;
+#endif
+
+                _selectionWireBox.CenterPosition = newCenterPosition;
 
                 InfoTextBlock.Text = string.Format("MoveVector3D: {0:0}", e.MoveVector3D);
             };
 
-            ModelMover.ModelMoveEnded += delegate(object sender, EventArgs args)
+            _modelMover.ModelMoveEnded += delegate (object sender, EventArgs args)
             {
                 InfoTextBlock.Text = "";
             };
 
 
-            _normalMaterial = new DiffuseMaterial(Brushes.Silver);
-            _eventManager = new Ab3d.Utilities.EventManager3D(MainViewport);
+            // Add ModelMover to Viewport3D 
+            // We need to insert it before other objects so that the transparent objects are correctly visible (transparent objects must be shown after other objects)
+            MainViewport.Children.Add(_modelMover);
 
-            CreateRandomScene();
+            _selectionWireBox = new WireBoxVisual3D()
+            {
+                LineColor = Colors.Yellow,
+                LineThickness = 2,
+                IsVisible = false
+            };
 
-            // IMPORTANT:
-            // It is very important to call Dispose method on DXSceneView after the control is not used any more (see help file for more info)
-            this.Unloaded += (sender, args) => MainDXViewportView.Dispose();
+            MainViewport.Children.Add(_selectionWireBox);
+        }
+
+        private void SelectObject(Ab3d.UIElements.BoxUIElement3D selectedBox)
+        {
+            // Deselect currently selected model
+            if (_selectedBoxModel != null)
+            {
+                // Set material back to normal
+                _selectedBoxModel.Material = _normalMaterial;
+                _selectedBoxModel.BackMaterial = null;
+
+                // Allow hit testing again - so user can select that object again
+                _selectedBoxModel.IsHitTestVisible = true;
+
+                // IMPORTANT !!!
+                // When ModelMoverVisual3D is used with EventManager3D
+                // we also need to remove the _selectedBoxModel from hit-testing.
+                // This way user will be able to click on the movable arrows that lie inside the _selectedBoxModel (otherwise the _selectedBoxModel will receive the clicks)
+                _eventManager.RemoveExcludedVisual3D(_selectedBoxModel);
+
+                _selectedBoxModel = null;
+            }
+
+            _selectedBoxModel = selectedBox;
+            if (_selectedBoxModel == null)
+            {
+                _selectionWireBox.IsVisible = false;
+                return;
+            }
+
+
+            // Prevent hit-testing in selected model
+            // This will allow clicking on the parts of move arrows that are inside the selected model
+            // Note that IsHitTestVisible is available only on models derived from UIElement3D (if you need that on GeometryModel3D or ModelVisual3D, then use ModelUIElement3D as parent of your model)
+            _selectedBoxModel.IsHitTestVisible = false;
+
+            // IMPORTANT !!!
+            // When ModelMoverVisual3D is used with EventManager3D
+            // we also need to remove the _selectedBoxModel from hit-testing.
+            // This way user will be able to click on the movable arrows that lie inside the _selectedBoxModel (otherwise the _selectedBoxModel will receive the clicks)
+            _eventManager.RegisterExcludedVisual3D(_selectedBoxModel);
+
+
+            // Change material to semi-transparent Silver
+            _selectedBoxModel.Material = _selectedMaterial;
+            _selectedBoxModel.BackMaterial = _selectedMaterial; // We also set BackMaterial so the inner side of boxes will be visible
+
+            // To render the transpant object correctly, we need to sort the objects so that the transparent objects are rendered after other objects
+            // We can use the TransparencySorter from Ab3d.PowerToys
+            // Note that it is also possible to use TransparencySorter with many advanced features - see the Model3DTransparencySortingSample for more info
+            TransparencySorter.SimpleSort(SceneObjectsContainer.Children);
+
+            // In our simple case (we have only one transparent object), we could also manually "sort" the objects with moving the transparent object to the back of the Children collection:
+            //SceneObjectsContainer.Children.Remove(_selectedBoxVisual3D);
+            //SceneObjectsContainer.Children.Add(_selectedBoxVisual3D);
+
+
+            if (_modelMover == null)
+                SetupModelMover();
+
+
+#if !USE_GENERIC_MODEL3D
+            _modelMover.Position = _selectedBoxModel.CenterPosition;
+#else
+            _startMovePosition = GetSelectedModelCenter();
+            _modelMover.Position = _startMovePosition;
+#endif
+
+
+            // Update Selection WireBox
+            _selectionWireBox.CenterPosition = _selectedBoxModel.CenterPosition;
+            _selectionWireBox.Size = _selectedBoxModel.Size;
+            _selectionWireBox.IsVisible = true;
+
+
+            // NOTE:
+            // When the 3D models are organized into hierarchy of models with using different ModelVisual3D or Model3DGroup objects, 
+            // you also need to so specify the SelectedModelDecorator.RootModelVisual3D in order to get the correct position of the TargetModel3D
         }
 
         private void CreateRandomScene()
@@ -106,7 +319,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
             for (int i = 0; i < 10; i++)
             {
-                var boxModel = new Ab3d.Visuals.BoxVisual3D()
+                var boxModel = new Ab3d.UIElements.BoxUIElement3D()
                 {
                     CenterPosition = new Point3D(_rnd.NextDouble() * 400 - 200, _rnd.NextDouble() * 40 - 20, _rnd.NextDouble() * 400 - 200),
                     Size = new Size3D(50, 20, 50),
@@ -118,9 +331,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
                 // Use EventManager from Ab3d.PowerToys to add support for click event on the box model
                 var visualEventSource3D = new Ab3d.Utilities.VisualEventSource3D(boxModel);
-                visualEventSource3D.MouseClick += delegate(object sender, MouseButton3DEventArgs e)
+                visualEventSource3D.MouseClick += delegate (object sender, MouseButton3DEventArgs e)
                 {
-                    var selectedBoxModel = e.HitObject as Ab3d.Visuals.BoxVisual3D;
+                    var selectedBoxModel = e.HitObject as Ab3d.UIElements.BoxUIElement3D;
                     SelectObject(selectedBoxModel);
                 };
 
@@ -129,26 +342,41 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
                 // Automatically select first box
                 if (_selectedBoxModel == null)
+                {
+                    boxModel.Refresh(); // Force creating the model
                     SelectObject(boxModel);
+                }
             }
         }
 
-        private void SelectObject(Ab3d.Visuals.BoxVisual3D selectedBox)
+        private void OnAxisCheckBoxChanged(object sender, RoutedEventArgs e)
         {
-            _selectedBoxModel = selectedBox;
-            if (_selectedBoxModel == null)
+            if (!this.IsLoaded || _modelMover == null)
                 return;
 
-            ModelMover.Position = _selectedBoxModel.CenterPosition;
-
-
-            // Tell ModelDecoratorVisual3D which Model3D to show
-            SelectedModelDecorator.TargetModel3D = _selectedBoxModel.Content;
-            
-            // NOTE:
-            // When the 3D models are organized into hierarchy of models with using different ModelVisual3D or Model3DGroup objects, 
-            // you also need to so specify the SelectedModelDecorator.RootModelVisual3D in order to get the correct position of the TargetModel3D
+            UpdatedShownAxes();
         }
+
+        private void UpdatedShownAxes()
+        {
+            _modelMover.IsXAxisShown = XAxisCheckBox.IsChecked ?? false;
+            _modelMover.IsYAxisShown = YAxisCheckBox.IsChecked ?? false;
+            _modelMover.IsZAxisShown = ZAxisCheckBox.IsChecked ?? false;
+        }
+
+#if USE_GENERIC_MODEL3D
+        private Point3D GetSelectedModelCenter()
+        {
+            var modelBounds = _selectedBoxModel.Model.Bounds; // Because we know that we are using BoxVisual3D, we could also use _selectedBoxVisual3D.Size; But using Bounds is more generic
+
+            var modelCenter = new Point3D(modelBounds.X + modelBounds.SizeX / 2, modelBounds.Y + modelBounds.SizeY / 2, modelBounds.Z + modelBounds.SizeZ / 2);
+
+            if (_selectedBoxModel.Transform != null)
+                modelCenter = _selectedBoxModel.Transform.Transform(modelCenter);
+
+            return modelCenter;
+        }
+#endif
 
         private void OnRotateModelMoverCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -156,9 +384,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
                 return;
 
             if (RotateModelMoverCheckBox.IsChecked ?? false)
-                ModelMover.SetRotation(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 45)));
+                _modelMover.SetRotation(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 45)));
             else
-                ModelMover.SetRotation(null);
+                _modelMover.SetRotation(null);
         }
     }
 }

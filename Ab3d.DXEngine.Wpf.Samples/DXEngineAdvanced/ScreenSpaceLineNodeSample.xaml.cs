@@ -121,6 +121,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 TextPadding = new Thickness(5, 3, 5, 3),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(1, 1, 1, 1),
+                Background = Brushes.Beige,
                 Text = text,
             };
 

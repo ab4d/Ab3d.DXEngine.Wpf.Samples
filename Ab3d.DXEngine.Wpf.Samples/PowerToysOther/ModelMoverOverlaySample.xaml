@@ -18,30 +18,15 @@
             <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
                 <Viewport3D Name="MainViewport">
                     <!-- ModelDecoratorVisual3D is used to show Bounding box around selected object -->
-                    <visuals:ModelDecoratorVisual3D x:Name="SelectedModelDecorator" 
+                    <!--<visuals:ModelDecoratorVisual3D x:Name="SelectedModelDecorator" 
 				                                    ShowBoundingBox="True" BoundingBoxLineColor="Yellow" BoundingBoxLineThickness="2"
 				                                    ShowNormals="False" NormalsLineColor="Blue" NormalsLineThickness="1"
-				                                    ShowTriangles="False" TrianglesLineColor="Green" TrianglesLineThickness="1"/>
+				                                    ShowTriangles="False" TrianglesLineColor="Green" TrianglesLineThickness="1"/>-->
                 
                     <ContainerUIElement3D x:Name="SceneObjectsContainer" IsHitTestVisible="True" />
                 </Viewport3D>
             </dxControls:DXViewportView>
         </Border>
-        
-        <!-- Overlay Viewport3D will show ModelMoverVisual3D over other 3D models -->
-        <!-- The camera and lights in the OverlayViewport are synchronized with the camera and lights in MainViewport - this is done in code behind -->
-        <Viewport3D Name="OverlayViewport">
-            <ModelVisual3D>               
-                <visuals:ModelMoverVisual3D x:Name="ModelMover" AxisLength="50" AxisRadius="1.5" AxisArrowRadius="5"
-                                            IsXAxisShown="{Binding ElementName=XAxisCheckBox, Path=IsChecked}"
-                                            IsYAxisShown="{Binding ElementName=YAxisCheckBox, Path=IsChecked}"
-                                            IsZAxisShown="{Binding ElementName=ZAxisCheckBox, Path=IsChecked}"
-                                            ShowMovablePlanes="{Binding ElementName=ShowMovablePlanesCheckBox, Path=IsChecked}"/>
-                <ModelVisual3D.Content>
-                    <DirectionalLight x:Name="OverlayViewportLight" />
-                </ModelVisual3D.Content>
-            </ModelVisual3D>
-        </Viewport3D>
 
         <cameras:TargetPositionCamera Name="Camera1" Heading="30" Attitude="-30" Bank="0" Distance="700" ShowCameraLight="Always" 
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>

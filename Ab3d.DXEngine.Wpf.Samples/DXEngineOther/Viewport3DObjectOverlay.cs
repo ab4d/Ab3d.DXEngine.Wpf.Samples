@@ -29,14 +29,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
 
         // When CopyRenderTargetToSeparateTexture is set to true, then the RenderTargets (contains the rendered 3D scene)
-        // from the CameraAxisPanel and from ViewCubeControllers are copied to a separate 2D texture before they are
+        // from the CameraAxisPanel and from CameraNavigationCircles are copied to a separate 2D texture before they are
         // shown in the main 3D scene as sprites.
         // When false, then the RenderedTarget is directly used as a sprite's texture.
         // The later option is faster because it skips one texture copying, but can theoretically produce flickering
         // in case when the DirectX is rendering the sprites in the main scene (note that in DirectXOverlay rendering 
         // is happening in the background) while the rendering of CameraAxisPanel and from ViewCubeControllers is also happening.
         //
-        // Because in the textures for rendered CameraAxisPanel and from ViewCubeControllers are small and the copying is
+        // Because in the textures for rendered CameraAxisPanel and from CameraNavigationCircles are small and the copying is
         // happening in GPU memory, this is very fast and therefore this sample is using it by default.
         public bool CopyRenderTargetToSeparateTexture = true;
 
@@ -103,18 +103,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             if (dxScene == null)
                 return;
 
-            _spriteBatch = dxScene.CreateSpriteBatch("CameraAxisPanelSprite");
+            _spriteBatch = dxScene.CreateSpriteBatch(_wpfControlWithViewport3D.GetType().Name + "OverlaySprite");
             _spriteBatch.UseDeviceIndependentUnits = true; // Do not use pixel units but the same units as WPF (pixels scaled by dpi scale) when defining the destination rectangle
 
             _secondaryDXViewportView = CreateSecondaryDXViewportView(_wpfControlWithViewport3D, _mainDXViewportView, out _texture2D, out _shaderResourceView);
-            _secondaryDXViewportView.SceneRendered += (sender, args) =>
-            {
-                Update();
-            };
 
-            // Render the 3D scene with CameraAxisPanel
-            // This will also call UpdateCameraAxisImageSprite (from SceneRendered event handler)
-            _secondaryDXViewportView.Refresh();
+            if (_secondaryDXViewportView != null)
+            {
+                _secondaryDXViewportView.SceneRendered += (sender, args) =>
+                {
+                    Update();
+                };
+
+                // Render the 3D scene with CameraAxisPanel
+                // This will also call UpdateCameraAxisImageSprite (from SceneRendered event handler)
+                _secondaryDXViewportView.Refresh();
+            }
         }
 
         public void Update()

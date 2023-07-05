@@ -42,6 +42,13 @@
 
         <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
 
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#CCFFFFFF" BorderBrush="Black" BorderThickness="2" >
+            <StackPanel Orientation="Vertical" Margin="10 8">
+                <Button Name="ChangeColorsButton" Content="Change colors" Click="ChangeColorsButton_OnClick" />
+                <CheckBox Name="TransparentCheckBox" Content="Transparent" IsChecked="False" Margin="0 5 0 0" />
+            </StackPanel>
+        </Border>
+
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="DimGray" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"
                    Text="Using VertexColorMaterial to specify different color for each position"/>
 

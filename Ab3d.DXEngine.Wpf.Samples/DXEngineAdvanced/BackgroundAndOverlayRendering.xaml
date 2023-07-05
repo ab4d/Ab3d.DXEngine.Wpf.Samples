@@ -7,6 +7,7 @@
       xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
       xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="StandardXaml"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="800">
@@ -31,22 +32,66 @@
         </Border>
 
         <cameras:TargetPositionCamera Name="Camera1" 
-                                      TargetPosition="0 0 0" 
-                                      Heading="30" Attitude="-20" Bank="0" 
-                                      Distance="300" 
+                                      TargetPosition="10 0 0" 
+                                      Heading="-11" Attitude="-20" Bank="0" 
+                                      Distance="360" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
         <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateAroundMousePosition="True"
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
                                     TargetCamera="{Binding ElementName=Camera1}" />
 
-        <ab3d:CameraAxisPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" TargetCamera="{Binding ElementName=Camera1}" />
-
-        <Border Margin="5 10" VerticalAlignment="Bottom" HorizontalAlignment="Right" BorderBrush="Black" BorderThickness="2" Background="#CCFFFFFF">
+        <Border Margin="5 10" HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#CCFFFFFF">
             <StackPanel Orientation="Vertical" Margin="10 10" TextBlock.FontSize="18">
+
+                <TextBlock Text="Rendering Technique:" FontWeight="Bold" Margin="0 0 0 5" />
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="ClearDepthBufferRadioButton" Content="Clear depth buffer" FontSize="12" Margin="10 3 0 0" IsChecked="True" GroupName="DepthGroup" Checked="ClearDepthBufferRadioButton_OnChecked">
+                        <RadioButton.LayoutTransform>
+                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" />
+                        </RadioButton.LayoutTransform>
+                    </RadioButton>
+                    <controls:InfoControl x:Name="ClearDepthBufferInfoControl" Margin="5 0 0 0" VerticalAlignment="Center" InfoWidth="500" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="DisableDepthReadRadioButton" Content="Disabled depth read" FontSize="12" Margin="10 3 0 0" GroupName="DepthGroup" Checked="DisableDepthReadRadioButton_OnChecked" >
+                        <RadioButton.LayoutTransform>
+                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" />
+                        </RadioButton.LayoutTransform>
+                    </RadioButton>
+                    <controls:InfoControl x:Name="DisableDepthReadInfoControl" Margin="5 0 0 0" VerticalAlignment="Center" InfoWidth="500" />
+                </StackPanel>
+
+                <TextBlock Text="Hit testing:" FontWeight="Bold" Margin="0 12 0 5" />
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="OverlayHitTestingCheckBox" Content="Prioritize overlay objects" Margin="10 0 0 0" IsChecked="True" FontSize="12"
+                              Checked="OnOverlayHitTestingCheckBoxCheckedChanged" Unchecked="OnOverlayHitTestingCheckBoxCheckedChanged" >
+                        <CheckBox.LayoutTransform>
+                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" />
+                        </CheckBox.LayoutTransform>
+                    </CheckBox>
+                    <controls:InfoControl x:Name="OverlayHitTestingInfoControl" Margin="5 0 0 0" VerticalAlignment="Center" InfoWidth="500" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                    <CheckBox Name="BackgroundHitTestingCheckBox" Content="Lower priority for BG objects" Margin="10 0 0 0" IsChecked="True" FontSize="12"
+                              Checked="OnBackgroundHitTestingCheckBoxCheckedChanged" Unchecked="OnBackgroundHitTestingCheckBoxCheckedChanged" >
+                        <CheckBox.LayoutTransform>
+                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" />
+                        </CheckBox.LayoutTransform>
+                    </CheckBox>
+                    <controls:InfoControl x:Name="BackgroundHitTestingInfoControl" Margin="5 0 0 0" VerticalAlignment="Center" InfoWidth="500" />
+                </StackPanel>
+
+
+                <TextBlock Text="Legend:" FontWeight="Bold" Margin="0 12 0 5" />
 
                 <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
                     <Rectangle Fill="Blue" Stroke="Black" StrokeThickness="1" SnapsToDevicePixels="True" Width="16" Height="16" />

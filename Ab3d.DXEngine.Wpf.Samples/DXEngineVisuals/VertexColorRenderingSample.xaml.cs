@@ -89,7 +89,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 //CreateDynamicBuffer = true,
             };
 
-
             // Create standard WPF material and set the _vertexColorMaterial to be used when the model is rendered in DXEngine.
             var vertexColorDiffuseMaterial = new DiffuseMaterial();
             vertexColorDiffuseMaterial.SetUsedDXMaterial(_vertexColorMaterial);
@@ -97,6 +96,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             // Create a GeometryModel3D that will be rendered with _vertexColorMaterial
             var vertexColorGeometryModel3D = new GeometryModel3D(boxMesh3D, vertexColorDiffuseMaterial);
+
+            // Also set BackMaterial - this is required when transparent colors are used - in this case the interior of the box needs to be visible
+            vertexColorGeometryModel3D.BackMaterial = vertexColorDiffuseMaterial;
+
             vertexColorGeometryModel3D.Transform = new ScaleTransform3D(100, 50, 80); // Scale the box
 
             var vertexColorModelVisual3D = new ModelVisual3D()
@@ -105,6 +108,27 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             };
 
             MainViewport.Children.Add(vertexColorModelVisual3D);
+        }
+
+        private void ChangeColorsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var rnd = new Random();
+
+            bool hasTransparency = TransparentCheckBox.IsChecked ?? false;
+
+            for (var i = 0; i < _vertexColorMaterial.PositionColors.Length; i++)
+            {
+                float alpha = hasTransparency ? (float)rnd.NextDouble() : 1;
+                _vertexColorMaterial.PositionColors[i] = new Color4((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble(), alpha);
+            }
+
+            _vertexColorMaterial.HasTransparency = hasTransparency;
+
+            _vertexColorMaterial.Update();
+
+            // We need to notify the DXEngine about the change
+            if (MainDXViewportView.DXScene != null)
+                MainDXViewportView.DXScene.NotifyChange(DXScene.ChangeNotifications.MaterialPropertiesChanged);
         }
     }
 }

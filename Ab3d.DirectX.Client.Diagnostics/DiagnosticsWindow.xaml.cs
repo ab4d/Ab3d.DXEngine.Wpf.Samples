@@ -1112,7 +1112,9 @@ ShaderChangesCount: {12:#,##0}
 VertexBuffersChangesCount: {13:#,##0}
 IndexBuffersChangesCount: {14:#,##0}
 ConstantBufferChangesCount: {15:#,##0}
-StateChangesCount: {16:#,##0}{17}{18}",
+StateChangesCount: {16:#,##0}
+MeshUpdatesCount: {17:#,##0}
+MeshBytesUploaded: {18:#,##0}{19}{20}",
                 renderingStatistics.FrameNumber,
                 renderingStatistics.UpdateTimeMs + renderingStatistics.TotalRenderTimeMs,
                 fpsText,
@@ -1130,6 +1132,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 renderingStatistics.IndexBuffersChangesCount,
                 renderingStatistics.ConstantBufferChangesCount,
                 renderingStatistics.StateChangesCount,
+                renderingStatistics.MeshUpdatesCount,
+                renderingStatistics.MeshBytesUploaded,
                 cachedCommandListsStatistics,
                 usedBackgroundThreadsCount
                 );
@@ -2815,47 +2819,49 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
             if (viewport3DCamera != null)
             {
-                string singleDigitFormatString = "{0}: {1:0.#}\r\n";
+                string formatString = "{0}: {1}\r\n";
 
                 var powerToysCamera = GetPowerToysCamera();
 
                 if (powerToysCamera != null)
                 {
-                    AppendCameraPropertyValue(powerToysCamera, "Heading", sb, singleDigitFormatString);
-                    AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, singleDigitFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "Heading", sb, formatString, useDynamicValueFormat: true);
+                    AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, formatString, useDynamicValueFormat: true);
 
-                    string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, singleDigitFormatString);
+                    string bankText = AppendCameraPropertyValue(powerToysCamera, "Bank", null, formatString, useDynamicValueFormat: true);
                     if (bankText != null && bankText != "0")
-                        AppendCameraPropertyValue(powerToysCamera, "Bank", sb, singleDigitFormatString);
+                        AppendCameraPropertyValue(powerToysCamera, "Bank", sb, formatString, useDynamicValueFormat: true);
 
-                    string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, singleDigitFormatString);
+                    string cameraType = AppendCameraPropertyValue(powerToysCamera, "CameraType", null, formatString, useDynamicValueFormat: true);
                     if (cameraType == "OrthographicCamera")
                     {
                         sb.Append("\r\nCameraType: OrthographicCamera\r\n");
-                        AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, singleDigitFormatString);
+                        AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, formatString, useDynamicValueFormat: true);
                     }
                     else
                     {
-                        AppendCameraPropertyValue(powerToysCamera, "Distance", sb, singleDigitFormatString);
-                        AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, singleDigitFormatString);
+                        AppendCameraPropertyValue(powerToysCamera, "Distance", sb, formatString, useDynamicValueFormat: true);
+                        AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, formatString, useDynamicValueFormat: true);
                     }
 
                     sb.AppendLine();
 
-                    AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, singleDigitFormatString);
-                    AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, singleDigitFormatString);
+                    AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, formatString, useDynamicValueFormat: true);
+                    AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, formatString, useDynamicValueFormat: true);
 
 
-                    string offsetText = AppendCameraPropertyValue(powerToysCamera, "Offset", null, singleDigitFormatString);
+                    string offsetText = AppendCameraPropertyValue(powerToysCamera, "Offset", null, formatString, useDynamicValueFormat: true);
                     if (offsetText != "0, 0, 0")
-                        AppendCameraPropertyValue(powerToysCamera, "Offset", sb, singleDigitFormatString);
+                        AppendCameraPropertyValue(powerToysCamera, "Offset", sb, formatString, useDynamicValueFormat: true);
                 }
 
                 sb.AppendLine();
 
-                AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, "CameraPosition: {1:0.#}\r\n");
-                AppendCameraPropertyValue(viewport3DCamera, "LookDirection", sb, "LookDirection:  {1:0.##}\r\n");
-                //AppendCameraPropertyValue(viewport3DCamera, "UpDirection", sb, directionFormatString);
+                AppendCameraPropertyValue(viewport3DCamera, "Position",      sb, formatString, useDynamicValueFormat: true);
+                AppendCameraPropertyValue(viewport3DCamera, "LookDirection", sb, formatString, useDynamicValueFormat: true);
+
+                if (powerToysCamera != null && powerToysCamera.GetType().Name == "FreeCamera")
+                    AppendCameraPropertyValue(viewport3DCamera, "UpDirection", sb, formatString, useDynamicValueFormat: true);
             }
 
             var dxViewport3D = GetDXViewportView();
@@ -2867,8 +2873,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
                                 "\r\nNearPlaneDistance: {0}\r\n" +
                                 "FarPlaneDistance:  {1}\n\n\n", 
-                                dxViewport3D.DXScene.Camera.NearPlaneDistance, 
-                                dxViewport3D.DXScene.Camera.FarPlaneDistance);
+                                GetDynamicallyFormatValue(dxViewport3D.DXScene.Camera.NearPlaneDistance),
+                                GetDynamicallyFormatValue(dxViewport3D.DXScene.Camera.FarPlaneDistance));
 
                 sb.Append(GetDXSceneCameraMatricesString(dxViewport3D.DXScene.Camera));
             }           
@@ -2918,27 +2924,27 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
                 string formatString = "    {0}=\"{1}\"\r\n";
 
-                AppendCameraPropertyValue(powerToysCamera, "Name", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Heading", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Bank", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Distance", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Position", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "CameraPosition", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "RotationUpAxis", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "Offset", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "IsDistancePercent", sb, formatString);
-                AppendCameraPropertyValue(powerToysCamera, "ShowCameraLights", sb, formatString);
+                AppendCameraPropertyValue(powerToysCamera, "Name", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Heading", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Attitude", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Bank", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Distance", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "TargetPosition", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "RotationCenterPosition", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Position", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "CameraPosition", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "RotationUpAxis", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "Offset", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "FieldOfView", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "IsDistancePercent", sb, formatString, useDynamicValueFormat: false);
+                AppendCameraPropertyValue(powerToysCamera, "ShowCameraLights", sb, formatString, useDynamicValueFormat: false);
 
                 if (powerToysCamera.GetType().Name == "FreeCamera")
-                    AppendCameraPropertyValue(powerToysCamera, "UpDirection", sb, formatString);
+                    AppendCameraPropertyValue(powerToysCamera, "UpDirection", sb, formatString, useDynamicValueFormat: false);
                 
-                var cameraTypeString = AppendCameraPropertyValue(powerToysCamera, "CameraType", sb, formatString);
+                var cameraTypeString = AppendCameraPropertyValue(powerToysCamera, "CameraType", sb, formatString, useDynamicValueFormat: false);
                 if (cameraTypeString == "OrthographicCamera")
-                    AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, formatString);
+                    AppendCameraPropertyValue(powerToysCamera, "CameraWidth", sb, formatString, useDynamicValueFormat: false);
 
                 sb.AppendLine("/>");
             }
@@ -2949,8 +2955,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
                 sb.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
                                 "\r\n\r\nNearPlaneDistance: {0}\r\n" +
                                 "FarPlaneDistance: {1}\r\n" +
-                                "OptimizeNearAndFarCameraPlanes: {2}\r\n", 
-                                dxViewport3D.DXScene.Camera.NearPlaneDistance, 
+                                "OptimizeNearAndFarCameraPlanes: {2}\r\n\r\n", 
+                                dxViewport3D.DXScene.Camera.NearPlaneDistance,
                                 dxViewport3D.DXScene.Camera.FarPlaneDistance,
                                 dxViewport3D.DXScene.OptimizeNearAndFarCameraPlanes);
 
@@ -2977,7 +2983,8 @@ StateChangesCount: {16:#,##0}{17}{18}",
 
         // formatString = "    {0}=\"{1:0.##}\"\r\n"
         // Returns propertyValue as string (without any special formatting)
-        private string AppendCameraPropertyValue(object cameraObject, string propertyName, StringBuilder sb, string formatString)
+        // when useDynamicValueFormat then the number of displayed decimals is based on the magnitude of the value (> 100 => 0 decimals; > 10 => 1 decimal; > 1 => 2 decimals; > 0.1 => 4 decimals
+        private string AppendCameraPropertyValue(object cameraObject, string propertyName, StringBuilder sb, string formatString, bool useDynamicValueFormat)
         {
             var propertyInfo = cameraObject.GetType().GetProperty(propertyName);
 
@@ -2988,22 +2995,105 @@ StateChangesCount: {16:#,##0}{17}{18}",
             
             if (propertyValue != null)
             {
-                var propertyValueString = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}", propertyValue);
+                var unformattedValueString = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}", propertyValue);
 
-                propertyValueString = propertyValueString.Replace(",", ", "); // Add space after comma
+                unformattedValueString = EnsureSpaceAfterComma(unformattedValueString); // Add space after comma: convert "123,123,123" => "123, 123, 123"
 
                 if (sb != null)
                 {
-                    string finalString = string.Format(System.Globalization.CultureInfo.InvariantCulture, formatString, propertyName, propertyValue);
-                    finalString = finalString.Replace(",", ", "); // Add space after comma
+                    string formattedValueString;
+
+                    if (useDynamicValueFormat)
+                        formattedValueString = GetDynamicallyFormatValue(propertyValue);
+                    else
+                        formattedValueString = unformattedValueString;
+
+                    string finalString = string.Format(System.Globalization.CultureInfo.InvariantCulture, formatString, propertyName, formattedValueString);
 
                     sb.AppendFormat(finalString);
                 }
 
-                return propertyValueString;
+                return unformattedValueString;
             }
 
             return null;
+        }
+
+        // Add space after comma: convert "123,123,123" => "123, 123, 123"
+        private string EnsureSpaceAfterComma(string valueText)
+        {
+            int pos = valueText.IndexOf(',');
+
+            if (pos == -1)
+                return valueText;
+
+            var sb = new StringBuilder(valueText.Length + 3);
+            for (int i = 0; i < valueText.Length; i++)
+            {
+                var ch = valueText[i];
+                sb.Append(ch);
+
+                if (ch == ',' && i < valueText.Length - 1 && valueText[i + 1] != ' ')
+                    sb.Append(' ');
+            }
+
+            return sb.ToString();
+        }
+
+        // the number of displayed decimals is based on the magnitude of the value (> 100 => 0 decimals; > 10 => 1 decimal; > 1 => 2 decimals; > 0.1 => 4 decimals
+        private string GetDynamicallyFormatValue(object value)
+        {
+            string formattedValueString;
+            string valueFormatString;
+            
+            if (value == null)
+                return "null";
+            
+            var valueType = value.GetType();
+
+            if (valueType == typeof(double) || valueType == typeof(float) || valueType == typeof(decimal))
+            {
+                var doubleValue = Convert.ToDouble(value);
+
+                if (doubleValue > 100) valueFormatString = "{0:#,##0}";
+                else if (doubleValue > 10) valueFormatString = "{0:0.#}";
+                else if (doubleValue > 1) valueFormatString = "{0:0.##}";
+                else valueFormatString = "{0:0.####}";
+
+                formattedValueString = string.Format(System.Globalization.CultureInfo.InvariantCulture, valueFormatString, value);
+            }
+            else if (valueType == typeof(Point3D) || valueType == typeof(Vector3D))
+            {
+                Vector3D vectorValue;
+
+                if (valueType == typeof(Vector3D))
+                {
+                    vectorValue = (Vector3D)value;
+                }
+                else
+                {
+                    var pointValue = (Point3D)value;
+                    vectorValue = new Vector3D(pointValue.X, pointValue.Y, pointValue.Z);
+                }
+
+                var length = vectorValue.Length;
+
+                if (length > 100) valueFormatString = "#,##0";
+                else if (length > 10) valueFormatString = "0.#";
+                else if (length > 1) valueFormatString = "0.##";
+                else valueFormatString = "0.####";
+
+                valueFormatString = string.Format("{{0:{0}}} {{1:{0}}} {{2:{0}}}", valueFormatString);
+
+                formattedValueString = string.Format(System.Globalization.CultureInfo.InvariantCulture, valueFormatString, vectorValue.X, vectorValue.Y, vectorValue.Z);
+            }
+            else
+            {
+                // Use generic formatting
+                formattedValueString = value.ToString();
+            }
+
+            return formattedValueString;
         }
 
         private string GetDXSceneCameraMatricesString(ICamera dxCamera)

@@ -165,6 +165,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                     if (heightMapMesh != null && _dxMaterial != null)
                         GenerateHeightMapSceneNodes(heightMapMesh, _dxMaterial);
 
+                    if (MainDXViewportView.IsDisposed)
+                        return;
+
                     _backgroundWorker = null;
                     GenerationProgressBar.Visibility = Visibility.Collapsed;
 
@@ -299,9 +302,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                                                                       inputLayoutType: InputLayoutType.Position | InputLayoutType.Normal | InputLayoutType.TextureCoordinate,
                                                                       name: "HeightSimpleMesh");
 
+            if (_backgroundWorker != null && _backgroundWorker.CancellationPending)
+                return null;
+
             // If DXDevice is already initialized, then we can also initialize (create DirectX resources) for the SimpleMesh.
             // This will create the DirectX resources and send them to the GPU
-            if (dxDevice != null)
+            if (dxDevice != null && dxDevice.Device != null)
                 heightMapMesh.InitializeResources(dxDevice);
 
             return heightMapMesh; 

@@ -5506,9 +5506,7 @@
             </summary>
         </member>
         <member name="P:Assimp.EmbeddedTexture.IsCompressed">
-            <summary>
-            Gets if the texture is compressed or not.
-            </summary>
+            <summary>Gets if the texture is compressed or not.</summary>
         </member>
         <member name="P:Assimp.EmbeddedTexture.Width">
             <summary>
@@ -5557,29 +5555,29 @@
             </summary>
         </member>
         <member name="P:Assimp.EmbeddedTexture.FileName">
-            <summary>
-            Texture original filename
-            </summary>
+            <summary>Texture original filename</summary>
         </member>
         <member name="M:Assimp.EmbeddedTexture.#ctor">
             <summary>
-            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture"/> class. Should use only if
+            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture" /> class. Should use only if
             reading from a native value.
             </summary>
         </member>
-        <member name="M:Assimp.EmbeddedTexture.#ctor(System.String,System.Byte[])">
+        <member name="M:Assimp.EmbeddedTexture.#ctor(System.String,System.String,System.Byte[])">
             <summary>
-            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture"/> class. This creates a compressed
+            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture" /> class. This creates a compressed
             embedded texture.
             </summary>
+            <param name="fileName">fileName</param>
             <param name="compressedFormatHint">The 3 character format hint.</param>
             <param name="compressedData">The compressed data.</param>
         </member>
-        <member name="M:Assimp.EmbeddedTexture.#ctor(System.Int32,System.Int32,Assimp.Texel[])">
+        <member name="M:Assimp.EmbeddedTexture.#ctor(System.String,System.Int32,System.Int32,Assimp.Texel[])">
             <summary>
-            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture"/> class. This creates an uncompressed
+            Constructs a new instance of the <see cref="T:Assimp.EmbeddedTexture" /> class. This creates an uncompressed
             embedded texture.
             </summary>
+            <param name="fileName">fileName</param>
             <param name="width">Width of the texture</param>
             <param name="height">Height of the texture</param>
             <param name="uncompressedData">Color data</param>
@@ -6392,7 +6390,13 @@
         </member>
         <member name="M:Assimp.Unmanaged.AssimpLibrary.GetVersionRevision">
             <summary>
-            Gets the native Assimp DLL's revision version number.
+            Gets the native Assimp DLL's revision version number (Git commit hash).
+            </summary>
+            <returns>Assimp revision version number</returns>
+        </member>
+        <member name="M:Assimp.Unmanaged.AssimpLibrary.GetVersionPatch">
+            <summary>
+            Gets the native Assimp DLL's patch version number.
             </summary>
             <returns>Assimp revision version number</returns>
         </member>
@@ -7128,6 +7132,16 @@
         <member name="F:Assimp.Unmanaged.AiScene.Name">
             <summary>
             The name of the scene itself.
+            </summary>
+        </member>
+        <member name="F:Assimp.Unmanaged.AiScene.NumSkeletons">
+            <summary>
+            Number of skeletons contained.
+            </summary>
+        </member>
+        <member name="F:Assimp.Unmanaged.AiScene.Skeletons">
+            <summary>
+            aiSkeleton**, skeleton in the scene.
             </summary>
         </member>
         <member name="F:Assimp.Unmanaged.AiScene.PrivateData">
@@ -9621,6 +9635,12 @@
             <param name="indicesPerFace">Indices per face</param>
             <returns>True if the operation succeeded, false otherwise (e.g. not enough data)</returns>
         </member>
+        <member name="M:Assimp.Mesh.GetIndicesList">
+            <summary>
+            Convienence method for accumulating all face indices into a single index list (this does not convert list to array as other convienence methods)
+            </summary>
+            <returns>int index array</returns>
+        </member>
         <member name="M:Assimp.Mesh.GetIndices">
             <summary>
             Convienence method for accumulating all face indices into a single
@@ -9959,7 +9979,7 @@
         <member name="M:Assimp.Scene.FreeUnmanagedScene(System.IntPtr)">
             <summary>
             Frees unmanaged memory allocated -ONLY- in <see cref="M:Assimp.Scene.ToUnmanagedScene(Assimp.Scene)"/>. To free an unmanaged scene allocated by the unmanaged Assimp library,
-            call the appropiate <see cref="M:Assimp.Unmanaged.AssimpLibrary.ReleaseImport(System.IntPtr)"/> function.
+            call the appropriate <see cref="M:Assimp.Unmanaged.AssimpLibrary.ReleaseImport(System.IntPtr)"/> function.
             </summary>
             <param name="scenePtr">Pointer to unmanaged scene data.</param>
         </member>

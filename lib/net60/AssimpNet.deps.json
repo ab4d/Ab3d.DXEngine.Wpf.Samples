@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "AssimpNet/5.2.5.0": {
+        "runtime": {
+          "AssimpNet.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AssimpNet/5.2.5.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

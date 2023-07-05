@@ -51,8 +51,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _dxLineMaterial = new LineMaterial()
             {
                 LineThickness = 1,
-                LineColor = Colors.Yellow.ToColor4(),
-                DepthBias = 0.1f
+                LineColor     = Colors.Yellow.ToColor4(),
+                DepthBias     = 0.1f
                 // Set DepthBias to prevent rendering wireframe at the same depth as the 3D objects. This creates much nicer 3D lines because lines are rendered on top of 3D object and not in the same position as 3D object.
             };
 
@@ -155,7 +155,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             // After adding new WPF objects to the scene, we need to manually call Update to create DXEngine's SceneNode objects that will be needed later
             MainDXViewportView.Update();
-
+            
             // We need to update the _sceneNodesDictionary because we have changed the scene
             CreateSceneNodesDictionary();
 
@@ -271,7 +271,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             _sceneNodesDictionary = new Dictionary<object, SceneNode>();
 
-            MainDXViewportView.DXScene.RootNode.ForEachChildNode<SceneNode>(delegate (SceneNode sceneNode)
+            MainDXViewportView.DXScene.RootNode.ForEachChildNode<SceneNode>(delegate(SceneNode sceneNode)
             {
                 if (sceneNode is WpfModelVisual3DNode)
                     _sceneNodesDictionary.Add(((WpfModelVisual3DNode)sceneNode).ModelVisual3D, sceneNode);
@@ -367,7 +367,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _dxLineMaterial.ReadZBuffer = true;
 
             var objectMaterial = new DiffuseMaterial(Brushes.Silver);
-
+            
             // Uncomment to test with using transparent objects
             //objectMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Silver) { Opacity = 0.95f });
 
@@ -385,7 +385,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // The following code shows how to create a DXEngine's ScreenSpaceLineNode directly (see DXEngineAdvanced/ScreenSpaceLineNodeSample for more info):
             var positions = new Vector3[2];
             positions[0] = new Vector3(-70, -3, 60);
-            positions[1] = new Vector3(70, -3, 60);
+            positions[1] = new Vector3( 70, -3, 60);
 
             _screenSpaceLineNode = new ScreenSpaceLineNode(positions, isLineStrip: false, isLineClosed: false, lineMaterial: _dxLineMaterial);
 

@@ -64,9 +64,7 @@
                     <visuals:MultiLineVisual3D x:Name="NormalLinesVisual3D" LineColor="Red" LineThickness="1" />
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
-                            <Model3DGroup x:Name="LightsModel3DGroup">
-                                <AmbientLight x:Name="SceneAmbientLight" Color="Black" />
-                            </Model3DGroup>
+                            <Model3DGroup x:Name="LightsModel3DGroup" />
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
                 </Viewport3D>
@@ -95,20 +93,24 @@
                                     ZoomMode="MousePosition"
                                     MouseMoveThreshold="4"
                                     RotationCursor="Hand"
-                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}" />
 
-        <ab3d:CameraAxisPanel TargetCamera="{Binding ElementName=Camera1}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-                              Visibility="{Binding ElementName=ShowCameraAxisPanelCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
+        <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+
+            <ab3d:CameraAxisPanel x:Name="CameraAxisPanel1" HorizontalAlignment="Left"
+                                  Visibility="{Binding ElementName=ShowCameraAxisPanelCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
+
+            <ab3d:CameraNavigationCircles x:Name="CameraNavigationCircles1" HorizontalAlignment="Left" Margin="0 0 0 0"
+                                          Visibility="{Binding ElementName=ShowCameraNavigationCirclesCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
+
+        </StackPanel>
 
         <ab3d:MouseCameraControllerInfo x:Name="CameraControllerInfo1" Grid.Column="0"
-                                        HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}"
                                         ShowRotateInfo="True" ShowMoveInfo="True" ShowQuickZoomInfo="True"
                                         Visibility="{Binding ElementName=ShowMouseCameraControllerInfoCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}"/>
 
-        <ab3d:ViewCubeCameraController Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 0 0 0" TargetCamera="{Binding ElementName=Camera1}"
-                                       Visibility="{Binding ElementName=ShowViewCubeCameraControllerCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}" />
 
         <TabControl Name="OptionsTabControl" Grid.Column="1" Background="{StaticResource OptionsPanelBackground}" BorderThickness="0 1 0 0">
             <TabItem>
@@ -199,8 +201,8 @@
 
                             <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 20 0 0" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Camera type:" VerticalAlignment="Center"/>
-                                <ComboBox Name="CameraTypeComboBox" SelectedIndex="0" Width="110" Margin="5 0 0 0" SelectionChanged="CameraTypeComboBox_OnSelectionChanged">
+                                <TextBlock Text="Camera:" VerticalAlignment="Center"/>
+                                <ComboBox Name="CameraComboBox" SelectedIndex="0" Width="200" Margin="5 0 0 0" SelectionChanged="CameraComboBox_OnSelectionChanged">
                                     <ComboBoxItem>Perspective</ComboBoxItem>
                                     <ComboBoxItem>Orthographic</ComboBoxItem>
                                 </ComboBox>
@@ -208,6 +210,8 @@
 
 
                             <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 20 0 0" />
+
+                            <StackPanel Name="ImportedLightsPanel" Orientation="Vertical" />
 
                             <CheckBox Name="CameraLightCheckBox" Content="Camera light" IsChecked="True" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
                             <CheckBox Name="TopDownLightCheckBox" Content="Top down light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
@@ -245,8 +249,8 @@
 
 
                         <TextBlock Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />
-                        <CheckBox Name="ShowViewCubeCameraControllerCheckBox" Content="Show ViewCubeCameraController" IsChecked="True" Margin="0 5 0 0" />
-                        <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="True" Margin="0 5 0 0" />
+                        <CheckBox Name="ShowCameraNavigationCirclesCheckBox" Content="Show CameraNavigationCircles" IsChecked="True" Margin="0 5 0 0" />
+                        <CheckBox Name="ShowCameraAxisPanelCheckBox" Content="Show CameraAxisPanel" IsChecked="False" Margin="0 5 0 0" />
                         <CheckBox Name="ShowMouseCameraControllerInfoCheckBox" Content="Show MouseCameraControllerInfo" IsChecked="True" Margin="0 5 0 0" />
 
 

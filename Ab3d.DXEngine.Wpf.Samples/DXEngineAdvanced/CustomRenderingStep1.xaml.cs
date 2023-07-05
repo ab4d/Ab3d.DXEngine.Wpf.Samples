@@ -90,7 +90,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             CompositionTarget.Rendering += OnCompositionTargetOnRendering;
 
-            this.Unloaded += delegate { Dispose(); };
+            this.Unloaded += delegate
+            {
+                CompositionTarget.Rendering -= OnCompositionTargetOnRendering;
+                Dispose();
+            };
         }
 
         private void OnCompositionTargetOnRendering(object sender, EventArgs args)

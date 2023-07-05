@@ -34,6 +34,9 @@ IsCachingCommandLists
 
 IsAutomaticallyUpdatingBeforeEachRender
 
+HardwareAccelerate3DLines
+HardwareAccelerate3DLineCaps
+
 UseGeometryShaderFor3DLines
 RenderAntialiased3DLines
 RenderConnectedLinesAsDisconnected
