@@ -25,7 +25,7 @@
   <ItemGroup>
     <PackageReference Include="Ab3d.DXEngine" Version="6.0.8585" />
     <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.0.8585" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="11.0.8585" />  
+    <PackageReference Include="Ab3d.PowerToys" Version="11.0.8614" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>
