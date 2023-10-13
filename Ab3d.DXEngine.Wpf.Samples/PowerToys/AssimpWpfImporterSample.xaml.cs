@@ -53,9 +53,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             var assimpWpfExporter = new AssimpWpfExporter();
             string[] supportedExportFormats = assimpWpfExporter.ExportFormatDescriptions.Select(f => f.FileExtension).ToArray();
 
-            FileFormatsTextBlock.Text = string.Format("Using native Assimp library version {0}; Git commit: {1:x7}.\r\n\r\nSupported import formats:\r\n{2}\r\n\r\nSupported export formats:\r\n{3}",
-                assimpWpfImporter.AssimpVersion,
-                assimpWpfImporter.GitCommitHash,
+
+            string assimpVersionText = assimpWpfImporter.AssimpVersion.ToString();
+
+            // When Assimp library is complied from a source that if get the GutHub, then GitCommitHash is set to the source's last commit hash.
+            // When Assimp library is complied from a zip file in GitHub's releases, then the GitCommitHash is zero. In this case do not show the hash.
+            if (assimpWpfImporter.GitCommitHash != 0)
+                assimpVersionText += string.Format("; Git commit hash: {0:x7}", assimpWpfImporter.GitCommitHash);
+
+            FileFormatsTextBlock.Text = string.Format("Using native Assimp library version {0}.\r\n\r\nSupported import formats:\r\n{1}\r\n\r\nSupported export formats:\r\n{2}",
+                assimpVersionText,
                 string.Join(", ", supportedImportFormats),
                 string.Join(", ", supportedExportFormats));
 
