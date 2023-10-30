@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using Ab3d.Animation;
+using Ab3d.Assimp;
 using Ab3d.Cameras;
 using Ab3d.Common;
 using Ab3d.Common.Cameras;
@@ -41,6 +43,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
         private DisposeList _modelDisposeList;
 
+        private AssimpWpfImporter _assimpWpfImporter;
         private Model3D _selectedModel3D;
         private Transform3D _selectedModelParentTransform3D;
         private Transform3D _selectedModelFullTransform3D;
@@ -64,8 +67,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private Point _mouseDownPosition;
         private bool _isLeftMouseDown;
         private bool _isDoubleClick;
-
-
+        
         public ModelViewerSample()
         {
             InitializeComponent();
@@ -112,6 +114,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
+                if (_assimpWpfImporter != null)
+                    _assimpWpfImporter.Dispose(); // Dispose unmanaged resource
+
                 if (_modelDisposeList != null)
                 {
                     _modelDisposeList.Dispose();
@@ -132,11 +137,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         {
             bool isNewFile = false;
 
+            // If we previously opened a file then dispose its native Assimp scene with its unmanaged resource
+            if (_assimpWpfImporter != null)
+                _assimpWpfImporter.Dispose();
+
             // Create an instance of AssimpWpfImporter
-            var assimpWpfImporter = new Ab3d.Assimp.AssimpWpfImporter();
+            _assimpWpfImporter = new Ab3d.Assimp.AssimpWpfImporter();
 
             string fileExtension = System.IO.Path.GetExtension(fileName);
-            if (!assimpWpfImporter.IsImportFormatSupported(fileExtension))
+            if (!_assimpWpfImporter.IsImportFormatSupported(fileExtension))
             {
                 MessageBox.Show("Assimp does not support importing files file extension: " + fileExtension);
                 return;
@@ -154,24 +163,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
 
                 // Before reading the file we can set the default material (used when no other material is defined)
-                assimpWpfImporter.DefaultMaterial = new DiffuseMaterial(Brushes.Silver);
+                _assimpWpfImporter.DefaultMaterial = new DiffuseMaterial(Brushes.Silver);
 
                 // After Assimp importer reads the file, it can execute many post processing steps to transform the geometry.
                 // See the possible enum values to see what post processes are available.
                 // Here we just set the AssimpPostProcessSteps to its default value - execute the Triangulate step to convert all polygons to triangles that are needed for WPF 3D.
                 // Note that if ReadPolygonIndices is set to true in the next line, then the assimpWpfImporter will not use assimp's triangulation because it needs original polygon data.
-                assimpWpfImporter.AssimpPostProcessSteps = PostProcessSteps.Triangulate;
+                _assimpWpfImporter.AssimpPostProcessSteps = PostProcessSteps.Triangulate;
 
                 // When ReadPolygonIndices is true, assimpWpfImporter will read PolygonIndices collection that can be used to show polygons instead of triangles.
-                assimpWpfImporter.ReadPolygonIndices = ReadPolygonIndicesCheckBox.IsChecked ?? false;
+                _assimpWpfImporter.ReadPolygonIndices = ReadPolygonIndicesCheckBox.IsChecked ?? false;
 
-                
+
                 Model3D readModel3D;
 
                 try
                 {
                     // Read model from file
-                    readModel3D = assimpWpfImporter.ReadModel3D(fileName, texturesPath: null); // we can also define a textures path if the textures are located in some other directory (this is parameter can be skipped, but is defined here so you will know that you can use it)
+                    readModel3D = _assimpWpfImporter.ReadModel3D(fileName, texturesPath: null); // we can also define a textures path if the textures are located in some other directory (this is parameter can be skipped, but is defined here so you will know that you can use it)
 
                     isNewFile = (_fileName != fileName);
                     _fileName = fileName;
@@ -199,8 +208,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                 int savedCameraSelectedIndex = CameraComboBox.SelectedIndex;
 
-                bool hasImportedCameras = UpdateAvailableCameras(assimpWpfImporter.Cameras);
-                UpdateLights(assimpWpfImporter.Lights);
+                bool hasImportedCameras = UpdateAvailableCameras(_assimpWpfImporter.Cameras);
+                UpdateLights(_assimpWpfImporter.Lights);
 
 
                 if (isNewFile && readModel3D != null)
@@ -229,8 +238,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             }
             finally
             {
-                // Dispose unmanaged resources
-                assimpWpfImporter.Dispose();
+                // If we will not need to access the native Assimp scene, then we can dispose it now.
+                // In this sample we can click on Info button and also show Assimp properties of the selected model
+                //_assimpWpfImporter.Dispose(); // Dispose native Assimp scene with its unmanaged resource
+                //_assimpWpfImporter = null;
 
                 Mouse.OverrideCursor = null;
             }
@@ -991,6 +1002,48 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 AddSceneNodeDetailsText(sceneNodeForWpfObject, "", ref objectInfoText);
             }
 
+            var modeName = selectedModel.GetName();
+            if (!string.IsNullOrEmpty(modeName) && _assimpWpfImporter != null)
+            {
+                Scene assimpScene = _assimpWpfImporter.ImportedAssimpScene;
+
+                if (assimpScene != null)
+                {
+                    Node foundNode;
+                    int meshIndex;
+                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, null, modeName, out foundNode, out meshIndex);
+
+                    if (!isFound)
+                    {
+                        int pos = modeName.IndexOf("__", StringComparison.Ordinal);
+                        if (pos != -1)
+                        {
+                            string parentGroupName = modeName.Substring(0, pos);
+                            string nodeName = modeName.Substring(pos + 2);
+
+                            isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, parentGroupName, nodeName, out foundNode, out meshIndex);
+                        }
+                    }
+
+                    if (isFound)
+                    {
+                        objectInfoText += "\r\n\r\nAssimp Node:\r\n" + GetObjectProperties(foundNode, "    ");
+
+                        var foundAssimpMesh = _assimpWpfImporter.ImportedAssimpScene.Meshes[meshIndex];
+
+                        if (foundAssimpMesh != null)
+                        {
+                            objectInfoText += string.Format("\r\nAssimp mesh (ImportedAssimpScene.Meshes[{0}]):\r\n", meshIndex) + GetObjectProperties(foundAssimpMesh, "    ");
+
+                            var assimpMaterial = _assimpWpfImporter.ImportedAssimpScene.Materials[foundAssimpMesh.MaterialIndex];
+
+                            if (assimpMaterial != null)
+                                objectInfoText += string.Format("\r\nAssimp material (ImportedAssimpScene.Materials[{0}]):\r\n", foundAssimpMesh.MaterialIndex) + GetObjectProperties(assimpMaterial, "    ");
+                        }
+                    }
+                }
+            }
+
             var geometryModel3D = selectedModel as GeometryModel3D;
             if (geometryModel3D != null)
             {
@@ -1009,6 +1062,123 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             ShowMessageWindow("3D Object info", objectInfoText);
         }
+
+        private bool GetAssimpMeshIndex(Scene assimpScene, Node assimpNode, string parentGroupName, string nodeName, out Node foundNode, out int meshIndex)
+        {
+            if (assimpNode.HasMeshes && assimpNode.Meshes != null)
+            {
+                int meshesCount = assimpNode.Meshes.Count;
+                if (meshesCount == 1 && assimpNode.Name == nodeName)
+                {
+                    foundNode = assimpNode;
+                    meshIndex = assimpNode.Meshes[0];
+                    return true;
+                }
+                
+                if (meshesCount > 1 && assimpNode.Name == parentGroupName)
+                {
+                    foreach (var oneMeshIndex in assimpNode.Meshes)
+                    {
+                        if (assimpScene.Meshes[oneMeshIndex].Name == nodeName)
+                        {
+                            foundNode = assimpNode;
+                            meshIndex = oneMeshIndex;
+                            return true;
+                        }
+                    }
+
+                    // When the GenerateUniqueModelNames is true, then AssimpImporter can add "__2", "__3", ect. if there are multiple nodes with the same name
+                    int pos = nodeName.IndexOf("__", StringComparison.Ordinal);
+                    if (pos != -1)
+                    {
+                        string nodeNameWithoutIndex = nodeName.Substring(0, pos);
+                        string nodeIndexText = nodeName.Substring(pos + 2);
+
+                        int indexValue;
+                        if (Int32.TryParse(nodeIndexText, out indexValue) && indexValue > 1 && indexValue < assimpNode.Meshes.Count + 1)
+                        {
+                            foundNode = assimpNode;
+                            meshIndex = assimpNode.Meshes[indexValue - 1]; // second mesh has "__2" so we need to subtract 1
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (assimpNode.HasChildren && assimpNode.Children != null && assimpNode.Children.Count > 0)
+            {
+                for (int i = 0; i < assimpNode.Children.Count; i++)
+                {
+                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpNode.Children[i], parentGroupName, nodeName, out foundNode, out meshIndex);
+                    if (isFound)
+                        return true;
+                }
+            }
+
+            foundNode = null;
+            meshIndex = -1;
+            return false;
+        }
+
+        private string GetObjectProperties(object objectToDump, string indent)
+        {
+            if (objectToDump == null)
+                return "";
+
+            var type = objectToDump.GetType();
+
+            var sb = new StringBuilder();
+
+            try
+            {
+                var allProperties = type.GetProperties().OrderBy(p => p.Name).ToList();
+
+                foreach (var propertyInfo in allProperties)
+                {
+                    if (propertyInfo.PropertyType.IsValueType || propertyInfo.PropertyType == typeof(string))
+                    {
+                        string valueText;
+
+                        try
+                        {
+                            var propertyValue = propertyInfo.GetValue(objectToDump, null);
+
+                            if (propertyValue == null)
+                            {
+                                valueText = "<null>";
+                            }
+                            else if (propertyInfo.PropertyType.Name == "TextureSlot")
+                            {
+                                var textureSlot = (TextureSlot)propertyValue;
+                                if (string.IsNullOrEmpty(textureSlot.FilePath))
+                                    continue; // Skip undefined TextureSlot
+
+                                // Show texture information
+                                valueText = string.Format("'{0}' TextureIndex: {1}; Type: {2}; BlendFactor: {3}; Operation: {4}; Mapping: {5}; UVIndex: {6}; WrapModeU: {7}; WrapModeV: {8}; Flags: {9}",
+                                                          textureSlot.FilePath, textureSlot.TextureIndex, textureSlot.TextureType, textureSlot.BlendFactor, textureSlot.Operation, textureSlot.Mapping, textureSlot.UVIndex, textureSlot.WrapModeU, textureSlot.WrapModeV, textureSlot.Flags);
+                            }
+                            else
+                            {
+                                valueText = string.Format(CultureInfo.InvariantCulture, "{0}", propertyValue);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            valueText = "ERROR: " + e.Message;
+                        }
+
+                        sb.AppendLine(indent + propertyInfo.Name + ": " + valueText);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                sb.Append(indent).Append("Error: ").AppendLine(ex.Message);
+            }
+
+            return sb.ToString();
+        }
+
 
         private void AddSceneNodeDetailsText(SceneNode sceneNode, string indentString, ref string objectInfoText)
         {
