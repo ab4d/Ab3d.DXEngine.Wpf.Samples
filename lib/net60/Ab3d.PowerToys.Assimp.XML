@@ -148,6 +148,18 @@
             Gets a Dictionary of objects as keys and names as values. Can be used to quickly get the object name.
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.GenerateUniqueModelNames">
+            <summary>
+            When true (by default) then unique object names are generated, e.g. when the objects from Assimp scene have the same name, the "__2", "__3", "__4", etc. suffixes added to the name (the first object does not have changed name).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.PreserveGroupNames">
+            <summary>
+            This property defines how the Assimp Nodes that have both meshes and child nodes defined are named converted to Model3DGroup and GeometryModel3D objects.
+            When true (by default), then the Model3DGroup is named the same as the node's name and the child GeometryModel3D objects have the names created by combining the node's name and mesh name (in case mesh name is not defined then "__Mesh" suffix is used).
+            When false, then Model3DGroup gets the "__Group" suffix in their names. In this case and when the group have only one mesh, then the GeometryModel3D from the first mesh is named from the node's name.
+            </summary>
+        </member>
         <member name="P:Ab3d.Assimp.AssimpWpfConverter.DefaultMaterial">
             <summary>
             Gets or sets a material that is used as default material (when material is not specified in the model file)
@@ -548,6 +560,18 @@
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.ObjectNames">
             <summary>
             Gets a dictionary that can be used to get a name of a 3D object (key = object, value = name)
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.GenerateUniqueModelNames">
+            <summary>
+            When true (by default) then unique object names are generated, e.g. when the objects from Assimp scene have the same name, the "__2", "__3", "__4", etc. suffixes added to the name (the first object does not have changed name).
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.PreserveGroupNames">
+            <summary>
+            This property defines how the Assimp Nodes that have both meshes and child nodes defined are named converted to Model3DGroup and GeometryModel3D objects.
+            When true (by default), then the Model3DGroup is named the same as the node's name and the child GeometryModel3D objects have the names created by combining the node's name and mesh name (in case mesh name is not defined then "__Mesh" suffix is used).
+            When false, then Model3DGroup gets the "__Group" suffix in their names. In this case and when the group have only one mesh, then the GeometryModel3D from the first mesh is named from the node's name.
             </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.ImportedAssimpScene">
