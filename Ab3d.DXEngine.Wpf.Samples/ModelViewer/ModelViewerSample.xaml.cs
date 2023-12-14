@@ -26,6 +26,7 @@ using Ab3d.Visuals;
 using Assimp;
 using Camera = System.Windows.Media.Media3D.Camera;
 using CheckBox = System.Windows.Controls.CheckBox;
+using GeometryModel3D = System.Windows.Media.Media3D.GeometryModel3D;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using LineCap = Ab3d.Common.Models.LineCap;
 using MessageBox = System.Windows.MessageBox;
@@ -1003,7 +1004,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             }
 
             var modeName = selectedModel.GetName();
-            if (!string.IsNullOrEmpty(modeName) && _assimpWpfImporter != null)
+
+            string meshName = null;
+            MeshGeometry3D meshGeometry3D = null;
+
+            var geometryModel3D = selectedModel as GeometryModel3D;
+            if (geometryModel3D != null)
+            {
+                meshGeometry3D = geometryModel3D.Geometry as MeshGeometry3D;
+                if (meshGeometry3D != null)
+                    meshName = meshGeometry3D.GetName();
+            }
+
+            if (_assimpWpfImporter != null && (!string.IsNullOrEmpty(modeName) || !string.IsNullOrEmpty(meshName)))
             {
                 Scene assimpScene = _assimpWpfImporter.ImportedAssimpScene;
 
@@ -1011,17 +1024,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 {
                     Node foundNode;
                     int meshIndex;
-                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, null, modeName, out foundNode, out meshIndex);
+                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, modeName, meshName, out foundNode, out meshIndex);
 
-                    if (!isFound)
+                    if (!isFound && modeName != null && meshName == null)
                     {
                         int pos = modeName.IndexOf("__", StringComparison.Ordinal);
                         if (pos != -1)
                         {
-                            string parentGroupName = modeName.Substring(0, pos);
-                            string nodeName = modeName.Substring(pos + 2);
+                            string nodeName = modeName.Substring(0, pos);
+                            meshName = modeName.Substring(pos + 2);
 
-                            isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, parentGroupName, nodeName, out foundNode, out meshIndex);
+                            if (meshName == "Group") // Handle case when AssimpImporter adds "__Group" to the name
+                            {
+                                isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, nodeName, null, out foundNode, out meshIndex);
+                                meshIndex = -1; // Show only Assimp.Node info without any mesh
+                            }
+                            else
+                            {
+                                isFound = GetAssimpMeshIndex(assimpScene, assimpScene.RootNode, nodeName, meshName, out foundNode, out meshIndex);
+                            }
                         }
                     }
 
@@ -1029,57 +1050,60 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     {
                         objectInfoText += "\r\n\r\nAssimp Node:\r\n" + GetObjectProperties(foundNode, "    ");
 
-                        var foundAssimpMesh = _assimpWpfImporter.ImportedAssimpScene.Meshes[meshIndex];
-
-                        if (foundAssimpMesh != null)
+                        if (meshIndex >= 0)
                         {
-                            objectInfoText += string.Format("\r\nAssimp mesh (ImportedAssimpScene.Meshes[{0}]):\r\n", meshIndex) + GetObjectProperties(foundAssimpMesh, "    ");
+                            var foundAssimpMesh = _assimpWpfImporter.ImportedAssimpScene.Meshes[meshIndex];
 
-                            var assimpMaterial = _assimpWpfImporter.ImportedAssimpScene.Materials[foundAssimpMesh.MaterialIndex];
+                            if (foundAssimpMesh != null)
+                            {
+                                objectInfoText += string.Format("\r\nAssimp mesh (ImportedAssimpScene.Meshes[{0}]):\r\n", meshIndex) + GetObjectProperties(foundAssimpMesh, "    ");
 
-                            if (assimpMaterial != null)
-                                objectInfoText += string.Format("\r\nAssimp material (ImportedAssimpScene.Materials[{0}]):\r\n", foundAssimpMesh.MaterialIndex) + GetObjectProperties(assimpMaterial, "    ");
+                                var assimpMaterial = _assimpWpfImporter.ImportedAssimpScene.Materials[foundAssimpMesh.MaterialIndex];
+
+                                if (assimpMaterial != null)
+                                    objectInfoText += string.Format("\r\nAssimp material (ImportedAssimpScene.Materials[{0}]):\r\n", foundAssimpMesh.MaterialIndex) + GetObjectProperties(assimpMaterial, "    ");
+                            }
                         }
                     }
                 }
             }
 
-            var geometryModel3D = selectedModel as GeometryModel3D;
-            if (geometryModel3D != null)
+            if (meshGeometry3D != null)
             {
-                var meshGeometry3D = geometryModel3D.Geometry as MeshGeometry3D;
+                objectInfoText += "\r\n\r\nMeshGeometry3D info:\r\n" + Ab3d.Utilities.Dumper.GetDumpString(meshGeometry3D, maxLineCount: 100, "0.00");
 
-                if (meshGeometry3D != null)
-                {
-                    objectInfoText += "\r\n\r\nMeshGeometry3D info:\r\n" + Ab3d.Utilities.Dumper.GetDumpString(meshGeometry3D, maxLineCount: 100, "0.00");
-
-                    if (meshGeometry3D.Positions.Count < 1000)
-                        objectInfoText += "\r\n\r\nMeshInitializationCode:\r\n" + Ab3d.Utilities.Dumper.GetMeshInitializationCode(meshGeometry3D);
-                    else
-                        objectInfoText += string.Format("\r\n\r\nMeshInitializationCode skipped because mesh has more than 1000 positions ({0}).\r\n", meshGeometry3D.Positions.Count);
-                }
+                if (meshGeometry3D.Positions.Count < 1000)
+                    objectInfoText += "\r\n\r\nMeshInitializationCode:\r\n" + Ab3d.Utilities.Dumper.GetMeshInitializationCode(meshGeometry3D);
+                else
+                    objectInfoText += string.Format("\r\n\r\nMeshInitializationCode skipped because mesh has more than 1000 positions ({0}).\r\n", meshGeometry3D.Positions.Count);
             }
 
             ShowMessageWindow("3D Object info", objectInfoText);
         }
 
-        private bool GetAssimpMeshIndex(Scene assimpScene, Node assimpNode, string parentGroupName, string nodeName, out Node foundNode, out int meshIndex)
+        private bool GetAssimpMeshIndex(Scene assimpScene, Node assimpNode, string nodeName, string meshName, out Node foundNode, out int meshIndex)
         {
+            string assimpNodeName = assimpNode.Name;
+            CorrectXamlName(ref assimpNodeName); // Because name is set by SetName method then name must be correct for XAML (must start with a letter or underscore and can contain only letters, digits, or underscores)
+
             if (assimpNode.HasMeshes && assimpNode.Meshes != null)
             {
                 int meshesCount = assimpNode.Meshes.Count;
-                if (meshesCount == 1 && assimpNode.Name == nodeName)
+                if (meshesCount == 1 && assimpNodeName == nodeName)
                 {
                     foundNode = assimpNode;
                     meshIndex = assimpNode.Meshes[0];
                     return true;
                 }
                 
-                if (meshesCount > 1 && assimpNode.Name == parentGroupName)
+                if (meshesCount > 1 && assimpNodeName == nodeName)
                 {
                     foreach (var oneMeshIndex in assimpNode.Meshes)
                     {
-                        if (assimpScene.Meshes[oneMeshIndex].Name == nodeName)
+                        string oneMeshName = assimpScene.Meshes[oneMeshIndex].Name;
+                        CorrectXamlName(ref oneMeshName);
+
+                        if (oneMeshName == meshName)
                         {
                             foundNode = assimpNode;
                             meshIndex = oneMeshIndex;
@@ -1088,11 +1112,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     }
 
                     // When the GenerateUniqueModelNames is true, then AssimpImporter can add "__2", "__3", ect. if there are multiple nodes with the same name
-                    int pos = nodeName.IndexOf("__", StringComparison.Ordinal);
+                    int pos = meshName.IndexOf("__", StringComparison.Ordinal);
                     if (pos != -1)
                     {
-                        string nodeNameWithoutIndex = nodeName.Substring(0, pos);
-                        string nodeIndexText = nodeName.Substring(pos + 2);
+                        string nodeNameWithoutIndex = meshName.Substring(0, pos);
+                        string nodeIndexText = meshName.Substring(pos + 2);
 
                         int indexValue;
                         if (Int32.TryParse(nodeIndexText, out indexValue) && indexValue > 1 && indexValue < assimpNode.Meshes.Count + 1)
@@ -1103,13 +1127,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                         }
                     }
                 }
+            } 
+            else if (assimpNodeName == nodeName)
+            {
+                foundNode = assimpNode;
+                meshIndex = -1; // no meshes
+                return true;
             }
 
             if (assimpNode.HasChildren && assimpNode.Children != null && assimpNode.Children.Count > 0)
             {
                 for (int i = 0; i < assimpNode.Children.Count; i++)
                 {
-                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpNode.Children[i], parentGroupName, nodeName, out foundNode, out meshIndex);
+                    bool isFound = GetAssimpMeshIndex(assimpScene, assimpNode.Children[i], nodeName, meshName, out foundNode, out meshIndex);
                     if (isFound)
                         return true;
                 }
@@ -1118,6 +1148,58 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             foundNode = null;
             meshIndex = -1;
             return false;
+        }
+
+        // Name must start with a letter or underscore and can contain only letters, digits, or underscores.
+        private static void CorrectXamlName(ref string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+
+
+            bool isNameOk = true;
+
+            // First check if name is ok
+            for (int i = 0; i < name.Length; i++)
+            {
+                char oneChar = name[i];
+
+                if (!char.IsLetterOrDigit(oneChar) && oneChar != '_')
+                {
+                    isNameOk = false;
+                    break;
+                }
+            }
+
+            if (!isNameOk)
+            {
+                StringBuilder sb;
+
+                sb = new StringBuilder(name.Length);
+
+                // If the first character is not letter or underscores - add '_' to the name
+                if (!char.IsLetter(name[0]) && name[0] != '_')
+                    sb.Append('_');
+
+                // Name must start with a letter or underscore and can contain only letters, digits, or underscores.
+                for (int i = 0; i < name.Length; i++)
+                {
+                    char oneChar = name[i];
+
+                    if (char.IsLetterOrDigit(oneChar) || oneChar == '_')
+                        sb.Append(oneChar);
+                    else
+                        sb.Append('_');
+                }
+
+                name = sb.ToString();
+            }
+            else
+            {
+                // Name does not contain wrong characters - just check if it starts with letter or underscore
+                if (!char.IsLetter(name[0]) && name[0] != '_')
+                    name = '_' + name;
+            }
         }
 
         private string GetObjectProperties(object objectToDump, string indent)

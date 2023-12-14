@@ -586,8 +586,9 @@ namespace Ab3d.DirectX.Client.Diagnostics
             {
                 double ceiling = Math.Ceiling(location);
 
-                interpolatedValue = (location - floor) * values[(int)floor] +
-                                    (ceiling - location) * values[(int)ceiling];
+                // Interpolate, for example for location = 8.2 we need to use 80% of the 8th value and 20% of the 9th value
+                interpolatedValue = (ceiling - location) * values[(int)floor] +
+                                    (location - floor) * values[(int)ceiling];
             }
 
             return interpolatedValue;

@@ -53,5 +53,11 @@
 
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="#444" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
                    Text="Sprites demo"/>
+
+        <Button Name="SetBackgroundImageButton" Content="Set background image" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="4 2" Click="SetBackgroundImageButton_OnClick">
+            <Button.LayoutTransform>
+                <ScaleTransform ScaleX="1.5" ScaleY="1.5"></ScaleTransform>
+            </Button.LayoutTransform>
+        </Button>
     </Grid>
 </Page>

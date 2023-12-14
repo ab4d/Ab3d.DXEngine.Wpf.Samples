@@ -1493,14 +1493,11 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 
         private void DumpRenderingSteps()
         {
-            if (DXView == null || DXView.DXScene == null)
+            if (DXView == null)
                 return;
 
-            var sb = new StringBuilder();
-            foreach (var renderingStepBase in DXView.DXScene.RenderingSteps)
-                sb.AppendLine(renderingStepBase.ToString());
-
-            ShowInfoText(sb.ToString());
+            var renderingStepsDumpString = DXView.GetRenderingStepsDumpString();
+            ShowInfoText(renderingStepsDumpString);
         }
         
         private void DumpBackBufferChanges()

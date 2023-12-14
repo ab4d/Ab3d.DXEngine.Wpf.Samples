@@ -112,14 +112,39 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
         private void ChangeColorsButton_OnClick(object sender, RoutedEventArgs e)
         {
+            ChangePositionColors(changeColors: true, changeAlpha: true);
+        }
+
+        private void OnTransparentCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            ChangePositionColors(changeColors: false, changeAlpha: true);
+        }
+
+        private void ChangePositionColors(bool changeColors, bool changeAlpha)
+        {
             var rnd = new Random();
 
             bool hasTransparency = TransparentCheckBox.IsChecked ?? false;
 
             for (var i = 0; i < _vertexColorMaterial.PositionColors.Length; i++)
             {
-                float alpha = hasTransparency ? (float)rnd.NextDouble() : 1;
-                _vertexColorMaterial.PositionColors[i] = new Color4((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble(), alpha);
+                float alpha;
+                Color4 newColor;
+
+                if (changeAlpha)
+                    alpha = hasTransparency ? (float)rnd.NextDouble() : 1;
+                else
+                    alpha = _vertexColorMaterial.PositionColors[i].Alpha;
+
+                if (changeColors)
+                    newColor = new Color4((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble(), alpha);
+                else
+                    newColor = new Color4(_vertexColorMaterial.PositionColors[i].Red, _vertexColorMaterial.PositionColors[i].Green, _vertexColorMaterial.PositionColors[i].Blue, alpha);
+
+                _vertexColorMaterial.PositionColors[i] = newColor;
             }
 
             _vertexColorMaterial.HasTransparency = hasTransparency;

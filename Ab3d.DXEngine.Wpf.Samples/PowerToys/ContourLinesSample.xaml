@@ -1,0 +1,119 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.PowerToys.ContourLinesSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:common="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="400"
+	Title="HeightMapSample">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibilityOfBool" />
+    </Page.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                <GradientStop Offset="0" Color="#033C62"/>
+                <GradientStop Offset="1" Color="#01131F"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Border Name="ViewportBorder" Background="Transparent">
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+                <Viewport3D Name="MainViewport">
+
+                    <visuals:ContentVisual3D x:Name="ContourLinesRootVisual3D" IsVisible="{Binding ElementName=ShowContourLinesCheckBox, Path=IsChecked}" />
+
+                    <visuals:AxesBoxVisual3D x:Name="AxesBox"
+                                         CenterPosition="0 15 0" Size="100 30.2 100" 
+                                         Is3DTextShown="False"
+                                         AxisShowingStrategy="LeftmostAxis"
+                                         IsWireBoxFullyClosed="True"
+                                         AxisTitleBrush="White" ValueLabelsBrush="White" AxisLineColor="White" TicksLineColor="LightGray" ConnectionLinesColor="Gray"
+                                         IsXAxis1Visible="False" IsXAxis2Visible="False"
+                                         IsYAxis1Visible="False" IsYAxis2Visible="False"
+                                         IsZAxis1Visible="True" IsZAxis2Visible="True"
+                                         ZAxis1Title="" ZAxis2Title=""
+                                         ValueDisplayFormatString="0.##"
+                                         ValueLabelsFontSize="14" MajorTicksLength="3" MinorTicksLength="1.5"
+                                         ShowBottomConnectionLines="True"
+                                         OverlayCanvas="{Binding ElementName=AxisOverlayCanvas}"
+                                         Camera="{Binding ElementName=Camera1}" />
+
+                    <visuals:HeightMapVisual3D x:Name="HeightMap1" Material="Silver" BackMaterial="Gray" Size="100 30 100"
+                                           IsWireframeShown="False"
+                                           IsSolidSurfaceShown="{Binding ElementName=ShowSolidSurfaceCheckBox, Path=IsChecked}"/>
+
+                </Viewport3D>
+            </dxControls:DXViewportView>
+        </Border>
+        <Canvas Name="AxisOverlayCanvas" IsHitTestVisible="False" Visibility="{Binding ElementName=ShowWireBoxCheckBox, Path=IsChecked, Converter={StaticResource VisibilityOfBool}}"/>
+
+        <cameras:TargetPositionCamera Name="Camera1"
+                                      TargetPosition="20 15 0" RotationCenterPosition="0 0 0"
+                                      Heading="30" Attitude="-20" Distance="300" 
+                                      ShowCameraLight="Always"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <ab3d:CameraAxisPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="5" TargetCamera="{Binding ElementName=Camera1}" />
+
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    TargetCamera="{Binding ElementName=Camera1}"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
+
+        <Border BorderThickness="1" BorderBrush="Silver" Background="#99000000" Margin="10 5" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <StackPanel Orientation="Vertical" Margin="10 5">
+                <TextBlock Text="Settings" FontWeight="Bold" FontSize="18" Foreground="Silver" Margin="0 3 0 10" TextDecorations="Underline"/>
+
+                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                    <RadioButton Name="CombineAllContourLinesRadioButton" Content="Combine all contour lines" GroupName="ContourLinesType" Foreground="Silver" IsChecked="False" Checked="OnContourLinesTypeChanged" />
+                    <common:InfoControl InfoText="Showing all contour lines with one MultiLineVisual3D is the best for performance, but this way all contour lines must have the same color and line thickness. In this case all positions for contour lines are get in one Point3DCollection by the CreateContourLinePositions method." InfoWidth="400" Margin="3 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                    <RadioButton Name="IndividualContourLinesRadioButton" Content="Individual contour lines" GroupName="ContourLinesType" Foreground="Silver" IsChecked="True" Checked="OnContourLinesTypeChanged" />
+                    <common:InfoControl InfoText="Calling CreateMultiContourLinePositions method creates an array of Point3DCollection objects. Each array element define contour lines for each contour value. This way it is possible to define different LineThickness for different contour lines." InfoWidth="400" Margin="3 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                    <RadioButton Name="ColoredContourLinesRadioButton" Content="Colored contour lines" GroupName="ContourLinesType" Foreground="Silver" IsChecked="False" Checked="OnContourLinesTypeChanged" />
+                    <common:InfoControl InfoText="In this case each contour line is colored by different color that is get from the height color in HeightMapVisual3D" InfoWidth="400" Margin="3 0 0 0" />
+                </StackPanel>
+
+                <TextBlock Text="Gradient colors:" FontWeight="Bold" Foreground="Silver" Margin="0 15 0 0"/>
+                <RadioButton Name="TechnicalColorsRadioButton" Content="Technical" IsChecked="False" GroupName="GradientType" Foreground="Silver" Margin="0 3 0 0" Checked="OnGradientTypeChanged" />
+                <RadioButton Name="GeographicalSmoothColorsRadioButton" Content="Geographical (smooth gradient)" IsChecked="False" GroupName="GradientType" Foreground="Silver" Margin="0 3 0 0" Checked="OnGradientTypeChanged" />
+                <RadioButton Name="GeographicalHardColorsRadioButton" Content="Geographical (hard gradient)" IsChecked="False" GroupName="GradientType" Foreground="Silver" Margin="0 3 0 0" Checked="OnGradientTypeChanged" />
+                <StackPanel Orientation="Horizontal" Margin="0 3 0 0" >
+                    <RadioButton Name="GeographicalNoInterpolationsRadioButton" Content="Geographical (no interpolation)" IsChecked="True" GroupName="GradientType" Foreground="Silver" Checked="OnGradientTypeChanged" />
+                    <Image Source="../Resources/new_icon.png" VerticalAlignment="Center" Margin="5 0 0 0" Width="19" Height="9"
+                           ToolTip="This option can be used only with Ab3d.DXEngine"/>
+                </StackPanel>
+
+                <CheckBox Name="ShowContourLinesCheckBox" Content="Show contour lines" IsChecked="True" Margin="0 15 0 3" Foreground="Silver" />
+                <CheckBox Name="ShowWireBoxCheckBox" Content="Show WireBox" IsChecked="True" Margin="0 0 0 3" Foreground="Silver" />
+                <CheckBox Name="ShowSolidSurfaceCheckBox" Content="Show solid surface" IsChecked="True" Margin="0 0 0 3" Foreground="Silver" />
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="ShowMinValueSurfaceCheckBox" Content="Show surface for min value" IsChecked="True" Margin="0 0 0 3" Foreground="Silver"
+                              Checked="OnShowMinValueSurfaceCheckedChanged" Unchecked="OnShowMinValueSurfaceCheckedChanged" />
+                    <common:InfoControl InfoText="When unchecked than the zero values are rendered with transparent color. This hides the surface for min values. Note that in this case the HeightMapVisual3D must be rendered after other objects (see comments in code behind and Transparency problem for more info)." InfoWidth="400" Margin="3 0 0 0" />
+                </StackPanel>
+
+                <TextBlock Text="Ambient light:" FontWeight="Bold" Foreground="Silver" Margin="0 15 0 0"/>
+                <Slider Name="AmbientSlider" Minimum="0" Maximum="255" ValueChanged="AmbientSlider_OnValueChanged" />
+
+                <Button Name="TopDownCameraButton" Content="Top down orthographic camera" Margin="0 15 0 0" Padding="5 2" Click="TopDownCameraButton_OnClick" />
+                <Button Name="SideCameraButton" Content="Side perspective camera" Margin="0 5 0 0" Padding="5 2" Click="SideCameraButton_OnClick" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Creating Contour Lines (also known as Isolines) from 3D mesh" FontWeight="Bold" FontSize="20" Foreground="Silver" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
+    </Grid>
+</Page>

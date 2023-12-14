@@ -206,7 +206,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             // To get object names execute the following in Visual Studio Immediate window:
             // robotModel3D.DumpHierarchy();
 
-            var hand2Group = assimpWpfImporter.NamedObjects["Hand2__Group"] as Model3DGroup;
+            var hand2Group = assimpWpfImporter.NamedObjects["Hand2"] as Model3DGroup;
             _originalModelAxisAngleRotation3D = new AxisAngleRotation3D(new Vector3D(0, 0, -1), 0);
             var rotateTransform3D = new RotateTransform3D(_originalModelAxisAngleRotation3D);
 

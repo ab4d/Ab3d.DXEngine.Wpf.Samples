@@ -22,6 +22,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
     //
     // When this sample is rendered by Ab3d.DXEngine, then it is possible to use super-sampling and
     // this produce super smooth 3D lines that look much better then when the scene is rendered only by WPF 3D.
+    //
+    // See also the ContourLinesSample.xaml.cs to see a new option to define color gradient without interpolating colors.
 
     /// <summary>
     /// Interaction logic for Plot3DSample.xaml

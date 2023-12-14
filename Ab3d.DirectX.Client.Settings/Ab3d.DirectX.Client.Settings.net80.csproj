@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DirectX.Client.Settings</AssemblyName>
     <RootNamespace>Ab3d.DirectX.Client.Settings</RootNamespace>
-    <Version>6.0.8585</Version>
-    <AssemblyVersion>6.0.8585.2070</AssemblyVersion>
-    <FileVersion>6.0.8585.2070</FileVersion>
+    <Version>6.1.8746</Version>
+    <AssemblyVersion>6.1.8746.2070</AssemblyVersion>
+    <FileVersion>6.1.8746.2070</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="6.0.8585" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.0.8585" />  
+    <PackageReference Include="Ab3d.DXEngine" Version="6.1.8746" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.1.8746" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>

@@ -286,6 +286,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                 // Create a child DXViewportView with using a constructor that takes a masterDXViewportView.
                 // When useMasterRenderingSteps parameter is true (by default), then the RenderingSteps in the master DXViewportView.DXScene are used.
                 // To customize rendering of a child DXViewportView, set useMasterRenderingSteps to false. This will create new RenderingSteps that can be customized (see below).
+                //
+                // When creating child DXViewportView we still need to pass a new Viewport3D object to the constructor,
+                // but still the 3D scene will be used from the master's DXViewportView's Viewport3D.
+                // The new viewport3D is used so that a new camera can be associated with that (see below when new TargetPositionCamera is created).
 
                 bool useMasterRenderingSteps = renderingType == RenderingTypes.Standard;
 

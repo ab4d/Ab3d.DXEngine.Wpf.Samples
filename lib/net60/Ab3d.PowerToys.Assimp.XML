@@ -148,9 +148,10 @@
             Gets a Dictionary of objects as keys and names as values. Can be used to quickly get the object name.
             </summary>
         </member>
-        <member name="P:Ab3d.Assimp.AssimpWpfConverter.GenerateUniqueModelNames">
+        <member name="P:Ab3d.Assimp.AssimpWpfConverter.GenerateUniqueNames">
             <summary>
-            When true (by default) then unique object names are generated, e.g. when the objects from Assimp scene have the same name, the "__2", "__3", "__4", etc. suffixes added to the name (the first object does not have changed name).
+            When true (by default) the importer will make sure that the imported models, materials and meshes have unique names (adding "__2", "__3", etc. if not).
+            It is always allowed that model and mesh have the same name, but when two models have the same name and GenerateUniqueNames is true, then additional index is added to the name (the first object does not have changed name).
             </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfConverter.PreserveGroupNames">
@@ -167,14 +168,14 @@
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfConverter.ForceConvertToRightHandedCoordinateSystem">
             <summary>
-            Gets or sets a Boolean that specifies if we always do a conversion from left to right handed coordinate system.
+            Gets or sets a Boolean that specifies if we always do a conversion from left to right-handed coordinate system.
             </summary>
             <remarks>
             <para>
-            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a conversion from left to right handed coordinate system.
+            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a conversion from left to right-handed coordinate system.
             </para>
             <para>
-            WPF uses right handed coordinate system - the Z axis points away from the screen. DirectX uses left handed coordinate system - there the Z axis points into the screen.
+            WPF uses right-handed coordinate system - the Z axis points away from the screen. DirectX uses left-handed coordinate system - there the Z axis points into the screen.
             </para>
             </remarks>
         </member>
@@ -477,6 +478,16 @@
             AssimpWpfImporter class uses Assimp importer library to read WPF 3D models from many 3D files.
             </summary>
         </member>
+        <member name="F:Ab3d.Assimp.AssimpWpfImporter.MaterialNameSuffix">
+            <summary>
+            MaterialNameSuffix is used in <see cref="P:Ab3d.Assimp.AssimpWpfImporter.NamedObjects"/> dictionary when the material has the same name as the model.
+            </summary>
+        </member>
+        <member name="F:Ab3d.Assimp.AssimpWpfImporter.MeshNameSuffix">
+            <summary>
+            MeshNameSuffix is used in <see cref="P:Ab3d.Assimp.AssimpWpfImporter.NamedObjects"/> dictionary when the mesh has the same name as the model.
+            </summary>
+        </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.TransformCamerasAndLights">
             <summary>
             Gets or sets a Boolean that specifies if Node transformations are used to transform imported cameras and lights.
@@ -562,9 +573,10 @@
             Gets a dictionary that can be used to get a name of a 3D object (key = object, value = name)
             </summary>
         </member>
-        <member name="P:Ab3d.Assimp.AssimpWpfImporter.GenerateUniqueModelNames">
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.GenerateUniqueNames">
             <summary>
-            When true (by default) then unique object names are generated, e.g. when the objects from Assimp scene have the same name, the "__2", "__3", "__4", etc. suffixes added to the name (the first object does not have changed name).
+            When true (by default) the importer will make sure that the imported models, materials and meshes have unique names (adding "__2", "__3", etc. if not).
+            It is always allowed that model and mesh have the same name, but when two models have the same name and GenerateUniqueNames is true, then additional index is added to the name (the first object does not have changed name).
             </summary>
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.PreserveGroupNames">

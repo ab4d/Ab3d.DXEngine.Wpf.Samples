@@ -1,15 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>6.0.8585</Version>
-    <AssemblyVersion>6.0.8585.2070</AssemblyVersion>
-    <FileVersion>6.0.8585.2070</FileVersion> 
+    <Version>6.1.8746</Version>
+    <AssemblyVersion>6.1.8746.2070</AssemblyVersion>
+    <FileVersion>6.1.8746.2070</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,16 +23,16 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="6.0.8585" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.0.8585" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="11.0.8614" />  
+    <PackageReference Include="Ab3d.DXEngine" Version="6.1.8746" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.1.8746" />    
+    <PackageReference Include="Ab3d.PowerToys" Version="11.0.8746" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net70.csproj" />
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net70.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net80.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net80.csproj" />
   </ItemGroup>
 
   <ItemGroup>    

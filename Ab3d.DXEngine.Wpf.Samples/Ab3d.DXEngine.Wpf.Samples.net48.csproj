@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -44,14 +44,14 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=6.0.8585.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.6.0.8585\lib\net45\Ab3d.DXEngine.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine, Version=6.1.8746.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.6.1.8746\lib\net45\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=6.0.8585.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.6.0.8585\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=6.1.8746.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.6.1.8746\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=11.0.8614.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.11.0.8614\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=11.0.8746.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.11.0.8746\lib\net45\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -893,6 +893,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PowerToys\ContourLinesSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PowerToys\DucksLakeDemo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -980,6 +984,9 @@
     </Compile>
     <Compile Include="PowerToys\AssimpWpfImporterSample.xaml.cs">
       <DependentUpon>AssimpWpfImporterSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PowerToys\ContourLinesSample.xaml.cs">
+      <DependentUpon>ContourLinesSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToys\DucksLakeDemo.xaml.cs">
       <DependentUpon>DucksLakeDemo.xaml</DependentUpon>
@@ -1372,7 +1379,7 @@
     <Resource Include="Resources\Settings.png" />
   </ItemGroup>
   <ItemGroup>
-      <Content Include="..\lib\Assimp32.dll">
+    <Content Include="..\lib\Assimp32.dll">
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1380,7 +1387,7 @@
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>    
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

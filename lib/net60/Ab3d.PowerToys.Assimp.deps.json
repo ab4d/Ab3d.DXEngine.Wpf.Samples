@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "Ab3d.PowerToys.Assimp/11.0.8703": {
+      "Ab3d.PowerToys.Assimp/11.0.8746": {
         "dependencies": {
           "AssimpNet": "5.3.1.0"
         },
@@ -25,7 +25,7 @@
     }
   },
   "libraries": {
-    "Ab3d.PowerToys.Assimp/11.0.8703": {
+    "Ab3d.PowerToys.Assimp/11.0.8746": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

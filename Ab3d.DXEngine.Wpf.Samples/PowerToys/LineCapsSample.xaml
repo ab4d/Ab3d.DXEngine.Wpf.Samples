@@ -50,8 +50,8 @@
         <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#AA000000" BorderBrush="Black" BorderThickness="2">
             <StackPanel Orientation="Vertical" Margin="10">
 
-                <CheckBox Name="ShowPolyLinesCheckBox" Content="Show poly-lines (orange)" IsChecked="False" Foreground="Silver" Margin="0 2 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
-                <CheckBox Name="ShowMultiLinesCheckBox" Content="Show multi-lines (yellow)" IsChecked="False" Foreground="Silver" Margin="0 4 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
+                <CheckBox Name="ShowPolyLinesCheckBox" Content="Show poly-lines (orange)" IsChecked="True" Foreground="Silver" Margin="0 2 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
+                <CheckBox Name="ShowMultiLinesCheckBox" Content="Show multi-lines (yellow)" IsChecked="True" Foreground="Silver" Margin="0 4 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
 
                 <StackPanel Orientation="Horizontal" Margin="0 5">
                     <TextBlock Text="LineThickness:" Foreground="Silver" VerticalAlignment="Center" />

@@ -28,6 +28,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
     {
         private SpriteBatch _animatedSpriteBatch;
         private ShaderResourceView _animatedSpriteShaderResourceView;
+        
+        private ShaderResourceView _backgroundSpriteShaderResourceView;
 
         private DateTime _animationStartTime;
         private SharpDX.Point _animatedSpritePosition;
@@ -35,10 +37,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
         private SpriteBatch _bottomRightSpriteBatch;
         private ShaderResourceView _logoShaderResourceView;
         private int _bottomRightSpriteSize;
+        
+        private DisposeList _disposables;
 
         public SpritesSample()
         {
             InitializeComponent();
+
+            _disposables = new DisposeList();
 
             MainDXViewportView.DXSceneInitialized += delegate(object sender, EventArgs args)
             {
@@ -59,6 +65,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
                 _animatedRotationAngle = (float)elapsedTime.TotalSeconds * 90f;
 
                 UpdateAnimatedSprite();
+            };
+
+            this.Unloaded += delegate(object sender, RoutedEventArgs args)
+            {
+                _disposables.Dispose();
+                MainDXViewportView.Dispose();
             };
         }
 
@@ -89,6 +101,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             var textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\TreeTexture.png");
             var textureShaderResourceView = WpfMaterial.LoadTexture2D(dxScene.DXDevice, textureFileName);
 
+            _disposables.Add(textureShaderResourceView);
+
             // Draw the textureShaderResourceView to specified destination: at coordinates (20, 20) and with destination size (128 x 128 pixels)
             spriteBatch.Draw(textureShaderResourceView, new RectangleF(20, 70, 100, 150)); // Image size is: 256 x 415
 
@@ -97,6 +111,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // Use custom source rectangle to render from a part of source texture.
             textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\10x10-texture.png");
             textureShaderResourceView = WpfMaterial.LoadTexture2D(dxScene.DXDevice, textureFileName);
+
+            _disposables.Add(textureShaderResourceView);
 
             spriteBatch.Draw(textureShaderResourceView,
                 sourceRectangle: new RectangleF(0.2f, 0.4f, 0.4f, 0.5f), // note that source rectangle is always specified in relative coordinates
@@ -110,7 +126,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\ab4d-logo-220x220.DDS");
             _logoShaderResourceView = Ab3d.DirectX.TextureLoader.LoadShaderResourceView(dxScene.Device, textureFileName);
 
-            
+            _disposables.Add(_logoShaderResourceView);
+
             // Draw another sprite but use relative coordinates this time (show at the right size; size is 50% of the width and 50% of the height of the view)
             // Note that when window is resized, the sprite size will also change to preserve the relative size.
             spriteBatch.Draw(_logoShaderResourceView, new RectangleF(0.55f, 0.0f, 0.4f, 0.2f), isDestinationRelative: true);
@@ -125,6 +142,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
             var renderedBitmap = Ab3d.Utilities.BitmapRendering.RenderToBitmap(textBlock, 256, 0);
             var renderedSpriteShaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, renderedBitmap);
+
+            _disposables.Add(renderedSpriteShaderResourceView);
 
             spriteBatch.Draw(renderedSpriteShaderResourceView, new RectangleF(20, 400, 256, 64));
 
@@ -192,6 +211,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // ... and then converting that to a DirectX 11 ShaderResourceView
             _animatedSpriteShaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, bitmap);
 
+            _disposables.Add(_animatedSpriteShaderResourceView);
+
             _animatedSpritePosition = new SharpDX.Point(100, 180);
             UpdateAnimatedSprite();
 
@@ -242,6 +263,39 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             _animatedRotationAngle = (float)elapsedTime.TotalSeconds * 90f;
 
             UpdateAnimatedSprite();
+        }
+        
+        private void SetBackgroundImageButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_backgroundSpriteShaderResourceView != null) // Background already set?
+                return;
+
+            var dxScene = MainDXViewportView.DXScene;
+
+            // First create a new RenderingStep that will render sprites
+            var renderSpritesRenderingStep = new RenderSpritesRenderingStep("BackgroundSpritesRenderingStep");
+
+            // This step is added before other objects are rendered
+            dxScene.RenderingSteps.AddBefore(dxScene.DefaultRenderObjectsRenderingStep, renderSpritesRenderingStep);
+
+
+            // Create a new SpriteBatch (note that we specify the renderSpritesRenderingStep: if this is omitted then DefaultRenderSpritesRenderingStep is used) 
+            var backgroundSpriteBatch = dxScene.CreateSpriteBatch(renderSpritesRenderingStep, "BackgroundSpriteBatch");
+
+
+            // Load bitmap
+            var fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\SemiTransparentFrame.png");
+            var backgroundBitmap = new BitmapImage(new Uri(fileName));
+
+            // ... and then converting that to a DirectX 11 ShaderResourceView
+            _backgroundSpriteShaderResourceView = WpfMaterial.CreateTexture2D(dxScene.DXDevice, backgroundBitmap);
+
+            _disposables.Add(_backgroundSpriteShaderResourceView);
+
+            // Render the sprite
+            backgroundSpriteBatch.Begin();
+            backgroundSpriteBatch.Draw(_backgroundSpriteShaderResourceView, new RectangleF(0, 0, 1, 1), isDestinationRelative: true); // render to the whole background
+            backgroundSpriteBatch.End();
         }
     }
 }
