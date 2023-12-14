@@ -1089,11 +1089,25 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (assimpNode.HasMeshes && assimpNode.Meshes != null)
             {
                 int meshesCount = assimpNode.Meshes.Count;
-                if (meshesCount == 1 && assimpNodeName == nodeName)
+                if (meshesCount == 1)
                 {
-                    foundNode = assimpNode;
                     meshIndex = assimpNode.Meshes[0];
-                    return true;
+
+                    if (assimpNodeName == nodeName)
+                    {
+                        foundNode = assimpNode;
+                        return true;
+                    }
+
+                    // In case the assimpNodeName is already taken by the Model3DGroup, then Assimp importer adds mesh name as suffix. Check this here:
+                    var oneMeshName = assimpScene.Meshes[meshIndex].Name;
+                    CorrectXamlName(ref oneMeshName);
+
+                    if (assimpNodeName + '_' + oneMeshName == nodeName)
+                    {
+                        foundNode = assimpNode;
+                        return true;
+                    }
                 }
                 
                 if (meshesCount > 1 && assimpNodeName == nodeName)
