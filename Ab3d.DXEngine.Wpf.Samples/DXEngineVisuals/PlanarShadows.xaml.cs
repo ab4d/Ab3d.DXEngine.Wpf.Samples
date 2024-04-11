@@ -50,7 +50,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private PlanarShadowRenderingProvider _planarShadowRenderingProvider;
 
         private DisposeList _disposables;
-        private PlaneVisual3D _planeVisual3D;
 
         public PlanarShadows()
         {
@@ -372,40 +371,45 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             if (_planarShadowRenderingProvider == null)
                 return;
 
-            if (ShowShadowCheckBox.IsChecked ?? false)
-            {
-                if (_planeVisual3D != null)
-                {
-                    MainViewport.Children.Remove(_planeVisual3D);
-                    _planeVisual3D = null;
-                }
+            // To quickly disable planar shadows, just set IsEnabled to false.
+            // To remove the PlanarShadowRenderingProvider, use the commented code below.
+            _planarShadowRenderingProvider.IsEnabled = ShowShadowCheckBox.IsChecked ?? false;
 
-                if (MainDXViewportView.DXScene.ShadowRenderingProvider == null)
-                    MainDXViewportView.DXScene.InitializeShadowRendering(_planarShadowRenderingProvider);
-            }
-            else
-            {
-                if (MainDXViewportView.DXScene.ShadowRenderingProvider != null)
-                    MainDXViewportView.DXScene.InitializeShadowRendering(null);
+            // The following code removes the PlanarShadowRenderingProvider and adds it back to scene:
+            //if (ShowShadowCheckBox.IsChecked ?? false)
+            //{
+            //    if (_planeVisual3D != null)
+            //    {
+            //        MainViewport.Children.Remove(_planeVisual3D);
+            //        _planeVisual3D = null;
+            //    }
 
-                // Because we are rendering the plane with ShadowRenderingProvider,
-                // we need to add a new plane to the scene after disabling the ShadowRenderingProvider.
-                //
-                // NOTE:
-                // If we would always have a PlaneVisual3D on the scene, then it would also generate a shadow.
-                // To prevent casting a shadow, we could change the rendering queue of the plane.
-                // This way it would not be rendered as standard object, but would be rendered specially.
-                // For example:
-                //_planeVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, _planarShadowRenderingProvider.ShadowPlaneRenderingQueue);
+            //    var shadowRenderingProviders = MainDXViewportView.DXScene.GetShadowRenderingProviders();
+            //    if (shadowRenderingProviders == null)
+            //        MainDXViewportView.DXScene.InitializeShadowRendering(_planarShadowRenderingProvider);
+            //}
+            //else
+            //{
+            //    MainDXViewportView.DXScene.RemoveShadowRenderingProvider(_planarShadowRenderingProvider);
 
-                _planeVisual3D = new PlaneVisual3D()
-                {
-                    Size     = new Size(400, 400),
-                    Material = new DiffuseMaterial(new ImageBrush(new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/10x10-texture.png")))))
-                };
+            //    // Because we are rendering the plane with ShadowRenderingProvider,
+            //    // we need to add a new plane to the scene after disabling the ShadowRenderingProvider.
+            //    //
+            //    // NOTE:
+            //    // If we would always have a PlaneVisual3D on the scene, then it would also generate a shadow.
+            //    // To prevent casting a shadow, we could change the rendering queue of the plane.
+            //    // This way it would not be rendered as standard object, but would be rendered specially.
+            //    // For example:
+            //    //_planeVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, _planarShadowRenderingProvider.ShadowPlaneRenderingQueue);
 
-                MainViewport.Children.Add(_planeVisual3D);
-            }
+            //    _planeVisual3D = new PlaneVisual3D()
+            //    {
+            //        Size     = new Size(400, 400),
+            //        Material = new DiffuseMaterial(new ImageBrush(new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources/10x10-texture.png")))))
+            //    };
+
+            //    MainViewport.Children.Add(_planeVisual3D);
+            //}
         }
     }
 }

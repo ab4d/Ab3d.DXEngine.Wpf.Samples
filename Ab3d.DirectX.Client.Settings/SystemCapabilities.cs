@@ -15,10 +15,6 @@ namespace Ab3d.DirectX.Client.Settings
     /// </summary>
     public class SystemCapabilities : IDisposable
     {
-#if LOGGING
-        private static readonly object Logger = NLog.LogManager.GetCurrentClassLogger();
-#endif
-
         /// <summary>
         /// Gets all DirectX Adapters on this computer.
         /// </summary>
@@ -93,10 +89,6 @@ namespace Ab3d.DirectX.Client.Settings
         /// </summary>
         public SystemCapabilities()
         {
-#if LOGGING
-            My.Log.Trace(Logger, "SystemCapabilities constructor");
-#endif
-
             var allAdapterCapabilities = new List<AdapterCapabilitiesBase>();
 
             if (IsSupportedOS) // If this operating system support DirectX 11?
@@ -216,10 +208,6 @@ namespace Ab3d.DirectX.Client.Settings
         {
             if (AllAdapterCapabilities == null || AllAdapterCapabilities.Count == 0 || !IsSupportedOS)
             {
-#if LOGGING
-                My.Log.Trace(Logger, "RecommendedAdapter: WPF 3D");
-#endif
-
                 bestAdapterCapabilities = WpfAdapterCapabilities;
                 renderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Normal;
 
@@ -280,10 +268,6 @@ namespace Ab3d.DirectX.Client.Settings
                     renderQuality = AdapterCapabilitiesBase.RenderQualityTypes.Normal;
                 }
             }
-
-#if LOGGING
-            My.Log.Trace(Logger, "RecommendedAdapter: {0}; RenderQuality: {1}", bestAdapterCapabilities.DisplayName, renderQuality);
-#endif
         }
 
         /// <summary>
@@ -340,10 +324,6 @@ namespace Ab3d.DirectX.Client.Settings
 
             try
             {
-#if LOGGING
-                My.Log.Trace(Logger, "Start CheckDebugSdkAvailable");
-#endif
-
                 // Create a null device with debug layer to check if it is available
                 var tempDevice = DXDevice.CreateDevice(DriverType.Null, adapter: null, deviceCreationFlags: DeviceCreationFlags.Debug, featureLevels: null);
 
@@ -351,22 +331,12 @@ namespace Ab3d.DirectX.Client.Settings
                 {
                     deviceCreated = true;
                     tempDevice.Dispose();
-
-#if LOGGING
-                    My.Log.Trace(Logger, "  Debug device available");
-#endif
                 }
             }
-#if LOGGING
-            catch(Exception ex)
-            {
-
-                My.Log.ErrorException(Logger, "  Error creating null debug device - no debug layer available", ex);
-            }
-#else
             catch
-            { }
-#endif
+            {
+                // pass
+            }
 
             return deviceCreated;
         }
@@ -397,16 +367,10 @@ namespace Ab3d.DirectX.Client.Settings
                 // If user have installed Platform update than this OS supports DirectX
                 try
                 {
-#if LOGGING
-                    My.Log.Trace(Logger, "Start loading D3D11.DLL library");
-#endif
                     libPtr = NativeMethods.LoadLibrary("D3D11.DLL"); // according to Direct3D 11 Install Helper we can check if library can be loaded
                 }
                 catch
                 {
-#if LOGGING
-                    My.Log.Trace(Logger, "  Failed to load D3D11.DLL library");
-#endif
                     libPtr = IntPtr.Zero;
                 }
 
@@ -421,7 +385,9 @@ namespace Ab3d.DirectX.Client.Settings
                     NativeMethods.FreeLibrary(libPtr);
                 }
                 catch
-                { }
+                {
+                    // pass
+                }
             }
 
             // If we come to here than the OS is supported

@@ -819,7 +819,12 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
         private void DumpCurrentSceneMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            ShowFullSceneDump();
+            ShowFullSceneDump(dumpXaml: false);
+        }
+        
+        private void DumpCurrentSceneWithXamlMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowFullSceneDump(dumpXaml: false);
         }
         
         private void RenderObjectIdMenuItemMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -1635,10 +1640,15 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
             sb.AppendLine();
 
 
-            if (dxView.DXScene.ShadowRenderingProvider != null)
+            var shadowRenderingProviders = dxView.DXScene.GetShadowRenderingProviders();
+            if (shadowRenderingProviders != null)
             {
-                sb.Append("  DXScene.ShadowRenderingProvider:\r\n  ");
-                DumpObjectProperties(dxView.DXScene.ShadowRenderingProvider, sb, "    ");
+                sb.Append("  DXScene.ShadowRenderingProviders:\r\n  ");
+                for (var i = 0; i < shadowRenderingProviders.Length; i++)
+                {
+                    sb.AppendFormat("    [{0}] {1}\r\n", i, shadowRenderingProviders[i].GetType().Name);
+                    DumpObjectProperties(shadowRenderingProviders[i], sb, "      ");
+                }
             }
 
             if (dxView.DXScene.VirtualRealityProvider != null)
@@ -2118,7 +2128,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
             }
         }
 
-        private void ShowFullSceneDump()
+        private void ShowFullSceneDump(bool dumpXaml)
         {
             // Start with empty DumpFile 
             System.IO.File.WriteAllText(DumpFileName, "Ab3d.DXEngine FULL SCENE DUMP\r\n\r\n");
@@ -2256,48 +2266,52 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 
 
                         // Add XAML of the scene:
-                        var dxViewport3D = GetDXViewportView(dxView);
-                        if (dxViewport3D != null && dxViewport3D.Viewport3D != null)
+                        if (dumpXaml)
                         {
-                            string xaml;
-
-                            try
+                            var dxViewport3D = GetDXViewportView(dxView);
+                            if (dxViewport3D != null && dxViewport3D.Viewport3D != null)
                             {
-                                xaml = GetXaml(dxViewport3D.Viewport3D);
-                            }
-                            catch (Exception ex)
-                            {
-                                xaml = "Exception saving Viewport3D to XAML:\r\n" + ex.Message;
-                            }
+                                string xaml;
 
-                            AppendDumpText("Viewport3D XAML:", xaml + "\r\n");
+                                try
+                                {
+                                    xaml = GetXaml(dxViewport3D.Viewport3D);
+                                }
+                                catch (Exception ex)
+                                {
+                                    xaml = "Exception saving Viewport3D to XAML:\r\n" + ex.Message;
+                                }
+
+                                AppendDumpText("Viewport3D XAML:", xaml + "\r\n");
 
 
-                            try
-                            {
-                                xaml = GetViewport3DXaml(dxViewport3D.Viewport3D);
+                                try
+                                {
+                                    xaml = GetViewport3DXaml(dxViewport3D.Viewport3D);
+                                }
+                                catch (Exception ex)
+                                {
+                                    xaml = "Exception creating cleaned Viewport3D XAML:\r\n" + ex.Message;
+                                }
+
+                                AppendDumpText("Cleaned Viewport3D XAML:", xaml + "\r\n");
                             }
-                            catch (Exception ex)
-                            {
-                                xaml = "Exception creating cleaned Viewport3D XAML:\r\n" + ex.Message;
-                            }
-
-                            AppendDumpText("Cleaned Viewport3D XAML:", xaml + "\r\n");
                         }
 
-
-                        // Finally we add rendered bitmap as base64 string.
-                        // This is done 
-                        string renderedBitmapBase64String = null;
-
-                        // To get a copy of next rendered scene, we can use the RegisterBackBufferMapping method that is called when the rendered scene's bitmap is ready to be copied to main memory
-                    
-                        var renderedBitmap = dxView.RenderToBitmap();
-                        renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
-                
-                        // After we have subscribed to capture next frame, we can force rendering that frame
                         try
                         {
+                            
+                            // Finally we add rendered bitmap as base64 string.
+                            // This is done 
+                            string renderedBitmapBase64String = null;
+
+                            // To get a copy of next rendered scene, we can use the RegisterBackBufferMapping method that is called when the rendered scene's bitmap is ready to be copied to main memory
+                    
+                            var renderedBitmap = dxView.RenderToBitmap();
+                            renderedBitmapBase64String = GetRenderedBitmapBase64String(renderedBitmap);
+
+
+                            // After we have subscribed to capture next frame, we can force rendering that frame
                             var savedLogLevels = DXDiagnostics.LogLevel;
                             var savedLogAction = DXDiagnostics.LogAction;
 
@@ -2333,8 +2347,9 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
                                 }));
                             }
                         }
-                        catch
+                        catch (Exception ex) 
                         {
+                            AppendDumpText("Error saving rendered bitmap:", ex.Message);
                         }
                     }
 

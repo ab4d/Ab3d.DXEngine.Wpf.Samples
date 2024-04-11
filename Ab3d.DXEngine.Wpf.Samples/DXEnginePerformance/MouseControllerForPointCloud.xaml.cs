@@ -11,18 +11,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ab3d.Common.Cameras;
-using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
+using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Visuals;
 using SharpDX;
 using SharpDX.Direct3D;
-using Point = System.Windows.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -75,6 +73,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     InitializePointCloud(positions, positionsBounds, positionColors);
 
 
+                    // PointCloudMouseCameraController class is available with full source code (see PointCloudMouseCameraController.cs in Common folder).
                     // Set DXScene and OptimizedPointMesh to PointCloudMouseCameraController1
                     PointCloudMouseCameraController1.DXScene = MainDXViewportView.DXScene;
                     PointCloudMouseCameraController1.OptimizedPointMesh = _optimizedPointMesh;
@@ -254,47 +253,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 new System.Windows.Point(0, 0)); // endPoint (offset == 1)
 
             return linearGradientBrush;
-        }
-    }
-
-
-
-    public class PointCloudMouseCameraController : MouseCameraController
-    {
-        public DXScene DXScene { get; set; }
-        public OptimizedPointMesh<Vector3> OptimizedPointMesh { get; set; }
-
-        /// <summary>
-        /// When set to a value bigger then 0, then the distance from the ray (from mouse position)
-        /// to the closest position need to be smaller that the specified amount for this to be a valid position.
-        /// This prevents getting positions that are far from the ray.
-        /// </summary>
-        public float MaxDistanceToAnyPosition { get; set; }
-
-        public PointCloudMouseCameraController()
-        {
-        }
-
-        public PointCloudMouseCameraController(DXScene dxScene, OptimizedPointMesh<Vector3> optimizedPointMesh)
-        {
-            OptimizedPointMesh = optimizedPointMesh;
-            DXScene            = dxScene;
-        }
-
-        protected override Point3D? GetRotationCenterPositionFromMousePosition(Point mousePosition, bool calculatePositionWhenNoObjectIsHit)
-        {
-            if (OptimizedPointMesh == null || DXScene == null)
-                return base.GetRotationCenterPositionFromMousePosition(mousePosition, calculatePositionWhenNoObjectIsHit);
-
-            var mouseRay = DXScene.GetRayFromCamera((int)mousePosition.X, (int)mousePosition.Y);
-
-            float distance;
-            var   closestPositionIndex = OptimizedPointMesh.GetClosestPositionIndex(mouseRay, out distance);
-
-            if (closestPositionIndex != -1 && MaxDistanceToAnyPosition > 0 && distance < MaxDistanceToAnyPosition)
-                return OptimizedPointMesh.PositionsArray[closestPositionIndex].ToWpfPoint3D();
-
-            return null;
         }
     }
 }

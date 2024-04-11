@@ -21,6 +21,7 @@ using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
 using SharpDX;
 using SharpDX.Direct3D;
+using Matrix = SharpDX.Matrix;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -50,6 +51,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private OptimizedPointMesh<Vector3> _optimizedPointMesh;
 
+        private Vector3[] _positions;
+        private Color4[] _positionColors;
+        private Color4[] _savedPositionColors;
+        private BoundingBox _positionsBounds;
+        private CustomRenderableNode _customRenderableNode;
+        private SceneNodeVisual3D _sceneNodeVisual3D;
+
         public ColoredPointCloud()
         {
             InitializeComponent();
@@ -63,12 +71,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 try
                 {
-                    Vector3[] positions;
-                    var positionsBounds = new BoundingBox(new Vector3(-100, 0, -100), new Vector3(100, 20, 100));
+                    _positionsBounds = new BoundingBox(new Vector3(-100, 0, -100), new Vector3(100, 20, 100));
 
                     GenerateSinusPointCloudData(xCount: 300, yCount: 300, 
-                                                bounds: positionsBounds,
-                                                positions: out positions);
+                                                bounds: _positionsBounds,
+                                                positions: out _positions);
 
 
                     var linearGradientBrush = CreateDataGradientBrush();
@@ -78,16 +85,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     // into a value from 0 to 1 based on the y position.
                     // This value will be used to define the color from the gradientColorsArray.
 
-                    float minValue = positionsBounds.Minimum.Y;
-                    float maxValue = positionsBounds.Maximum.Y;
+                    float minValue = _positionsBounds.Minimum.Y;
+                    float maxValue = _positionsBounds.Maximum.Y;
 
                     var offsets = new Vector3(0, -minValue, 0);
                     var factors = new Vector3(0, 1.0f / (maxValue - minValue), 0);
-                    Color4[] positionColors = CreatePositionColorsArray(positions, offsets, factors, gradientColorsArray);
+                    _positionColors = CreatePositionColorsArray(_positions, offsets, factors, gradientColorsArray);
 
 
 
-                    InitializePointCloud(positions, positionsBounds, positionColors, UseOptimizedPointMesh, DisableDepthRead, DisableDepthWrite);
+                    InitializePointCloud(_positions, _positionsBounds, _positionColors, UseOptimizedPointMesh, DisableDepthRead, DisableDepthWrite);
                 }
                 finally
                 {
@@ -154,16 +161,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
 
                 // To render OptimizedPointMesh we need to use CustomRenderableNode that provides custom rendering callback action.
-                var customRenderableNode = new CustomRenderableNode(RenderAction, _optimizedPointMesh.Bounds, _optimizedPointMesh, _pixelMaterial);
-                customRenderableNode.Name = "CustomRenderableNode";
+                _customRenderableNode = new CustomRenderableNode(RenderAction, _optimizedPointMesh.Bounds, _optimizedPointMesh, _pixelMaterial);
+                _customRenderableNode.Name = "CustomRenderableNode";
                 //customRenderableNode.CustomRenderingQueue = MainDXViewportView.DXScene.BackgroundRenderingQueue;
 
-                _disposables.Add(customRenderableNode);
+                _disposables.Add(_customRenderableNode);
 
-                var sceneNodeVisual3D = new SceneNodeVisual3D(customRenderableNode);
+                _sceneNodeVisual3D = new SceneNodeVisual3D(_customRenderableNode);
                 //sceneNodeVisual3D.Transform = transform;
 
-                MainViewport.Children.Add(sceneNodeVisual3D);
+                MainViewport.Children.Add(_sceneNodeVisual3D);
             }
             else
             {
@@ -307,6 +314,91 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 new System.Windows.Point(0, 0)); // endPoint (offset == 1)
 
             return linearGradientBrush;
+        }
+
+
+        private void TransformButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_positions == null || MainDXViewportView.DXScene == null)
+                return;
+
+            var transform = _customRenderableNode.Transform;
+            if (transform == null)
+            {
+                transform = new Transformation(Matrix.Identity);
+                _customRenderableNode.Transform = transform;
+            }
+
+            transform.Value *= Matrix.Translation(0, 10, 0); // move up for 10 units
+
+            _customRenderableNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.TransformChanged);
+            MainDXViewportView.Refresh();
+        }
+        
+        private void ChangeColorButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_positionColors == null || MainDXViewportView.DXScene == null)
+                return;
+
+            var rnd = new Random();
+            var randomPixelColor = System.Windows.Media.Color.FromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255)).ToColor4();
+
+            // Change colors of 1/5 of positions to green
+            int oneFifth = _positionColors.Length / 5;
+            for (var i = 0; i < oneFifth; i++)
+                _positionColors[i] = randomPixelColor;
+
+            _pixelMaterial.UpdatePixelColors();
+            
+            if (_savedPositionColors != null)
+            {
+                // Also update _savedPositionColors
+                for (var i = 0; i < oneFifth; i++)
+                    _savedPositionColors[i] = randomPixelColor;
+            }
+
+            MainDXViewportView.DXScene.NotifyChange(DXScene.ChangeNotifications.RenderingPrimitiveDirty);
+            MainDXViewportView.Refresh();
+        }
+        
+        
+
+        private void ShowHideButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_positionColors == null || MainDXViewportView.DXScene == null)
+                return;
+
+            int oneFifth = _positionColors.Length / 5;
+
+            if (_positionColors[oneFifth].Alpha == 0)
+            {
+                ShowHideButton.Content = "Hide";
+
+                // Restore position colors
+                Array.Copy(_savedPositionColors, _positionColors, _positionColors.Length);
+            }
+            else
+            {
+                // Save position colors
+                if (_savedPositionColors == null)
+                    _savedPositionColors = new Color4[_positionColors.Length];
+
+                // NOTE:
+                // We could save only 1/5 of the colors (those that are changes below), but for simplicity we save all colors
+                Array.Copy(_positionColors, _savedPositionColors, _positionColors.Length); 
+
+
+                // set color's alpha value to 0, to hide the pixel
+                for (var i = oneFifth; i < oneFifth * 2; i++)
+                    _positionColors[i] = new Color4(0, 0, 0, 0); 
+
+                ShowHideButton.Content = "Show";
+            }
+
+            _pixelMaterial.UpdatePixelColors();
+
+            MainDXViewportView.DXScene.NotifyChange(DXScene.ChangeNotifications.RenderingPrimitiveDirty);
+            MainDXViewportView.Refresh();
         }
     }
 }

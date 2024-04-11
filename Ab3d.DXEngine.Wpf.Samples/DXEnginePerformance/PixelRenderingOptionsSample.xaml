@@ -7,6 +7,7 @@
       xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
       xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"   
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="InstancedMeshGeometry3DTest"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="800">
@@ -15,32 +16,40 @@
         <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="White">
             <Viewport3D Name="MainViewport">
                 <visuals:BoxVisual3D CenterPosition="50 -5 -30" Size="300 10 600" Material="Silver" />
-                
-                <visuals:TextBlockVisual3D Position="70 1 -200" PositionType="Left" FontSize="14"
-                                           TextDirection="1 0 0" UpDirection="0 0 -1"
-                                           Text="Per pixel color" />
-
-                <visuals:TextBlockVisual3D Position="70 1 -100" PositionType="Left" FontSize="14"
-                                           TextDirection="1 0 0" UpDirection="0 0 -1"
-                                           Text="Per pixel color&#x0d;&#x0a;with color mask&#x0d;&#x0a;(0 255 0)" />
-
-                <visuals:TextBlockVisual3D Position="70 1 0" PositionType="Left" FontSize="14"
-                                           TextDirection="1 0 0" UpDirection="0 0 -1"
-                                           Text="Per pixel size" />
-
-                <visuals:TextBlockVisual3D Position="70 1 100" PositionType="Left" FontSize="14"
-                                           TextDirection="1 0 0" UpDirection="0 0 -1"
-                                           Text="Per pixel size&#x0d;&#x0a;with scale factor 3" />
 
                 <visuals:TextBlockVisual3D Position="70 1 200" PositionType="Left" FontSize="14"
                                            TextDirection="1 0 0" UpDirection="0 0 -1"
                                            Text="Per pixel&#x0d;&#x0a;color and size" />
 
+                <visuals:TextBlockVisual3D Position="70 1 100" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel color" />
+
+                <visuals:TextBlockVisual3D Position="70 1 0" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel color&#x0d;&#x0a;with color mask&#x0d;&#x0a;(0 255 0)" />
+
+                <visuals:TextBlockVisual3D Position="70 1 -100" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel size" />
+
+                <visuals:TextBlockVisual3D Position="70 1 -200" PositionType="Left" FontSize="14"
+                                           TextDirection="1 0 0" UpDirection="0 0 -1"
+                                           Text="Per pixel size&#x0d;&#x0a;with scale factor 2" />
+
+                <ModelVisual3D x:Name="PixelsRootVisual3D" />
+
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <AmbientLight Color="#444" />
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+
             </Viewport3D>
         </dxControls:DXViewportView>
 
         <cameras:TargetPositionCamera Name="Camera1"
-                                      Heading="-20" Attitude="-40" Bank="0" Distance="800" 
+                                      Heading="-20" Attitude="-35" Bank="0" Distance="800" 
                                       TargetPosition="10 -75 -20"
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
@@ -53,8 +62,30 @@
                                     ZoomMode="MousePosition"
                                     TargetCamera="{Binding ElementName=Camera1}"/>
 
-        <ab3d:MouseCameraControllerInfo HorizontalAlignment="Right" VerticalAlignment="Bottom"
+        <ab3d:MouseCameraControllerInfo HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}" />
+
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Background="#CCFFFFFF">
+            <StackPanel Orientation="Vertical" Margin="10 8">
+                <CheckBox Name="IsCircularPixelCheckBox" Content="IsCircularPixel" IsChecked="False" FontWeight="Bold" Margin="0 0 0 5" VerticalAlignment="Center" Checked="OnIsCircularPixelCheckedChanged" Unchecked="OnIsCircularPixelCheckedChanged" />
+
+                <CheckBox Name="IsWorldSizeCheckBox" Content="IsWorldSize" IsChecked="False" FontWeight="Bold" Margin="0 0 0 5" VerticalAlignment="Center" Checked="OnIsWorldSizeCheckedChanged" Unchecked="OnIsWorldSizeCheckedChanged" 
+                          ToolTip="When checked then the pixel size is specified in 3D world coordinates&#x0a;(when using perspective camera, the size of the pixel is smaller when it is farther away from the camera).&#x0a;When unchecked, then the size is defined in screen coordinates.&#x0a;(the size of the pixel is the same regardless of the distance from the camera)"/>
+
+                <CheckBox Name="UseTextureCheckBox" Content="Use texture (billboards)" IsChecked="False" FontWeight="Bold" Margin="0 0 0 0" VerticalAlignment="Center" Checked="OnUseTextureCheckedChanged" Unchecked="OnUseTextureCheckedChanged" />
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <CheckBox Name="HasTransparentPixelColorsCheckBox" Content="Has transparent pixel colors" IsChecked="False" FontWeight="Bold"
+                              Checked="OnHasTransparentPixelColorsCheckedChanged" Unchecked="OnHasTransparentPixelColorsCheckedChanged" />
+                    <controls:InfoControl x:Name="HasTransparentPixelColorsInfoControl" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                <CheckBox Name="FixUpVectorCheckBox" Content="Fix up vector to (0,1,0)" IsEnabled="False"  IsChecked="False" FontWeight="Bold" VerticalAlignment="Center" Checked="OnFixUpVectorCheckedChanged" Unchecked="OnFixUpVectorCheckedChanged" />
+                    <controls:InfoControl x:Name="FixUpVectorInfoControl" Margin="5 0 0 0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
         <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Foreground="#333" Margin="5 0 5 4" TextWrapping="Wrap"
                    HorizontalAlignment="Left" VerticalAlignment="Top"

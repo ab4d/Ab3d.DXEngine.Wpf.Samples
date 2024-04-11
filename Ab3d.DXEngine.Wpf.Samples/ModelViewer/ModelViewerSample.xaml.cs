@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -68,7 +69,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private Point _mouseDownPosition;
         private bool _isLeftMouseDown;
         private bool _isDoubleClick;
-        
+
+        private EdgeLinesFactory _edgeLinesFactory;
+        private Point3DCollection _wireframeLinePositions;
+        private Point3DCollection _edgeLinePositions;
+        private double _lastEdgeStartAngle;
+
+        private ScreenSpaceAmbientOcclusionRenderingProvider _ssaoRenderingProvider;
+
         public ModelViewerSample()
         {
             InitializeComponent();
@@ -86,6 +94,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             SetCurrentCamera(Camera1);
 
 
+            MainDXViewportView.DXSceneInitialized += (sender, args) =>
+            {
+                if (MainDXViewportView.DXScene != null) // if not wpf 3d rendering
+                {
+                    _ssaoRenderingProvider = new ScreenSpaceAmbientOcclusionRenderingProvider();
+                    _ssaoRenderingProvider.IsEnabled = SSAOCheckBox.IsChecked ?? false;
+
+                    MainDXViewportView.DXScene.InitializeShadowRendering(_ssaoRenderingProvider);
+                }
+
+                
+                //string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.3DS");
+                string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\RobotModel\Robot_Main.FBX");
+                LoadModel(startUpFileName);
+            };
+
+
             // Use helper class (defined in this sample project) to load the native Assimp libraries
             Ab3d.Assimp.AssimpLoader.LoadAssimpNativeLibrary();
 
@@ -93,8 +118,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             dragAndDropHelper.FileDropped += (sender, args) => LoadModel(args.FileName);
 
 
-            string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.3DS");
-            LoadModel(startUpFileName);
 
             // To allow using left mouse button for camera rotation and for object selection, we need to subscribe to PreviewMouse events.
             // We also need to set the MouseMoveThreshold in the MouseCameraController to prevent starting a rotation on mouse down.
@@ -115,6 +138,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
+                if (_ssaoRenderingProvider != null)
+                {
+                    _ssaoRenderingProvider.Dispose();
+                    _ssaoRenderingProvider = null;
+                }
+
                 if (_assimpWpfImporter != null)
                     _assimpWpfImporter.Dispose(); // Dispose unmanaged resource
 
@@ -142,6 +171,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (_assimpWpfImporter != null)
                 _assimpWpfImporter.Dispose();
 
+            
             // Create an instance of AssimpWpfImporter
             _assimpWpfImporter = new Ab3d.Assimp.AssimpWpfImporter();
 
@@ -192,6 +222,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     MessageBox.Show("Error importing file:\r\n" + ex.Message);
                 }
 
+
+                // Setup Physically Based Rendering (PBR) materials
+                // See also PhysicallyBasedRendering/PBRModelViewer sample for more info (the sample also shows individual PBR maps)
+                bool usePbrMaterials = UsePbrMaterialsCheckBox.IsChecked ?? false;
+                if (readModel3D != null && usePbrMaterials && MainDXViewportView.DXScene != null && MainDXViewportView.DXScene.DXDevice != null)
+                {
+                    bool findPbrMapsFromFileNames = FindPbrFilesCheckBox.IsChecked ?? false;
+                    var pbrMaterials = AssimpPbrHelper.SetupPbrMaterials(_assimpWpfImporter, MainDXViewportView.DXScene.DXDevice, findPbrMapsFromFileNames, true, environmentCubeMap: null, texturesCache: null);
+
+                    if (pbrMaterials != null)
+                    {
+                        foreach (var physicallyBasedMaterial in pbrMaterials.Values)
+                            _modelDisposeList.Add(physicallyBasedMaterial);
+                    }
+                }
+
+
                 // After the model is read and if the object names are defined in the file,
                 // you can get the model names by assimpWpfImporter.ObjectNames
                 // or get object by name with assimpWpfImporter.NamedObjects
@@ -213,6 +260,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 UpdateLights(_assimpWpfImporter.Lights);
 
 
+                // When only a single 3D object is read, then select it
+                // This will enable Info button
+                if (readModel3D is GeometryModel3D)
+                    SelectTreeViewItem(readModel3D);
+
+
                 if (isNewFile && readModel3D != null)
                 {
                     // Adjust the camera so the bounding box of the loaded model will fit into view
@@ -222,6 +275,26 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     
                     // Select perspective camera
                     CameraComboBox.SelectedIndex = CameraComboBox.Items.Count - 2;
+
+
+                    // Adjust the SSAO occlusion radius slider
+                    var diagonalLength = readModel3D.Bounds.GetDiagonalLength();
+                    if (diagonalLength < 100 || diagonalLength > 500)
+                        OcclusionRadiusSlider.Maximum = diagonalLength * 0.2;
+                    else
+                        OcclusionRadiusSlider.Maximum = 99;
+                 
+                    // Adjust size of TextBlock that shows the selected occlusion radius
+                    if (OcclusionRadiusSlider.Maximum >= 100)
+                        OcclusionRadiusTextBlock.Width = 125;
+                    else
+                        OcclusionRadiusTextBlock.Width = 110;
+
+
+                    OcclusionRadiusSlider.Value = OcclusionRadiusSlider.Maximum * 0.2;
+
+                    if (_ssaoRenderingProvider != null)
+                        _ssaoRenderingProvider.OcclusionRadius = (float)OcclusionRadiusSlider.Value;
                 }
                 else
                 {
@@ -286,11 +359,29 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             bool showPolygonLines = ReadPolygonIndicesCheckBox.IsChecked ?? false;
 
-            var wireframeLinePositions = WireframeFactory.CreateWireframeLinePositions(model3D, null, showPolygonLines, removedDuplicates: true);
-            
-            AllWireframesLineVisual3D.Positions = wireframeLinePositions;
+            if (ShowEdgeLinesCheckBox.IsChecked ?? false)
+            {
+                if (_edgeLinesFactory == null)
+                    _edgeLinesFactory = new EdgeLinesFactory();
 
-            UpdateWireframe();
+                var edgeStartAngleInDegrees = GetSelectedEdgeStartAngle();
+
+                _edgeLinePositions = _edgeLinesFactory.GetEdgeLines(model3D, edgeStartAngleInDegrees);
+                _lastEdgeStartAngle = edgeStartAngleInDegrees;
+
+                AllEdgeWireframesLineVisual3D.Positions = _edgeLinePositions;
+            }
+            else if (ShowWireframeCheckBox.IsChecked ?? false)
+            {
+                _wireframeLinePositions = WireframeFactory.CreateWireframeLinePositions(model3D, null, showPolygonLines, removedDuplicates: true);
+                AllEdgeWireframesLineVisual3D.Positions = _wireframeLinePositions;
+            }
+            else
+            {
+                AllEdgeWireframesLineVisual3D.Positions = null;
+            }
+
+            UpdateEdgeWireframeLines();
 
 
             // If the read model already define some lights, then do not show the Camera's light
@@ -308,7 +399,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             }
 
 
-            FillTreeView(model3D);
+            
+            int geometryModelsCount = 0;
+            Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(model3D, null, (childModel3D, transform3D) =>
+            {
+                geometryModelsCount ++;
+            });
+
+            bool expandAllTreeItems = geometryModelsCount < 100;
+
+            FillTreeView(model3D, expandAllTreeItems);
         }
 
         private bool UpdateAvailableCameras(List<Camera> importedCameras)
@@ -432,8 +532,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                 // No imported lights - use build-in lights
                 CameraLightCheckBox.IsChecked = true;
+                SideLightCheckBox.IsChecked = true;
                 TopDownLightCheckBox.IsChecked = false;
-                SideLightCheckBox.IsChecked = false;
             }
 
             if (_currentCamera != null)
@@ -446,6 +546,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                 UpdateAmbientLight();
             }
+
+            UpdateSceneLights();
         }
 
         private void ClearCurrentModel()
@@ -463,8 +565,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (_savedBackMaterials != null)
                 _savedBackMaterials.Clear();
 
-            AllWireframesLineVisual3D.Positions = null;
-            SelectedModelWireframeVisual3D.Positions = null;
+            _wireframeLinePositions = null;
+            _edgeLinePositions = null;
+
+            AllEdgeWireframesLineVisual3D.Positions = null;
+            SelectedModelLinesVisual3D.Positions = null;
             NormalLinesVisual3D.Positions = null;
         }
 
@@ -472,7 +577,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private void LoadButton_OnClick(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            openFileDialog.InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
+            openFileDialog.InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models");
 
             openFileDialog.Filter = "3D model file (*.*)|*.*";
             openFileDialog.Title = "Open 3D model file";
@@ -557,41 +662,44 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             }
         }
 
-        public void FillTreeView(Model3D rootModel)
+        public void FillTreeView(Model3D rootModel, bool expandTreeItems)
         {
             ElementsTreeView.BeginInit();
             ElementsTreeView.Items.Clear();
 
+
             var rootItem = new TreeViewItem
             {
                 Header = GetTreeViewDisplayName(rootModel),
-                Tag    = rootModel
+                Tag    = rootModel,
+                IsExpanded = expandTreeItems
             };
 
             ElementsTreeView.Items.Add(rootItem);
 
             if (rootModel is Model3DGroup)
-                FillTreeView(rootItem, (Model3DGroup)rootModel);
+                FillTreeView(rootItem, (Model3DGroup)rootModel, expandTreeItems);
 
             rootItem.IsExpanded = true;
 
             ElementsTreeView.EndInit();
         }
 
-        private void FillTreeView(TreeViewItem currentItem, Model3DGroup currentModel)
+        private void FillTreeView(TreeViewItem currentItem, Model3DGroup currentModel, bool expandTreeItems)
         {
             foreach (Model3D oneModel in currentModel.Children)
             {
                 var newItem = new TreeViewItem
                 {
                     Header = GetTreeViewDisplayName(oneModel),
-                    Tag = oneModel
+                    Tag = oneModel,
+                    IsExpanded = expandTreeItems
                 };
 
                 currentItem.Items.Add(newItem);
 
                 if (oneModel is Model3DGroup)
-                    FillTreeView(newItem, (Model3DGroup)oneModel);
+                    FillTreeView(newItem, (Model3DGroup)oneModel, expandTreeItems);
             }
         }
 
@@ -898,7 +1006,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             Transform3D selectedModelParentTransform3D;
             Transform3D selectedModelFullTransform3D;
 
-            if (selectedModel3D == _loadedModel3D) // when we select the root node, this is processed as deselecting any selected model
+            if (selectedModel3D == _loadedModel3D && !(_loadedModel3D is GeometryModel3D)) // when we select the root node, this is processed as deselecting any selected model
                 selectedModel3D = null; 
 
             if (selectedModel3D == null)
@@ -953,7 +1061,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             _selectedModelParentTransform3D = selectedModelParentTransform3D;
             _selectedModelFullTransform3D   = selectedModelFullTransform3D;
 
-            UpdateWireframe();
+            UpdateEdgeWireframeLines();
 
             UpdateNonSelectedObjectsTransparency();
 
@@ -1129,7 +1237,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     int pos = meshName.IndexOf("__", StringComparison.Ordinal);
                     if (pos != -1)
                     {
-                        string nodeNameWithoutIndex = meshName.Substring(0, pos);
                         string nodeIndexText = meshName.Substring(pos + 2);
 
                         int indexValue;
@@ -1325,7 +1432,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (_colorTypeConverter == null)
                 _colorTypeConverter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(Color));
 
-            var color = (Color)_colorTypeConverter.ConvertFromString(colorText);
+            var colorObject = _colorTypeConverter.ConvertFromString(colorText);
+
+            var color = colorObject is Color ? (Color)colorObject : Colors.Black;
 
             return color;
         }
@@ -1370,72 +1479,152 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             return doubleValue;
         }
 
-        private void OnWireframeLineSettingsChanged(object sender, RoutedEventArgs e)
+        private void OnLineSettingsChanged(object sender, RoutedEventArgs e)
         {
             if (!this.IsLoaded)
                 return;
 
-            UpdateWireframe();
+            UpdateEdgeWireframeLines();
         }
 
-        private void UpdateWireframe()
+        private double GetSelectedEdgeStartAngle()
         {
-            if (ShowWireframeCheckBox.IsChecked ?? false)
+            var comboBoxItem = EdgeStartAngleComboBox.SelectedItem as ComboBoxItem;
+            if (comboBoxItem != null)
             {
+                var content = comboBoxItem.Content as string;
+                if (content != null)
+                    return (double)Int32.Parse(content);
+            }
+
+            return 20.0; // fallback
+        }
+
+        private void UpdateEdgeWireframeLines()
+        {
+            var showWireframe = ShowWireframeCheckBox.IsChecked ?? false;
+            var showEdgeLines = ShowEdgeLinesCheckBox.IsChecked ?? false;
+
+            if (showWireframe || showEdgeLines)
+            {
+                Point3DCollection linePositions;
+
                 if (_selectedModel3D != null)
                 {
-                    AllWireframesLineVisual3D.IsVisible = false;
-                    SelectedModelWireframeVisual3D.IsVisible = true;
+                    AllEdgeWireframesLineVisual3D.IsVisible = false;
+                    SelectedModelLinesVisual3D.IsVisible = true;
 
-                    bool showPolygonLines = ReadPolygonIndicesCheckBox.IsChecked ?? false;
-                    var wireframeLinePositions = WireframeFactory.CreateWireframeLinePositions(_selectedModel3D, _selectedModelParentTransform3D, showPolygonLines, removedDuplicates: true);
+                    if (showWireframe)
+                    {
+                        bool showPolygonLines = ReadPolygonIndicesCheckBox.IsChecked ?? false;
+                        linePositions = WireframeFactory.CreateWireframeLinePositions(_selectedModel3D, _selectedModelParentTransform3D, showPolygonLines, removedDuplicates: true);
+                    }
+                    else
+                    {
+                        if (_edgeLinesFactory == null)
+                            _edgeLinesFactory = new EdgeLinesFactory();
 
-                    SelectedModelWireframeVisual3D.Positions = wireframeLinePositions;
+                        linePositions = _edgeLinesFactory.GetEdgeLines(_selectedModel3D, edgeStartAngleInDegrees: 20, parentTransform3D: _selectedModelParentTransform3D);
+                    }
+
+                    SelectedModelLinesVisual3D.Positions = linePositions;
                 }
                 else
                 {
-                    AllWireframesLineVisual3D.IsVisible = true;
-                    SelectedModelWireframeVisual3D.IsVisible = false;
+                    if (showWireframe)
+                    {
+                        if (_wireframeLinePositions == null)
+                        {
+                            bool showPolygonLines = ReadPolygonIndicesCheckBox.IsChecked ?? false;
+                            _wireframeLinePositions = WireframeFactory.CreateWireframeLinePositions(_loadedModel3D, _selectedModelParentTransform3D, showPolygonLines, removedDuplicates: true);
+                        }
+
+                        linePositions = _wireframeLinePositions;
+                    }
+                    else
+                    {
+                        var edgeStartAngleInDegrees = GetSelectedEdgeStartAngle();
+
+                        if (edgeStartAngleInDegrees != _lastEdgeStartAngle)
+                        {
+                            EdgeLinesFactory.ClearEdgeLineIndices(_loadedModel3D); // When edge start angle is changed we need to clear the calculated edge lines that are stored in the mesh
+                            _edgeLinePositions = null;
+                        }
+
+                        if (_edgeLinePositions == null)
+                        {
+                            if (_edgeLinesFactory == null)
+                                _edgeLinesFactory = new EdgeLinesFactory();
+
+                            _edgeLinePositions = _edgeLinesFactory.GetEdgeLines(_loadedModel3D, edgeStartAngleInDegrees, parentTransform3D: _selectedModelParentTransform3D);
+                            _lastEdgeStartAngle = edgeStartAngleInDegrees;
+                        }
+
+                        linePositions = _edgeLinePositions;
+                    }
+
+                    if (AllEdgeWireframesLineVisual3D.Positions != linePositions)
+                        AllEdgeWireframesLineVisual3D.Positions = linePositions;
+
+                    AllEdgeWireframesLineVisual3D.IsVisible = true;
+                    SelectedModelLinesVisual3D.IsVisible = false;
                 }
 
-                AllWireframesLineVisual3D.LineColor = GetColorFromComboBox(LineColorComboBox);
-                AllWireframesLineVisual3D.LineThickness = GetDoubleFromComboBox(LineThicknessComboBox, fallbackValue: 0.5);
+                AllEdgeWireframesLineVisual3D.LineColor = GetColorFromComboBox(LineColorComboBox);
+                AllEdgeWireframesLineVisual3D.LineThickness = GetDoubleFromComboBox(LineThicknessComboBox, fallbackValue: 0.5);
 
-                SelectedModelWireframeVisual3D.LineColor = AllWireframesLineVisual3D.LineColor;
-                SelectedModelWireframeVisual3D.LineThickness = AllWireframesLineVisual3D.LineThickness;
+                SelectedModelLinesVisual3D.LineColor = AllEdgeWireframesLineVisual3D.LineColor;
+                SelectedModelLinesVisual3D.LineThickness = AllEdgeWireframesLineVisual3D.LineThickness;
 
                 if (AddLineDepthBiasCheckBox.IsChecked ?? false)
                 {
                     // Use line depth bias to move the lines closer to the camera so the lines are rendered on top of solid model and are not partially occluded by it.
                     // See DXEngineVisuals/LineDepthBiasSample for more info.
-                    AllWireframesLineVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
-                    AllWireframesLineVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
+                    AllEdgeWireframesLineVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+                    AllEdgeWireframesLineVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
 
-                    SelectedModelWireframeVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
-                    SelectedModelWireframeVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
+                    SelectedModelLinesVisual3D.SetDXAttribute(DXAttributeType.LineDepthBias, 0.1);
+                    SelectedModelLinesVisual3D.SetDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor, 0.02);
                 }
                 else
                 {
-                    AllWireframesLineVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
-                    AllWireframesLineVisual3D.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
+                    AllEdgeWireframesLineVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
+                    AllEdgeWireframesLineVisual3D.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
 
-                    SelectedModelWireframeVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
-                    SelectedModelWireframeVisual3D.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
+                    SelectedModelLinesVisual3D.ClearDXAttribute(DXAttributeType.LineDepthBias);
+                    SelectedModelLinesVisual3D.ClearDXAttribute(DXAttributeType.LineDynamicDepthBiasFactor);
                 }
             }
             else
             {
-                AllWireframesLineVisual3D.IsVisible = false;
-                SelectedModelWireframeVisual3D.IsVisible = false;
+                AllEdgeWireframesLineVisual3D.Positions = null;
+                SelectedModelLinesVisual3D.Positions = null;
+
+                AllEdgeWireframesLineVisual3D.IsVisible = false;
+                SelectedModelLinesVisual3D.IsVisible = false;
             }
         }
 
+        private void OnShowEdgeLinesCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            if (ShowEdgeLinesCheckBox.IsChecked ?? false)
+                ShowWireframeCheckBox.IsChecked = false; // Show only Edge lines
+
+            UpdateEdgeWireframeLines();
+        }
+        
         private void OnShowWireframeCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
         {
             if (!this.IsLoaded)
                 return;
 
-            UpdateWireframe();
+            if (ShowWireframeCheckBox.IsChecked ?? false)
+                ShowEdgeLinesCheckBox.IsChecked = false; // Show only wireframe
+
+            UpdateEdgeWireframeLines();
         }
 
         private void AmbientLightSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1448,7 +1637,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (AmbientLightSlider == null || _sceneAmbientLight == null)
                 return;
 
-            var color = (byte)(2.55 * AmbientLightSlider.Value); // Minimum="0" Maximum="100"
+            var color = (byte)(2.55 * AmbientLightSlider.Value); // Minimum="0" Maximum="100" => 0 .. 255
             _sceneAmbientLight.Color = Color.FromRgb(color, color, color);
         }
 
@@ -1529,36 +1718,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (!this.IsLoaded)
                 return;
 
-            Camera1.ShowCameraLight = (CameraLightCheckBox.IsChecked ?? false) ? ShowCameraLightType.Always : ShowCameraLightType.Never;
-            
-            if (TopDownLightCheckBox.IsChecked ?? false)
-            {
-                if (_topDownLight == null)
-                    _topDownLight = new DirectionalLight(Colors.White, new System.Windows.Media.Media3D.Vector3D(0, -1, 0));
-
-                if (!LightsModel3DGroup.Children.Contains(_topDownLight))
-                    LightsModel3DGroup.Children.Add(_topDownLight);
-            }
-            else
-            {
-                if (_topDownLight != null && LightsModel3DGroup.Children.Contains(_topDownLight))
-                    LightsModel3DGroup.Children.Remove(_topDownLight);
-            }
-            
-            if (SideLightCheckBox.IsChecked ?? false)
-            {
-                if (_sideLight == null)
-                    _sideLight = new DirectionalLight(Colors.White, new System.Windows.Media.Media3D.Vector3D(1, 0, 0));
-
-                if (!LightsModel3DGroup.Children.Contains(_sideLight))
-                    LightsModel3DGroup.Children.Add(_sideLight);
-            }
-            else
-            {
-                if (_sideLight != null && LightsModel3DGroup.Children.Contains(_sideLight))
-                    LightsModel3DGroup.Children.Remove(_sideLight);
-            }
-
+            UpdateSceneLights();
 
             var checkBox = sender as CheckBox;
 
@@ -1579,6 +1739,39 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                             LightsModel3DGroup.Children.Remove(light);
                     }
                 }
+            }
+        }
+
+        private void UpdateSceneLights()
+        {
+            Camera1.ShowCameraLight = (CameraLightCheckBox.IsChecked ?? false) ? ShowCameraLightType.Always : ShowCameraLightType.Never;
+            
+            if (TopDownLightCheckBox.IsChecked ?? false)
+            {
+                if (_topDownLight == null)
+                    _topDownLight = new DirectionalLight(Colors.White, new System.Windows.Media.Media3D.Vector3D(0, -1, 0));
+
+                if (!LightsModel3DGroup.Children.Contains(_topDownLight))
+                    LightsModel3DGroup.Children.Add(_topDownLight);
+            }
+            else
+            {
+                if (_topDownLight != null && LightsModel3DGroup.Children.Contains(_topDownLight))
+                    LightsModel3DGroup.Children.Remove(_topDownLight);
+            }
+            
+            if (SideLightCheckBox.IsChecked ?? false)
+            {
+                if (_sideLight == null)
+                    _sideLight = new DirectionalLight(Colors.White, new System.Windows.Media.Media3D.Vector3D(-1, 0, 0));
+
+                if (!LightsModel3DGroup.Children.Contains(_sideLight))
+                    LightsModel3DGroup.Children.Add(_sideLight);
+            }
+            else
+            {
+                if (_sideLight != null && LightsModel3DGroup.Children.Contains(_sideLight))
+                    LightsModel3DGroup.Children.Remove(_sideLight);
             }
         }
 
@@ -1718,6 +1911,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
                 e.Handled = true;
             }
+        }
+
+        private void OnSSAOCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (_ssaoRenderingProvider != null)
+                _ssaoRenderingProvider.IsEnabled = SSAOCheckBox.IsChecked ?? false;
+
+            MainDXViewportView.Refresh();
+        }
+
+        private void OcclusionRadiusSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_ssaoRenderingProvider != null)
+                _ssaoRenderingProvider.OcclusionRadius = (float)OcclusionRadiusSlider.Value;
+
+            MainDXViewportView.Refresh();
         }
     }
 }

@@ -59,6 +59,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         private List<GeometryModel3D> _modelsToRemove;
         private List<BaseLineVisual3D> _linesToRemove;
 
+#if DEBUG
+        private List<int> _renderingQueueObjectsCounts;
+#endif
+
         public RectangularSelectionSample()
         {
             InitializeComponent();
@@ -104,7 +108,7 @@ Disadvantages:
 
             _savedMaterials  = new Dictionary<GeometryModel3D, Material>();
             _savedLineColors = new Dictionary<BaseLineVisual3D, Color>();
-
+            
             _disposables = new DisposeList();
 
 
@@ -269,6 +273,8 @@ Disadvantages:
 
                     _objectIdBitmapWidth  = objectIdBitmap.PixelWidth;
                     _objectIdBitmapHeight = objectIdBitmap.PixelHeight;
+
+                    SetRenderingQueueObjectsCounts();
                 }
             }
             finally
@@ -387,6 +393,9 @@ Disadvantages:
             _isMouseSelectionStarted = true;
             _startMousePosition = args.GetPosition(ViewportBorder);
 
+            // It is important to restore original materials so that the ID bitmap will use the unselected objects
+            RestoreOriginalMaterials();
+
             if (ObjectIdMapRadioButton.IsChecked ?? false)
                 UpdateObjectIdBitmap();
         }
@@ -453,7 +462,7 @@ Disadvantages:
         {
             if (_objectIdPixelsArray == null || selectionRectangle.IsEmpty)
                 return;
-            
+
             int minX = (int)Math.Max(selectionRectangle.X * _dpiScaleX, 0);
             int maxX = (int)Math.Min((selectionRectangle.X + selectionRectangle.Width) * _dpiScaleX, _objectIdBitmapWidth);
             int width = (maxX - minX);
@@ -462,6 +471,10 @@ Disadvantages:
             int maxY = (int)Math.Min((selectionRectangle.Y + selectionRectangle.Height) * _dpiScaleY, _objectIdBitmapHeight);
             
             int stride = _objectIdBitmapWidth;
+
+
+            // Check that the number of objects in each RenderingQueue is still the same as when we rendered the object ID bitmap.
+            CheckRenderingQueueObjectsCounts();
 
 
             if (_selectedIds == null)
@@ -524,7 +537,13 @@ Disadvantages:
                 if (renderingQueueIndex < 0) // No 3D object
                     continue;
 
-                var renderingQueue      = renderingQueues[renderingQueueIndex];
+
+                var renderingQueue = renderingQueues[renderingQueueIndex];
+
+                if (objectIndex >= renderingQueue.Count)
+                    continue; // This can happen if ID bitmap was rendered with different materials (some object have both Material and BackMaterial) set than the current scene; see also exception text in the second exception in the CheckRenderingQueueObjectsCounts method.
+
+
                 var renderablePrimitive = renderingQueue[objectIndex];
 
                 var wpfGeometryModel3DNode = renderablePrimitive.OriginalObject as WpfGeometryModel3DNode;
@@ -565,7 +584,12 @@ Disadvantages:
                 var geometryModel3D = keyValuePair.Key;
                 if (!_selectedObjects.Contains(geometryModel3D))
                 {
-                    geometryModel3D.Material = keyValuePair.Value; // Restore saved material
+                    // Restore saved material
+                    if (geometryModel3D.BackMaterial != null)
+                        geometryModel3D.BackMaterial = keyValuePair.Value;
+                    else
+                        geometryModel3D.Material = keyValuePair.Value;
+
                     _modelsToRemove.Add(geometryModel3D);          // And mark to be removed from _savedMaterials (we cannot do that inside foreach)
                 }
             }
@@ -602,13 +626,19 @@ Disadvantages:
                 var geometryModel3D = selectedObject as GeometryModel3D;
                 if (geometryModel3D != null)
                 {
-                    if (!_savedMaterials.ContainsKey(geometryModel3D)) // Is this geometryModel3D alrady selected?
+                    if (!_savedMaterials.ContainsKey(geometryModel3D)) // Is this geometryModel3D already selected?
                     {
-                        // NO: Add it to selection ...
-                        _savedMaterials.Add(geometryModel3D, geometryModel3D.Material);
-
-                        // ... and change its material
-                        geometryModel3D.Material = _selectedDiffuseMaterial;
+                        // NO: Add it to the selection
+                        if (geometryModel3D.Material == null) // Do we need to change the BackMaterial (see CheckRenderingQueueObjectsCounts method for more info about that)
+                        {
+                            _savedMaterials.Add(geometryModel3D, geometryModel3D.BackMaterial);
+                            geometryModel3D.BackMaterial = _selectedDiffuseMaterial;
+                        }
+                        else
+                        {
+                            _savedMaterials.Add(geometryModel3D, geometryModel3D.Material);
+                            geometryModel3D.Material = _selectedDiffuseMaterial;
+                        }
                     }
                 }
                 else
@@ -617,7 +647,7 @@ Disadvantages:
 
                     if (baseLineVisual3D != null)
                     {
-                        if (!_savedLineColors.ContainsKey(baseLineVisual3D)) // Is this geometryModel3D alrady selected?
+                        if (!_savedLineColors.ContainsKey(baseLineVisual3D)) // Is this geometryModel3D already selected?
                         {
                             // NO: Add it to selection ...
                             _savedLineColors.Add(baseLineVisual3D, baseLineVisual3D.LineColor);
@@ -635,7 +665,11 @@ Disadvantages:
             foreach (var keyValuePair in _savedMaterials)
             {
                 var geometryModel3D = keyValuePair.Key;
-                geometryModel3D.Material = keyValuePair.Value;
+
+                if (geometryModel3D.BackMaterial != null)
+                    geometryModel3D.BackMaterial = keyValuePair.Value;
+                else
+                    geometryModel3D.Material = keyValuePair.Value;
             }
 
             _savedMaterials.Clear();
@@ -665,7 +699,73 @@ Disadvantages:
             _objectIdBitmapWidth = objectIdBitmap.PixelWidth;
             _objectIdBitmapHeight = objectIdBitmap.PixelHeight;
         }
+        
+        // Save the current number of objects in each RenderingQueue.
+        // This is used in the CheckRenderingQueueObjectsCounts method.
+        // This prevents that the number of objects is changed after the object ID bitmap is rendered.
+        private void SetRenderingQueueObjectsCounts()
+        {
+#if DEBUG
+            var renderingQueues = MainDXViewportView.DXScene.RenderingQueues;
 
+            if (_renderingQueueObjectsCounts == null)
+                _renderingQueueObjectsCounts = new List<int>(renderingQueues.Count);
+            else
+                _renderingQueueObjectsCounts.Clear();
+            
+            for (var i = 0; i < renderingQueues.Count; i++)
+                _renderingQueueObjectsCounts.Add(renderingQueues[i].Count);
+#endif
+        }
+
+        // This method checks that the number of objects in each RenderingQueue is the now the same as it was when the object ID bitmap was rendered.
+        //
+        // This can prevent problems with using object ID bitmap that can happen when an object that only has BackMaterial set
+        // when rendering the object ID bitmap also gets a Material set when it is selected.
+        // The same thing can happen when BackMaterial and Material are set to the same material, but after the selection, they are different.
+        // Both cases change the number of required objects in the RenderingQueue from one object to two objects (to render different back and front material).
+        // Because object ID bitmap renders indexes in the RenderingQueue as colors, the indexes do not match anymore if the objects in the RenderingQueues are changed.
+        //
+        // For example, you have a 3D scene with 2 objects:
+        // - 1st has BackMaterial set
+        // - the 2nd has Material set.
+        // Those two objects create 2 items in the RenderingQueue: 1st renders the BackMaterial for the first object, 2nd renders the Material for the Material.
+        //
+        // When an ID bitmap is rendered, the indexes from the RenderingQueue are converted into colors.
+        // If you do a selection and assign a new material to the 1st object's Material property,
+        // then that object has both Material and BackMaterial set and both are different materials.
+        // This requires 2 items in RenderingQueue. So the number of items in the RenderingQueue is now 3.
+        //
+        // If you do a selection on the old ID bitmap and select the object with index 1 (index 1 was retrieved from the pixel's color)
+        // this will now point to the first object because it is used to create the second item in the RenderingQueue.
+        // This will be a mistake, because based on the ID bitmap the second object should be selected, but it now has an index 2 in the RenderingQueue.
+        // 
+        // There are the following possibilities to solve that:
+        // 1) When doing selection: If the selected object has only Material set, then change the Material. If it has only  BackMaterial set, than change only BackMaterial. If both BackMaterial and Material are set to the same material, then change both to the same selected material.
+        // 2) Render another ID bitmap after changing the materials.
+        //
+        //
+        // To test this change the line in the UpdateSelectedObjects method from:
+        // geometryModel3D.BackMaterial = _selectedDiffuseMaterial;
+        // to:
+        // geometryModel3D.Material = _selectedDiffuseMaterial;
+        //
+        // Then start the sample and check the "Use BackMaterials" checkbox
+        private void CheckRenderingQueueObjectsCounts()
+        {
+#if DEBUG            
+            var renderingQueues = MainDXViewportView.DXScene.RenderingQueues;
+
+            if (_renderingQueueObjectsCounts.Count != renderingQueues.Count)
+                throw new InvalidOperationException("Cannot use object ID bitmap because the number of RenderingQueues was changed after the object ID bitmap was render. Please render the IO bitmap again or change only existing Material and BackMaterial objects (do not add new one) to prevent changing the order of items in the RenderingQueues.");
+
+            for (var i = 0; i < renderingQueues.Count; i++)
+            {
+                if (renderingQueues[i].Count != _renderingQueueObjectsCounts[i])
+                    throw new InvalidOperationException(string.Format("Cannot use object ID bitmap because the number of objects in the {0} was changed from {1} to {2} after the object ID bitmap was render. This is probably caused because Material and BackMaterial property have changed. For example, if an object had only the BackMaterial property set and after rendering object ID bitmap it also got the Material set, then this objects now requires two RenderableObjects in the RenderingQueue instead of one. This breaks the indexes of the objects in the bitmap ID bitmap. If the selected object has only Material set, then change the Material. If it has only BackMaterial set, than change only BackMaterial. If both BackMaterial and Material are set to the same material, then change both. You can also render another ID bitmap after changing the selected objects.", renderingQueues[i].Name, _renderingQueueObjectsCounts[i], renderingQueues[i].Count));
+            }
+#endif
+        }
 
         private void CreateTestScene()
         {
@@ -678,8 +778,8 @@ Disadvantages:
 
             _objectsModel3DGroup = new Model3DGroup();
 
-            AddModels(_objectsModel3DGroup, boxMesh, new Point3D(0, 5, 0), new Size3D(500, modelsYCount * 10, 500), 10, modelsXCount, modelsYCount, modelsZCount);
-            AddModels(_objectsModel3DGroup, sphereMesh, new Point3D(25, 5, 25), new Size3D(500, modelsYCount * 10, 500), 10, modelsXCount, modelsYCount, modelsZCount);
+            AddModels(_objectsModel3DGroup, boxMesh, new Point3D(0, 5, 0), new Size3D(500, modelsYCount * 10, 500), 10, modelsXCount, modelsYCount, modelsZCount, "Box", useBackMaterial: UseBackMaterialsCheckBox.IsChecked ?? false);
+            AddModels(_objectsModel3DGroup, sphereMesh, new Point3D(25, 5, 25), new Size3D(500, modelsYCount * 10, 500), 10, modelsXCount, modelsYCount, modelsZCount, "Sphere");
             
             MainViewport.Children.Add(_objectsModel3DGroup.CreateContentVisual3D());
 
@@ -693,7 +793,7 @@ Disadvantages:
             MainViewport.Children.Add(contentVisual3D);
         }
 
-        public static void AddModels(Model3DGroup parentModel3DGroup, MeshGeometry3D mesh, Point3D center, Size3D size, float modelScaleFactor, int xCount, int yCount, int zCount)
+        public static void AddModels(Model3DGroup parentModel3DGroup, MeshGeometry3D mesh, Point3D center, Size3D size, float modelScaleFactor, int xCount, int yCount, int zCount, string name, bool useBackMaterial = false)
         {
             float xStep = (float)(size.X / xCount);
             float yStep = (float)(size.Y / yCount);
@@ -721,8 +821,17 @@ Disadvantages:
 
                         var material = new DiffuseMaterial(new SolidColorBrush(System.Windows.Media.Color.FromRgb((byte)(255 * (float)x / (float)xCount), 255, (byte)(yPercent * 255))));
 
-                        var model3D = new GeometryModel3D(mesh, material);
+                        var model3D = new GeometryModel3D();
+                        model3D.Geometry = mesh;
+
+                        if (useBackMaterial)
+                            model3D.BackMaterial = material;
+                        else
+                            model3D.Material = material;
+
                         model3D.Transform = new MatrixTransform3D(matrix);
+
+                        model3D.SetName($"{name}_{z}_{y}_{x}");
 
                         parentModel3DGroup.Children.Add(model3D);
 
@@ -794,6 +903,15 @@ Disadvantages:
             }
 
             return contentVisual3D;
+        }
+
+        private void OnUseBackMaterialsCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            MainViewport.Children.Clear();
+            CreateTestScene();
         }
     }
 }

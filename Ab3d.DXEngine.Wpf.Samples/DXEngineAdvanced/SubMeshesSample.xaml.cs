@@ -25,10 +25,9 @@ using Point = System.Windows.Point;
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
     // This sample shows how to create one vertex buffer and one index buffer for many mesh geometries
-    // and how it is possible to specify different materials for different for
-    // parts of this combined mesh.
+    // and how it is possible to specify different materials for different parts of this combined mesh.
     // 
-    // This can be achieved with using SubMeshes in SimpleMesh.
+    // This can be achieved by using SubMeshes in SimpleMesh.
     // The SimpleMesh will define one big vertex buffer and one big index buffer.
     // The SimpleMesh can define multiple SubMeshes.
     // Each SubMesh define a material index and a subset of triangle indices (from index buffer)
@@ -41,7 +40,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     // Note that when SubMeshes are changed you need to call UpdateMesh method on the MeshObjectNode.
     //
     // Additional note:
-    // The same sample as here can be also created with using instancing and InstancedMeshGeometry3D.
+    // The same sample as here can be also created by using instancing and InstancedMeshGeometry3D.
     // This would make the code much simpler and in some cases with better performance.
     // But the purpose of this sample was to simply demonstrate how to create and change SubMeshes.
     // Also, with SubMeshes and SimpleMesh it is possible to create a vertex and index buffer
@@ -51,7 +50,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     // It combines all the child GeometryModel3D objects into one vertex and index buffer
     // and then for each material that is used in GeometryModel3D objects it creates its own SubMesh.
     // This way the frozen Model3DGroup object can be rendered in the most efficient way.
-    // This is done with the WpfOptimizedModel3DGroupNode.
+    // This is done by the WpfOptimizedModel3DGroupNode.
 
 
     /// <summary>

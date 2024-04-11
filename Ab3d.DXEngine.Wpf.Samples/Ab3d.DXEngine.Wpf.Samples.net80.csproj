@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -7,9 +7,9 @@
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>6.1.8746</Version>
-    <AssemblyVersion>6.1.8746.2070</AssemblyVersion>
-    <FileVersion>6.1.8746.2070</FileVersion> 
+    <Version>7.0.8865</Version>
+    <AssemblyVersion>7.0.8865.2070</AssemblyVersion>
+    <FileVersion>7.0.8865.2070</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,9 +23,9 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="6.1.8746" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="6.1.8746" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="11.0.8746" />  
+    <PackageReference Include="Ab3d.DXEngine" Version="7.0.8865" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8865" />    
+    <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
   </ItemGroup>
@@ -48,6 +48,12 @@
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   
+
+  <ItemGroup>
+    <None Remove="Resources\RobotModel\**" />
+    <Content Include="Resources\RobotModel\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="ab4d.ico" />
     <None Remove="Resources\10x10-texture.png" />
@@ -107,39 +113,11 @@
     <None Remove="Resources\objects.png" />
     <None Remove="Resources\options.png" />
     <None Remove="Resources\palazz_sport.bin" />
+    <None Remove="Resources\PointClouds\14 Ladybrook Road 10 - cropped.ply" />
+    <None Remove="Resources\PointClouds\readme.txt" />
     <None Remove="Resources\PowerToysTexture.png" />
     <None Remove="Resources\RobotModel\get 4k textures.txt" />
     <None Remove="Resources\RobotModel\License and credits.txt" />
-    <None Remove="Resources\RobotModel\Robot_Claw.FBX" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_AmbientOcclusion.png" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_BaseColor.png" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Height.png" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Metallic.png" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Normal.png" />
-    <None Remove="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Roughness.png" />
-    <None Remove="Resources\RobotModel\Robot_Main.FBX" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_AmbientOcclusion.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_BaseColor.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Emissive.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Height.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Metallic.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Normal.png" />
-    <None Remove="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Roughness.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel.FBX" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_AmbientOcclusion.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_BaseColor.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Emissive.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Height.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Metallic.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Normal.png" />
-    <None Remove="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Roughness.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw.FBX" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_AmbientOcclusion.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_BaseColor.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Height.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Metallic.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Normal.png" />
-    <None Remove="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png" />
     <None Remove="Resources\SemiTransparentFrame.png" />
     <None Remove="Resources\Settings.png" />
     <None Remove="Resources\ShaderFactoryScreenshot.PNG" />
@@ -288,101 +266,17 @@
     </Content>
     <Content Include="Resources\palazz_sport.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PointClouds\14 Ladybrook Road 10 - cropped.ply">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PointClouds\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>    
     <Content Include="Resources\RobotModel\get 4k textures.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\RobotModel\License and credits.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw.FBX">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_AmbientOcclusion.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_BaseColor.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Height.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Metallic.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Normal.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Claw_Maps\Robot_Claw_robot_Claw_Roughness.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main.FBX">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_AmbientOcclusion.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_BaseColor.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Emissive.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Height.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Metallic.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Normal.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Main_Maps\Robot_Main_Robot_Main_Roughness.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel.FBX">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_AmbientOcclusion.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_BaseColor.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Emissive.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Height.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Metallic.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Normal.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Panel_Maps\Robot_Panel_Robot_Panel_Roughness.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw.FBX">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_AmbientOcclusion.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_BaseColor.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Height.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Metallic.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Normal.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RobotModel\Robot_Saw_Maps\Robot_Saw_robot_Saw_Roughness.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\SemiTransparentFrame.png">

@@ -1,0 +1,110 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting.DXLinesSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+             xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+             xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys" 
+             xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+             Title="LinesSelector"
+             d:DesignHeight="400" d:DesignWidth="800">
+    <Grid>
+        <Border Name="MainBorder" Background="White">
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+                <Viewport3D Name="MainViewport" >
+                    <ModelVisual3D x:Name="RootVisual3D">
+                        <ModelVisual3D.Transform>
+                            <TranslateTransform3D OffsetX="20" />
+                        </ModelVisual3D.Transform>
+                    </ModelVisual3D>
+                </Viewport3D>
+            </dxControls:DXViewportView>
+        </Border>
+        <Canvas Name="OverlayCanvas" IsHitTestVisible="False" />
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                      Heading="30" Attitude="-20" 
+                                      TargetPosition="0 0 0"
+                                      Distance="400" 
+                                      ShowCameraLight="Always"/>
+
+        <ab3d:MouseCameraController Name="MouseCameraController1" 
+                                    RotateCameraConditions="RightMouseButtonPressed"
+                                    MoveCameraConditions="RightMouseButtonPressed, ControlKey"
+                                    EventsSourceElement="{Binding ElementName=MainBorder}"/>
+
+        <ab3d:MouseCameraControllerInfo MouseCameraController="{Binding ElementName=MouseCameraController1}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+
+        <StackPanel  VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Vertical">
+            <Border BorderThickness="1" BorderBrush="Black" Background="#DDFFFFFF" Margin="10 10 10 0">
+                <StackPanel Orientation="Vertical" Margin="10 5" Width="190">
+
+                    <TextBlock>
+                        <Run>Closest line distance:</Run>
+                        <Run Name="ClosestDistanceValue"></Run>
+                    </TextBlock>
+                    
+                    <TextBlock Margin="0 3 0 0">
+                        <Run>Line segment index:</Run>
+                        <Run Name="LineSegmentIndexValue"></Run>
+                    </TextBlock>
+
+                    <TextBlock Margin="0 3 0 0" ToolTip="This shows time to call CalculateScreenSpacePositions method + time to call GetClosestDistance method and process the distances">
+                        <Run>Update time (in ms):</Run>
+                        <Run Name="UpdateTimeValue"></Run>
+                    </TextBlock>
+
+
+                    <TextBlock Margin="0 10 0 0">
+                        <Run>Max selection distance:</Run>
+                        <Run Name="MaxDistanceValue"></Run>
+                    </TextBlock>
+
+                    <Slider Name="MaxDistanceSlider" Minimum="0" Maximum="21" Value="15" TickPlacement="TopLeft" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="MaxDistanceSlider_OnValueChanged" />
+
+                    <CheckBox Name="OrderByDistanceCheckBox" Content="Order lines by camera distance" IsChecked="True" Margin="0 10 0 2"/>
+                    <TextBlock Text="When unchecked the line that is closest to the mouse will be selected even if it is behind some other line in 3D space." 
+                               FontSize="10" FontStyle="Italic" TextWrapping="Wrap"/>
+
+                    <CheckBox Name="CheckBoundingBoxCheckBox" Content="Check BoundingBox" IsChecked="True" Margin="0 10 0 2" Checked="OnCheckBoundingBoxCheckBoxCheckedChanged" Unchecked="OnCheckBoundingBoxCheckBoxCheckedChanged"/>
+                    <TextBlock Text="When checked this significantly improves performance for lines with many segments because individual segment are checked only after initial bounding box check. Increase line numbers and segments below to see this effect." 
+                               FontSize="10" FontStyle="Italic" TextWrapping="Wrap"/>
+                    
+                    <CheckBox Name="MultiThreadedCheckBox" Content="Use multiple threads" IsChecked="False" Margin="0 10 0 2"/>
+                    <TextBlock Text="When checked then Parallel.For is used to get the closest line (useful when there are many 3D lines in the scene)." 
+                               FontSize="10" FontStyle="Italic" TextWrapping="Wrap"/>
+
+
+                    <TextBlock Text="Shown lines:" Margin="0 20 0 0"  />
+
+                    <ComboBox Name="LinesCountComboBox" SelectedIndex="0" Margin="0 3 0 0" Width="190" SelectionChanged="LinesCountComboBox_OnSelectionChanged">
+                        <ComboBoxItem>10 lines + 20 poly-lines</ComboBoxItem>
+                        <ComboBoxItem>10 lines + 20 multi-lines</ComboBoxItem>
+                        <ComboBoxItem>100 poly-lines</ComboBoxItem>
+                        <ComboBoxItem>500 poly-lines</ComboBoxItem>
+                        <ComboBoxItem>1000 poly-lines</ComboBoxItem>
+                        <ComboBoxItem>5000 poly-lines</ComboBoxItem>
+                    </ComboBox>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                        <TextBlock Text="Line segments count:" VerticalAlignment="Center" />
+                        <ComboBox Name="LinesSegmentsComboBox" SelectedIndex="0" Margin="5 0 0 0" Width="70" SelectionChanged="LinesSegmentsComboBox_OnSelectionChanged">
+                            <ComboBoxItem>10</ComboBoxItem>
+                            <ComboBoxItem>50</ComboBoxItem>
+                            <ComboBoxItem>100</ComboBoxItem>
+                            <ComboBoxItem>500</ComboBoxItem>
+                            <ComboBoxItem>1000</ComboBoxItem>
+                            <ComboBoxItem>5000</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <Button Name="CameraRotationButton" Content="Stop camera rotation" Margin="0 20 0 0" Click="CameraRotationButton_OnClick"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <TextBlock Text="3D line selection with Ab3d.DXEngine" FontWeight="Bold" FontSize="20" Foreground="#555" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+    </Grid>
+</Page>

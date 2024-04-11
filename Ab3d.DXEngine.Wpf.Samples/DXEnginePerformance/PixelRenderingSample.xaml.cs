@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,8 @@ using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
 using SharpDX;
 using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using Color = SharpDX.Color;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -40,25 +43,36 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private PixelMaterial _pixelMaterial;
         private MeshObjectNode _meshObjectNode;
+        private PixelsVisual3D _pixelsVisual3D;
+
+        private ShaderResourceView _pixelTexture;
+        private Size2 _pixelTextureSize;
+        private Color4 _savedPixelColor;
 
         public PixelRenderingSample()
         {
             InitializeComponent();
 
-            PixelSizeComboBox.ItemsSource = new float[] {0.1f, 0.5f, 1, 2, 4, 8};
+            PixelSizeComboBox.ItemsSource = new float[] { 0.1f, 0.5f, 1, 2, 4, 8, 16, 32 };
             PixelSizeComboBox.SelectedIndex = 3;
 
             _disposables = new DisposeList();
 
-            MainDXViewportView.DXSceneInitialized += delegate(object sender, EventArgs args)
+            MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
             {
                 CreateScene();
             };
 
-            this.Unloaded += delegate(object sender, RoutedEventArgs args)
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
                 _disposables.Dispose();
 
+                if (_pixelTexture != null)
+                {
+                    _pixelTexture.Dispose();
+                    _pixelTexture = null;
+                }
+                
                 if (_pixelEffect != null)
                 {
                     _pixelEffect.Dispose();
@@ -77,6 +91,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             Mouse.OverrideCursor = Cursors.Wait;
 
             MainViewport.Children.Clear();
+            _pixelsVisual3D = null;
+
             _disposables.Dispose(); // Dispose previously used resources
 
             _disposables = new DisposeList(); // Start with a fresh DisposeList
@@ -180,10 +196,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private void ShowPositionsArray(Vector3[] positionsArray, float pixelSize, Color4 pixelColor, Point3D centerPosition, Size3D size)
         {
-            var positionBounds = new Bounds(new Vector3((float) (centerPosition.X - size.X * 0.5), (float) (centerPosition.Y - size.Y * 0.5), (float) (centerPosition.Z - size.Z * 0.5)),
-                                            new Vector3((float) (centerPosition.X + size.X * 0.5), (float) (centerPosition.Y + size.Y * 0.5), (float) (centerPosition.Z + size.Z * 0.5)));
+            var positionBounds = new Bounds(new Vector3((float)(centerPosition.X - size.X * 0.5), (float)(centerPosition.Y - size.Y * 0.5), (float)(centerPosition.Z - size.Z * 0.5)),
+                                            new Vector3((float)(centerPosition.X + size.X * 0.5), (float)(centerPosition.Y + size.Y * 0.5), (float)(centerPosition.Z + size.Z * 0.5)));
 
-            ShowPositionsArray(positionsArray, pixelSize, pixelColor, positionBounds);  
+            ShowPositionsArray(positionsArray, pixelSize, pixelColor, positionBounds);
         }
 
         private void ShowPositionsArray(Vector3[] positionsArray, float pixelSize, Color4 pixelColor, Bounds positionBounds)
@@ -191,22 +207,32 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             if (IsUsingPixelsVisual3D)
             {
                 // The easiest way to show many pixels is to use PixelsVisual3D.
-                var pixelsVisual3D = new PixelsVisual3D()
+                _pixelsVisual3D = new PixelsVisual3D()
                 {
                     Positions = positionsArray,
                     PixelColor = pixelColor.ToWpfColor(),
-                    PixelSize = pixelSize
+                    PixelSize = pixelSize,
+                    IsCircularPixel = IsCircularPixelCheckBox.IsChecked ?? false,
+                    IsWorldSize = IsWorldSizeCheckBox.IsChecked ?? false,
                 };
+
+                if (UseTextureCheckBox.IsChecked ?? false)
+                {
+                    ShaderResourceView pixelTexture;
+                    Size2 pixelTextureSize;
+                    GetPixelTexture(out pixelTexture, out pixelTextureSize);
+                    _pixelsVisual3D.SetTexture(pixelTexture, pixelTextureSize, colorMask: Colors.White);
+                }
 
                 // It is highly recommended to manually set the PositionsBounds.
                 // If this is not done, the bounds are calculated by the DXEngine with checking all the positions.
-                pixelsVisual3D.PositionsBounds = positionBounds;
+                _pixelsVisual3D.PositionsBounds = positionBounds;
 
-                MainViewport.Children.Add(pixelsVisual3D);
+                MainViewport.Children.Add(_pixelsVisual3D);
 
                 // !!! IMPORTANT !!!
                 // When PixelsVisual3D is not used any more, it needs to be disposed (we are using DisposeList to dispose all in Unloaded event handler)
-                _disposables.Add(pixelsVisual3D);
+                _disposables.Add(_pixelsVisual3D);
 
                 return;
             }
@@ -221,7 +247,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             simpleMesh.PrimitiveTopology = PrimitiveTopology.PointList; // We need to change the default PrimitiveTopology.TriangleList to PointList
 
             // To correctly set the Camera's Near and Far distance, we need to provide the correct bounds of each shown 3D model.
-            
+
             if (positionBounds != null && !positionBounds.IsEmpty)
             {
                 // It is highly recommended to manually set the Bounds.
@@ -244,9 +270,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             _pixelMaterial = new PixelMaterial()
             {
                 PixelColor = pixelColor,
-                PixelSize = pixelSize
+                PixelSize = pixelSize,
+                IsCircularPixel = IsCircularPixelCheckBox.IsChecked ?? false,
+                IsWorldSize = IsWorldSizeCheckBox.IsChecked ?? false,
             };
 
+            if (UseTextureCheckBox.IsChecked ?? false)
+            {
+                ShaderResourceView pixelTexture;
+                Size2 pixelTextureSize;
+                GetPixelTexture(out pixelTexture, out pixelTextureSize);
+
+                _pixelMaterial.SetTexture(pixelTexture, pixelTextureSize, colorMask: Color4.White);
+            }
+            
             _pixelMaterial.InitializeResources(MainDXViewportView.DXScene.DXDevice);
 
             _disposables.Add(_pixelMaterial);
@@ -273,10 +310,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             if (_pixelEffect == null)
             {
-                // Get an instance of PixelEffect (it is used to provide the correct shaders to render specified postions as pixels)
+                // Get an instance of PixelEffect (it is used to provide the correct shaders to render specified positions as pixels)
                 _pixelEffect = MainDXViewportView.DXScene.DXDevice.EffectsManager.GetEffect<PixelEffect>(createNewEffectInstanceIfNotFound: true);
 
-                // Do not forget to dispose the effect when it is not used any more - we will do that in the Unloaded event handler
+                // Do not forget to dispose the effect when it is not used anymore - we will do that in the Unloaded event handler
             }
 
 
@@ -288,6 +325,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             // Because the standard material does not provide pixel size,
             // we need to set the fallback pixel size value to the PixelEffect.
             _pixelEffect.PixelSize = pixelSize;
+            _pixelEffect.IsCircularPixel = IsCircularPixelCheckBox.IsChecked ?? false;
+            _pixelEffect.IsWorldSize = IsWorldSizeCheckBox.IsChecked ?? false;
+
+            if (UseTextureCheckBox.IsChecked ?? false)
+            {
+                ShaderResourceView pixelTexture;
+                Size2 pixelTextureSize;
+                GetPixelTexture(out pixelTexture, out pixelTextureSize);
+                _pixelEffect.SetTexture(pixelTexture, pixelTextureSize, colorMask: Color4.White);
+            }
 
 
             // To override the used material, we first need to create a new WpfMaterial from the WPF material.
@@ -350,14 +397,50 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             //ShowPositionsArray(positionsArray, pixelSize, pixelColor, model3D.Bounds.ToDXEngineBounds());
         }
 
+        private void GetPixelTexture(out ShaderResourceView pixelTexture, out Size2 pixelTextureSize)
+        {
+            if (_pixelTexture == null)
+            {
+                // Load ShaderResourceView from a WPF's Resource:
+                var warningBitmap = new BitmapImage(new Uri("pack://application:,,,/Ab3d.DXEngine.Wpf.Samples;component/Resources/warningIcon.png", UriKind.Absolute));
+                _pixelTexture = WpfMaterial.CreateTexture2D(MainDXViewportView.DXScene.DXDevice, warningBitmap);
+                _pixelTextureSize = new Size2(warningBitmap.PixelWidth, warningBitmap.PixelHeight);
+
+                //// To load ShaderResourceView from a file, use the following
+                //string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TreeTexture.png");
+                //_pixelTexture = TextureLoader.LoadShaderResourceView(MainDXViewportView.DXScene.DXDevice.Device, fileName, out TextureInfo textureInfo);
+                //_pixelTextureSize = new Size2(textureInfo.Width, textureInfo.Height);
+            }
+
+            pixelTexture = _pixelTexture;
+            pixelTextureSize = _pixelTextureSize;
+        }
+
         private void OnPixelSizeChanged(object sender, RoutedEventArgs e)
         {
-            if (!this.IsLoaded || DesignerProperties.GetIsInDesignMode(this) || _isInternalChange || _pixelEffect == null)
+            if (!this.IsLoaded || DesignerProperties.GetIsInDesignMode(this))
+                return;
+
+            var newPixelSize = GetSelectedPixelSize();
+            ChangePixelSize(newPixelSize);
+
+            // Re-render the scene
+            // Manually calling Refresh is needed in case ShowGeometryModel3D method was used to show pixels.
+            // In this case we have only changed the _pixelEffect.PixelSize and this will not trigger automatic scene re-render.
+            MainDXViewportView.Refresh();
+        }
+
+        private float GetSelectedPixelSize()
+        {
+            return (float)PixelSizeComboBox.SelectedItem;
+        }
+
+        private void ChangePixelSize(float newPixelSize)
+        {
+            if (_isInternalChange || _pixelEffect == null)
                 return;
 
             _isPixelSizeChanged = true;
-
-            var newPixelSize = (float)PixelSizeComboBox.SelectedItem;
 
             if (IsUsingPixelsVisual3D)
             {
@@ -381,13 +464,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 }
             }
 
-
             _pixelEffect.PixelSize = newPixelSize;
-
-            // Re-render the scene
-            // Manually calling Refresh is needed in case ShowGeometryModel3D method was used to show pixels.
-            // In this case we have only changed the _pixelEffect.PixelSize and this will not trigger automatic scene re-render.
-            MainDXViewportView.Refresh();
         }
 
         private void OnSceneTypeChanged(object sender, RoutedEventArgs e)
@@ -430,6 +507,159 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             }
 
             return positionsArray;
+        }
+
+        private void OnIsWorldSizeCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+
+            var newIsWorldSize = IsWorldSizeCheckBox.IsChecked ?? false;
+
+            if (_pixelsVisual3D != null)
+            {
+                _pixelsVisual3D.IsWorldSize = newIsWorldSize;
+            }
+            else if (_pixelMaterial != null)
+            {
+                _pixelMaterial.IsWorldSize = newIsWorldSize;
+                _meshObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+            }
+            else if (_pixelEffect != null)
+            {
+                _pixelEffect.IsWorldSize = newIsWorldSize;
+            }
+
+            // We can fix up vector only when IsWorldSize is true
+            FixUpVectorCheckBox.IsEnabled = newIsWorldSize;
+
+            MainDXViewportView.Refresh();
+        }
+
+        private void OnIsCircularPixelCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+
+            var newIsCircularPixel = IsCircularPixelCheckBox.IsChecked ?? false;
+
+            if (_pixelsVisual3D != null)
+            {
+                _pixelsVisual3D.IsCircularPixel = newIsCircularPixel;
+            }
+            else if (_pixelMaterial != null)
+            {
+                _pixelMaterial.IsCircularPixel = newIsCircularPixel;
+                _meshObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+            }
+            else if (_pixelEffect != null)
+            {
+                _pixelEffect.IsCircularPixel = newIsCircularPixel;
+            }
+
+            MainDXViewportView.Refresh();
+        }
+
+        private void OnUseTextureCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+
+            var pixelSize = GetSelectedPixelSize();
+            if (pixelSize < 8)
+                PixelSizeComboBox.SelectedItem = 16.0f;
+
+
+            var newUseTexture = UseTextureCheckBox.IsChecked ?? false;
+            
+
+            if (newUseTexture)
+            {
+                ShaderResourceView pixelTexture;
+                Size2 pixelTextureSize;
+                GetPixelTexture(out pixelTexture, out pixelTextureSize);
+
+                if (_pixelsVisual3D != null)
+                {
+                    _savedPixelColor = _pixelsVisual3D.PixelColor.ToColor4(); // Save PixelColor because we will change the PixelColor to White to prevent any color masking
+                    _pixelsVisual3D.SetTexture(pixelTexture, pixelTextureSize, colorMask: Colors.White);
+                }
+                else if (_pixelMaterial != null)
+                {
+                    _savedPixelColor = _pixelMaterial.PixelColor;
+                    _pixelMaterial.SetTexture(pixelTexture, pixelTextureSize, colorMask: Color4.White);
+                    _meshObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+                }
+                else if (_pixelEffect != null)
+                {
+                    _savedPixelColor = _pixelEffect.PixelColor;
+                    _pixelEffect.SetTexture(pixelTexture, pixelTextureSize, colorMask: Color4.White);
+                }
+
+                IsCircularPixelCheckBox.IsEnabled = false; // IsCircularPixel is not supported when using circular pixels
+            }
+            else
+            {
+                if (_pixelsVisual3D != null)
+                {
+                    _pixelsVisual3D.RemoveTexture();
+                    _pixelsVisual3D.PixelColor = _savedPixelColor.ToWpfColor();
+                }
+                else if (_pixelMaterial != null)
+                {
+                    _pixelMaterial.RemoveTexture();
+                    _pixelMaterial.PixelColor = _savedPixelColor;
+                    _meshObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+                }
+                else if (_pixelEffect != null)
+                {
+                    _pixelEffect.RemoveTexture();
+                    _pixelEffect.PixelColor = _savedPixelColor;
+                    _pixelEffect.OverridePixelColor = false; // Calling SetTexture will also set OverridePixelColor to true, so we need to set that back to false to use the color from the Model3D
+                }
+
+                IsCircularPixelCheckBox.IsEnabled = true;
+            }
+
+            
+            MainDXViewportView.Refresh();
+        }
+
+        private void OnFixUpVectorCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            var fixUpVector = FixUpVectorCheckBox.IsChecked ?? false;
+
+            if (_pixelsVisual3D != null)
+            {
+                if (fixUpVector)
+                    _pixelsVisual3D.SetFixedUpVector(new Vector3(0, 1, 0));
+                else
+                    _pixelsVisual3D.ResetFixedUpVector();
+            }
+            else if (_pixelMaterial != null)
+            {
+                if (fixUpVector)
+                    _pixelMaterial.SetFixedUpVector(new Vector3(0, 1, 0));
+                else
+                    _pixelMaterial.ResetFixedUpVector();
+                
+                _meshObjectNode.NotifySceneNodeChange(SceneNode.SceneNodeDirtyFlags.MaterialChanged);
+            }
+            else if (_pixelEffect != null)
+            {
+                if (fixUpVector)
+                    _pixelEffect.SetFixedUpVector(new Vector3(0, 1, 0));
+                else
+                    _pixelEffect.ResetFixedUpVector();
+            }
+
+            MainDXViewportView.Refresh();
         }
     }
 }

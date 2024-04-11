@@ -49,6 +49,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private DXViewportView _mainDXViewportView;
         private Viewport3D _mainViewport3D;
 
+        private EdgeLinesFactory _edgeLinesFactory;
+
 
         public AdvancedEdgeLinesSample()
         {
@@ -176,24 +178,29 @@ What is more, as shown in this sample, the following additional features are ava
             // EdgeLinesFactory from Ab3d.PowerToys library will be used to create 3D lines that define the edges of the 3D models.  
             // The edges are created when the angle between two triangles is bigger then the specified edgeStartAngleInDegrees (set by EdgeStartAngleSlider).
             //
-            // See Lines3D\StaticEdgeLinesCreationSample and Lines3D\DynamicEdgeLinesSample samples for more info.
-            //
-            //
-            // ADDITIONAL NOTE: 
-            // It is possible to store edge lines into wpf3d file format (this way it is not needed to generate the edge lines after the file is read).
-            // The source code to read and write wpf3d file is available with Ab3d.PowerToys library.
+            // See Lines3D\StaticEdgeLinesCreationSample and Lines3D\DynamicEdgeLinesSample samples in Ab3d.PowerToys samples project for more info.
 
 
-
-            // With using AddEdgeLinePositions we will create STATIC lines from the current readModel3D.
-            // If the readModel3D would be changed (any child transformation would be changed),
-            // then the lines would not be correct any more.
+            // By using EdgeLinesFactory.GetEdgeLines we will create STATIC lines from the current readModel3D.
+            // If the readModel3D is changed (any child transformation would be changed),
+            // then the lines would not be correct anymore.
             // See the DynamicEdgeLinesSample to see how to create dynamic edge lines.
             // If your object will not change, then it is better to create static edge lines for performance reasons
-            // (having single MultiLineVisual3D for the whole instead of one MultiLineVisual3D for each GeometryModel3D).
+            // (having single MultiLineVisual3D for the all the models instead of one MultiLineVisual3D for each GeometryModel3D).
 
-            var edgeLinePositions = new Point3DCollection();
-            EdgeLinesFactory.AddEdgeLinePositions(readModel3D, EdgeStartAngleSlider.Value, edgeLinePositions);
+            // Create EdgeLinesFactory if it was not yet created
+            // Preserving EdgeLinesFactory objects will also preserve intermediate objects and lists that are used when generating the edge lines (when CacheIntermediateObjects is true).
+            if (_edgeLinesFactory == null)
+                _edgeLinesFactory = new EdgeLinesFactory();
+
+            // We can also adjust some properties to speed up generation of edge lines in case when the mesh is nicely defined.
+            // See Lines3D\StaticEdgeLinesCreationSample sin Ab3d.PowerToys samples project for more info.
+            //_edgeLinesFactory.CacheIntermediateObjects     = CacheIntermediateObjectsCheckBox.IsChecked ?? false;
+            //_edgeLinesFactory.ProcessDuplicatePositions    = ProcessDuplicatePositionsCheckBox.IsChecked ?? false;
+            //_edgeLinesFactory.ProcessPartiallyCoveredEdges = ProcessPartiallyCoveredEdgesCheckBox.IsChecked ?? false;
+            //_edgeLinesFactory.AddMeshOuterEdges            = AddMeshOuterEdgesCheckBox.IsChecked ?? false;
+
+            var edgeLinePositions = _edgeLinesFactory.GetEdgeLines(readModel3D, EdgeStartAngleSlider.Value);
 
 
             _edgeLinesVisual3D = new MultiLineVisual3D()

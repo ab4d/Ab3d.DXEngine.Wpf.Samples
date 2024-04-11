@@ -43,6 +43,7 @@
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
                 <MenuItem Name="DumpDXEngineSettingsMenuItem" Header="Dump DXEngine settings" Click="DumpDXEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpCurrentSceneMenuItem" Header="Get full scene dump" Click="DumpCurrentSceneMenuItem_OnClick"/>
+                <MenuItem Name="DumpCurrentSceneWithXamlMenuItem" Header="Get full scene dump with xaml" Click="DumpCurrentSceneWithXamlMenuItem_OnClick"/>
                 
                 <Separator />
                 <MenuItem Name="EditDXEngineSettingsMenuItem" Header="Edit DXEngine settings" Click="EditDXEngineSettingsMenuItem_OnClick"/>

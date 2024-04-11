@@ -46,21 +46,32 @@
 
         <Rectangle Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
         <WrapPanel Grid.Row="2" Margin="0 7 10 5" Orientation="Horizontal">
-            <TextBlock Text="Pixel size:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-            <ComboBox Name="PixelSizeComboBox" Margin="0 0 15 0" Width="50" SelectionChanged="OnPixelSizeChanged" />
-
             <TextBlock Text="Positions:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-            <ComboBox Name="SceneTypeComboBox" SelectedIndex="2" Margin="0 0 15 0" Width="220" SelectionChanged="OnSceneTypeChanged">
-                <ComboBoxItem>Box</ComboBoxItem>
-                <ComboBoxItem>Sphere</ComboBoxItem>
-                <ComboBoxItem>Dragon model</ComboBoxItem>
+            <ComboBox Name="SceneTypeComboBox" SelectedIndex="2" Margin="0 0 20 0" Width="220" SelectionChanged="OnSceneTypeChanged">
+                <ComboBoxItem>Box (726)</ComboBoxItem>
+                <ComboBoxItem>Sphere (2,601)</ComboBoxItem>
+                <ComboBoxItem>Dragon model (143,382)</ComboBoxItem>
                 <ComboBoxItem>10,000 pixels (100 x 1 x 100)</ComboBoxItem>
                 <ComboBoxItem>1 million pixels (100 x 100 x 100)</ComboBoxItem>
                 <ComboBoxItem>9 million pixels (9 x 1M)</ComboBoxItem>
                 <ComboBoxItem>25 million pixels (5 x 5 x 1M)</ComboBoxItem>
                 <ComboBoxItem>100 million pixels (10 x 10 x 1M)</ComboBoxItem>
             </ComboBox>
-   
+
+
+            <TextBlock Text="Pixel size:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
+            <ComboBox Name="PixelSizeComboBox" Margin="0 0 10 0" Width="50" SelectionChanged="OnPixelSizeChanged" />
+
+            <CheckBox Name="IsWorldSizeCheckBox" Content="IsWorldSize" IsChecked="False" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center" Checked="OnIsWorldSizeCheckedChanged" Unchecked="OnIsWorldSizeCheckedChanged" 
+                      ToolTip="When checked then the pixel size is specified in 3D world coordinates&#x0a;(when using perspective camera, the size of the pixel is smaller when it is farther away from the camera).&#x0a;When unchecked, then the size is defined in screen coordinates.&#x0a;(the size of the pixel is the same regardless of the distance from the camera)"/>
+
+            <CheckBox Name="IsCircularPixelCheckBox" Content="IsCircularPixel" IsChecked="False" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center" Checked="OnIsCircularPixelCheckedChanged" Unchecked="OnIsCircularPixelCheckedChanged" />
+
+            <CheckBox Name="UseTextureCheckBox" Content="Use texture (billboards)" IsChecked="False" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center" Checked="OnUseTextureCheckedChanged" Unchecked="OnUseTextureCheckedChanged" />
+
+            <CheckBox Name="FixUpVectorCheckBox" Content="Fix up vector to (0,1,0)" IsEnabled="False"  IsChecked="False" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 0 0" Checked="OnFixUpVectorCheckedChanged" Unchecked="OnFixUpVectorCheckedChanged"
+                      ToolTip="When unchecked then pixels always face the camera.&#x0a;When checked then pixels are always oriented up&#x0a;(this is supported only when IsWorldSize is checked)"
+                      ToolTipService.ShowOnDisabled="True"/>
         </WrapPanel>
     </Grid>
 </Page>

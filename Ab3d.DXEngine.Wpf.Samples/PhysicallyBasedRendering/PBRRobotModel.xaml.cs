@@ -28,6 +28,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Material = System.Windows.Media.Media3D.Material;
 using AssimpMaterial = Assimp.Material;
+using Ab3d.DXEngine.Wpf.Samples.Common;
 
 
 // Robot model license:
@@ -69,7 +70,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
     {
         private string _rootFolder;
 
-        private string _texturesSubfolder = @"Robot_{0}_Maps";
         private string _robotModelFileName = "Robot_{0}.FBX";
 
 
@@ -154,7 +154,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             string partName = robotPart.ToString();
 
             string fileName = _rootFolder + string.Format(_robotModelFileName, partName);
-            string texturesFolder = _rootFolder + string.Format(_texturesSubfolder, partName);
 
             Mouse.OverrideCursor = Cursors.Wait;
 
@@ -169,7 +168,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 }
 
                 Dictionary<string, Model3D> namedObjects;
-                var readModel3D = LoadModel3D(fileName, texturesFolder, out namedObjects);
+                var readModel3D = LoadModel3D(fileName, out namedObjects);
 
                 if (readModel3D == null)
                     return;
@@ -297,7 +296,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             }
         }
 
-        private Model3D LoadModel3D(string fileName, string customTexturesFolder, out Dictionary<string, Model3D> namedObjects)
+        private Model3D LoadModel3D(string fileName, out Dictionary<string, Model3D> namedObjects)
         {
             if (!System.IO.File.Exists(fileName))
             {
@@ -323,7 +322,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 
 
             // Update WPF materials with PhysicallyBasedMaterial
-            UpdateMaterials(fileName, customTexturesFolder, assimpScene, assimpWpfConverter, useStrictFileNameMatch: true, supportDDSTextures: true);
+            var texturesFolder = System.IO.Path.GetDirectoryName(fileName);
+            UpdateMaterials(fileName, texturesFolder, assimpScene, assimpWpfConverter, useStrictFileNameMatch: true, supportDDSTextures: true);
 
 
             // Convert ObjectNames to NamedObjects
@@ -414,8 +414,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                 PhysicallyBasedMaterial physicallyBasedMaterial;
                 if (_dxMaterials.TryGetValue(assimpMaterial, out physicallyBasedMaterial))
                 {
-                    // ... and tangent data
-                    SetMeshTangentData(assimpMesh, geometryModel3D);
+                    // Set mesh tangent data (this is required for rendering normal maps)
+                    AssimpPbrHelper.SetMeshTangentData(assimpMesh, geometryModel3D);
 
                     // Finally call SetUsedDXMaterial on WPF material.
                     // This will tell DXEngine to use the diffuseSpecularNormalMapMaterial instead of creating a standard WpfMaterial.
@@ -478,13 +478,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             }
 
             
-            string fileNameWithoutKnownSuffix = KnownTextureFiles.GetFileNameWithoutKnownSuffix(diffuseTextureFileName);
+            string fileNameWithoutKnownSuffix = AssimpPbrHelper.GetFileNameWithoutKnownSuffix(diffuseTextureFileName);
 
             // Get material files that start with the diffuse texture file name without a suffix
             List<string> materialFiles;
 
             if (useStrictFileNameMatch)
-                materialFiles = allFilesInFolder.Where(f => fileNameWithoutKnownSuffix == KnownTextureFiles.GetFileNameWithoutKnownSuffix(f)).ToList();
+                materialFiles = allFilesInFolder.Where(f => fileNameWithoutKnownSuffix == AssimpPbrHelper.GetFileNameWithoutKnownSuffix(f)).ToList();
             else
                 materialFiles = allFilesInFolder.Where(f => f.IndexOf(fileNameWithoutKnownSuffix, 0, StringComparison.OrdinalIgnoreCase) != -1).ToList();
 
@@ -504,7 +504,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
                     if (!TextureLoader.IsSupportedFile(materialFile, supportDDSTextures)) // Skip unsupported files
                         continue;
 
-                    var textureMapType = KnownTextureFiles.GetTextureType(materialFile);
+                    var textureMapType = AssimpPbrHelper.GetTextureType(materialFile);
                     if (textureMapType == TextureMapTypes.Unknown)
                     {
                         if (!hasDiffuseTexture)
@@ -584,25 +584,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
             }
 
             return physicallyBasedMaterial;
-        }
-
-
-        private static void SetMeshTangentData(Mesh assimpMesh, GeometryModel3D geometryModel3D)
-        {
-            var assimpTangents = assimpMesh.Tangents;
-
-            if (assimpTangents != null && assimpTangents.Count > 0)
-            {
-                var count      = assimpTangents.Count;
-                var dxTangents = new SharpDX.Vector3[count];
-
-                for (int i = 0; i < count; i++)
-                    dxTangents[i] = new SharpDX.Vector3(assimpTangents[i].X, assimpTangents[i].Y, assimpTangents[i].Z);
-
-                // Tangent values are stored with the MeshGeometry3D object.
-                // This is done with using DXAttributeType.MeshTangentArray:
-                geometryModel3D.Geometry.SetDXAttribute(DXAttributeType.MeshTangentArray, dxTangents);
-            }
         }
 
         private void ToolNameRadioButtonCheckedChanged(object sender, RoutedEventArgs e)

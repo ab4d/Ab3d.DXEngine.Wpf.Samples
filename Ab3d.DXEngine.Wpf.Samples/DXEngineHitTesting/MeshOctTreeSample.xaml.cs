@@ -132,6 +132,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             ShowBoundingBoxes();
 
             var nodeStatistics = _meshOctTree.GetNodeStatistics();
+
+            ResultTextBox.Text = "";
             AddMessage("MeshOctTree nodes statistics:\r\n" + nodeStatistics);
         }
 

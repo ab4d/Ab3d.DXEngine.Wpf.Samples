@@ -22,10 +22,6 @@
             <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage">
 
                 <Viewport3D Name="MainViewport">
-
-                    <visuals:ObjModelVisual3D x:Name="TeapotVisual3D" Source="/Resources/Models/Teapot with material.obj" SizeX="80" 
-                                              Position="0 0 0" PositionType="Center"/>
-
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
                             <Model3DGroup>

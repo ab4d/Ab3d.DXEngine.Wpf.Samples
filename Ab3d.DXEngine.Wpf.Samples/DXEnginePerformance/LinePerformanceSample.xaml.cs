@@ -181,6 +181,20 @@ You can get rendering statistics (including number of draw calls) by setting Ab3
         
         private void RecreateLines()
         {
+            InitializationTimeTextBlock.Text = null;
+            LinesCountTextBlock.Text = null;
+            DrawCallsCountTextBlock.Text = null;
+
+            // Wait until idle and then Create the lines
+            Dispatcher.BeginInvoke(new Action(CreateLines), DispatcherPriority.Background);
+        }
+
+        private void CreateLines()
+        {
+            if (MainViewportView.DXScene == null) // This may happen if user already left the sample before BeginInvoke with Background is executed
+                return;
+
+
             Mouse.OverrideCursor = Cursors.Wait;
 
             MainViewport.Children.Clear();
@@ -195,21 +209,6 @@ You can get rendering statistics (including number of draw calls) by setting Ab3
             _disposables.Dispose();
             _disposables = new DisposeList();
 
-            InitializationTimeTextBlock.Text = null;
-            LinesCountTextBlock.Text = null;
-            DrawCallsCountTextBlock.Text = null;
-
-            // Wait until idle and then Create the lines
-            Dispatcher.BeginInvoke(new Action(CreateLines), DispatcherPriority.Background);
-        }
-
-        private void CreateLines()
-        {
-            if (MainViewportView.DXScene == null) // This may happen if user already left the sample before BeginInvoke with Background is executed
-            {
-                Mouse.OverrideCursor = null;
-                return;
-            }
 
             int xCount = (int)Math.Round(XCountSlider.Value);
             int yCount = (int)Math.Round(YCountSlider.Value);
@@ -244,6 +243,10 @@ You can get rendering statistics (including number of draw calls) by setting Ab3
 
                     Mouse.OverrideCursor = null;
                 }
+            }
+            else
+            {
+                Mouse.OverrideCursor = null;
             }
 
             if (isPolyLine)

@@ -49,22 +49,20 @@
 
                 <TextBlock Text="Line type:" FontWeight="Bold" TextDecorations="Underline" Margin="0 0 0 3"/>
 
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton Name="MultiLinesRadioButton" Content="LineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
-                    <Image Name="LineVisual3DWarningImage" Source="pack://application:,,,/Resources/warningIcon.png" Width="12" Height="12" VerticalAlignment="Center" Margin="3 -2 0 0" ToolTipService.ShowDuration="120000" 
-                           ToolTip="It make take a few seconds to generate all the LineVisual3D objects&#10;because a new LineVisual3D is generated for each line segment."/>
-                </StackPanel>
-
-                <RadioButton Name="MultiPolyLinesRadioButton" Content="PolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
-                <RadioButton Name="MultiMultiLinesRadioButton" Content="MultiLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
-                <RadioButton Name="SinglePolyLinesRadioButton" Content="MultiPolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
-
-                <RadioButton Name="MultiScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode" GroupName="LineTypes" Margin="0 5 0 0" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultiScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode (multi-lines)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="MultiScreenSpaceLineNodePolylinesRadioButton" Content="ScreenSpaceLineNode (polylines)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="SingleScreenSpaceLineNodePolylinesRadioButton" Content="ScreenSpaceLineNode (combined lines)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="ReusedMeshScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode (reused mesh)" IsChecked="True" GroupName="LineTypes" Checked="OnLineTypeChanged" />
                 <RadioButton Name="MultihreadedScreenSpaceLineNodeRadioButton" Content="ScreenSpaceLineNode (multi-threaded)" GroupName="LineTypes" Checked="OnLineTypeChanged" />
 
+                <RadioButton Name="MultiPolyLinesRadioButton" Content="PolyLineVisual3D" GroupName="LineTypes" Margin="0 5 0 0" Checked="OnLineTypeChanged" />
+                <RadioButton Name="MultiMultiLinesRadioButton" Content="MultiLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <RadioButton Name="SinglePolyLinesRadioButton" Content="MultiPolyLineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="MultiLinesRadioButton" Content="LineVisual3D" GroupName="LineTypes" Checked="OnLineTypeChanged" />
+                    <Image Name="LineVisual3DWarningImage" Source="pack://application:,,,/Resources/warningIcon.png" Width="12" Height="12" VerticalAlignment="Center" Margin="3 -2 0 0" ToolTipService.ShowDuration="120000" 
+                           ToolTip="It may take a few seconds to generate all the LineVisual3D objects&#10;because a new LineVisual3D is generated for each line segment."/>
+                </StackPanel>
 
                 <TextBlock Text="Lines count settings:" FontWeight="Bold" Margin="0 15 0 3" TextDecorations="Underline"/>
 

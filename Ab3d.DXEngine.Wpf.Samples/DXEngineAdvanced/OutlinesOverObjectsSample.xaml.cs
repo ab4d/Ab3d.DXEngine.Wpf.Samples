@@ -349,17 +349,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             _savedSuperSamplingCount    = renderingContext.CurrentSupersamplingCount;
 
             // If size is changed, we need to recreate the back buffer
-            if (_outlineBackBuffer != null &&
-                (renderingContext.CurrentBackBufferDescription.Width != _outlineBackBufferDescription.Width ||
-                 renderingContext.CurrentBackBufferDescription.Height != _outlineBackBufferDescription.Height))
-            {
+
+            int requiredWidth  = renderingContext.FinalBackBufferDescription.Width; // Read size from FinalBackBufferDescription because CurrentBackBufferDescription can be super-sampled
+            int requiredHeight = renderingContext.FinalBackBufferDescription.Height;
+
+            if (_outlineBackBuffer != null && (requiredWidth != _outlineBackBufferDescription.Width || requiredHeight != _outlineBackBufferDescription.Height))
                 DisposeOutlineBackBuffers();
-            }
 
             if (_outlineBackBuffer == null)
             {
-                _outlineBackBufferDescription = dxDevice.CreateTexture2DDescription(renderingContext.FinalBackBufferDescription.Width, // Read size from FinalBackBufferDescription because CurrentBackBufferDescription can be super-sampled
-                                                                                    renderingContext.FinalBackBufferDescription.Height,
+                _outlineBackBufferDescription = dxDevice.CreateTexture2DDescription(requiredWidth, 
+                                                                                    requiredHeight,
                                                                                     new SampleDescription(1, 0),
                                                                                     isRenderTarget: true,
                                                                                     isSharedResource: false,

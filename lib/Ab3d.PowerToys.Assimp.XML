@@ -488,6 +488,11 @@
             MeshNameSuffix is used in <see cref="P:Ab3d.Assimp.AssimpWpfImporter.NamedObjects"/> dictionary when the mesh has the same name as the model.
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.AssimpWpfConverter">
+            <summary>
+            Gets the used <see cref="P:Ab3d.Assimp.AssimpWpfImporter.AssimpWpfConverter"/>.
+            </summary>
+        </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.TransformCamerasAndLights">
             <summary>
             Gets or sets a Boolean that specifies if Node transformations are used to transform imported cameras and lights.
@@ -540,14 +545,14 @@
         </member>
         <member name="P:Ab3d.Assimp.AssimpWpfImporter.ForceConvertToRightHandedCoordinateSystem">
             <summary>
-            Gets or sets a Boolean that specifies if we always do a convertion from left to right handed coordinate system.
+            Gets or sets a Boolean that specifies if we always do a conversion from left to right-handed coordinate system.
             </summary>
             <remarks>
             <para>
-            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a convertion from left to right handed coordinate system.
+            <b>ForceConvertToRightHandedCoordinateSystem</b> gets or sets a Boolean that specifies if we always do a conversion from left to right-handed coordinate system.
             </para>
             <para>
-            WPF uses right handed coordinate system - the Z axis points away from the screen. DirectX uses left handed coordinate system - there the Z axis points into the screen.
+            WPF uses right-handed coordinate system - the Z axis points away from the screen. DirectX uses left-handed coordinate system - there the Z axis points into the screen.
             </para>
             </remarks>
         </member>
@@ -611,6 +616,16 @@
             Gets a string array of file extensions that are supported for import by Assimp.
             </summary>
         </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.LastImportedFileName">
+            <summary>
+            Gets the file name of the last imported file.
+            </summary>
+        </member>
+        <member name="P:Ab3d.Assimp.AssimpWpfImporter.LastUsedTexturesPath">
+            <summary>
+            Gets the textures path that was specified by the last call to the ImportModel3D method.
+            </summary>
+        </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.#ctor">
             <summary>
             Initializes a new instance of the AssimpWpfImporter class.
@@ -618,7 +633,7 @@
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadModel3D(System.String,System.String)">
             <summary>
-            ReadModel3D method reads 3D models from specified file and returns the 3D models as Model3DGroup or GeomentryModel3D.
+            ReadModel3D method reads 3D models from specified file and returns the 3D models as Model3DGroup or GeometryModel3D.
             </summary>
             <param name="fileName">file name</param>
             <param name="texturesPath">optional: directory name where the textures files are; if null than the same path as fileName is used</param>
@@ -652,7 +667,7 @@
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.ReadFileToAssimpScene(System.String)">
             <summary>
-            ReadFileToAssimpScene reads the specifed file and returns Assimp's Scene object.
+            ReadFileToAssimpScene reads the specified file and returns Assimp's Scene object.
             Assimp's Scene object can be manually converted into WPF's object with AssimpWpfConverter class.
             </summary>
             <param name="fileName">file name</param>
@@ -666,6 +681,57 @@
             <returns>
             True if the file extension is supported, false otherwise
             </returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.SetConfig(Assimp.Configs.PropertyConfig)">
+            <summary>
+            Sets a configuration property to the context. This is only used during import.
+            You can get the possible setting class by using intelli sense and checking the classes available in the global::Assimp.Configs namespace
+            or get property names from config.h.in file in Assimp source (https://github.com/assimp/assimp/blob/master/include/assimp/config.h.in)
+            </summary>
+            <example>
+            <code>
+            _assimpWpfImporter.SetConfig(new global::Assimp.Configs.FBXPreservePivotsConfig(preservePivots: false));
+            // this is the same as: 
+            _assimpWpfImporter.SetConfig(new global::Assimp.Configs.BooleanPropertyConfig("IMPORT_FBX_PRESERVE_PIVOTS", false));
+            </code>
+            </example>
+            <param name="config">Config to set</param>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.GetEmbeddedTextureBytes(Assimp.Scene,System.String)">
+            <summary>
+            Returns a byte array with compressed data for the embedded texture that is referenced by the specified fileName (fileName starts with '*' following with an index of the texture).
+            When the embedded texture cannot be found, then null is returned.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="fileName">fileName as written in the Assimp's material (fileName starts with '*' following with an index of the texture)</param>
+            <returns>Stream for the embedded texture or null when the embedded texture cannot be found</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.GetEmbeddedTextureBytes(Assimp.Scene,System.Int32)">
+            <summary>
+            Returns a byte array with compressed data for the embedded texture with the specified index.
+            When the embedded texture cannot be found or index is of our range, then null is returned.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="embeddedTextureIndex">index of the embedded texture</param>
+            <returns>byte array with compressed texture data or null when the embedded texture cannot be found</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.GetEmbeddedTexture(Assimp.Scene,System.String)">
+            <summary>
+            Returns a WPF's BitmapImage for the embedded texture with the specified fileName (fileName starts with '*' following with an index of the texture).
+            When the embedded texture cannot be found, then null is returned.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="fileName">fileName as written in the Assimp's material (fileName starts with '*' following with an index of the texture)</param>
+            <returns>WPF's BitmapImage for the embedded texture or null when the embedded texture cannot be found</returns>
+        </member>
+        <member name="M:Ab3d.Assimp.AssimpWpfImporter.GetEmbeddedTexture(Assimp.Scene,System.Int32)">
+            <summary>
+            Returns a WPF's BitmapImage for the embedded texture with the specified index.
+            When the embedded texture cannot be found or index is of our range, then null is returned.
+            </summary>
+            <param name="assimpScene">assimpScene</param>
+            <param name="embeddedTextureIndex">index of the embedded texture</param>
+            <returns>WPF's BitmapImage for the embedded texture or null when the embedded texture cannot be found</returns>
         </member>
         <member name="M:Ab3d.Assimp.AssimpWpfImporter.LoadAssimpNativeLibrary(System.String)">
             <summary>

@@ -9,6 +9,7 @@
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
       xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       xmlns:dxEnginePerformance="clr-namespace:Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance"
+      xmlns:common="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Common"
       Title="InstancedMeshGeometry3DTest"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="800">
@@ -41,17 +42,17 @@
                                       CameraType="PerspectiveCamera"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
 
-        <dxEnginePerformance:PointCloudMouseCameraController x:Name="PointCloudMouseCameraController1" Grid.Row="1"
-                                                             RotateAroundMousePosition="True"
-                                                             ZoomMode="MousePosition"
-                                                             ShowRotationCenterMarker="True"
-                                                             RotateCameraConditions="RightMouseButtonPressed"
-                                                             MoveCameraConditions="LeftMouseButtonPressed"
-                                                             QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
-                                                             EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                                             TargetCamera="{Binding ElementName=Camera1}"/>
+        <common:PointCloudMouseCameraController x:Name="PointCloudMouseCameraController1" Grid.Row="1"
+                                                RotateAroundMousePosition="True"
+                                                ZoomMode="MousePosition"
+                                                ShowRotationCenterMarker="True"
+                                                RotateCameraConditions="RightMouseButtonPressed"
+                                                MoveCameraConditions="LeftMouseButtonPressed"
+                                                QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
+                                                EventsSourceElement="{Binding ElementName=MainDXViewportView}"
+                                                TargetCamera="{Binding ElementName=Camera1}"/>
 
-       <ab3d:MouseCameraControllerInfo Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <ab3d:MouseCameraControllerInfo Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                                        FontSize="18" FontWeight="Bold"
                                        ShowQuickZoomInfo="True"
                                        MouseCameraController="{Binding ElementName=PointCloudMouseCameraController1}" />

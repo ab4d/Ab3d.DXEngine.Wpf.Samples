@@ -46,5 +46,11 @@
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
                                     ShowRotationCenterMarker="True"
                                     TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Name="ShowHideButton" Content="Hide" Margin="10 0 0 0" Padding="6 2" Click="ShowHideButton_OnClick" />
+            <Button Name="TransformButton" Content="Transform" Margin="10 0 0 0" Padding="6 2" Click="TransformButton_OnClick" />
+            <Button Name="ChangeColorButton" Content="Change color" Margin="10 0 0 0" Padding="6 2" Click="ChangeColorButton_OnClick" />
+        </StackPanel>
     </Grid>
 </Page>

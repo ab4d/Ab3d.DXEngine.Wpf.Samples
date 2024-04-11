@@ -214,7 +214,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             _showNormalsTextureRenderingStep = new RenderTextureRenderingStep(RenderTextureRenderingStep.TextureChannelsCount.FourChannels, "Show DepthNormal texture")
             {
                 Offsets = new Vector4(0.5f, 0.5f, 0.5f, 1), // show only normals
-                Factors = new Vector4(0.5f, 0.5f, 0.5f, 1),
+                Factors = new Vector4(0.5f, 0.5f, 0.5f, 0),
                 TargetViewport = new ViewportF(0.02f, 0.68f, 0.3f, 0.3f), // render to lower left part of screen (values are relative to view size)
             };
 
@@ -298,8 +298,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                                                                                         isSharedResource: false,
                                                                                         isStagingTexture: false,
                                                                                         isShaderResource: true,
-                                                                                        //format: Format.R16G16B16A16_Float); // This use 16 bits for depth but requires double the bandwidth as B8G8R8A8_UNorm
-                                                                                        format: Format.B8G8R8A8_UNorm);  // In this case we only have 8 bits for depth (we may improve that by using RA for depth - see DX11 book page 723)
+                                                                                        format: Format.B8G8R8A8_UNorm); // When using 8 bit UNORM, then directions and depth values are normalized to 0 to 1 (0 to 255)
+                                                                                        //format: Format.R16G16B16A16_Float); // It is also possible to render to 16 bits float values. In this case the actual normal and depth values are used (depth values are in range from 0 to FarPlaneDistance)
 
                 // Super-sampling note:
                 // To render the outlines at super-sampling resolution, then use the size from CurrentBackBufferDescription and not from FinalBackBufferDescription:

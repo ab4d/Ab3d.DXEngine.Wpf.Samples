@@ -230,10 +230,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 for (var i = 0; i < allHitTests.Count; i++)
                 {
                     var hitTest = allHitTests[i];
-                    sb.AppendFormat("{0}. PointHit: {1:0.0};  Dist: {2:0};   SceneNode Id: {3}",
+                    sb.AppendFormat("{0}. PointHit: {1:0.0};  Dist: {2:0};{3}   SceneNode Id: {4}",
                         i + 1,
                         hitTest.HitPosition,
                         hitTest.DistanceToRayOrigin,
+                        hitTest.IsBackFacing ? " (back face)" : "",
                         hitTest.HitSceneNode.Id);
 
                     if (!string.IsNullOrEmpty(hitTest.HitSceneNode.Name))

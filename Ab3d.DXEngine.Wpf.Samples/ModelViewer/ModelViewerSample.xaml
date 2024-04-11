@@ -59,8 +59,8 @@
 
                 <Viewport3D Name="MainViewport">
                     <visuals:ContentVisual3D x:Name="ContentVisual" IsVisible="{Binding ElementName=ShowSolidObjectsCheckBox, Path=IsChecked}" />
-                    <visuals:MultiLineVisual3D x:Name="AllWireframesLineVisual3D" LineColor="Black" LineThickness="0.5" />
-                    <visuals:MultiLineVisual3D x:Name="SelectedModelWireframeVisual3D" LineColor="Black" LineThickness="0.5" />
+                    <visuals:MultiLineVisual3D x:Name="AllEdgeWireframesLineVisual3D" LineColor="Black" LineThickness="0.5" />
+                    <visuals:MultiLineVisual3D x:Name="SelectedModelLinesVisual3D" LineColor="Black" LineThickness="0.5" />
                     <visuals:MultiLineVisual3D x:Name="NormalLinesVisual3D" LineColor="Red" LineThickness="1" />
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
@@ -80,7 +80,7 @@
 
         <cameras:TargetPositionCamera Name="Camera1" Grid.Column="0" 
                                       TargetPosition="0 0 0" 
-                                      Heading="30" Attitude="-20" Bank="0" 
+                                      Heading="-40" Attitude="-20" Bank="0" 
                                       Distance="200" 
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}"/>
@@ -156,17 +156,18 @@
                             <TextBlock Text="Scene view settings:" FontWeight="Bold" Margin="0 0 0 0" />
 
                             <CheckBox Name="ShowSolidObjectsCheckBox" Content="Show solid objects" Margin="0 10 0 0" IsChecked="True" />
-                            <CheckBox Name="ShowWireframeCheckBox" Content="Show wireframe" Margin="0 5 0 0" IsChecked="True" Checked="OnShowWireframeCheckBoxCheckedChanged" Unchecked="OnShowWireframeCheckBoxCheckedChanged" />
+                            <CheckBox Name="ShowEdgeLinesCheckBox" Content="Show edge lines" Margin="0 5 0 0" IsChecked="True" Checked="OnShowEdgeLinesCheckBoxCheckedChanged" Unchecked="OnShowEdgeLinesCheckBoxCheckedChanged" />
+                            <CheckBox Name="ShowWireframeCheckBox" Content="Show wireframe" Margin="0 5 0 0" IsChecked="False" Checked="OnShowWireframeCheckBoxCheckedChanged" Unchecked="OnShowWireframeCheckBoxCheckedChanged" />
 
 
-                            <TextBlock Text="Wireframe line settings:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Text="Edge / wireframe lines settings:" FontWeight="Bold" Margin="0 15 0 0" />
 
                             <controls:SimpleGrid ColumnsCount="2" RowSpacing="3" Margin="0 5 0 0">
                                 <TextBlock Text="LineThickness:" VerticalAlignment="Center" Margin="0 0 10 0" />
-                                <ComboBox Name="LineThicknessComboBox" SelectionChanged="OnWireframeLineSettingsChanged" />
+                                <ComboBox Name="LineThicknessComboBox" SelectionChanged="OnLineSettingsChanged" />
 
                                 <TextBlock Text="LineColor:" VerticalAlignment="Center" Margin="0 0 10 0" />
-                                <ComboBox Name="LineColorComboBox" Width="100" SelectedIndex="1" SelectionChanged="OnWireframeLineSettingsChanged" >
+                                <ComboBox Name="LineColorComboBox" Width="100" SelectedIndex="1" SelectionChanged="OnLineSettingsChanged" >
                                     <ComboBoxItem>(from object)</ComboBoxItem>
                                     <ComboBoxItem>Black</ComboBoxItem>
                                     <ComboBoxItem>White</ComboBoxItem>
@@ -174,13 +175,25 @@
                                     <ComboBoxItem>Orange</ComboBoxItem>
                                     <ComboBoxItem>Red</ComboBoxItem>
                                 </ComboBox>
+                                
+                                <TextBlock Text="Edge start angle:" VerticalAlignment="Center" Margin="0 0 10 0" />
+                                <ComboBox Name="EdgeStartAngleComboBox" Width="100" SelectedIndex="3" SelectionChanged="OnLineSettingsChanged" >
+                                    <ComboBoxItem>5</ComboBoxItem>
+                                    <ComboBoxItem>10</ComboBoxItem>
+                                    <ComboBoxItem>15</ComboBoxItem>
+                                    <ComboBoxItem>20</ComboBoxItem>
+                                    <ComboBoxItem>30</ComboBoxItem>
+                                    <ComboBoxItem>40</ComboBoxItem>
+                                    <ComboBoxItem>50</ComboBoxItem>
+                                    <ComboBoxItem>60</ComboBoxItem>
+                                </ComboBox>
                             </controls:SimpleGrid>
 
                             <CheckBox Name="AddLineDepthBiasCheckBox" Content="Add line depth bias" Margin="0 5 0 0" IsChecked="True"
-                                      Checked="OnWireframeLineSettingsChanged" Unchecked="OnWireframeLineSettingsChanged" />
+                                      Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
 
 
-                            <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 15 0 0" />
 
                             <CheckBox Name="TransparentNonSelectedObjectsCheckBox" Content="Transparent not selected objects" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
                             <CheckBox Name="TwoSidedTransparentMaterialCheckBox" Content="Use two-sided transparent material" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
@@ -199,7 +212,7 @@
                             </ComboBox>
 
 
-                            <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 15 0 0" />
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Camera:" VerticalAlignment="Center"/>
                                 <ComboBox Name="CameraComboBox" SelectedIndex="0" Width="200" Margin="5 0 0 0" SelectionChanged="CameraComboBox_OnSelectionChanged">
@@ -209,13 +222,13 @@
                             </StackPanel>
 
 
-                            <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 20 0 0" />
+                            <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 15 0 0" />
 
                             <StackPanel Name="ImportedLightsPanel" Orientation="Vertical" />
 
                             <CheckBox Name="CameraLightCheckBox" Content="Camera light" IsChecked="True" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
+                            <CheckBox Name="SideLightCheckBox" Content="Side light" IsChecked="True" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
                             <CheckBox Name="TopDownLightCheckBox" Content="Top down light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
-                            <CheckBox Name="SideLightCheckBox" Content="Side light" IsChecked="False" Margin="0 5 0 0" Checked="OnLightSettingsChanged" Unchecked="OnLightSettingsChanged" />
 
                             <Grid Margin="0 5 0 0">
                                 <Grid.ColumnDefinitions>
@@ -224,6 +237,18 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding ElementName=AmbientLightSlider, Path=Value, StringFormat='Ambient light: {0:0}%'}" Width="110" VerticalAlignment="Center"/>
                                 <Slider Name="AmbientLightSlider" Grid.Column="1" Value="30" Minimum="0" Maximum="100" ValueChanged="AmbientLightSlider_OnValueChanged"/>
+                            </Grid>
+
+                            <CheckBox Name="SSAOCheckBox" Content="SSAO" IsChecked="False" Margin="0 10 0 0" Checked="OnSSAOCheckBoxCheckedChanged" Unchecked="OnSSAOCheckBoxCheckedChanged"
+                                      ToolTip="When checked, than Screen Space Ambient Occlusion (SSAO) is enabled" />
+
+                            <Grid Margin="0 5 0 0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Name="OcclusionRadiusTextBlock" Grid.Column="0" Text="{Binding ElementName=OcclusionRadiusSlider, Path=Value, StringFormat='Occlusion radius: {0:0}'}" Width="110" VerticalAlignment="Center"/>
+                                <Slider Name="OcclusionRadiusSlider" Grid.Column="1" Value="10" Minimum="0" Maximum="99" ValueChanged="OcclusionRadiusSlider_OnValueChanged"/>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
@@ -246,6 +271,14 @@
 
                         <CheckBox Name="TwoSidedMaterialsCheckBox" Content="Force two sided materials" IsChecked="False" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
                                   ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided."/>
+
+
+                        <CheckBox Name="UsePbrMaterialsCheckBox" Content="Use PBR materials" IsChecked="True" Margin="0 10 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
+                                  ToolTip="When checked then Physically Based Rendering (PBR) materials will be used when defined."/>
+
+                        <CheckBox Name="FindPbrFilesCheckBox" Content="Find PBR maps from related files" IsChecked="True" Margin="0 5 0 0" 
+                                  ToolTip="Because Assimp importer may not define all PBR maps from the read file,&#x0a;it may be necessary to search the file in same folder and&#x0a;based on the file name assigned them to PBR maps."/>
+
 
 
                         <TextBlock Text="View panels:" FontWeight="Bold" Margin="0 20 0 0" />

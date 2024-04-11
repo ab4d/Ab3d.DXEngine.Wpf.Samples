@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
+using SharpDX.Direct3D11;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -23,6 +24,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
     public partial class ReflectionMapSample : Page
     {
         private DXCubeMap _dxCubeMap;
+        private Model3D _teapotModel;
 
         public ReflectionMapSample()
         {
@@ -32,30 +34,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
             {
-                if (MainDXViewportView.UsedGraphicsProfile.DriverType != GraphicsProfile.DriverTypes.Wpf3D)
-                {
-                    // We create the CubeMap from 6 bitmap images
-                    string packUriPrefix = string.Format("pack://application:,,,/{0};component/Resources/SkyboxTextures/", this.GetType().Assembly.GetName().Name);
+                if (MainDXViewportView.UsedGraphicsProfile.DriverType == GraphicsProfile.DriverTypes.Wpf3D)
+                    return; // WPF 3D rendering
 
-                    // Create DXCubeMap with specifying 6 bitmaps for all sides of the cube
-                    _dxCubeMap = new DXCubeMap(packUriPrefix,
-                                                "CloudyLightRaysRight512.png",
-                                                "CloudyLightRaysLeft512.png",
-                                                "CloudyLightRaysUp512.png",
-                                                "CloudyLightRaysDown512.png",
-                                                "CloudyLightRaysFront512.png",
-                                                "CloudyLightRaysBack512.png");
-
-                    // To show the environment map correctly for our bitmaps we need to flip bottom bitmap horizontally and vertically
-                    _dxCubeMap.FlipBitmaps(flipRightBitmapType: DXCubeMap.FlipBitmapType.None,
-                                            flipLeftBitmapType: DXCubeMap.FlipBitmapType.None,
-                                            flipUpBitmapType: DXCubeMap.FlipBitmapType.None,
-                                            flipDownBitmapType: DXCubeMap.FlipBitmapType.FlipXY,
-                                            flipFrontBitmapType: DXCubeMap.FlipBitmapType.None,
-                                            flipBackBitmapType: DXCubeMap.FlipBitmapType.None);
-
-                    SetupCubeMapMaterial();
-                }
+                LoadTeapot();
+                SetupCubeMapMaterial();
             };
 
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
@@ -72,13 +55,47 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             };
         }
 
+        private void LoadTeapot()
+        {
+            var readerObj = new ReaderObj();
+            var fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot with material.obj");
+            
+            _teapotModel = readerObj.ReadModel3D(fileName);
+
+            Ab3d.Utilities.ModelUtils.CenterAndScaleModel3D(_teapotModel, centerPosition: new Point3D(0, 0, 0), finalSize: new Size3D(80, 80, 80));
+
+            MainViewport.Children.Add(_teapotModel.CreateModelVisual3D());
+        }
+
         private void SetupCubeMapMaterial()
         {
+            if (_teapotModel == null)
+                return;
+
+
+            // We create the CubeMap from 6 bitmap images
+            string packUriPrefix = string.Format("pack://application:,,,/{0};component/Resources/SkyboxTextures/", this.GetType().Assembly.GetName().Name);
+
+            // Create DXCubeMap with specifying 6 bitmaps for all sides of the cube
+            _dxCubeMap = new DXCubeMap(packUriPrefix,
+                                       "CloudyLightRaysRight512.png",
+                                       "CloudyLightRaysLeft512.png",
+                                       "CloudyLightRaysUp512.png",
+                                       "CloudyLightRaysDown512.png",
+                                       "CloudyLightRaysFront512.png",
+                                       "CloudyLightRaysBack512.png");
+
+            // To show the environment map correctly for our bitmaps we need to flip bottom bitmap horizontally and vertically
+            _dxCubeMap.FlipBitmaps(flipRightBitmapType: DXCubeMap.FlipBitmapType.None,
+                flipLeftBitmapType: DXCubeMap.FlipBitmapType.None,
+                flipUpBitmapType: DXCubeMap.FlipBitmapType.None,
+                flipDownBitmapType: DXCubeMap.FlipBitmapType.FlipXY,
+                flipFrontBitmapType: DXCubeMap.FlipBitmapType.None,
+                flipBackBitmapType: DXCubeMap.FlipBitmapType.None);
+
+
             // We are using ModelIterator to change material on every GeometryModel3D inside the rootModel3D.
-
-            Model3D rootModel3D = TeapotVisual3D.Content;
-
-            Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(rootModel3D, parentTransform3D: null, callback: delegate (GeometryModel3D model3D, Transform3D transform3D)
+            Ab3d.Utilities.ModelIterator.IterateGeometryModel3DObjects(_teapotModel, parentTransform3D: null, callback: delegate (GeometryModel3D model3D, Transform3D transform3D)
             {
                 // This code is called for each GeometryModel3D inside rootModel3D:
 
