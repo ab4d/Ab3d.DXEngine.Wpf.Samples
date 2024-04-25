@@ -58,9 +58,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
 
                     if (FileFormat == "ascii")
                     {
-                        bool readColor = HasPixelColor();
+                        bool swapRedAndBlue;
+                        int colorIndex = GetColorIndex(requireUCharColor: false, swapRedAndBlue: out swapRedAndBlue);
+                        int redOffset = swapRedAndBlue ? 0 : 2;
+                        int blueOffset = swapRedAndBlue ? 2 : 1;
 
-                        if (readColor)
+                        if (colorIndex > 0)
                         {
                             pixelColors = new Color4[VerticesCount];
 
@@ -75,9 +78,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
                                 vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
 
 
-                                int red   = Int32.Parse(_lineParts[3]);
-                                int green = Int32.Parse(_lineParts[4]);
-                                int blue  = Int32.Parse(_lineParts[5]);
+                                int red   = Int32.Parse(_lineParts[colorIndex + redOffset]);
+                                int green = Int32.Parse(_lineParts[colorIndex + 1]);
+                                int blue  = Int32.Parse(_lineParts[colorIndex + blueOffset]);
 
                                 pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
                             }
@@ -104,11 +107,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
                         if (!HasFloatPositionFormat())
                             throw new FileFormatException("Binary ply file cannot be read because positions are not defined as float values");
 
-                        bool readColor = HasPixelColor() && HasUCharPixelColor();
 
-                        if (readColor)
+                        bool swapRedAndBlue;
+                        int colorIndex = GetColorIndex(requireUCharColor: true, swapRedAndBlue: out swapRedAndBlue);
+
+                        if (colorIndex > 0)
                         {
-                            var skippedSize = oneElementSize - 3 * 4 - 3; // we read 3 float32 and 3 uchars, other bytes need to be skipped
+                            var colorOffset = GetElementOffset(colorIndex);
+                            var skippedSizeAfterPosition = colorOffset - 3 * 4;               // how many bytes we need to skip to read the color after reading the position (position is 3 * 4 bytes)
+                            var skippedSizeAfterColor = oneElementSize - colorOffset - 3; // we read 3 float32, then skip colorOffset and read 3 uchars, other bytes need to be skipped
 
                             pixelColors = new Color4[VerticesCount];
 
@@ -120,14 +127,24 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
 
                                 vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
 
+                                if (skippedSizeAfterPosition > 0)
+                                    reader.BaseStream.Seek(skippedSizeAfterPosition, SeekOrigin.Current);
+
                                 byte red   = reader.ReadByte();
                                 byte green = reader.ReadByte();
                                 byte blue  = reader.ReadByte();
 
+                                if (swapRedAndBlue)
+                                {
+                                    byte temp = red;
+                                    red = blue;
+                                    blue = temp;
+                                }
+
                                 pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
 
-                                if (skippedSize > 0)
-                                    reader.BaseStream.Seek(skippedSize, SeekOrigin.Current);
+                                if (skippedSizeAfterColor > 0)
+                                    reader.BaseStream.Seek(skippedSizeAfterColor, SeekOrigin.Current);
                             }
                         }
                         else
@@ -148,11 +165,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
                             }
                         }
                     }
-                    else  if (FileFormat == "binary_big_endian")
-                    {
-                        // TODO:
-                        // See https://stackoverflow.com/questions/8620885/c-sharp-binary-reader-in-big-endian
-                    }
+                    //else if (FileFormat == "binary_big_endian")
+                    //{
+                    //    // TODO:
+                    //    // See https://stackoverflow.com/questions/8620885/c-sharp-binary-reader-in-big-endian
+                    //}
                     else
                     {
                         throw new FileFormatException("Unsupported file format: " + FileFormat);
@@ -192,20 +209,71 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
                    (_vertexElementTypes[1] == "float" || _vertexElementTypes[1] == "float32") &&
                    (_vertexElementTypes[2] == "float" || _vertexElementTypes[2] == "float32");
         }
-        
-        private bool HasPixelColor()
+
+        private int GetElementNameIndex(string name, bool exactMatch)
         {
-            return _vertexElementNames.Count >= 6 &&
-                   _vertexElementNames[3].IndexOf("red", StringComparison.OrdinalIgnoreCase) != -1 &&
-                   _vertexElementNames[4].IndexOf("green", StringComparison.OrdinalIgnoreCase) != -1 &&
-                   _vertexElementNames[5].IndexOf("blue", StringComparison.OrdinalIgnoreCase) != -1;
+            for (var i = 0; i < _vertexElementNames.Count; i++)
+            {
+                string oneName = _vertexElementNames[i];
+
+                if ((exactMatch && oneName.Equals(name, StringComparison.OrdinalIgnoreCase)) ||
+                    (!exactMatch && oneName.IndexOf(name, StringComparison.OrdinalIgnoreCase) != -1))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
-        
-        private bool HasUCharPixelColor()
+
+        private int GetElementOffset(int elementIndex)
         {
-            return _vertexElementTypes[3] == "uchar" &&
-                   _vertexElementTypes[4] == "uchar" &&
-                   _vertexElementTypes[5] == "uchar";
+            int offset = 0;
+            for (int i = 0; i < elementIndex; i++)
+                offset += GetSizeOfElement(_vertexElementTypes[i]);
+
+            return offset;
+        }
+
+        private int GetColorIndex(bool requireUCharColor, out bool swapRedAndBlue)
+        {
+            swapRedAndBlue = false;
+
+            int redIndex = GetElementNameIndex("red", exactMatch: false); // this also matches "diffuse_red", etc.
+
+            if (redIndex == -1)
+                return -1;
+
+            int greenIndex = GetElementNameIndex("green", exactMatch: false);
+            int blueIndex = GetElementNameIndex("blue", exactMatch: false);
+
+            if (greenIndex == -1 || blueIndex == -1)
+                return -1;
+
+
+            // Check if color is specified in the supported format (uchar)
+            // This is required when reading from binary format where we need to know the color type
+            // When reading from ascii, we are reading color as text and there the type is not that important
+            if (requireUCharColor &&
+                 (!_vertexElementTypes[redIndex].Equals("uchar", StringComparison.OrdinalIgnoreCase) ||
+                 !_vertexElementTypes[greenIndex].Equals("uchar", StringComparison.OrdinalIgnoreCase) ||
+                 !_vertexElementTypes[blueIndex].Equals("uchar", StringComparison.OrdinalIgnoreCase)))
+            {
+                return -1;
+            }
+
+
+            // check if we have any of the supported color orders
+            if (greenIndex == redIndex + 1 && blueIndex == redIndex + 2)
+                return redIndex; // RGB
+            
+            if (greenIndex == blueIndex + 1 && redIndex == blueIndex + 2)
+            {
+                swapRedAndBlue = true;
+                return blueIndex; // BGR
+            }
+
+            return -1; // unsupported colors order
         }
 
         private void ResetFile()
@@ -329,40 +397,41 @@ namespace Ab3d.DXEngine.Wpf.Samples.Common
             int size = 0;
 
             foreach (var elementType in elementTypesList)
-            {
-                switch (elementType)
-                {
-                    case "float":
-                    case "float32":
-                    case "int":
-                    case "uint":
-                    case "int32":
-                    case "uint32":
-                        size += 4;
-                        break;
-
-                    case "int16":
-                    case "uint16":
-                    case "short":
-                    case "ushort":
-                        size += 2;
-                        break;
-
-                    case "int8":
-                    case "uint8":
-                    case "uchar":
-                    case "char":
-                        size += 1;
-                        break;
-
-                    case "float64":
-                    case "double":
-                        size += 8;
-                        break;
-                }
-            }
+                size += GetSizeOfElement(elementType);
 
             return size;
+        }
+
+        private static int GetSizeOfElement(string elementType)
+        {
+            switch (elementType)
+            {
+                case "float":
+                case "float32":
+                case "int":
+                case "uint":
+                case "int32":
+                case "uint32":
+                    return 4;
+
+                case "int16":
+                case "uint16":
+                case "short":
+                case "ushort":
+                    return 2;
+
+                case "int8":
+                case "uint8":
+                case "uchar":
+                case "char":
+                    return 1;
+
+                case "float64":
+                case "double":
+                    return 8;
+            }
+
+            return 0; // unknown
         }
     }
 }
