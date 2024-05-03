@@ -228,11 +228,16 @@ To test the difference when saving to png, uncomment the code in the SetupConten
             {
                 // Create only one instance of WriteableBitmap, then reuse it with other calls to RenderToBitmap
                 
+                int finalBitmapWidth  = (int)(BitmapWidth  * dpiScaleX);
+                int finalBitmapHeight = (int)(BitmapHeight * dpiScaleY);
+
+                // Except in case when the size is changed
+                if (_writeableBitmap != null && (_writeableBitmap.PixelWidth != finalBitmapWidth || _writeableBitmap.PixelHeight != finalBitmapHeight))
+                    _writeableBitmap = null; // recreate the WriteableBitmap
+
+
                 if (_writeableBitmap == null) // we would also need to recreate the WriteableBitmap in case the size changes
                 {
-                    int finalBitmapWidth  = (int)(BitmapWidth  * dpiScaleX);
-                    int finalBitmapHeight = (int)(BitmapHeight * dpiScaleY);
-
                     // When using WriteableBitmap, the RenderToBitmap will use pre-multiplied alpha
                     // or non pre-multiplied alpha based on the pixel format (Pbgra32 for pre-multiplied alpha).
                     //
