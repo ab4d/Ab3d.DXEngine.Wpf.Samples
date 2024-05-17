@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -167,6 +168,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                 positionColors = plyPointCloudReader.PixelColors;
             }
+            else if (fileExtension.Equals(".xyz", StringComparison.OrdinalIgnoreCase))
+            {
+                positions = LoadXyzFile(fileName, out positionColors);
+            }
             else
             {
                 // Use AssimpImporter to read other files
@@ -270,6 +275,56 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     });
 
                     positionColors = newPositionColors;
+                }
+            }
+
+            return positions;
+        }
+
+        // Load xyz files that have x,y and z value separated by tab ('\t')
+        // It can also read position colors that are written after z value: color is written as red, green and blue separated by tab ('\t').
+        // Note that the code below is from the performance and memory usage not optimal because it uses File.ReadAllLines.
+        // This requires reading the whole file and storing it into memory. It would be better to use stream reader and read line by line.
+        private Vector3[] LoadXyzFile(string fileName, out Color4[] positionColors)
+        {
+            var fileLines = System.IO.File.ReadAllLines(fileName);
+
+            int count = fileLines.Length;
+
+            var positions = new Vector3[count];
+
+            var oneLine = fileLines[0];
+            var oneLineParts = oneLine.Split('\t');
+
+            if (oneLineParts.Length == 6)
+            {
+                // we also have color data
+                positionColors = new Color4[count];
+            }
+            else
+            {
+                positionColors = null;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                oneLine = fileLines[i];
+                oneLineParts = oneLine.Split('\t');
+
+                float x = float.Parse(oneLineParts[0], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                float y = float.Parse(oneLineParts[1], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                float z = float.Parse(oneLineParts[2], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+
+                // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
+                positions[i] = new Vector3(x, z, y); 
+
+                if (positionColors != null)
+                {
+                    int red   = Int32.Parse(oneLineParts[3]);
+                    int green = Int32.Parse(oneLineParts[4]);
+                    int blue  = Int32.Parse(oneLineParts[5]);
+
+                    positionColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
                 }
             }
 
