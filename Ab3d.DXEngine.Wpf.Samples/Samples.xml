@@ -129,6 +129,7 @@
 
   <Sample Page="DXEngineOther/DXEngineOtherIntroPage.xaml" IsTitle="True" Title="Other Ab3d.DXEngine samples"/>
 
+  <Sample Page="DXEngineOther/GltfImporterSample.xaml" Title="glTF importer" IsNew="True" Description=""/>
   <Sample Page="DXEngineOther/MultiDXViewportViewsSample.xaml" Title="Multi DXViewportViews" Description="This sample shows how to defined a master DXViewportView that contains the 3D scene and then add child DXViewportView objects that show the same 3D scene but provide its own cameras and can also override or change the rendering of the 3D scene."/>
   <Sample Page="DXEngineOther/ManyLightsTest.xaml" Title="Many lights test" Description="This sample shows that DXEngine can render scene with many lights. This is achieved with rendering the scene with multiple passes. But this can also have some limitations - read the comments in the ManyLightsTest.xaml.cs file for more information."/>
   <Sample Page="DXEngineOther/DDSTextureLoading.xaml" Title="DDS texture loading" Description="See code behind for more information on DDS files."/>

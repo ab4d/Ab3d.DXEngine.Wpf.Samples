@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -23,8 +23,9 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="7.0.8881" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8881" />    
+    <PackageReference Include="Ab3d.DXEngine" Version="7.0.8959" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.0.8959" />    
+    <PackageReference Include="Ab3d.DXEngine.glTF" Version="1.0.8960" />    
     <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" /> 
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
@@ -109,6 +110,8 @@
     <None Remove="Resources\Models\teapot-reflection.png" />
     <None Remove="Resources\Models\Teapot.mtl" />
     <None Remove="Resources\Models\Teapot.obj" />
+    <None Remove="Resources\Models\voyager readme.txt" />
+    <None Remove="Resources\Models\voyager.gltf" />
     <None Remove="Resources\new_icon.png" />
     <None Remove="Resources\objects.png" />
     <None Remove="Resources\options.png" />
@@ -262,6 +265,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Models\Teapot.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\voyager readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\voyager.gltf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\palazz_sport.bin">
