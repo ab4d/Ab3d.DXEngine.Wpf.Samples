@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using Ab3d.DirectX;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Visuals;
-using Ab4d.DXEngine.glTF;
+using Ab3d.DXEngine.glTF;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {

@@ -52,8 +52,8 @@
       <HintPath>..\packages\Ab3d.DXEngine.Wpf.7.0.8959\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.glTF, Version=1.0.8960.2045, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.glTF.1.0.8960\lib\net45\Ab3d.DXEngine.glTF.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.glTF, Version=1.0.8961.2045, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.glTF.1.0.8961\lib\net45\Ab3d.DXEngine.glTF.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Ab3d.PowerToys, Version=11.1.8864.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
