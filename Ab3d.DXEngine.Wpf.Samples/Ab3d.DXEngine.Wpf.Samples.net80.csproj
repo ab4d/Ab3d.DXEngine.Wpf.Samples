@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -69,6 +69,7 @@
     <None Remove="Resources\BricksMaps\bricks_normal.png" />
     <None Remove="Resources\BricksMaps\bricks_specular.png" />
     <None Remove="Resources\BricksMaps\readme.txt" />
+    <None Remove="Resources\CadImporter.png" />
     <None Remove="Resources\cameras.png" />
     <None Remove="Resources\Diagnostics-gray.png" />
     <None Remove="Resources\Diagnostics.png" />
@@ -348,6 +349,7 @@
     <Resource Include="Resources\Ab3dPowerToysSamples.png" />
     <Resource Include="Resources\ab4d-logo.png" />
     <Resource Include="Resources\animation.png" />
+    <Resource Include="Resources\CadImporter.png" />
     <Resource Include="Resources\cameras.png" />
     <Resource Include="Resources\Diagnostics-gray.png" />
     <Resource Include="Resources\Diagnostics.png" />

@@ -377,6 +377,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Other\CadImporterSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PowerToys\ContourLinesSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -763,6 +767,9 @@
     <Compile Include="ModelViewer\ModelViewerSample.xaml.cs">
       <DependentUpon>ModelViewerSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Other\CadImporterSample.xaml.cs">
+      <DependentUpon>CadImporterSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PowerToys\ContourLinesSample.xaml.cs">
       <DependentUpon>ContourLinesSample.xaml</DependentUpon>
     </Compile>
@@ -1087,6 +1094,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\CadImporter.png" />
     <Content Include="Resources\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

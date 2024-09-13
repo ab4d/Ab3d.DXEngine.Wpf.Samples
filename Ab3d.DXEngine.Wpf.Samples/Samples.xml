@@ -172,6 +172,7 @@
 
   <Sample IsSeparator="True" />
 
+  <Sample Page="Other/CadImporterSample.xaml" IsTitle="True" Title="CAD Importer" IsNew="True" Description=""/>
   <Sample Page="Other/WinFormsSample.xaml" IsTitle="True" Title="WinForms samples" Description=""/>
   <Sample Page="Other/ShaderFactoryInfo.xaml" IsTitle="True" Title="ShaderFactory solution" Description=""/>
 

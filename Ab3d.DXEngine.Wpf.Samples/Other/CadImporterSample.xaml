@@ -1,0 +1,30 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.Other.CadImporterSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Other"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="900"
+      Title="ShaderFactoryInto">
+
+    <StackPanel Margin="20 20 20 0" Orientation="Vertical">
+
+        <controls:TextBlockEx Style="{StaticResource InfoContent}" FontSize="16">
+            \!CadImporter\! can import and show \!3D objects from STEP\! (.step and .stp) and \!IGES\! (.iges and .igs) files.\n
+            \n
+            CadImporter can import original 3D models with parts hierarchy and exact edge lines that are defined in the CAD application.
+        </controls:TextBlockEx>
+
+        <TextBlock Margin="0 12 0 0" FontSize="16">
+            <Hyperlink Name="OpenGitHubSolutionHyperlink" Click="Hyperlink_OnClick">Click here to open CadImporter on GitHub</Hyperlink>
+        </TextBlock>
+
+        <Image Name="SampleImage" Source="/Resources/CadImporter.png" Width="800" HorizontalAlignment="Left" Margin="0 20 0 0" />
+
+        <controls:TextBlockEx Style="{StaticResource InfoContent}" FontSize="16" Margin="0 20 0 0">
+            CadImporter uses Ab4d.OpenCascade library that provides a .Net wrapper for a third-part Open CASCADE library.
+        </controls:TextBlockEx>
+    </StackPanel>
+</Page>
