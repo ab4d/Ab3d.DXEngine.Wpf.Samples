@@ -28,6 +28,12 @@
     <PackageReference Include="Ab3d.PowerToys" Version="11.1.8864" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+
+    <!--The following PackageReferences are required to prevent reporting vulnerability because SharpDX is build with older .NET Standard version -->
+    <!--Another option is to update auditing mode to check only top-level dependencies - add the following to the root PropertyGroup: -->
+    <!-- <NuGetAuditMode>direct</NuGetAuditMode> -->
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />    
   </ItemGroup>
 
   <ItemGroup>
