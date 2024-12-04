@@ -25,8 +25,8 @@
         </Border>
 
         <cameras:TargetPositionCamera Name="Camera1" 
-                                      TargetPosition="0 0 0"
-                                      Heading="10" Attitude="-20" Bank="0" 
+                                      TargetPosition="-50 -15 0"
+                                      Heading="17" Attitude="-16" Bank="0" 
                                       Distance="1100"
                                       ShowCameraLight="Always"
                                       TargetViewport3D="{Binding ElementName=MainViewport}" />
@@ -47,62 +47,96 @@
                        FontSize="15" Foreground="Silver" Margin="0 3 0 0" HorizontalAlignment="Left" TextWrapping="Wrap" />
         </StackPanel>
 
-        <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#AA000000" BorderBrush="Black" BorderThickness="2">
-            <StackPanel Orientation="Vertical" Margin="10">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <Border Background="#AA000000" BorderBrush="Black" BorderThickness="2" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <TextBlock Text="Global arrow settings:" Foreground="Silver" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 5 2"/>
 
-                <CheckBox Name="ShowPolyLinesCheckBox" Content="Show poly-lines (orange)" IsChecked="True" Foreground="Silver" Margin="0 2 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
-                <CheckBox Name="ShowMultiLinesCheckBox" Content="Show multi-lines (yellow)" IsChecked="True" Foreground="Silver" Margin="0 4 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
+                    <Grid Margin="0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" Margin="0 5">
-                    <TextBlock Text="LineThickness:" Foreground="Silver" VerticalAlignment="Center" />
-                    <ComboBox Name="LineThicknessComboBox" SelectedIndex="3" Width="50" Margin="5 0 0 0" SelectionChanged="LineThicknessComboBox_OnSelectionChanged">
-                        <ComboBoxItem>0.5</ComboBoxItem>
-                        <ComboBoxItem>0.8</ComboBoxItem>
-                        <ComboBoxItem>1</ComboBoxItem>
-                        <ComboBoxItem>2</ComboBoxItem>
-                        <ComboBoxItem>3</ComboBoxItem>
-                        <ComboBoxItem>5</ComboBoxItem>
-                        <ComboBoxItem>10</ComboBoxItem>
-                    </ComboBox>
+                        <TextBlock Grid.Column="0" Grid.Row="0" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="Arrow angle:"/>
+                        <ComboBox Name="AngleComboBox" Grid.Column="1" Grid.Row="0" SelectedIndex="1" Width="60" Margin="0 3" SelectionChanged="AngleComboBox_OnSelectionChanged">
+                            <ComboBoxItem>10</ComboBoxItem>
+                            <ComboBoxItem>15</ComboBoxItem>
+                            <ComboBoxItem>30</ComboBoxItem>
+                            <ComboBoxItem>45</ComboBoxItem>
+                        </ComboBox>
+                        <controls:InfoControl x:Name="AngleInfoControl" Grid.Row="0" Grid.Column="2" Margin="5 0 0 0" />
+
+                        <TextBlock Grid.Column="0" Grid.Row="1" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="Max arrow length:"/>
+                        <ComboBox Name="LengthComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="2" Width="60" Margin="0 3" SelectionChanged="LengthComboBox_OnSelectionChanged">
+                            <ComboBoxItem>0.1</ComboBoxItem>
+                            <ComboBoxItem>0.25</ComboBoxItem>
+                            <ComboBoxItem>0.333</ComboBoxItem>
+                            <ComboBoxItem>0.4</ComboBoxItem>
+                            <ComboBoxItem>0.5</ComboBoxItem>
+                        </ComboBox>
+                        <controls:InfoControl x:Name="ArrowLengthInfoControl" Grid.Row="1" Grid.Column="2" Margin="5 0 0 0" />
+
+                        <TextBlock Grid.Column="0" Grid.Row="2" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="MinLineStripArrowLength:"/>
+                        <ComboBox Name="MinLineStripArrowLengthComboBox" Grid.Row="2" Grid.Column="1" SelectedIndex="2" Width="60" Margin="0 3 0 0" SelectionChanged="LengthComboBox_OnSelectionChanged">
+                            <ComboBoxItem>0</ComboBoxItem>
+                            <ComboBoxItem>1</ComboBoxItem>
+                            <ComboBoxItem>2</ComboBoxItem>
+                            <ComboBoxItem>3</ComboBoxItem>
+                            <ComboBoxItem>4</ComboBoxItem>
+                            <ComboBoxItem>6</ComboBoxItem>
+                            <ComboBoxItem>10</ComboBoxItem>
+                        </ComboBox>
+                        <controls:InfoControl x:Name="MinLineStripArrowLengthInfoControl" Grid.Row="2" Grid.Column="2" Margin="5 0 0 0" />
+
+                        <TextBlock Grid.Column="0" Grid.Row="3" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="MinLineListArrowLength:"/>
+                        <ComboBox Name="MinLineListArrowLengthComboBox" Grid.Column="1" Grid.Row="3" SelectedIndex="0" Width="60" Margin="0 3" SelectionChanged="LengthComboBox_OnSelectionChanged">
+                            <ComboBoxItem>0</ComboBoxItem>
+                            <ComboBoxItem>1</ComboBoxItem>
+                            <ComboBoxItem>2</ComboBoxItem>
+                            <ComboBoxItem>3</ComboBoxItem>
+                            <ComboBoxItem>4</ComboBoxItem>
+                            <ComboBoxItem>6</ComboBoxItem>
+                            <ComboBoxItem>10</ComboBoxItem>
+                        </ComboBox>
+                        <controls:InfoControl x:Name="MinLineListArrowLengthInfoControl" Grid.Row="3" Grid.Column="2" Margin="5 0 0 0" />
+                    </Grid>
                 </StackPanel>
+            </Border>
+            <Border VerticalAlignment="Bottom" Background="#AA000000" BorderBrush="Black" BorderThickness="2" Margin="2 0 0 0">
+                <StackPanel Orientation="Vertical" Margin="10">
 
-                <TextBlock Text="Global arrow settings:" Foreground="Silver" FontWeight="Bold" VerticalAlignment="Center" Margin="0 8 5 2"/>
+                    <TextBlock Text="Shown lines:" Foreground="Silver" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 5 5"/>
 
-                <Grid Margin="0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                    <CheckBox Name="ShowPolyLinesCheckBox" Content="Show poly-lines (orange)" IsChecked="True" Foreground="Silver" Margin="0 2 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
+                    <CheckBox Name="ShowMultiLinesCheckBox" Content="Show multi-lines (yellow)" IsChecked="True" Foreground="Silver" Margin="0 4 0 2" Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
+                    <CheckBox Name="ShowArcLinesCheckBox" Content="Show arc for poly-lines" IsChecked="False" Foreground="Silver" Margin="0 4 0 2" Checked="OnShowArcLinesCheckedChanged" Unchecked="OnShowArcLinesCheckedChanged" />
 
-                    <TextBlock Grid.Column="0" Grid.Row="0" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="Arrow angle:"/>
-                    <ComboBox Name="AngleComboBox" Grid.Column="1" Grid.Row="0" SelectedIndex="1" Width="60" Margin="0 3" SelectionChanged="AngleComboBox_OnSelectionChanged">
-                        <ComboBoxItem>10</ComboBoxItem>
-                        <ComboBoxItem>15</ComboBoxItem>
-                        <ComboBoxItem>30</ComboBoxItem>
-                        <ComboBoxItem>45</ComboBoxItem>
-                    </ComboBox>
-                    <controls:InfoControl Grid.Row="0" Grid.Column="2" Margin="5 0 0 0" InfoText="Sets the angle of the arrow in degrees" />
+                    <StackPanel Orientation="Horizontal" Margin="0 5">
+                        <TextBlock Text="LineThickness:" Foreground="Silver" VerticalAlignment="Center" />
+                        <ComboBox Name="LineThicknessComboBox" SelectedIndex="3" Width="50" Margin="5 0 0 0" SelectionChanged="LineThicknessComboBox_OnSelectionChanged">
+                            <ComboBoxItem>0.5</ComboBoxItem>
+                            <ComboBoxItem>0.8</ComboBoxItem>
+                            <ComboBoxItem>1</ComboBoxItem>
+                            <ComboBoxItem>2</ComboBoxItem>
+                            <ComboBoxItem>3</ComboBoxItem>
+                            <ComboBoxItem>5</ComboBoxItem>
+                            <ComboBoxItem>10</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
 
-                    <TextBlock Grid.Column="0" Grid.Row="1" Foreground="Silver" VerticalAlignment="Center" Margin="0 3 5 0" Text="Max arrow length:"/>
-                    <ComboBox Name="LengthComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="2" Width="60" Margin="0 3" SelectionChanged="LengthComboBox_OnSelectionChanged">
-                        <ComboBoxItem>0.1</ComboBoxItem>
-                        <ComboBoxItem>0.25</ComboBoxItem>
-                        <ComboBoxItem>0.333</ComboBoxItem>
-                        <ComboBoxItem>0.4</ComboBoxItem>
-                        <ComboBoxItem>0.5</ComboBoxItem>
-                    </ComboBox>
-                    <controls:InfoControl x:Name="ArrowLengthInfoControl" Grid.Row="1" Grid.Column="2" Margin="5 0 0 0" />
-                </Grid>
-
-                <Button Name="RandomizeButton" Content="Randomize line caps" Margin="0 8 0 0" Click="RandomizeButton_OnClick" />
-            </StackPanel>
-        </Border>
+                    <Button Name="RandomizeButton" Content="Randomize line caps" Margin="0 8 0 0" Click="RandomizeButton_OnClick" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
     </Grid>
 </Page>
 

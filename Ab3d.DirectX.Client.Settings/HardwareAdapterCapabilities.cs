@@ -73,6 +73,9 @@ namespace Ab3d.DirectX.Client.Settings
                 case RenderQualityTypes.Normal:
                     graphicsProfile = GraphicsProfile.NormalQualityHardwareRendering;
                     break;
+                case RenderQualityTypes.OptimizedHigh:
+                    graphicsProfile = GraphicsProfile.OptimizedHighQualityHardwareRendering;
+                    break;
                 case RenderQualityTypes.High:
                     graphicsProfile = GraphicsProfile.HighQualityHardwareRendering;
                     break;

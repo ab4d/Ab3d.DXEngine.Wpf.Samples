@@ -1,0 +1,148 @@
+﻿<Page x:Class="Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals.DynamicPlanarShadowSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:cameras="clr-namespace:Ab3d.Cameras;assembly=Ab3d.PowerToys"
+      xmlns:ab3d="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"  
+      xmlns:visuals="clr-namespace:Ab3d.Visuals;assembly=Ab3d.PowerToys"
+      xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
+      xmlns:local="clr-namespace:Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals"
+      xmlns:controls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="DynamicPlanarShadowlSample">
+
+    <Grid>
+        <Border Name="ViewportBorder">
+            <!--<Border.Background>
+                <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                    <GradientStop Offset="0" Color="#033C62"/>
+                    <GradientStop Offset="1" Color="#01131F"/>
+                </LinearGradientBrush>
+            </Border.Background>-->
+
+            <dxControls:DXViewportView Name="MainDXViewportView" PresentationType="DirectXImage" BackgroundColor="Transparent">
+
+                <Viewport3D Name="MainViewport">
+
+                    <ModelVisual3D x:Name="SampleObjectsVisual3D" />
+
+                    <ModelVisual3D>
+                        <ModelVisual3D.Content>
+                            <Model3DGroup x:Name="LightsModel3DGroup" />
+                        </ModelVisual3D.Content>
+                    </ModelVisual3D>
+
+
+                </Viewport3D>
+
+            </dxControls:DXViewportView>
+
+        </Border>
+
+        <cameras:TargetPositionCamera Name="Camera1" 
+                                      Heading="50" Attitude="-20" Bank="0" 
+                                      Distance="420" 
+                                      TargetPosition="40 30 0"
+                                      ShowCameraLight="Never"
+                                      TargetViewport3D="{Binding ElementName=MainViewport}"/>
+
+        <!-- EventsSourceElement is set to ViewportBorder - this means that the ViewportBorder's mouse events are subscribed to - this enables camera rotation without the need to be over the rendered 3D element -->
+        <ab3d:MouseCameraController Name="MouseCameraController1"
+                                    RotateCameraConditions="LeftMouseButtonPressed"
+                                    MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
+                                    ShowRotationCenterMarker="True"
+                                    EventsSourceElement="{Binding ElementName=ViewportBorder}"
+                                    TargetCamera="{Binding ElementName=Camera1}"/>
+
+        <Border BorderBrush="Black" BorderThickness="2" Background="#88FFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
+
+            <StackPanel Orientation="Vertical" Margin="10">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Shadow map size:" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 3 0 0"/>
+                    <ComboBox Name="ShadowMapSizeComboBox" Grid.Column="1" Grid.Row="0" SelectedIndex="1" Width="100" Margin="5 3 0 0" SelectionChanged="ShadowMapSizeComboBox_OnSelectionChanged">
+                        <ComboBoxItem>128 x 128</ComboBoxItem>
+                        <ComboBoxItem>256 x 265</ComboBoxItem>
+                        <ComboBoxItem>512 x 512</ComboBoxItem>
+                        <ComboBoxItem>1024 x 1024</ComboBoxItem>
+                    </ComboBox>
+                    <controls:InfoControl Grid.Column="2" Grid.Row="0" InfoWidth="400" Margin="5 0 0 0" InfoText="Size of a shadow depth map texture that is used to store depth information. Bigger texture will produce more detailed shadows but will be slower to render." />
+
+                    <TextBlock Text="Blur filter size:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0 3 0 0"/>
+                    <ComboBox Name="BlurFilterSizeComboBox" Grid.Column="1" Grid.Row="1" SelectedIndex="5" Width="100" Margin="5 3 0 0" SelectionChanged="BlurFilterSizeComboBox_OnSelectionChanged">
+                        <ComboBoxItem>5</ComboBoxItem>
+                        <ComboBoxItem>7</ComboBoxItem>
+                        <ComboBoxItem>9</ComboBoxItem>
+                        <ComboBoxItem>11</ComboBoxItem>
+                        <ComboBoxItem>13</ComboBoxItem>
+                        <ComboBoxItem>15</ComboBoxItem>
+                    </ComboBox>
+                    <controls:InfoControl Grid.Column="2" Grid.Row="1" InfoWidth="400" Margin="5 0 0 0" InfoText="Number of samples that are used to generate the blurred texture. Higher number requires more reads and reduces performance." />
+
+                    <TextBlock Text="{Binding ElementName=BlurAmountSlider, Path=Value, StringFormat='Blur amount: {0:0.0}'}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0 3 0 0" />
+                    <Slider Name="BlurAmountSlider" Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="10" Value="2" Margin="0 3 0 0" ValueChanged="BlurAmountSlider_OnValueChanged"/>
+                    <controls:InfoControl Grid.Column="2" Grid.Row="2" InfoWidth="400" Margin="5 0 0 0" InfoText="Note that higher values lead to artifacts. In this case it is better to reduce the shadow map size, and then the BlurAmount can be also reduced." />
+
+                    <TextBlock Text="{Binding ElementName=DarknessSlider, Path=Value, StringFormat='Darkness: {0:0.0}'}" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Margin="0 3 0 0" />
+                    <Slider Name="DarknessSlider" Grid.Column="1" Grid.Row="3" Minimum="0" Maximum="1" Value="1" Margin="0 3 0 0" ValueChanged="DarknessSlider_OnValueChanged"/>
+
+                    <TextBlock Text="{Binding ElementName=MaxDistanceSlider, Path=Value, StringFormat='Max distance: {0:0}'}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Margin="0 3 0 0" />
+                    <Slider Name="MaxDistanceSlider" Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="200" Value="100" Margin="0 3 0 0" ValueChanged="MaxDistanceSlider_OnValueChanged"/>
+                    <controls:InfoControl Grid.Column="2" Grid.Row="4" InfoWidth="400" Margin="5 0 0 0" InfoText="When set to 0, then the size of scene's BoundingBox is used to determine the max distance (note that when animating the scene objects, this value can change)." />
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                    <CheckBox Name="IsTransparentShadowCheckBox" Content="IsTransparentShadow" IsChecked="True" Checked="OnIsTransparentShadowCheckBoxChanged" Unchecked="OnIsTransparentShadowCheckBoxChanged" />
+                    <controls:InfoControl InfoWidth="400" Margin="5 0 0 0" VerticalAlignment="Center" InfoText="When checked, the shadow is rendered as semi-transparent material&#x0a;(full shadow is opaque black, no shadow is filly transparent).&#x0a;When unchecked, then the PlaneVisual3D is shaded by the camera's light." />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"  Margin="0 5 0 0">
+                    <CheckBox Name="ShowShadowBackMaterialCheckBox" Content="Show shadow as back material" IsChecked="True"
+                              ToolTip="Rotate the camera to see the shadow plane from below and then change the checked state of this CheckBox"
+                              Checked="OnShowShadowBackMaterialCheckedChanged" Unchecked="OnShowShadowBackMaterialCheckedChanged" />
+                    <controls:InfoControl InfoWidth="400" Margin="5 0 0 0" VerticalAlignment="Center" InfoText="To see that in action rotate the camera to see the world from below and check / uncheck this CheckBox." />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"  Margin="0 5 0 0">
+                    <CheckBox Name="ShowShadowEdgeCheckBox" Content="Show shadow plane edge" IsChecked="False"
+                              Checked="OnShowShadowEdgeCheckedChanged" Unchecked="OnShowShadowEdgeCheckedChanged" />
+
+                    <controls:InfoControl InfoWidth="400" Margin="5 0 0 0" VerticalAlignment="Center" InfoText="When checked then the edge of the PlaneVisual3D objects is shown. That object has its material set to the rendered dynamic shadow texture." />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"  Margin="0 5 0 0">
+                    <CheckBox Name="ShowPartialShadowCheckBox" Content="Show shadow only for part of scene" IsChecked="False" Checked="OnShowPartialShadowCheckBoxChanged" Unchecked="OnShowPartialShadowCheckBoxChanged" />
+                    <controls:InfoControl InfoWidth="400" Margin="5 0 0 0" VerticalAlignment="Center" InfoText="Checking this CheckBox changes the shadow's CenterPosition and ShadowWorldSize and adjust the position and size of PlaneVisual3D that shows the shadow." />
+                </StackPanel>
+
+                <CheckBox Name="IsAnimatingCheckBox" Content="Is animating" IsChecked="True" Margin="0 10 0 0" />
+
+                <CheckBox Name="RenderShadowOnEachFrameCheckBox" Content="Is rendering shadow on each frame" IsChecked="True" Margin="0 5 0 0"
+                          Checked="OnRenderShadowOnEachFrameCheckBoxChanged" Unchecked="OnRenderShadowOnEachFrameCheckBoxChanged" />
+
+                <Button Name="ManuallyUpdateButton" Content="Manually update shadow" Margin="0 3 0 0" IsEnabled="False" Click="ManuallyUpdateButton_OnClick" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" >
+            <TextBlock Text="Dynamic planar shadows" FontWeight="Bold" FontSize="20" Foreground="#333"/>
+            <TextBlock Text="Dynamic planar shadow is rendered to a DirectX texture that can be shown as a material on a PlaneVisual3D." FontSize="14" TextWrapping="Wrap" Foreground="#333"/>
+        </StackPanel>
+
+    </Grid>
+</Page>

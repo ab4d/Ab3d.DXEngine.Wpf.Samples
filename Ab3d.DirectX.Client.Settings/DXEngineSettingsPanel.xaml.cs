@@ -69,7 +69,12 @@ namespace Ab3d.DirectX.Client.Settings
 
 1) Multi-sampling (MSAA) can produce smoother edges with storing multiple color values for each pixel. To improve performance, pixel shader is executed once for each pixel and then its result (color) is shared across multiple pixels. This produces smoother edges but do not provide additional sub-pixel details. For example, 4xMSAA runs pixel shader only once per each pixel but require 4 times the amount of memory.
 
-2) Super-sampling (SSAA) is a technique that renders the image at a higher resolution and then down-samples the rendered image to the final resolution. The Ab3d.DXEngine can use smart down-sampling filter that improves smoothness of the final image. Super-sampling produces smoother edges and also provides additional sub-pixel details. For example, 4xSSAA renders the scene to a texture with 4 times more pixels (width and height are multiplied by 2). This requires running the pixel shader 4 times for each final pixel and requires 4 times the amount of memory.";
+2) Super-sampling (SSAA) is a technique that renders the image at a higher resolution and then down-samples the rendered image to the final resolution. The Ab3d.DXEngine can use smart down-sampling filter that improves smoothness of the final image. Super-sampling produces smoother edges and also provides additional sub-pixel details.
+
+Examples:
+4xSSAA renders the scene to a texture with 4 times more pixels (width and height are multiplied by 2). This requires running the pixel shader 4 times for each final pixel and requires 4 times the amount of memory.
+
+2xSSAA renders the scene to a texture with 2 times more pixels. In this case width and height are multiplied by 1.41 = sqrt(2).";
 
 
             ShaderQualityInfoControl.InfoText =
@@ -92,6 +97,7 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
             ShaderQualityComboBox.ItemsSource = new ShaderQuality[] { ShaderQuality.Low, ShaderQuality.Normal, ShaderQuality.High };
             QualityComboBox.ItemsSource = new AdapterCapabilitiesBase.RenderQualityTypes[] { AdapterCapabilitiesBase.RenderQualityTypes.Low,
                                                                                              AdapterCapabilitiesBase.RenderQualityTypes.Normal,
+                                                                                             AdapterCapabilitiesBase.RenderQualityTypes.OptimizedHigh,
                                                                                              AdapterCapabilitiesBase.RenderQualityTypes.High,
                                                                                              AdapterCapabilitiesBase.RenderQualityTypes.Ultra,
                                                                                              AdapterCapabilitiesBase.RenderQualityTypes.Custom };
@@ -249,8 +255,8 @@ Usually modern graphics cards are so fast that using low quality shaders do not 
                     count *= 2;
                 }
 
-                FillAntialiasingComboBox(MultisamplingComboBox, "MSAA", msaaValues.ToArray(),     _selectedGraphicsProfile.PreferedMultisampleCount, firstValueText: "No MSAA");
-                FillAntialiasingComboBox(SupersamplingComboBox, "SSAA", new int[]{ 1, 4, 16, 64}, _selectedGraphicsProfile.SupersamplingCount,       firstValueText: "No SSAA");
+                FillAntialiasingComboBox(MultisamplingComboBox, "MSAA", msaaValues.ToArray(),           _selectedGraphicsProfile.PreferedMultisampleCount, firstValueText: "No MSAA");
+                FillAntialiasingComboBox(SupersamplingComboBox, "SSAA", new int[]{ 1, 2, 3, 4, 16, 64}, _selectedGraphicsProfile.SupersamplingCount,       firstValueText: "No SSAA");
 
 
                 FillTextureFilteringComboBox(TextureFilteringComboBox, _selectedGraphicsProfile.TextureFiltering, maxAnisotropicLevel: 16); // All feature levels from 9.2 on support 16x AnisotropicLevel

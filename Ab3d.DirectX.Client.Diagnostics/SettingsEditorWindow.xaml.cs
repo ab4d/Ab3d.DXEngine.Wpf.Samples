@@ -43,6 +43,8 @@ RenderConnectedLinesAsDisconnected
   
 IsMaterialSortingEnabled
 IsTransparencySortingEnabled
+
+IsCreatingFinalBackBufferCopy
   
 OptimizeNearAndFarCameraPlanes";
         

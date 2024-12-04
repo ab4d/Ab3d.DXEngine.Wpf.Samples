@@ -25,6 +25,11 @@ namespace Ab3d.DirectX.Client.Settings
             /// Normal quality
             /// </summary>
             Normal,
+            
+            /// <summary>
+            /// Optimized High quality
+            /// </summary>
+            OptimizedHigh,
 
             /// <summary>
             /// High quality

@@ -442,7 +442,7 @@ namespace Ab3d.DirectX.Client.Diagnostics
 
                     if (bestAdapter != null && usedAdapter.Description.Luid != bestAdapter.Description.Luid)
                     {
-                        DXEngineLogAction(DXDiagnostics.LogLevels.Warn, string.Format("The Ab3d.DXEngine is using an adapter (graphics card) that is not the best adapter on this computer - using: '{0}'; best: '{1}'. On laptop computers with Optimus or similar technology you may try to start the application with using the best graphics card.", usedAdapter.Description.Description, bestAdapter.Description.Description));
+                        DXEngineLogAction(DXDiagnostics.LogLevels.Warn, string.Format("The Ab3d.DXEngine is using an adapter (graphics card) that is not the best adapter on this computer - using: '{0}'; best: '{1}'. On Windows 10 or newer this can be changed by going to 'Graphics setting' and under 'Custom options for apps' browse for your app and select 'High performance' option.", usedAdapter.Description.Description, bestAdapter.Description.Description));
                     }
 
                     foreach (var adapter in allAdapters)

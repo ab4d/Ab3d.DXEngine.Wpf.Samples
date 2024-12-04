@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:dxControls="clr-namespace:Ab3d.DirectX.Controls;assembly=Ab3d.DXEngine.Wpf"
       xmlns:controls="clr-namespace:Ab3d.Controls;assembly=Ab3d.PowerToys"
+      xmlns:localControls="clr-namespace:Ab3d.DXEngine.Wpf.Samples.Controls"
       Title="StandardXaml"
       mc:Ignorable="d" 
       d:DesignHeight="400" d:DesignWidth="800">
@@ -23,13 +24,18 @@
         <controls:MouseCameraControllerInfo x:Name="MouseCameraControllerInfo1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                                             ShowMoveInfo="True" ShowQuickZoomInfo="True" ShowRotateInfo="False" />
 
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
+            <CheckBox Name="DisableWpfResizingOfRenderedImageCheckBox" Content="DisableWpfResizingOfRenderedImage" IsChecked="True" VerticalAlignment="Center" Checked="OnDisableWpfResizingOfRenderedImageCheckCheckedChanged" Unchecked="OnDisableWpfResizingOfRenderedImageCheckCheckedChanged" />
+            <localControls:InfoControl x:Name="DisableWpfResizingOfRenderedImageInfoControl" Margin="5 0 0 0" />
+        </StackPanel>
+
         <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left">
 
             <TextBlock FontWeight="Bold" FontSize="20" Foreground="#444" 
                        Text="Lines that are always rendered to the screen pixels (are not anti-aliased) and with 1 pixel thickness"/>
 
-            <TextBlock Name="SupersamplingWarningTextBlock" Text="Do not use super-sampling with 1px non-antialiased lines because they will be dimmer. See comments in code for more info." 
-                       Foreground="Red" Margin="0 5 0 0" FontSize="16" Visibility="Collapsed" />
+            <TextBlock Name="SupersamplingWarningTextBlock" Text="To correctly see 1px non-antialiased lines the super-sampling (SSAA) need to be disabled.&#x0a;When SSAA is enabled the lines will be slightly blurred because of down-sampling. See comments in code for more info." 
+                       Margin="0 5 0 0" TextWrapping="Wrap" FontSize="12" />
 
         </StackPanel>
     </Grid>

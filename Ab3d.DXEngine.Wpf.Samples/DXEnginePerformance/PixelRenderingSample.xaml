@@ -46,8 +46,7 @@
 
         <Rectangle Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
         <WrapPanel Grid.Row="2" Margin="0 7 10 5" Orientation="Horizontal">
-            <TextBlock Text="Positions:" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 3 0"/>
-            <ComboBox Name="SceneTypeComboBox" SelectedIndex="2" Margin="0 0 20 0" Width="220" SelectionChanged="OnSceneTypeChanged">
+            <ComboBox Name="SceneTypeComboBox" SelectedIndex="2" Margin="0 0 10 0" Width="210" SelectionChanged="OnSceneTypeChanged">
                 <ComboBoxItem>Box (726)</ComboBoxItem>
                 <ComboBoxItem>Sphere (2,601)</ComboBoxItem>
                 <ComboBoxItem>Dragon model (143,382)</ComboBoxItem>
@@ -69,8 +68,12 @@
 
             <CheckBox Name="UseTextureCheckBox" Content="Use texture (billboards)" IsChecked="False" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center" Checked="OnUseTextureCheckedChanged" Unchecked="OnUseTextureCheckedChanged" />
 
-            <CheckBox Name="FixUpVectorCheckBox" Content="Fix up vector to (0,1,0)" IsEnabled="False"  IsChecked="False" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 0 0" Checked="OnFixUpVectorCheckedChanged" Unchecked="OnFixUpVectorCheckedChanged"
+            <CheckBox Name="FixUpVectorCheckBox" Content="Fix up vector to (0,1,0)" IsEnabled="False"  IsChecked="False" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 10 0" Checked="OnFixUpVectorCheckedChanged" Unchecked="OnFixUpVectorCheckedChanged"
                       ToolTip="When unchecked then pixels always face the camera.&#x0a;When checked then pixels are always oriented up&#x0a;(this is supported only when IsWorldSize is checked)"
+                      ToolTipService.ShowOnDisabled="True"/>
+
+            <CheckBox Name="UseVertexIdColorCheckBox" Content="VertexId color" IsChecked="False" FontWeight="Bold" VerticalAlignment="Center" Margin="0 0 0 0" Checked="OnUseVertexIdColorCheckedChanged" Unchecked="OnUseVertexIdColorCheckedChanged"
+                      ToolTip="When checked then the color of the pixel is calculated from the vertex index.&#x0a;This can be used to render the point-cloud to a bitmap&#x0a;that is used for hit-testing on point-cloud."
                       ToolTipService.ShowOnDisabled="True"/>
         </WrapPanel>
     </Grid>

@@ -44,20 +44,20 @@
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ab3d.DXEngine, Version=7.0.8976.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.7.0.8976\lib\net45\Ab3d.DXEngine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ab3d.DXEngine, Version=7.1.9104.2048, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ab3d.DXEngine.7.1.9104\lib\net48\Ab3d.DXEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.Wpf, Version=7.0.8976.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.Wpf.7.0.8976\lib\net45\Ab3d.DXEngine.Wpf.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.Wpf, Version=7.1.9104.2048, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.Wpf.7.1.9104\lib\net48\Ab3d.DXEngine.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Ab3d.DXEngine.glTF, Version=1.0.8992.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
       <HintPath>..\packages\Ab3d.DXEngine.glTF.1.0.8992\lib\net45\Ab3d.DXEngine.glTF.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.PowerToys, Version=11.1.8864.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.PowerToys.11.1.8864\lib\net45\Ab3d.PowerToys.dll</HintPath>
+    <Reference Include="Ab3d.PowerToys, Version=11.2.9104.2048, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.PowerToys.11.2.9104\lib\net48\Ab3d.PowerToys.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
       <SpecificVersion>False</SpecificVersion>
@@ -169,6 +169,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DXEngineHitTesting\VertexIdBitmapHitTesting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineOther\ClosestDistanceSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -190,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DXEngineOther\MeshColliderSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEnginePerformance\InstancedTextNodePerformanceSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -301,6 +309,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DXEngineVisuals\DynamicPlanarShadowSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DXEngineVisuals\NormalDepthEdgeDetectionSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -354,6 +366,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DXEngineVisuals\FaceColorRenderingSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DXEngineVisuals\VarianceShadowMaterialSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -615,6 +631,9 @@
     <Compile Include="DXEngineHitTesting\ManualInputEventsSample.xaml.cs">
       <DependentUpon>ManualInputEventsSample.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineHitTesting\VertexIdBitmapHitTesting.xaml.cs">
+      <DependentUpon>VertexIdBitmapHitTesting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineOther\ClosestDistanceSample.xaml.cs">
       <DependentUpon>ClosestDistanceSample.xaml</DependentUpon>
     </Compile>
@@ -635,6 +654,9 @@
     </Compile>
     <Compile Include="DXEngineOther\Viewport3DObjectOverlay.cs" />
     <Compile Include="DXEngineOther\WpfElementOverlay.cs" />
+    <Compile Include="DXEnginePerformance\InstancedTextNodePerformanceSample.xaml.cs">
+      <DependentUpon>InstancedTextNodePerformanceSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEnginePerformance\InstancedTextNodeSample.xaml.cs">
       <DependentUpon>InstancedTextNodeSample.xaml</DependentUpon>
     </Compile>
@@ -725,6 +747,9 @@
     <Compile Include="DXEnginePerformance\ScreenSpaceScaledInstancing.xaml.cs">
       <DependentUpon>ScreenSpaceScaledInstancing.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DXEngineVisuals\DynamicPlanarShadowSample.xaml.cs">
+      <DependentUpon>DynamicPlanarShadowSample.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DXEngineVisuals\NormalDepthEdgeDetectionSample.xaml.cs">
       <DependentUpon>NormalDepthEdgeDetectionSample.xaml</DependentUpon>
     </Compile>
@@ -751,6 +776,9 @@
     </Compile>
     <Compile Include="DXEngineVisuals\FaceColorRenderingSample.xaml.cs">
       <DependentUpon>FaceColorRenderingSample.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DXEngineVisuals\VarianceShadowMaterialSample.xaml.cs">
+      <DependentUpon>VarianceShadowMaterialSample.xaml</DependentUpon>
     </Compile>
     <Compile Include="DXEngineVisuals\XRayMaterialSample.xaml.cs">
       <DependentUpon>XRayMaterialSample.xaml</DependentUpon>
@@ -955,6 +983,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PowerToys\DucksLakeMouseMoveDemo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PowerToys\LineCapsSample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1041,6 +1073,9 @@
     </Compile>
     <Compile Include="PowerToys\DucksLakeDemo.xaml.cs">
       <DependentUpon>DucksLakeDemo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PowerToys\DucksLakeMouseMoveDemo.xaml.cs">
+      <DependentUpon>DucksLakeMouseMoveDemo.xaml</DependentUpon>
     </Compile>
     <Compile Include="PowerToys\LineCapsSample.xaml.cs">
       <DependentUpon>LineCapsSample.xaml</DependentUpon>

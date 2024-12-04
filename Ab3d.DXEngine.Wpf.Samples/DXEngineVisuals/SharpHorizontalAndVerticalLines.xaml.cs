@@ -18,6 +18,7 @@ using Ab3d.Common.Cameras;
 using Ab3d.Common.Models;
 using Ab3d.Controls;
 using Ab3d.DirectX;
+using Ab3d.DirectX.Client.Settings;
 using Ab3d.DirectX.Common;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Effects;
@@ -37,6 +38,29 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         public SharpHorizontalAndVerticalLines()
         {
             InitializeComponent();
+
+            DisableWpfResizingOfRenderedImageInfoControl.InfoText = 
+@"When checked than NearestNeighbor image filtering is used by WPF and this can show
+a sharper rendered image because the exact same image is shows as rendered by DXEngine.
+This requires that the root Window element or parent element that sets the size for 
+DXViewportView (for example Grid) has UseLayoutRounding set to true, otherwise image tearing can appear.
+
+When unchecked (by default in DXViewportView) then linear filtering is used exactly match (to subpixel value) the size 
+of the rendered image and exactly align it to other WPF objects. 
+This may produce more blurred image.";
+
+            // Setting DisableWpfResizingOfRenderedImage produces sharped image (see text above)
+            MainDXViewportView.DisableWpfResizingOfRenderedImage = true;
+
+
+            var noSuperSamplingGraphicsProfile = GraphicsProfile.HighQualityHardwareRendering.Clone();
+            noSuperSamplingGraphicsProfile.SupersamplingCount = 1;
+
+            MainDXViewportView.GraphicsProfiles = new GraphicsProfile[]
+            {
+                noSuperSamplingGraphicsProfile,
+                GraphicsProfile.Wpf3D,
+            };
 
             _twoDimensionalCamera = new TwoDimensionalCamera(MainDXViewportView,
                                                              ViewportBorder,
@@ -266,6 +290,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     lineVisual3D.SetDXAttribute(DXAttributeType.RenderAntialiased3DLines,    false);
                 }
             }
+        }
+
+        private void OnDisableWpfResizingOfRenderedImageCheckCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+            
+            MainDXViewportView.DisableWpfResizingOfRenderedImage = DisableWpfResizingOfRenderedImageCheckBox.IsChecked ?? false;
         }
     }
 }

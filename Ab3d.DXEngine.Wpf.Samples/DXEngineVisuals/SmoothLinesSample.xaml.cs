@@ -32,15 +32,36 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
     {
         private double _dpiScale;
 
+        private List<DXViewportView> _dxViewports = new List<DXViewportView>();
+
         public SmoothLinesSample()
         {
             InitializeComponent();
 
+            DisableWpfResizingOfRenderedImageInfoControl.InfoText = 
+@"When checked than NearestNeighbor image filtering is used by WPF and this can show
+a sharper rendered image because the exact same image is shows as rendered by DXEngine.
+This requires that the root Window element or parent element that sets the size for 
+DXViewportView (for example Grid) has UseLayoutRounding set to true, otherwise image tearing can appear.
+
+When unchecked then linear filtering is used exactly match (to subpixel value) the size 
+of the rendered image and exactly align it to other WPF objects. 
+This may produce more blurred image.";
+
+            FilterTypeInfoControl.InfoText = 
+@"SSAA-FilterType sets the ResolveFilter property on the DefaultResolveBackBufferRenderingStep.
+It is used only when using super-sampling (SSAA; on lower two 3D scenes)
+and defines how the super-sampled image is downsampled to its final size. 
+Using a filter results in generally smoother at the cost of a blurrier final result.
+Default value is RotatedFilterSize5.";
+
+
             // NOTE: Standard GraphicsProfiles use the following MSAA and SSAA settings:
-            // LowQualityHardwareRendering:    0xMSAA,  1xSSAA
-            // NormalQualityHardwareRendering: 4xMSAA,  1xSSAA
-            // HighQualityHardwareRendering:   4xMSAA,  4xSSAA
-            // UltraQualityHardwareRendering:  2xMSAA, 16xSSAA
+            // LowQualityHardwareRendering:             0xMSAA,  1xSSAA
+            // NormalQualityHardwareRendering:          4xMSAA,  1xSSAA
+            // OptimizedHighQualityHardwareRendering:   4xMSAA,  2xSSAA
+            // HighQualityHardwareRendering:            4xMSAA,  4xSSAA
+            // UltraQualityHardwareRendering:           2xMSAA, 16xSSAA
 
             // Get dpi scale
             if (Application.Current == null || Application.Current.MainWindow == null)
@@ -58,11 +79,21 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             AddDXViewport3DGrid("4x MSAA, No SSAA", "NormalQualityHardwareRendering",
                                 multisamplingCount: 4, supersamplingCount: 1, rowIndex: 0, columnIndex: 1);
 
-            AddDXViewport3DGrid("4x MSAA, 4x SSAA", "HighQualityHardwareRendering",
-                                multisamplingCount: 4, supersamplingCount: 4, rowIndex: 1, columnIndex: 0);
+            AddDXViewport3DGrid("4x MSAA, 2x SSAA", "OptimizedHighQualityHardwareRendering",
+                                multisamplingCount: 4, supersamplingCount: 2, rowIndex: 1, columnIndex: 0);
 
-            AddDXViewport3DGrid("2x MSAA, 16x SSAA", "UltraQualityHardwareRendering",
-                                multisamplingCount: 2, supersamplingCount: 16, rowIndex: 1, columnIndex: 1);
+            AddDXViewport3DGrid("4x MSAA, 4x SSAA", "HighQualityHardwareRendering",
+                                multisamplingCount: 4, supersamplingCount: 2, rowIndex: 1, columnIndex: 1);
+
+
+            // To compare HighQualityHardwareRendering and UltraQualityHardwareRendering,
+            // comment the two calls to AddDXViewport3DGrid and uncomment the following:
+
+            //AddDXViewport3DGrid("4x MSAA, 4x SSAA", "HighQualityHardwareRendering",
+            //    multisamplingCount: 4, supersamplingCount: 4, rowIndex: 1, columnIndex: 0);
+
+            //AddDXViewport3DGrid("2x MSAA, 16x SSAA", "UltraQualityHardwareRendering",
+            //                    multisamplingCount: 2, supersamplingCount: 16, rowIndex: 1, columnIndex: 1);
 
 
             // When there is no DPI scaling used, then do not show the DPI scale info
@@ -76,37 +107,30 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             var rootModelVisual3D = new ModelVisual3D();
 
-            var showLineThicknesses = new double[4];
-            showLineThicknesses[0] = 0.6;
-
             double screenPixelLineThickness = 1.0 / _dpiScale; // set line thickness so that it will take 1 pixel
-            string screenPixelThickLineText;
+            
+            string oneLineThickLineText;
+            double oneLineThickness;
 
             if (_dpiScale == 1)
             {
                 // No DPI scaling is used
-                showLineThicknesses[1] = 0.8;
-                showLineThicknesses[2] = 1.0;
-                showLineThicknesses[3] = 2.0;
-
-                screenPixelThickLineText = null; // No special line title
+                oneLineThickness = 0.8;
+                oneLineThickLineText = null; // No special line title
             }
             else
             {
                 // DPI scaling is used => show line with 1 screen pixel line thickness
-                showLineThicknesses[1] = screenPixelLineThickness;
-                showLineThicknesses[2] = 1.0;
-                showLineThicknesses[3] = 2.0;
-
-                screenPixelThickLineText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "LineThickness {0:0.##} (1px *):", screenPixelLineThickness);
+                oneLineThickness = screenPixelLineThickness;
+                oneLineThickLineText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "LineThickness {0:0.##} (1px *):", screenPixelLineThickness);
             }
 
 
             AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-210, -5, 0), lineThickness: 0.6, linesLength: 100);
-            AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-50, -5, 0), lineThickness: 0.8, linesLength: 100, screenPixelThickLineText);
+            AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-50, -5, 0),  lineThickness: oneLineThickness, linesLength: 100, oneLineThickLineText);
 
             AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-210, -140, 0), lineThickness: 1, linesLength: 100);
-            AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-50, -140, 0), lineThickness: 2, linesLength: 100);
+            AddLinesFan(rootModelVisual3D, startPosition: new Point3D(-50, -140, 0),  lineThickness: 2, linesLength: 100);
 
 
             // Add lines that start from vertical lines and then continue with slightly angled lines
@@ -214,8 +238,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             dxViewportView.UseLayoutRounding   = true;
             dxViewportView.SnapsToDevicePixels = true;
 
+            _dxViewports.Add(dxViewportView);
+
             // Set GraphicsProfile:
-            var graphicsProfile = new GraphicsProfile(string.Format("{0}xMSAA_{1}xSSAA_HardwareRendering", multisamplingCount, supersamplingCount), 
+            var graphicsProfile = new GraphicsProfile("CustomGraphicsProfile", 
                                                       GraphicsProfile.DriverTypes.DirectXHardware, 
                                                       ShaderQuality.High, 
                                                       preferedMultisampleCount: multisamplingCount,
@@ -294,7 +320,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     FontSize          = 12,
                     TextWrapping      = TextWrapping.Wrap,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Margin            = new Thickness(15, 0, 0, 0)
+                    Margin            = new Thickness(graphicsProfileName.Length > 35 ? 3 : 15, 0, 0, 0) // Special margin for "OptimizedHighQualityHardwareRendering"
                 };
 
                 titlesPanel.Children.Add(textBlock);
@@ -313,6 +339,30 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             RootGrid.Children.Add(viewRootGrid);
 
             return dxViewportView;
+        }
+
+        private void OnDisableWpfResizingOfRenderedImageCheckCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+            
+            foreach (var dxViewportView in _dxViewports)
+                dxViewportView.DisableWpfResizingOfRenderedImage = DisableWpfResizingOfRenderedImageCheckBox.IsChecked ?? false;
+        }
+
+        private void FilterTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded || FilterTypeComboBox.SelectedIndex == -1)
+                return;
+
+
+            var filterType = (SupersamplingResolveFilterType)FilterTypeComboBox.SelectedIndex;
+
+            foreach (var dxViewportView in _dxViewports)
+            {
+                dxViewportView.DXScene.DefaultResolveBackBufferRenderingStep.ResolveFilter = filterType;
+                dxViewportView.Refresh(); // Render again
+            }
         }
     }
 }

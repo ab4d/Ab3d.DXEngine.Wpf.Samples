@@ -73,7 +73,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         private Color4 _addedInstanceIdColor;
         private byte[] _addedInstanceIdColorBytes;
         
-        private bool _isHitTesting;
+        private bool _isCameraChanging;
         private bool _isInstanceIdBitmapDirty;
 
         private WriteableBitmap _writeableBitmap;
@@ -117,7 +117,6 @@ this significantly reduces the time to get the bitmap.";
 
                 CreateScene();
 
-                _isHitTesting = true;
                 SubscribeCameraAndMouseEvents();
             };
 
@@ -129,24 +128,62 @@ this significantly reduces the time to get the bitmap.";
         private void SubscribeCameraAndMouseEvents()
         {
             // Subscribe to Camera changes and size changed to mark that we need to render the InstanceId bitmap again
-            Camera1.CameraChanged                  += (sender, args) => _isInstanceIdBitmapDirty = true;
-            MainDXViewportView.DXRenderSizeChanged += (sender, args) => _isInstanceIdBitmapDirty = true;
+            Camera1.CameraChanged                  += (sender, args) => ProcessCameraChanged();
+            MainDXViewportView.DXRenderSizeChanged += (sender, args) => ProcessCameraChanged();
 
             // Disable hit-testing (rendering to bitmap) while user is rotating or moving the camera
-            MouseCameraController1.CameraRotateStarted += (sender, args) => _isHitTesting = false;
-            MouseCameraController1.CameraRotateEnded   += (sender, args) => _isHitTesting = true;
+            MouseCameraController1.CameraRotateStarted += (sender, args) => StartCameraChanging();
+            MouseCameraController1.CameraRotateEnded   += (sender, args) => StopCameraChanging();
 
-            MouseCameraController1.CameraMoveStarted += (sender, args) => _isHitTesting = false;
-            MouseCameraController1.CameraMoveEnded   += (sender, args) => _isHitTesting = true;
+            MouseCameraController1.CameraMoveStarted += (sender, args) => StartCameraChanging();
+            MouseCameraController1.CameraMoveEnded   += (sender, args) => StopCameraChanging();
 
-            MouseCameraController1.CameraQuickZoomStarted += (sender, args) => _isHitTesting = false;
-            MouseCameraController1.CameraQuickZoomEnded   += (sender, args) => _isHitTesting = true;
+            MouseCameraController1.CameraQuickZoomStarted += (sender, args) => StartCameraChanging();
+            MouseCameraController1.CameraQuickZoomEnded   += (sender, args) => StopCameraChanging();
+        }
+
+        private void StartCameraChanging()
+        {
+            _isCameraChanging = true;
+        }
+
+        private void StopCameraChanging()
+        {
+            _isCameraChanging = false;
+            ClearSelectedInstance();
+        }
+
+        private void ProcessCameraChanged()
+        {
+            _isInstanceIdBitmapDirty = true;
+
+            if (_isCameraChanging || _instanceIdBitmapBytes == null) // Do not update InstanceId bitmap and hit vertex while camera is changing; also wait until first bitmap is rendered and only then update
+                return;
+
+
+            if (IsUpdatingInstanceIdBitmapCheckBox.IsChecked ?? false)
+                UpdateInstanceIdBitmap();
+
+            if (IsHitTestingCheckBox.IsChecked ?? false)
+            {
+                var mousePosition = Mouse.GetPosition(MainDXViewportView);
+                HitTestWithInstanceIdBitmap(mousePosition);
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (_isHitTesting && (IsHitTestingCheckBox.IsChecked ?? false))
-                HitTestWithInstanceIdBitmap(e.GetPosition(MainDXViewportView));
+            if (_isCameraChanging) // Do not update VertexId bitmap and hit vertex while camera is changing
+                return;
+
+            if (_isInstanceIdBitmapDirty && (IsUpdatingInstanceIdBitmapCheckBox.IsChecked ?? false))
+                UpdateInstanceIdBitmap();
+
+            if (IsHitTestingCheckBox.IsChecked ?? false)
+            {
+                var mousePosition = e.GetPosition(MainDXViewportView);
+                HitTestWithInstanceIdBitmap(mousePosition);
+            }
 
             base.OnMouseMove(e);
         }
@@ -157,6 +194,9 @@ this significantly reduces the time to get the bitmap.";
                 UpdateInstanceIdBitmap();
 
             if (_instanceIdBitmapBytes == null || _instanceIdBitmapWidth <= 0 || _instanceIdBitmapHeight <= 0)
+                return;
+
+            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > MainDXViewportView.ActualWidth || mousePosition.Y > MainDXViewportView.ActualHeight)
                 return;
 
             // We need to scale from WPF's coordinates to the rendered coordinates
@@ -214,14 +254,15 @@ this significantly reduces the time to get the bitmap.";
             if (!_isInstanceIdBitmapDirty) 
                 return;
 
-            // When rendering instance id bitmap we will add a Opaque black color (0, 0, 0, 255: with alpha set to 1) the rendered bitmap. 
+            // When rendering instance id bitmap we will add an Opaque black color (0, 0, 0, 255: with alpha set to 1) to the rendered bitmap. 
             // This makes it possible for us to see the colors on the rendered image because alpha value is set to 1.
-            // If we would render more the 16.7 million instances, then we should set added color to (0, 0, 0, 0) so that 
+            // If we render more the 16.7 million instances, then we should set added color to (0, 0, 0, 0) so that 
             // the alpha value can be also used for instance id value.
             
             _addedInstanceIdColor = Color4.Black;
             _addedInstanceIdColorBytes = _addedInstanceIdColor.ToArray().Select(c => (byte)(c * 255)).ToArray(); // Convert to byte array
 
+            MainDXViewportView.Update();
 
             // Prepare the scene:
 
@@ -245,7 +286,7 @@ this significantly reduces the time to get the bitmap.";
 
             _stopwatch.Restart();
 
-            // Render to bitmap with the same size (width = height = -1) but without multi-sampling and super-sampling
+            // Render to bitmap with the specified size but without multi-sampling and super-sampling
             MainDXViewportView.RenderToBitmap(OnRenderedBitmapReady, width, height, preferedMultisampling: 1, supersamplingCount: 1, dpiX: 96, dpiY: 96, convertToNonPreMultipledAlpha: false);
 
             _stopwatch.Stop();

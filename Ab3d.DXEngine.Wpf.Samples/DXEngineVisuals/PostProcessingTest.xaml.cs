@@ -210,7 +210,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         {
             var dxScene = MainDXViewportView.DXScene;
 
-            if (dxScene == null)
+            if (dxScene == null || (GaussianBlurCheckBox.IsChecked ?? false) == false)
                 return;
 
 
@@ -244,6 +244,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // Blur is done in two passes - one horizontal and one vertical
                 _gaussianHorizontalBlurPostProcess = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: false, commonStandardDeviation, filterSize);
                 _gaussianVerticalBlurPostProcess   = new Ab3d.DirectX.PostProcessing.GaussianBlurPostProcess(isVerticalBlur: true,  commonStandardDeviation, filterSize);
+
+                var blurRangeScale = (float)BlurRangeScaleSlider.Value;
+                _gaussianHorizontalBlurPostProcess.BlurRangeScale = blurRangeScale;
+                _gaussianVerticalBlurPostProcess.BlurRangeScale = blurRangeScale;
 
                 _createdPostProcesses.Add(_gaussianHorizontalBlurPostProcess);
                 _createdPostProcesses.Add(_gaussianVerticalBlurPostProcess);
@@ -316,6 +320,18 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 return;
 
             UpdateGaussianBlurParameters();
+
+            MainDXViewportView.Refresh(); // Render the scene again
+        }
+        
+        private void BlurRangeScaleSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!this.IsLoaded || _gaussianHorizontalBlurPostProcess == null || _gaussianVerticalBlurPostProcess == null)
+                return;
+
+            var blurRangeScale = (float)BlurRangeScaleSlider.Value;
+            _gaussianHorizontalBlurPostProcess.BlurRangeScale = blurRangeScale;
+            _gaussianVerticalBlurPostProcess.BlurRangeScale = blurRangeScale;
 
             MainDXViewportView.Refresh(); // Render the scene again
         }

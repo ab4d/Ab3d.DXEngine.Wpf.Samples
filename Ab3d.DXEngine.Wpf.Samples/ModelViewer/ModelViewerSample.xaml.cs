@@ -25,12 +25,16 @@ using Ab3d.Models;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 using Assimp;
+using SharpDX;
+using SharpDX.Direct3D11;
 using Camera = System.Windows.Media.Media3D.Camera;
 using CheckBox = System.Windows.Controls.CheckBox;
+using Color = System.Windows.Media.Color;
 using GeometryModel3D = System.Windows.Media.Media3D.GeometryModel3D;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using LineCap = Ab3d.Common.Models.LineCap;
 using MessageBox = System.Windows.MessageBox;
+using Point = System.Windows.Point;
 
 namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 {
@@ -42,6 +46,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private string _fileName;
 
         private Model3D _loadedModel3D;
+
+        private const float _loadedModelSize = 100;
 
         private DisposeList _modelDisposeList;
 
@@ -76,6 +82,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private double _lastEdgeStartAngle;
 
         private ScreenSpaceAmbientOcclusionRenderingProvider _ssaoRenderingProvider;
+        private DynamicPlanarShadowRenderingProvider _dynamicPlanarShadowRenderingProvider;
+        private PlaneVisual3D _shadowPlaneVisual3D;
+        private DiffuseMaterial _shadowDiffuseMaterial;
+        private StandardMaterial _shadowDxMaterial;
 
         public ModelViewerSample()
         {
@@ -96,19 +106,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
             MainDXViewportView.DXSceneInitialized += (sender, args) =>
             {
-                if (MainDXViewportView.DXScene != null) // if not wpf 3d rendering
-                {
-                    _ssaoRenderingProvider = new ScreenSpaceAmbientOcclusionRenderingProvider();
-                    _ssaoRenderingProvider.IsEnabled = SSAOCheckBox.IsChecked ?? false;
+                SetupDynamicPlanarShadow();
 
-                    MainDXViewportView.DXScene.InitializeShadowRendering(_ssaoRenderingProvider);
-                }
-
-                
                 //string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.3DS");
                 string startUpFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\RobotModel\Robot_Main.FBX");
                 LoadModel(startUpFileName);
             };
+
+            //MainDXViewportView.SceneRendered += (sender, args) =>
+            //{
+            //    // We can disable
+            //    if (_dynamicPlanarShadowRenderingProvider != null)
+            //        _dynamicPlanarShadowRenderingProvider.IsEnabled = false;
+            //};
 
 
             // Use helper class (defined in this sample project) to load the native Assimp libraries
@@ -157,6 +167,68 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             };
         }
 
+        private void SetupDynamicPlanarShadow()
+        {
+            if (MainDXViewportView.DXScene == null) // if not wpf 3d rendering
+                return;
+
+            // See DXEngineVisuals/DynamicPlanarShadowSample for more info
+
+            _dynamicPlanarShadowRenderingProvider = new DynamicPlanarShadowRenderingProvider(shadowMapWidth: 256, shadowMapHeight: 256)
+            {
+                ShadowCenterPosition = new Vector3(0, -1f, 0),
+                ShadowWorldSize = new Vector2(_loadedModelSize * 1.1f, _loadedModelSize * 1.1f), // Make the shadow plane slightly bigger as the object because the shadow is blurred
+                ShadowDarkness = 0.5f,
+                ShadowVisibilityDistance = 50
+            };
+
+            // Initialize shadow rendering
+            MainDXViewportView.DXScene.InitializeShadowRendering(_dynamicPlanarShadowRenderingProvider);
+
+
+            _shadowDiffuseMaterial = new DiffuseMaterial(Brushes.Green);
+
+            _shadowDxMaterial = new StandardMaterial()
+            {
+                // Set ShaderResourceView into array of diffuse textures
+                DiffuseTextures   = new ShaderResourceView[] { _dynamicPlanarShadowRenderingProvider.ShadowShaderResourceView },
+                TextureBlendState = MainDXViewportView.DXScene.DXDevice.CommonStates.GetRecommendedBlendState(hasTransparency: true, hasPreMultipliedAlpha: true),
+                HasTransparency = true,
+                DiffuseColor = Color3.White
+            };
+
+            _shadowDiffuseMaterial.SetUsedDXMaterial(_shadowDxMaterial);
+
+
+            _shadowPlaneVisual3D = new PlaneVisual3D()
+            {
+                CenterPosition = new Point3D(0, -10f, 0),
+                Size = new Size((float)_dynamicPlanarShadowRenderingProvider.ShadowWorldSize.X, (float)_dynamicPlanarShadowRenderingProvider.ShadowWorldSize.Y),
+                Material = _shadowDiffuseMaterial,
+                BackMaterial = _shadowDiffuseMaterial
+            };
+
+            // Disable casting shadow by _shadowPlaneVisual3D
+            // This is not needed in this sample but is a good practice and also shows how to do that
+            _shadowPlaneVisual3D.SetDXAttribute(DXAttributeType.IsCastingShadow, false);
+
+            MainViewport.Children.Add(_shadowPlaneVisual3D);
+        }
+        
+        private void SetupScreenSpaceAmbientOcclusion()
+        {
+            if (MainDXViewportView.DXScene == null) // if not wpf 3d rendering
+                return;
+
+            if (_ssaoRenderingProvider == null)
+            {
+                _ssaoRenderingProvider = new ScreenSpaceAmbientOcclusionRenderingProvider();
+                _ssaoRenderingProvider.IsEnabled = SSAOCheckBox.IsChecked ?? false;
+            }
+
+            if (!_ssaoRenderingProvider.IsInitialized)
+                MainDXViewportView.DXScene.InitializeShadowRendering(_ssaoRenderingProvider);
+        }
 
         private void ShowAllObjects()
         {
@@ -250,6 +322,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     SetTwoSidedMaterial(readModel3D);
 
 
+                // Position the loaded object so that its bottom center position is at (0,0,0).
+                // Also scale it to 100 (defined by _loadedModelSize).
+                Ab3d.Utilities.ModelUtils.PositionAndScaleModel3D(readModel3D, 
+                                                                  position: new Point3D(0, 0, 0), 
+                                                                  positionType: PositionTypes.Bottom | PositionTypes.Center, 
+                                                                  finalSize: new Size3D(_loadedModelSize, _loadedModelSize, _loadedModelSize));
+
+
                 // Show the model
                 ShowModel(readModel3D, updateCamera: isNewFile); // If we just reloaded the previous file, we preserve the current camera TargetPosition and Distance
 
@@ -275,26 +355,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                     
                     // Select perspective camera
                     CameraComboBox.SelectedIndex = CameraComboBox.Items.Count - 2;
-
-
-                    // Adjust the SSAO occlusion radius slider
-                    var diagonalLength = readModel3D.Bounds.GetDiagonalLength();
-                    if (diagonalLength < 100 || diagonalLength > 500)
-                        OcclusionRadiusSlider.Maximum = diagonalLength * 0.2;
-                    else
-                        OcclusionRadiusSlider.Maximum = 99;
-                 
-                    // Adjust size of TextBlock that shows the selected occlusion radius
-                    if (OcclusionRadiusSlider.Maximum >= 100)
-                        OcclusionRadiusTextBlock.Width = 125;
-                    else
-                        OcclusionRadiusTextBlock.Width = 110;
-
-
-                    OcclusionRadiusSlider.Value = OcclusionRadiusSlider.Maximum * 0.2;
-
-                    if (_ssaoRenderingProvider != null)
-                        _ssaoRenderingProvider.OcclusionRadius = (float)OcclusionRadiusSlider.Value;
                 }
                 else
                 {
@@ -337,20 +397,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
             if (model3D == null)
                 return;
 
-
-            if (model3D.Bounds.GetDiagonalLength() > 10000 && (ScaleLargeModelsCheckBox.IsChecked ?? false))
-            {
-                // IMPORTANT:
-                // Some imported files may define the models in actual units (meters or millimeters) and
-                // this may make the objects very big (for example, objects bounds are bigger than 100000).
-                // For such big models the camera rotation may become irregular (not smooth) because
-                // of floating point precision errors on the graphics card.
-                //
-                // Therefore it is recommended to prevent such big models by scaling them to a more common size.
-                // This can be done by the ModelUtils.CenterAndScaleModel3D method:
-                // Put the model to the center of coordinate axis and scale it to 100 x 100 x 100.
-                Ab3d.Utilities.ModelUtils.CenterAndScaleModel3D(model3D, centerPosition: new Point3D(0, 0, 0), finalSize: new Size3D(100, 100, 100));
-            }
 
             ContentVisual.Content = model3D;
 
@@ -396,6 +442,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
                 // Adjust the camera so the bounding box of the loaded model will fit into view
                 // if camera is not valid (for example when the size of Viewport3D is not set yet), then wait until camera is valid and then automatically call FitIntoView
                 Camera1.FitIntoView(model3D.Bounds, adjustTargetPosition: true, adjustmentFactor: 1, waitUntilCameraIsValid: true); 
+            }
+
+
+            if (_dynamicPlanarShadowRenderingProvider != null && (DynamicPlanarShadowCheckBox.IsChecked ?? false))
+            {
+                // We only need to enable _dynamicPlanarShadowRenderingProvider for one frame.
+                // This will render the shadow texture that is required for _shadowDxMaterial.
+                _dynamicPlanarShadowRenderingProvider.EnableForOneFrame();
             }
 
 
@@ -1915,8 +1969,21 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 
         private void OnSSAOCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
         {
-            if (_ssaoRenderingProvider != null)
-                _ssaoRenderingProvider.IsEnabled = SSAOCheckBox.IsChecked ?? false;
+            if (!this.IsLoaded)
+                return;
+
+            if (SSAOCheckBox.IsChecked ?? false)
+            {
+                if (_ssaoRenderingProvider == null)
+                    SetupScreenSpaceAmbientOcclusion();
+                else
+                    _ssaoRenderingProvider.IsEnabled = true;
+            }
+            else
+            {
+                if (_ssaoRenderingProvider != null)
+                    _ssaoRenderingProvider.IsEnabled = false;
+            }
 
             MainDXViewportView.Refresh();
         }
@@ -1924,7 +1991,40 @@ namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
         private void OcclusionRadiusSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_ssaoRenderingProvider != null)
+            {
                 _ssaoRenderingProvider.OcclusionRadius = (float)OcclusionRadiusSlider.Value;
+                MainDXViewportView.Refresh();
+            }
+        }
+
+        private void OnDynamicPlanarShadowCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            if (DynamicPlanarShadowCheckBox.IsChecked ?? false)
+            {
+                if (_dynamicPlanarShadowRenderingProvider == null)
+                {
+                    SetupDynamicPlanarShadow();
+                }
+                else
+                {
+                    // Update the shadow texture
+                    _dynamicPlanarShadowRenderingProvider.EnableForOneFrame();
+
+                    if (_shadowPlaneVisual3D != null)
+                        _shadowPlaneVisual3D.IsVisible = true;
+                }
+            }
+            else
+            {
+                if (_dynamicPlanarShadowRenderingProvider != null)
+                    _dynamicPlanarShadowRenderingProvider.IsEnabled = false;
+
+                if (_shadowPlaneVisual3D != null)
+                    _shadowPlaneVisual3D.IsVisible = false;
+            }
 
             MainDXViewportView.Refresh();
         }

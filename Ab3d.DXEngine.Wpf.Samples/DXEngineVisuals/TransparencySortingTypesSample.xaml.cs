@@ -65,7 +65,12 @@ This is very fast and in most cases this gives accurate results. But in case whe
 
 When this CheckBox is checked, then this will prevent writing to depth buffer for all transparent objects (set CommonStates.DefaultTransparentDepthStencilState to DepthRead instead of DepthReadWrite).
 
-This helps to prevent transparency problems.";
+This can helps to prevent some transparency problems.
+
+However, this does not work correctly in all of the cases because objects that are farther away from the camera can be rendered after closer objects, and this can affect the final color of the pixels.
+You can observe that by first checking the 'No transparency sorting' check box. This will prevent showing blue boxes behind green plate in the middle group of objects. When checking 'Prevent writing to depth for transparent objects' the result will be much better, but the final color will stil not be correct because the blue boxes are rendered after the green plate and the result colors are too blue. If you check the 'Transparency sorting of all bounding box corners' check box the results will be correct.
+
+Preventing depth write for transparent objects usually gives better results but this is not the default option to preserve the behavior of the engine with the previous version when this feature was introduced.";
 
 
             var semiTransparentBrush = new SolidColorBrush(Color.FromArgb(64, 26, 161, 226));

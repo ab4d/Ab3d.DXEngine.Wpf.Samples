@@ -16,7 +16,7 @@
         <local:IsStringEmptyConverter x:Key="IsStringEmptyConverter"/>
         <local:LineBreakableStringConverter x:Key="LineBreakableStringConverter"/>
 
-        <XmlDataProvider x:Key="SamplesXml" Source="Samples.xml"/>
+        <!--<XmlDataProvider x:Key="SamplesXml" Source="Samples.xml"/>-->
 
         <DataTemplate x:Key="SamplesTemplate">
             <StackPanel Orientation="Horizontal">

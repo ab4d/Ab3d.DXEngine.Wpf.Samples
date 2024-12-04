@@ -21,7 +21,9 @@
             <Hyperlink Name="OpenGitHubSolutionHyperlink" Click="Hyperlink_OnClick">Click here to open CadImporter on GitHub</Hyperlink>
         </TextBlock>
 
-        <Image Name="SampleImage" Source="/Resources/CadImporter.png" Width="800" HorizontalAlignment="Left" Margin="0 20 0 0" />
+        <Border Margin="0 20 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left">
+            <Image Name="SampleImage" Source="/Resources/CadImporter.png" Width="800" />
+        </Border>
 
         <controls:TextBlockEx Style="{StaticResource InfoContent}" FontSize="16" Margin="0 20 0 0">
             CadImporter uses Ab4d.OpenCascade library that provides a .Net wrapper for a third-part Open CASCADE library.

@@ -73,7 +73,7 @@
                             ValueChanged="FilterWidthSlider_OnValueChanged" />
                 </StackPanel>
 
-                <CheckBox Name="GaussianBlurCheckBox" Content="Gaussian blur" FontWeight="Bold" IsChecked="False"  Margin="0 7 0 2" ToolTip="More accurate gaussian blur effect" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
+                <CheckBox Name="GaussianBlurCheckBox" Content="Gaussian blur" FontWeight="Bold" IsChecked="False" Margin="0 7 0 2" ToolTip="More accurate gaussian blur effect" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
                     <TextBlock Text="Filter size:" VerticalAlignment="Center"/>
                     <ComboBox Name="FilterSizeComboBox" Margin="5 0 0 0" Width="60" SelectedIndex="5" SelectionChanged="FilterSizeComboBox_OnSelectionChanged">
@@ -86,10 +86,16 @@
                     </ComboBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
-                    <TextBlock Text="Standard deviation:" />
+                    <TextBlock Text="Standard deviation:" Width="107" />
                     <Slider Name="StandardDeviationSlider" Minimum="0" Maximum="2" Value="1" Width="60" 
                             AutoToolTipPrecision="1" AutoToolTipPlacement="BottomRight" TickFrequency="1" 
                             ValueChanged="StandardDeviationSlider_OnValueChanged" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+                    <TextBlock Text="BlurRangeScale:" Width="107" />
+                    <Slider Name="BlurRangeScaleSlider" Minimum="0" Maximum="4" Value="1" Width="60" 
+                            AutoToolTipPrecision="1" AutoToolTipPlacement="BottomRight" TickFrequency="1" 
+                            ValueChanged="BlurRangeScaleSlider_OnValueChanged" />
                 </StackPanel>
 
                 <CheckBox Name="ExpandCheckBox" Content="Expand" FontWeight="Bold" Margin="0 7 0 2" Checked="PostProcessesCheckBoxChanged" Unchecked="PostProcessesCheckBoxChanged"/>

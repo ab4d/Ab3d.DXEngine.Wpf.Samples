@@ -52,7 +52,13 @@
                                     TargetCamera="{Binding ElementName=Camera1}"/>
 
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
-                   Text="Planar shadows"/>
+                   Text="Simple planar shadows"/>
+
+
+        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" >
+            <TextBlock Text="Simple planar shadows" FontWeight="Bold" FontSize="20" Foreground="#333"/>
+            <TextBlock Text="Simple planar shadows are rendered by transforming the 3D objects to flat 3D models (using shadow matrix)." FontSize="14" TextWrapping="Wrap" Foreground="#333"/>
+        </StackPanel>
 
         <Border BorderBrush="Black" BorderThickness="2" Background="#88FFFFFF" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5">
 

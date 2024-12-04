@@ -79,7 +79,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             var dxViewportView = new DXViewportView(viewport3D);
 
             // Set GraphicsProfile:
-            var graphicsProfile = new GraphicsProfile(string.Format("{0}MSAA_{1}SSAA_HardwareRendering", multisamplingCount, supersamplingCount), 
+            var graphicsProfile = new GraphicsProfile("CustomGraphicsProfile", 
                                                       GraphicsProfile.DriverTypes.DirectXHardware, 
                                                       ShaderQuality.High, 
                                                       preferedMultisampleCount: multisamplingCount,

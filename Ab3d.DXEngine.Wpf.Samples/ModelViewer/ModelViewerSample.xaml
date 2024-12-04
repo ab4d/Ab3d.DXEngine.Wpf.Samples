@@ -155,6 +155,14 @@
                         <StackPanel Orientation="Vertical" Margin="5 5 0 5">
                             <TextBlock Text="Scene view settings:" FontWeight="Bold" Margin="0 0 0 0" />
 
+                            <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                                <TextBlock Text="Camera:" VerticalAlignment="Center"/>
+                                <ComboBox Name="CameraComboBox" SelectedIndex="0" Width="200" Margin="5 0 0 0" SelectionChanged="CameraComboBox_OnSelectionChanged">
+                                    <ComboBoxItem>Perspective</ComboBoxItem>
+                                    <ComboBoxItem>Orthographic</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
                             <CheckBox Name="ShowSolidObjectsCheckBox" Content="Show solid objects" Margin="0 10 0 0" IsChecked="True" />
                             <CheckBox Name="ShowEdgeLinesCheckBox" Content="Show edge lines" Margin="0 5 0 0" IsChecked="True" Checked="OnShowEdgeLinesCheckBoxCheckedChanged" Unchecked="OnShowEdgeLinesCheckBoxCheckedChanged" />
                             <CheckBox Name="ShowWireframeCheckBox" Content="Show wireframe" Margin="0 5 0 0" IsChecked="False" Checked="OnShowWireframeCheckBoxCheckedChanged" Unchecked="OnShowWireframeCheckBoxCheckedChanged" />
@@ -193,7 +201,7 @@
                                       Checked="OnLineSettingsChanged" Unchecked="OnLineSettingsChanged" />
 
 
-                            <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 15 0 0" />
+                            <TextBlock Text="Selected object settings:" FontWeight="Bold" Margin="0 12 0 0" />
 
                             <CheckBox Name="TransparentNonSelectedObjectsCheckBox" Content="Transparent not selected objects" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
                             <CheckBox Name="TwoSidedTransparentMaterialCheckBox" Content="Use two-sided transparent material" IsChecked="True" Margin="0 5 0 0" Checked="OnTransparentNonSelectedObjectsCheckBoxChanged" Unchecked="OnTransparentNonSelectedObjectsCheckBoxChanged" />
@@ -212,17 +220,8 @@
                             </ComboBox>
 
 
-                            <TextBlock Text="Camera:" FontWeight="Bold" Margin="0 15 0 0" />
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Camera:" VerticalAlignment="Center"/>
-                                <ComboBox Name="CameraComboBox" SelectedIndex="0" Width="200" Margin="5 0 0 0" SelectionChanged="CameraComboBox_OnSelectionChanged">
-                                    <ComboBoxItem>Perspective</ComboBoxItem>
-                                    <ComboBoxItem>Orthographic</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
 
-
-                            <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 15 0 0" />
+                            <TextBlock Text="Lights:" FontWeight="Bold" Margin="0 12 0 0" />
 
                             <StackPanel Name="ImportedLightsPanel" Orientation="Vertical" />
 
@@ -239,16 +238,23 @@
                                 <Slider Name="AmbientLightSlider" Grid.Column="1" Value="30" Minimum="0" Maximum="100" ValueChanged="AmbientLightSlider_OnValueChanged"/>
                             </Grid>
 
-                            <CheckBox Name="SSAOCheckBox" Content="SSAO" IsChecked="False" Margin="0 10 0 0" Checked="OnSSAOCheckBoxCheckedChanged" Unchecked="OnSSAOCheckBoxCheckedChanged"
-                                      ToolTip="When checked, than Screen Space Ambient Occlusion (SSAO) is enabled" />
+
+                            <TextBlock Text="Shadows:" FontWeight="Bold" Margin="0 12 0 0" />
+
+                            <CheckBox Name="DynamicPlanarShadowCheckBox" Content="DynamicPlanarShadow" IsChecked="True" Margin="0 5 0 0" Checked="OnDynamicPlanarShadowCheckedChanged" Unchecked="OnDynamicPlanarShadowCheckedChanged" />
 
                             <Grid Margin="0 5 0 0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Name="OcclusionRadiusTextBlock" Grid.Column="0" Text="{Binding ElementName=OcclusionRadiusSlider, Path=Value, StringFormat='Occlusion radius: {0:0}'}" Width="110" VerticalAlignment="Center"/>
-                                <Slider Name="OcclusionRadiusSlider" Grid.Column="1" Value="10" Minimum="0" Maximum="99" ValueChanged="OcclusionRadiusSlider_OnValueChanged"/>
+
+                                <CheckBox Name="SSAOCheckBox" Grid.Column="0" VerticalAlignment="Center" IsChecked="False" Checked="OnSSAOCheckBoxCheckedChanged" Unchecked="OnSSAOCheckBoxCheckedChanged"
+                                          ToolTip="When checked, then Screen Space Ambient Occlusion (SSAO) is enabled" />
+
+                                <TextBlock Name="OcclusionRadiusTextBlock" Grid.Column="1" Text="{Binding ElementName=OcclusionRadiusSlider, Path=Value, StringFormat='Use SSAO - radius: {0:0.0}'}" Width="130" Margin="3 0 0 0" VerticalAlignment="Center"/>
+                                <Slider Name="OcclusionRadiusSlider" Grid.Column="2" Value="3" Minimum="0" Maximum="20" ValueChanged="OcclusionRadiusSlider_OnValueChanged"/>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
@@ -266,10 +272,7 @@
                         <CheckBox Name="ReadPolygonIndicesCheckBox" Content="Read PolygonIndices" Margin="0 5 0 0" IsChecked="True" Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged"
                                   ToolTip="When checked the Assimp importer will read PolygonIndices collection that can be used&#x0a;to show polygons instead of triangles. Object need to be shown with wireframe to see the difference."/>
 
-                        <CheckBox Name="ScaleLargeModelsCheckBox" Content="Scale down large models" IsChecked="True" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
-                                  ToolTip="Some imported files may define the models in actual units (meters or millimeters) and&#x0a;this may make the objects very big (for example, objects bounds are bigger than 100000).&#x0a;For such big models the camera rotation may become irregular (not smooth)&#x0a;because of floating point precision errors on the graphics card."/>
-
-                        <CheckBox Name="TwoSidedMaterialsCheckBox" Content="Force two sided materials" IsChecked="False" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
+                        <CheckBox Name="TwoSidedMaterialsCheckBox" Content="Force two-sided materials" IsChecked="False" Margin="0 5 0 0"  Checked="OnModelLoadingSettingsChanged" Unchecked="OnModelLoadingSettingsChanged" 
                                   ToolTip="When checked then the BackMaterial is set to the same material as Material so that all triangles of the model are visible from both sided."/>
 
 

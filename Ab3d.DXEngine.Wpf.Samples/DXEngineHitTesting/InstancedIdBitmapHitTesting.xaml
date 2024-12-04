@@ -54,6 +54,9 @@
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
                                     TargetCamera="{Binding ElementName=Camera1}"/>
 
+        <ab3d:MouseCameraControllerInfo Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                        MouseCameraController="{Binding ElementName=MouseCameraController1}" />
+
         <Border Name="PreviewImageBorder" Grid.Row="0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10 10 0 10" SnapsToDevicePixels="True" UseLayoutRounding="True"
                 Visibility="{Binding ElementName=ShowInstanceIdBitmapCheckBox, Path=IsChecked, Converter={StaticResource BooleanToVisibility}, FallbackValue=Visible}">
             <Image Name="PreviewImage" Width="200" />

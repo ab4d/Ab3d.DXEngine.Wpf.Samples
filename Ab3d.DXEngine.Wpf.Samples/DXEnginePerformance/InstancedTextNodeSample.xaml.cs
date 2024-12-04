@@ -46,21 +46,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         {
             InitializeComponent();
 
-
-            AlphaClipThresholdInfoControl.InfoText =
-@"AlphaClipThreshold is used to correctly render the textures with rendered characters and transparent background. It specifies at which alpha value the pixels will be clipped (skipped from rendering and their depth will not be written to the depth buffer).
-
-When set to 0, then alpha-clipping is disabled and in this case the characters may not be rendered correctly.
-Default value is 0.15.
-
-See 'Improved visuals / Alpha clipping' sample and comments in its code for more info.";
-
             var coloredAxisVisual3D = new ColoredAxisVisual3D();
             MainViewport.Children.Add(coloredAxisVisual3D);
 
             this.Loaded += delegate(object sender, RoutedEventArgs args)
             {
-                ShowCurrentDemo();
+                CreateSimpleDemoScene();
             };
 
             this.Unloaded += delegate(object sender, RoutedEventArgs args)
@@ -83,11 +74,11 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             var textBlockVisual3D = new TextBlockVisual3D()
             {
                 Text                   = "TextBlockVisual3D",
-                Position               = new Point3D(-190, -50, 0),
+                Position               = new Point3D(20, 50, 0),
                 PositionType           = PositionTypes.BottomLeft,
                 TextDirection          = new Vector3D(1, 0, 0),
                 UpDirection            = new Vector3D(0, 1, 0),
-                Size                   = new Size(80, 40),
+                Size                   = new Size(120, 40),
                 Background             = Brushes.Transparent,
                 RenderBitmapSize       = new Size(256, 128),
                 TextPadding            = new Thickness(5, 0, 5, 0),
@@ -194,125 +185,12 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
 
             // To show text with other font or with other font weight, we need to create another InstancedTextNode
             _instancedTextNode2 = new InstancedTextNode(new FontFamily("Times New Roman"), FontWeights.Bold, fontBitmapSize: 128);
-            _instancedTextNode2.AddText("Text with any font", Colors.Gold, new Point3D(100, -100, 0), 30, true);
+            _instancedTextNode2.AddText("Text with any font", Colors.Gold, new Point3D(30, 10, 0), 30, true);
 
             var sceneNodeVisual2 = new SceneNodeVisual3D(_instancedTextNode2);
             MainViewport.Children.Add(sceneNodeVisual2);
 
-
-            SetupDemoSceneButtons(isDemoSceneShown: true);
-
-            UpdateCharactersCountInfo();
-
             _addedTexts = new List<InstancedText>();
-        }
-
-        private void CreateInstanceText(InstancedTextNode instancedTextNode, Point3D centerPosition, Size3D size, int xCount, int yCount, int zCount, Color textColor, double textSize, string stringFormat = "({0:0} {1:0} {2:0})")
-        {
-            float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
-            float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
-            float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
-
-            for (int z = 0; z < zCount; z++)
-            {
-                float zPos = (float)(centerPosition.Z - (size.Z / 2.0) + (z * zStep));
-
-                for (int y = 0; y < yCount; y++)
-                {
-                    float yPos = (float)(centerPosition.Y - (size.Y / 2.0) + (y * yStep));
-
-                    for (int x = 0; x < xCount; x++)
-                    {
-                        float xPos = (float)(centerPosition.X - (size.X / 2.0) + (x * xStep));
-
-                        string infoText = string.Format(stringFormat, xPos, yPos, zPos);
-
-                        instancedTextNode.AddText(infoText, textColor, new Point3D(xPos, yPos, zPos), textSize, hasBackSide: true);
-                    }
-                }
-            }
-        }
-
-        private void SetupDemoSceneButtons(bool isDemoSceneShown)
-        {
-            SimpleDemoButtonsPanel.Visibility  = isDemoSceneShown ? Visibility.Visible : Visibility.Collapsed;
-            AlphaClipThresholdPanel.Visibility = isDemoSceneShown ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        private void UpdateCharactersCountInfo()
-        {
-            int charactersCount = _instancedTextNode.CharactersCount;
-            if (_instancedTextNode2 != null)
-                charactersCount += _instancedTextNode2.CharactersCount;
-
-            CharactersCountTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "Chars count: {0:#,##0}", charactersCount);
-        }
-
-        private void SceneTypeComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (!this.IsLoaded)
-                return;
-
-            ShowCurrentDemo();
-        }
-
-        private void ShowCurrentDemo()
-        {
-            MainViewport.Children.Clear();
-            DisposeInstancedTextNodes();
-
-            InfoTextBox.Text = "";
-            InfoTextBox.Visibility = Visibility.Collapsed;
-
-
-            if (SceneTypeComboBox.SelectedIndex == 0)
-            {
-                CreateSimpleDemoScene();
-
-                Camera1.Heading        = 30;
-                Camera1.Attitude       = -20;
-                Camera1.Distance       = 600;
-                Camera1.Offset         = new Vector3D(0, 0, 0);
-                Camera1.TargetPosition = new Point3D(0, 0, 0);
-            }
-            else
-            {
-                _instancedTextNode = new InstancedTextNode(new FontFamily("Consolas"), FontWeights.Normal, fontBitmapSize: 128);
-
-                // Reset direction
-                _instancedTextNode.SetTextDirection(textDirection: new Vector3D(1, 0, 0), upDirection: new Vector3D(0, 1, 0));
-
-
-                try
-                {
-                    Mouse.OverrideCursor = Cursors.Wait;
-
-                    if (SceneTypeComboBox.SelectedIndex == 1)
-                        CreateInstanceText(_instancedTextNode, centerPosition: new Point3D(0, 0, 0), size: new Size3D(1000, 500, 2000), xCount: 10, yCount: 20, zCount: 40, textColor: Colors.Black, textSize: 10);
-                    else if (SceneTypeComboBox.SelectedIndex == 2)
-                        CreateInstanceText(_instancedTextNode, centerPosition: new Point3D(0, 0, 0), size: new Size3D(2000, 2000, 2000), xCount: 20, yCount: 100, zCount: 100, textColor: Colors.Black, textSize: 10);
-                    else if (SceneTypeComboBox.SelectedIndex == 3)
-                        CreateInstanceText(_instancedTextNode, centerPosition: new Point3D(0, 0, 0), size: new Size3D(2000, 2000, 10000), xCount: 20, yCount: 100, zCount: 500, textColor: Colors.Black, textSize: 10);
-
-                    var sceneNodeVisual1 = new SceneNodeVisual3D(_instancedTextNode);
-                    MainViewport.Children.Add(sceneNodeVisual1);
-
-
-                    Camera1.Heading        = -8.2881686066695;
-                    Camera1.Attitude       = 3.35596244333162;
-                    Camera1.Distance       = 1131.38948539394;
-                    Camera1.TargetPosition = new Point3D(67.7795992281885, 14.1717311898692, 1.24683504967857);
-
-                    UpdateCharactersCountInfo();
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
-                }
-
-
-                SetupDemoSceneButtons(isDemoSceneShown: false);
-            }
         }
 
         private void ChangeTextButton_OnClick(object sender, RoutedEventArgs e)
@@ -352,9 +230,6 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             string newText = currentText.Substring(0, currentText.Length - 1) + newEndChar;
 
             _instancedText.ChangeText(newText);
-            //_instancedText.ChangeText(_instancedText.Text + '!');
-
-            UpdateCharactersCountInfo();
         }
 
         private void ChangeColorButton_OnClick(object sender, RoutedEventArgs e)
@@ -450,12 +325,10 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             int addedTextCount = _addedTexts.Count + 1;
 
             _instancedTextNode.SetTextDirection(textDirection: new Vector3D(1, 0, 0), upDirection: new Vector3D(0, 1, 0));
-            var instancedText = _instancedTextNode.AddText("Added text " + addedTextCount.ToString(), Colors.Black, new Point3D(-190, 50 + addedTextCount * 10, -5), size: 10, hasBackSide: true);
+            var instancedText = _instancedTextNode.AddText("Added text " + addedTextCount.ToString(), Colors.Black, new Point3D(-190, 20 + addedTextCount * 10, -5), size: 10, hasBackSide: true);
 
             _addedTexts.Add(instancedText);
             RemoveTextButton.IsEnabled = true;
-
-            UpdateCharactersCountInfo();
         }
 
         private void RemoveTextButton_OnClick(object sender, RoutedEventArgs e)
@@ -471,8 +344,6 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
 
             if (_addedTexts.Count == 0)
                 RemoveTextButton.IsEnabled = false;
-
-            UpdateCharactersCountInfo();
         }
 
         private void ShowReportButton_OnClick(object sender, RoutedEventArgs e)
@@ -485,24 +356,6 @@ See 'Improved visuals / Alpha clipping' sample and comments in its code for more
             InfoTextBox.Text = reportText;
 
             InfoTextBox.Visibility = Visibility.Visible;
-        }
-
-        private void AlphaClipThresholdSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (_instancedTextNode == null)
-                return;
-
-            var newValue = (float)AlphaClipThresholdSlider.Value;
-
-            if (MathUtils.IsZero(newValue))
-                AlphaClipThresholdValueTextBlock.Text = "disabled";
-            else
-                AlphaClipThresholdValueTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00}", newValue);
-
-            
-            _instancedTextNode.AlphaClipThreshold = newValue;
-
-            MainDXViewportView.Refresh();
         }
 
         private void DisposeInstancedTextNodes()

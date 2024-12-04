@@ -67,7 +67,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
-                _disposables.Dispose();
+                if (_disposables != null)
+                {
+                    _disposables.Dispose();
+                    _disposables = null;
+                }
+
                 MainDXViewportView.Dispose();
             };
         }
@@ -91,7 +96,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             try
             {
                 Color4[] positionColors;
-                var positions = LoadPositions(fileName, out positionColors);
+                bool swapYZCoordinates = ZUpAxisCheckBox.IsChecked ?? false;
+
+                if (_assimpWpfImporter == null)
+                {
+                    // See Ab3d.PowerToys.Samples/AssimpSamples/AssimpWpfImporterSample.xaml.cs in Ab3d.PowerToys samples for more information.
+                    AssimpLoader.LoadAssimpNativeLibrary();
+                    _assimpWpfImporter = new AssimpWpfImporter();
+                }
+
+                var positions = LoadPositions(fileName, swapYZCoordinates, _assimpWpfImporter, out positionColors);
 
                 if (positions == null)
                 {
@@ -103,9 +117,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                 _boundsDiagonalLength = positionsBounds.ToRect3D().GetDiagonalLength();
 
                 Camera1.TargetPosition = positionsBounds.Center.ToWpfPoint3D();
+                Camera1.Offset = new Vector3D(0, 0, 0);
                 Camera1.Distance = _boundsDiagonalLength * 1.8;
-
-
+                
                 // When using WorldSize pixel size, then set the Maximum size based on the size of the scene (max value is 1/200 of the _boundsDiagonalLength)
                 if (IsWorldSizeCheckBox.IsChecked ?? false)
                     _pixelSizeSliderFactor = _boundsDiagonalLength / 20000;
@@ -147,13 +161,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             }
         }
 
-        private Vector3[] LoadPositions(string fileName, out Color4[] positionColors)
+        public static Vector3[] LoadPositions(string fileName, bool swapYZCoordinates, AssimpWpfImporter assimpWpfImporter, out Color4[] positionColors)
         {
             Vector3[] positions = null;
             positionColors = null;
             
             var fileExtension = System.IO.Path.GetExtension(fileName);
-            bool swapYZCoordinates = ZUpAxisCheckBox.IsChecked ?? false;
 
             // Use PlyPointCloudReader to read .ply files
             // PlyPointCloudReader is available with full source code in the Common folder so you can change it to your needs.
@@ -172,18 +185,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             {
                 positions = LoadXyzFile(fileName, out positionColors);
             }
-            else
+            else if (assimpWpfImporter != null)
             {
                 // Use AssimpImporter to read other files
-
-                if (_assimpWpfImporter == null)
-                {
-                    // See Ab3d.PowerToys.Samples/AssimpSamples/AssimpWpfImporterSample.xaml.cs in Ab3d.PowerToys samples for more information.
-                    AssimpLoader.LoadAssimpNativeLibrary();
-                    _assimpWpfImporter = new AssimpWpfImporter();
-                }
-
-                var readModel3D = _assimpWpfImporter.ReadModel3D(fileName, texturesPath: null); // we can also define a textures path if the textures are located in some other directory (this is parameter can be skipped, but is defined here so you will know that you can use it)
+                var readModel3D = assimpWpfImporter.ReadModel3D(fileName, texturesPath: null); // we can also define a textures path if the textures are located in some other directory (this is parameter can be skipped, but is defined here so you will know that you can use it)
 
                 // First we count all the positions so we can allocate the positions and position color arrays
                 var totalPositionsCount = CountPositions(readModel3D);
@@ -285,7 +290,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         // It can also read position colors that are written after z value: color is written as red, green and blue separated by tab ('\t').
         // Note that the code below is from the performance and memory usage not optimal because it uses File.ReadAllLines.
         // This requires reading the whole file and storing it into memory. It would be better to use stream reader and read line by line.
-        private Vector3[] LoadXyzFile(string fileName, out Color4[] positionColors)
+        public static Vector3[] LoadXyzFile(string fileName, out Color4[] positionColors)
         {
             var fileLines = System.IO.File.ReadAllLines(fileName);
 
@@ -331,7 +336,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             return positions;
         }
 
-        private int CountPositions(Model3D model3D)
+        private static int CountPositions(Model3D model3D)
         {
             var geometryModel3D = model3D as GeometryModel3D;
             if (geometryModel3D != null)

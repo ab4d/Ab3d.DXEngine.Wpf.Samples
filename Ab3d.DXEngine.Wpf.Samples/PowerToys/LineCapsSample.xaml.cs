@@ -36,13 +36,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             new Vector3D(30, 80, 0),
         };
 
-        private readonly Vector3D[] _polyLinePositions = new Vector3D[]
-        {
-            new Vector3D(10, 0, 0),
-            new Vector3D(10, 60, 0),
-            new Vector3D(30, 20, 0),
-            new Vector3D(30, 80, 0),
-        };
+        private Vector3D[] _polyLinePositions;
 
         private double _selectedLineThickness = 2;
 
@@ -53,11 +47,44 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
         {
             InitializeComponent();
 
+            _polyLinePositions = _multiLinePositions;
+
+
+            AngleInfoControl.InfoText =
+@"Sets the angle of the Arrow line cap in degrees.
+The angle of other line types is changed relative to the Arrow line cap.";
+
             ArrowLengthInfoControl.InfoText =
 @"Specifies the maximum arrow length set as fraction of the line length.
-For example: 0.2 means that the maximum arrow length will be 1 / 5 (=0.2) of the line length.
+For example: 0.333 means that the maximum arrow length will be 1/3 of the line length.
 If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength,
-the arrow is shortened (the arrow angle is increased).";
+the arrow is shortened (and the arrow angle is increased).
+Default value is 0.333.
+
+To use a different value of MaxLineArrowLength for only a few lines, 
+create the ScreenSpaceLineNode (see 'Advanced / Creating ScreenSpaceLineNodes' sample)
+and then call SetMaxLineArrowLength method.";
+
+            MinLineStripArrowLengthInfoControl.InfoText =
+@"Specifies the minimum arrow length set as a multiplier of the line thickness.
+For example 2 means that the line arrow will not be shorter than 2 times the line arrow.
+This can be used to line arcs and curves where the line segments are very short.
+This is applied after the MaxLineArrowLength property and only for poly-lines and connected lines (IsLineStrip is true).
+Default value is 2.
+This feature is available only by Ab3d.DXEngine and not with Ab3d.PowerToys.
+
+To use different value of MinLineStripArrowLength for only a few lines, 
+create the ScreenSpaceLineNode (see 'Advanced / Creating ScreenSpaceLineNodes' sample)
+and then call SetMinLineArrowLength method.";
+            
+            MinLineListArrowLengthInfoControl.InfoText =
+@"This is the same as MinLineStripArrowLength but is used only for individual lines and disconnected lines (IsLineStrip is false).
+Default value is 0 (arrow size can be zero).
+This feature is available only by Ab3d.DXEngine and not with Ab3d.PowerToys.
+
+To use different value of MinLineStripArrowLength for only a few lines, 
+create the ScreenSpaceLineNode (see 'Advanced / Creating ScreenSpaceLineNodes' sample)
+and then call SetMinLineArrowLength method.";
 
             CreateSampleLines();
         }
@@ -230,29 +257,24 @@ the arrow is shortened (the arrow angle is increased).";
             if (!this.IsLoaded)
                 return;
 
-            var comboBoxItem = AngleComboBox.SelectedItem as ComboBoxItem;
-
-            if (comboBoxItem != null)
+            if (MainDXViewportView.DXScene != null)
             {
-                if (MainDXViewportView.DXScene != null)
-                {
-                    // DXEngine rendering:
-                    // Update the static LineArrowAngle property
+                // DXEngine rendering:
+                // Update the static LineArrowAngle property
 
-                    // LineArrowAngle is the angle of the line arrows. Default value is 15 degrees.
-                    // Note that if the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength, the arrow is shortened which increased the arrow angle.
+                // LineArrowAngle is the angle of the line arrows. Default value is 15 degrees.
+                // Note that if the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength, the arrow is shortened which increased the arrow angle.
 
-                    LineMaterial.LineArrowAngle = float.Parse((string)comboBoxItem.Content, CultureInfo.InvariantCulture);
+                LineMaterial.LineArrowAngle = GetSelectedDoubleValue(AngleComboBox);
 
-                    // Changing this value will be used only on lines that are created from that point on, so we need to regenerate the scene.
-                    CreateSampleLines();
-                }
-                else
-                {
-                    // WPF 3D rendering:
-                    LinesUpdater.Instance.LineArrowAngle = double.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
-                    LinesUpdater.Instance.Refresh();
-                }
+                // Changing this value will be used only on lines that are created from that point on, so we need to regenerate the scene.
+                CreateSampleLines();
+            }
+            else
+            {
+                // WPF 3D rendering:
+                LinesUpdater.Instance.LineArrowAngle = GetSelectedDoubleValue(AngleComboBox);
+                LinesUpdater.Instance.Refresh();
             }
         }
 
@@ -261,34 +283,45 @@ the arrow is shortened (the arrow angle is increased).";
             if (!this.IsLoaded)
                 return;
 
-            var comboBoxItem = LengthComboBox.SelectedItem as ComboBoxItem;
-
-            if (comboBoxItem != null)
+            if (MainDXViewportView.DXScene != null)
             {
-                if (MainDXViewportView.DXScene != null)
-                {
-                    // DXEngine rendering:
-                    // Update the static MaxLineArrowLength property
+                // DXEngine rendering:
+                // Update the static MaxLineArrowLength property
 
-                    // MaxLineArrowLength specifies the maximum arrow length set as fraction of the line length - e.g. 0.333 means that the maximum arrow length will be 1 / 3 (=0.333) of the line length.
-                    // If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength, the arrow is shortened (the arrow angle is increased).
-                    // Default value is 0.333 (1 / 3 of the line's length)
+                // MaxLineArrowLength specifies the maximum arrow length set as fraction of the line length - e.g. 0.333 means that the maximum arrow length will be 1 / 3 (=0.333) of the line length.
+                // If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength, the arrow is shortened (the arrow angle is increased).
+                // Default value is 0.333 (1 / 3 of the line's length)
 
-                    LineMaterial.MaxLineArrowLength = float.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
+                LineMaterial.MaxLineArrowLength = GetSelectedDoubleValue(LengthComboBox);
 
-                    // Changing this value will be used only on lines that are created from that point on, so we need to regenerate the scene.
-                    CreateSampleLines();
-                }
-                else
-                {
-                    // WPF 3D rendering:
-                    LinesUpdater.Instance.MaxLineArrowLength = double.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
-                    LinesUpdater.Instance.Refresh();
-                }
+                // The following two static properties are available ONLY in Ab3d.DXEngine:
+                LineMaterial.MinLineListArrowLength = GetSelectedDoubleValue(MinLineListArrowLengthComboBox);
+                LineMaterial.MinLineStripArrowLength = GetSelectedDoubleValue(MinLineStripArrowLengthComboBox);
 
-                LineMaterial.MaxLineArrowLength = float.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
+                // To use different value of MaxLineArrowLength or MinLineStripArrowLength for only a few lines, 
+                // create the ScreenSpaceLineNode (see 'Advanced / Creating ScreenSpaceLineNodes' sample)
+                // and then call SetMaxLineArrowLength or SetMinLineArrowLength method.
+                // For example:
+                // var lineNode = new ScreenSpaceLineNode(positions, isLineStrip: true, isPolyLine: true, isLineClosed: false, lineColor: Colors.Green.ToColor4(), lineThickness: 2, miterLimit: 2, startLineCap: LineCap.ArrowAnchor, endLineCap: LineCap.Flat);
+                // lineNode.SetMinLineArrowLength(4);
+                // 
+                // var lineNodeVisual = new SceneNodeVisual3D(lineNode);
+                // MainViewport.Children.Add(lineNodeVisual);
+
+                // Changing this value will be used only on lines that are created from that point on, so we need to regenerate the scene.
                 CreateSampleLines();
             }
+            else
+            {
+                // WPF 3D rendering:
+                LinesUpdater.Instance.MaxLineArrowLength = GetSelectedDoubleValue(LengthComboBox);
+
+                // MinLineListArrowLength and MinLineStripArrowLength are not supported
+
+                LinesUpdater.Instance.Refresh();
+            }
+
+            CreateSampleLines();
         }
 
         private void OnLineSettingsChanged(object sender, RoutedEventArgs e)
@@ -304,19 +337,47 @@ the arrow is shortened (the arrow angle is increased).";
             if (!this.IsLoaded)
                 return;
 
-            var comboBoxItem = LineThicknessComboBox.SelectedItem as ComboBoxItem;
-
+            _selectedLineThickness = GetSelectedDoubleValue(LineThicknessComboBox);
+            CreateSampleLines();
+        }
+        
+        private float GetSelectedDoubleValue(ComboBox comboBox)
+        {
+            var comboBoxItem = comboBox.SelectedItem as ComboBoxItem;
             if (comboBoxItem != null)
-            {
-                _selectedLineThickness = double.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
-                CreateSampleLines();
-            }
+                return float.Parse((string)comboBoxItem.Content, System.Globalization.CultureInfo.InvariantCulture);
+
+            return 0;
         }
 
         private void RandomizeButton_OnClick(object sender, RoutedEventArgs e)
         {
             RandomizeLineCaps();
             _isRandomized = true;
+        }
+
+        private void OnShowArcLinesCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded)
+                return;
+
+            if (ShowArcLinesCheckBox.IsChecked ?? false)
+            {
+                _polyLinePositions = MathUtils.GetArc3DPoints(ellipseCenterPosition: new Point3D(15, 15, 0), 
+                                                              ellipseNormal: new Vector3D(0, 0, 1), 
+                                                              zeroAngleDirection: new Vector3D(1, 0, 0), 
+                                                              xRadius: 15, 
+                                                              yRadius: 15, 
+                                                              startAngle: 30, 
+                                                              endAngle: 300, 
+                                                              segments: 30).Select(p => p.ToVector3D()).ToArray();
+            }
+            else
+            {
+                _polyLinePositions = _multiLinePositions;
+            }
+
+            CreateSampleLines();
         }
     }
 }

@@ -661,5 +661,32 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             MainDXViewportView.Refresh();
         }
+        
+        private void OnUseVertexIdColorCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded || _pixelEffect == null)
+                return;
+
+            if (UseVertexIdColorCheckBox.IsChecked ?? false)
+            {
+                // When UseVertexIdColor is true, then the pixel color is defined by the index of the pixel.
+                // In this case the lowest 8 bits of the vertex index number are written to the blue color,
+                // then to the green color, then to the red color and the highest byte (when more the 16M vertices) is written to the alpha color.
+                // For example, vertexId = 1: RGB: 0x000001; vertexId 257: RGB: 0x000102.
+                _pixelEffect.UseVertexIdColor = true;
+
+                // When UseVertexIdColor is true, then the color set in the PixelColor is added to
+                // the color that is calculated from the vertex index.
+                // We set that to Black (0,0,0,1) so that the alpha chanel is 1 so we can see the colors on the screen.
+                // When showing more than 16M pixels, set that to "new Color4(0,0,0,0)".
+                _pixelEffect.PixelColor = Color4.Black; 
+            }
+            else
+            {
+                _pixelEffect.UseVertexIdColor = false;
+            }
+
+            MainDXViewportView.Refresh();
+        }
     }
 }
