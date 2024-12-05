@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="7.1.9104" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9104" />   
+    <PackageReference Include="Ab3d.DXEngine" Version="7.1.9105" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9105" />   
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
 

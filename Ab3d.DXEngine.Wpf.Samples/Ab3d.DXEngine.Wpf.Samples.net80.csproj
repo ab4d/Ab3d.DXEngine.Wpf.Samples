@@ -7,9 +7,9 @@
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>7.1.9104</Version>
-    <AssemblyVersion>7.1.9104.2080</AssemblyVersion>
-    <FileVersion>7.1.9104.2080</FileVersion> 
+    <Version>7.1.9105</Version>
+    <AssemblyVersion>7.1.9105.2080</AssemblyVersion>
+    <FileVersion>7.1.9105.2080</FileVersion> 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -22,8 +22,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="7.1.9104" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9104" />
+    <PackageReference Include="Ab3d.DXEngine" Version="7.1.9105" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9105" />
     <PackageReference Include="Ab3d.DXEngine.glTF" Version="1.0.8992" />
     <PackageReference Include="Ab3d.PowerToys" Version="11.2.9104" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
