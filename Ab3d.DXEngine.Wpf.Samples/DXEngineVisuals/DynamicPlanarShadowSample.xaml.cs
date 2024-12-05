@@ -29,16 +29,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
     /// </summary>
     public partial class DynamicPlanarShadowSample : Page, ICompositionRenderingSubscriber
     {
-        private PointLight _shadowPointLight;
-        private DirectionalLight _shadowDirectionalLight;
-        private AmbientLight _ambientLight;
-
-        private Light _currentShadowLight;
-        
-        private double _lightVerticalAngle;
-        private double _lightHorizontalAngle;
-        private double _lightDistance;
-
         private PlaneVisual3D _shadowPlaneVisual3D;
 
         private int _shadowMapSize = 256;
