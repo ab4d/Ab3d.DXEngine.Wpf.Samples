@@ -70,6 +70,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     _shadowMapSize = 512;
                     _shadowDepthBluringSize = 8;
                     _shadowThreshold = 0.4f;
+                    _shadowDepthBias = 0;
 
                     _varianceShadowRenderingProvider.ShadowMapSize = _shadowMapSize;
                     _varianceShadowRenderingProvider.ShadowDepthBluringSize = _shadowDepthBluringSize;
