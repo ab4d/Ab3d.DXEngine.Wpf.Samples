@@ -24,10 +24,11 @@
   <ItemGroup>
     <PackageReference Include="Ab3d.DXEngine" Version="7.1.9105" />
     <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9105" />    
-    <PackageReference Include="Ab3d.DXEngine.glTF" Version="1.0.8992" />    
+    <PackageReference Include="Ab3d.DXEngine.glTF" Version="1.1.9293" />    
     <PackageReference Include="Ab3d.PowerToys" Version="11.2.9104" /> 
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+    <PackageReference Include="Openize.Drako" version="1.4.3" />
 
     <!--The following PackageReferences are required to prevent reporting vulnerability because SharpDX is build with older .NET Standard version -->
     <!--Another option is to update auditing mode to check only top-level dependencies - add the following to the root PropertyGroup: -->

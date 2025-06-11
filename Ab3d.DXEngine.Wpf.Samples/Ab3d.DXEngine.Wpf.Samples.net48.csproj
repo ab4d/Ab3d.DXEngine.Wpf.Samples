@@ -52,8 +52,8 @@
       <HintPath>..\packages\Ab3d.DXEngine.Wpf.7.1.9105\lib\net48\Ab3d.DXEngine.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ab3d.DXEngine.glTF, Version=1.0.8992.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ab3d.DXEngine.glTF.1.0.8992\lib\net45\Ab3d.DXEngine.glTF.dll</HintPath>
+    <Reference Include="Ab3d.DXEngine.glTF, Version=1.1.9293.2045, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ab3d.DXEngine.glTF.1.1.9293\lib\net45\Ab3d.DXEngine.glTF.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Ab3d.PowerToys, Version=11.2.9104.2048, Culture=neutral, PublicKeyToken=d45c8e156fba2841, processorArchitecture=MSIL">
@@ -66,6 +66,9 @@
     <Reference Include="Ab3d.PowerToys.Assimp">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Ab3d.PowerToys.Assimp.dll</HintPath>
+    </Reference>
+    <Reference Include="Openize.Drako, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Openize.Drako.1.4.3\lib\net46\Openize.Drako.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
@@ -80,9 +83,22 @@
       <HintPath>..\packages\SharpDX.Mathematics.4.2.0\lib\net45\SharpDX.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />

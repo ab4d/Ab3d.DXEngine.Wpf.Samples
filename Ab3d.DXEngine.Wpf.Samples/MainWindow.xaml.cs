@@ -47,7 +47,8 @@ namespace Ab3d.DXEngine.Wpf.Samples
         public MainWindow()
         {
             // When using the DXEngine from NuGet and when you have purchase a commercial version,
-            // then uncomment the following line to activate the license uncomment (see your User Account web page for more info):
+            // then uncomment the following line to activate the license.
+            // You can get your license code from your User Account web page.
             //Ab3d.Licensing.DXEngine.LicenseHelper.SetLicense(licenseOwner: "[CompanyName]", 
             //                                                 licenseType: "[LicenseType]", 
             //                                                 license: "[LicenseText]");

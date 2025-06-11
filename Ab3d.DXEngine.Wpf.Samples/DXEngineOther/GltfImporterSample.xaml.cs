@@ -1,11 +1,14 @@
-﻿using System;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using Ab3d.DirectX;
+﻿using Ab3d.DirectX;
+using Ab3d.DXEngine.glTF;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Visuals;
-using Ab3d.DXEngine.glTF;
+using Openize.Drako;
+using SharpDX;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {
@@ -17,13 +20,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
         private const string InitialFileName = @"Resources\Models\voyager.gltf";
 
         private glTFImporter _glTfImporter;
-        //private MeshGeometry3D _mesh;
 
         public GltfImporterSample()
         {
             InitializeComponent();
-
-
+            
             ConvertSimpleInfoControl.InfoText = 
 @"When checked then simple glTF's PhysicallyBasedMaterials (PBR)
 (have MetallicFactor set to 0 and do not have MetallicRoughness texture)
@@ -42,7 +43,11 @@ To test this import a gltf file that use PBR material.";
             MainDXViewportView.DXSceneInitialized += delegate (object sender, EventArgs args)
             {
                 _glTfImporter = new glTFImporter(MainDXViewportView.DXScene.DXDevice);
-            
+
+                // To support Draco compressed meshes we need to set the DracoMeshReaderFactory.
+                // The MyDracoReader class is defined below and uses Openize.Drako library to read Draco compressed meshes.
+                _glTfImporter.DracoMeshReaderFactory = (dracoFileBytes) => new MyDracoReader(dracoFileBytes);
+                
                 var fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, InitialFileName);
                 LoadModel(fileName);
             };
@@ -107,4 +112,115 @@ To test this import a gltf file that use PBR material.";
                 LoadModel(openFileDialog.FileName);
         }
     }
+    
+
+    // Custom DracoMeshReader that uses Openize.Drako library to read Draco compressed meshes.
+    class MyDracoReader : DracoMeshReader
+    {
+        private readonly DracoMesh _dracoMesh;
+        
+        public MyDracoReader(byte[] dracoFileBytes)
+        {
+            _dracoMesh = Draco.Decode(dracoFileBytes) as DracoMesh;
+        }
+        
+        public override Vector3[] GetPositions()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(Openize.Drako.AttributeType.Position);
+
+            // IndicesMap define the mapping from the original indices to the new indices in the attribute buffer,
+            // for example for box.gltf, the IndicesMap is [2, 2, 2, 0, 0, 0, ...
+            // and this means that the first 3 positions in the final positions array are the same as the 2nd position in the attribute (compressed buffer)
+            var positionsCount = attribute.IndicesMap.Length;
+            var positions = new Vector3[positionsCount];
+            for (int i = 0; i < positionsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                var pos = attribute.GetValueAsVector3(index);
+                positions[i] = new Vector3(pos.X, pos.Y, pos.Z);
+            }
+            
+            return positions;
+        }
+
+        public override Vector3[] GetNormals()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(Openize.Drako.AttributeType.Normal);
+            
+            if (attribute == null)
+                return null;
+
+            // See comment in GetPositions
+            var normalsCount = attribute.IndicesMap.Length;
+            var normals = new Vector3[normalsCount];
+            for (int i = 0; i < normalsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                var n = attribute.GetValueAsVector3(index);
+                normals[i] = new Vector3(n.X, n.Y, n.Z);
+            }
+            
+            return normals;
+        }
+        
+        public override Vector4[] GetTangents()
+        {
+            // Openize.Drako does not define Tangent attribute type.
+            // When Tangent data is present, it stores that as Generic attribute.
+            // In this cas we need to check that the DataType is FLOAT32 and ComponentsCount is 4 (Vector4)
+            var attribute = _dracoMesh.GetNamedAttribute(AttributeType.Generic);
+
+            if (attribute == null || attribute.ComponentsCount != 4 || attribute.DataType != DataType.FLOAT32)
+                return null;
+            
+            var oneVector4 = new float[4];
+            
+            var tangentsCount = attribute.IndicesMap.Length;
+            var tangents = new Vector4[tangentsCount];
+        
+            for (int i = 0; i < tangentsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                attribute.GetValue(index, oneVector4);
+                tangents[i] = new Vector4(oneVector4[0], oneVector4[1], oneVector4[2], oneVector4[3]);
+            }
+            
+            return tangents;
+        }
+        
+        public override Vector2[] GetTextureCoordinates()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(AttributeType.TexCoord);
+
+            if (attribute == null)
+                return null;
+            
+            var oneUV = new float[2];
+            
+            var textureCoordinatesCount = attribute.IndicesMap.Length;
+            var textureCoordinates = new Vector2[textureCoordinatesCount];
+        
+            for (int i = 0; i < textureCoordinatesCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                attribute.GetValue(index, oneUV);
+                textureCoordinates[i] = new Vector2(oneUV[0], oneUV[1]);
+            }
+            
+            return textureCoordinates;
+        }
+        
+        public override int[] GetTriangleIndices()
+        {
+            if (_dracoMesh.Indices == null || _dracoMesh.Indices.Count == 0)
+                return null;
+            
+            var indicesCount = _dracoMesh.Indices.Count;
+            var indices = new int[indicesCount];
+            for (int i = 0; i < indicesCount; i++)
+                indices[i] = _dracoMesh.Indices[i];
+
+            return indices;
+        }
+    }    
 }
