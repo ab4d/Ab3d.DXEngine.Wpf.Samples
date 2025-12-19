@@ -46,7 +46,7 @@
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <ab3d:MouseCameraControllerInfo Name="MouseCameraControllerInfo1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}" />
@@ -65,10 +65,10 @@
             <Run FontSize="16" Foreground="#444">Use left mouse button and mouse dragging to </Run>
             <Run FontSize="16" FontWeight="Bold" Foreground="#444">measure distance.</Run>
             <LineBreak/>
-            <Run FontSize="16" Foreground="#444">Drag and drop a file to show the positions in the file as a point-cloud</Run>
+            <Run FontSize="16" Foreground="#444">Drag and drop a file to show the positions in the file as a point-cloud.</Run>
         </TextBlock>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Height="67">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -85,18 +85,22 @@
                 </StackPanel>
 
                 <WrapPanel Orientation="Horizontal">
-                    <CheckBox Name="IsHitTestingCheckBox" Content="Is Hit testing" IsChecked="True" VerticalAlignment="Center"/>
-                    <CheckBox Name="IsUpdatingVertexIdBitmapCheckBox" Content="Update VertexIdBitmap" IsChecked="True" Margin="10 0 0 0" VerticalAlignment="Center"/>
-                    <CheckBox Name="ShowVertexIdBitmapCheckBox" Content="Show VertexIdBitmap" IsChecked="True" Margin="10 0 0 0" VerticalAlignment="Center"/>
-                    <CheckBox Name="SaveToDesktopBitmapCheckBox" Content="Save bitmap to desktop" IsChecked="False" Margin="10 0 10 0" VerticalAlignment="Center"
+                    <CheckBox Name="IsUpdatingVertexIdBitmapCheckBox" Content="Update VertexIdBitmap (?)" IsChecked="True" Margin="0 0 0 0" VerticalAlignment="Center"
+                              ToolTip="When checked then the ID bitmap is updated after each camera change."/>
+                    <CheckBox Name="CopyWholeIDBitmapCheckBox" Content="Copy whole ID bitmap (?)" IsChecked="False" Margin="10 0 0 0" VerticalAlignment="Center" Checked="OnCopyWholeIDBitmapCheckedChanged" Unchecked="OnCopyWholeIDBitmapCheckedChanged"
+                              ToolTip="When checked then the whole ID bitmap is copied from the GPU memory to the CPU memory.&#x0a;This can take some time, especially when using big screen sizes.&#x0a;But after that reading individual ID from pixel color is instantaneous.&#x0a;On the other side (when unchecked), we can preserve the ID bitmap in the GPU memory&#x0a;and only read a single pixel color to the CPU memory."/>
+                    <CheckBox Name="ShowVertexIdBitmapCheckBox" Content="Show VertexIdBitmap (?)" IsEnabled="False" IsChecked="False" Margin="20 0 0 0" VerticalAlignment="Center"
+                              ToolTip="This CheckBox is enabled only when we copy the whole ID bitmap from the GPU to the CPU memory."/>
+                    <CheckBox Name="SaveToDesktopBitmapCheckBox" Content="Save bitmap to desktop (?)" IsEnabled="False" IsChecked="False" Margin="10 0 10 0" VerticalAlignment="Center"
                               ToolTip="When checked each rendered vertex id bitmap is saved to 'VertexIdBitmap.png' file that is saved to desktop"/>
                 </WrapPanel>
             </StackPanel>
 
-            <StackPanel Name="InfoPanel" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" Margin="0 6 0 5" MinWidth="200">
+            <StackPanel Name="InfoPanel" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" Margin="0 3 0 0" MinWidth="200">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Hit vertex index:" Margin="0 0 3 0" />
-                    <TextBlock Name="VertexIndexTextBlock" />
+                    <TextBlock Name="VertexIndexTextBlock" Width="95" />
+                    <Rectangle Name="PixelColorRectangle" Width="14" Height="14" ></Rectangle>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Vertex position:" Margin="0 0 3 0" />
@@ -106,8 +110,12 @@
                     <TextBlock Text="VertexIdBitmap render time:" Margin="0 0 3 0" />
                     <TextBlock Name="RenderTimeTextBlock" />
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Read pixel ID time:" Margin="0 0 3 0" />
+                    <TextBlock Name="ReadIdTimeTextBlock" />
+                </StackPanel>
             </StackPanel>
-            <StackPanel Name="DistancePanel" Grid.Column="1" Visibility="Collapsed" Orientation="Vertical" HorizontalAlignment="Right" Margin="0 6 0 5" MinWidth="200">
+            <StackPanel Name="DistancePanel" Grid.Column="1" Visibility="Collapsed" Orientation="Vertical" HorizontalAlignment="Right" Margin="0 3 0 0" MinWidth="200">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Start position:" Margin="0 0 3 0" />
                     <TextBlock Name="StartPositionTextBlock" />

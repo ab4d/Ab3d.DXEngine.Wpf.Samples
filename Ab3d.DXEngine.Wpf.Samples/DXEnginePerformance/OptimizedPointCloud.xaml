@@ -46,7 +46,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
                                     ShowRotationCenterMarker="True"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <Rectangle Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2" Fill="#333333" SnapsToDevicePixels="True" />
         <StackPanel Grid.Row="2" Margin="0 7 10 5" Orientation="Vertical">

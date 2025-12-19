@@ -1,27 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
+using Point = System.Windows.Point;
+
+#if SHARPDX
 using SharpDX;
 using Matrix = SharpDX.Matrix;
-using Point = System.Windows.Point;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,6 +7,9 @@ using Ab3d.Assimp;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
 
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -60,7 +61,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 {
                     // SsaoShaderResourceView has R_16 format (one channel with 16 bit floats value) - render that as grayscale
                     _renderSsaoTextureRenderingStep = new RenderTextureRenderingStep(RenderTextureRenderingStep.TextureChannelsCount.OneChannelGrayscaleRendering, "Show SSAO texture");
-                    _renderSsaoTextureRenderingStep.TargetViewport = new SharpDX.ViewportF(0.68f, 0.02f, 0.3f, 0.3f); // upper right corner; size: 30% of the screen width and height
+                    _renderSsaoTextureRenderingStep.TargetViewport = new ViewportF(0.68f, 0.02f, 0.3f, 0.3f); // upper right corner; size: 30% of the screen width and height
 
                     // Preserve the original factors and offsets (can be used to adjust how the values are converted into colors)
                     //_renderSsaoTextureRenderingStep.Factors = new Vector4(1, 1, 1, 0);
@@ -157,7 +158,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             }
 
             var color = (byte)(2.55 * AmbientLightSlider.Value); // Minimum="0" Maximum="100" => 0 .. 255
-            _sceneAmbientLight.Color = Color.FromRgb(color, color, color);
+            _sceneAmbientLight.Color = System.Windows.Media.Color.FromRgb(color, color, color);
         }
 
         private void UpdateSceneLights()

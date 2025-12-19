@@ -42,7 +42,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     ShowRotationCenterMarker="True"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" >
             <TextBlock Text="XRay effect" FontWeight="Bold" FontSize="22" Foreground="Silver" />

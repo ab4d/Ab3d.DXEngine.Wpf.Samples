@@ -2,59 +2,54 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>Ab3d.DXEngine.Wpf.Samples</AssemblyName>
     <RootNamespace>Ab3d.DXEngine.Wpf.Samples</RootNamespace>
     <ApplicationIcon>ab4d.ico</ApplicationIcon>
-    <Version>7.1.9105</Version>
-    <AssemblyVersion>7.1.9105.2060</AssemblyVersion>
-    <FileVersion>7.1.9105.2060</FileVersion> 
+    <Version>7.2.9484</Version>
+    <AssemblyVersion>7.2.9484.2090</AssemblyVersion>
+    <FileVersion>7.2.9484.2090</FileVersion> 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>SHARPDX</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;CORE3</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Ab3d.DXEngine" Version="7.1.9105" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.1.9105" />    
-    <PackageReference Include="Ab3d.DXEngine.glTF" Version="1.1.9293" />    
-    <PackageReference Include="Ab3d.PowerToys" Version="11.2.9104" /> 
+    <PackageReference Include="Ab3d.DXEngine" Version="7.2.9484" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="7.2.9484" />
+    <PackageReference Include="Ab3d.DXEngine.glTF" Version="7.2.9484" />
+    <PackageReference Include="Ab3d.PowerToys" Version="12.0.9484" />  
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
-    <PackageReference Include="Openize.Drako" version="1.4.3" />
-
-    <!--The following PackageReferences are required to prevent reporting vulnerability because SharpDX is build with older .NET Standard version -->
-    <!--Another option is to update auditing mode to check only top-level dependencies - add the following to the root PropertyGroup: -->
-    <!-- <NuGetAuditMode>direct</NuGetAuditMode> -->
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	  <PackageReference Include="Openize.Drako" version="1.4.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net60.csproj" />
-    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net60.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net10.csproj" />
+    <ProjectReference Include="..\Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net10.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup>    
     <Reference Include="Ab3d.PowerToys.Assimp">
       <HintPath>..\lib\Ab3d.PowerToys.Assimp.dll</HintPath>
-    </Reference>
+    </Reference>    
     <Reference Include="AssimpNet">
       <HintPath>..\lib\AssimpNet.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-  </ItemGroup>
+  </ItemGroup>  
   
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  
 
   <ItemGroup>
     <None Remove="Resources\RobotModel\**" />
@@ -355,13 +350,9 @@
     </Resource>
     <Resource Include="Resources\Ab3dPowerToysSamples.png" />
     <Resource Include="Resources\ab4d-logo.png" />
-    <Resource Include="Resources\animation.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\animation.png" />
     <Resource Include="Resources\CadImporter.png" />
-    <Resource Include="Resources\cameras.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\cameras.png" />
     <Resource Include="Resources\Diagnostics-gray.png" />
     <Resource Include="Resources\Diagnostics.png" />
     <Resource Include="Resources\DXEngine-car_engine.png" />
@@ -374,16 +365,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\info_orange_icon.png" />
-    <Resource Include="Resources\lights.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\lights.png" />
     <Resource Include="Resources\new_icon.png" />
-    <Resource Include="Resources\objects.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\options.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\objects.png" />
+    <Resource Include="Resources\options.png" />
     <Resource Include="Resources\PowerToysTexture.png" />
     <Resource Include="Resources\Settings.png" />
     <Resource Include="Resources\ShaderFactoryScreenshot.PNG" />

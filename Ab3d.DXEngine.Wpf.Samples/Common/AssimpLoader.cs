@@ -1,7 +1,5 @@
 ﻿using System;
-using System.CodeDom;
 using System.Windows;
-using Ab3d.Assimp;
 using Assimp;
 
 namespace Ab3d.Assimp

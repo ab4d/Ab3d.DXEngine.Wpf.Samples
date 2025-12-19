@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
-using SharpDX.Direct3D;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -70,7 +63,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         private AxisAngleRotation3D _axisAngleRotation3D;
 
         private bool _hasTransformationMatrix;
-        private SharpDX.Matrix _transformationMatrix;
+        private Matrix _transformationMatrix;
 
 
         public OptimizedPointCloud()
@@ -241,7 +234,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             _optimizedPointMesh.OptimizationIndicesNumberThreshold = 100000; // We are satisfied with reducing the number of shown positions to 100000 (no need to optimize further - higher number reduced the initialization time)
             _optimizedPointMesh.MaxOptimizationViewsCount = 10; // Maximum number of created data sub-sets. The actual number can be lower when we hit the OptimizationIndicesNumberThreshold or when all vertices needs to be shown.
             
-            _optimizedPointMesh.Optimize(new SharpDX.Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), pixelSize);
+            _optimizedPointMesh.Optimize(new Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), pixelSize);
 
             _optimizedPointMesh.InitializeResources(MainDXViewportView.DXScene.DXDevice);
 
@@ -313,7 +306,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
         private void RenderAction(RenderingContext renderingContext, CustomRenderableNode customRenderableNode, object objectToRender)
         {
-            SharpDX.Matrix worldViewProjectionMatrix = renderingContext.UsedCamera.GetViewProjection();
+            Matrix worldViewProjectionMatrix = renderingContext.UsedCamera.GetViewProjection();
 
             if (_hasTransformationMatrix)
                 worldViewProjectionMatrix = _transformationMatrix * worldViewProjectionMatrix;
@@ -343,7 +336,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             var newPixelSize = (float)PixelSizeComboBox.SelectedItem;
 
 
-            _optimizedPointMesh.Optimize(new SharpDX.Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), newPixelSize);
+            _optimizedPointMesh.Optimize(new Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), newPixelSize);
 
             _pixelMaterial.PixelSize = newPixelSize;
 
@@ -485,7 +478,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
             // We can apply transformation to DXEngine's _customRenderableNode:
 
-            //_transformationMatrix = Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians((float) rotationAngle));
+            //_transformationMatrix = SharpDX.Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians((float) rotationAngle));
             //_hasTransformationMatrix = true;
 
             //if (_customRenderableNode.Transform == null)

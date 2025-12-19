@@ -1,30 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.PostProcessing;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -155,7 +148,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             var instancedData = new List<InstanceData>();
 
             for (int x = -300; x < 500; x += 100)
-                instancedData.Add(new InstanceData(SharpDX.Matrix.Translation(x, 30, 0), Colors.Yellow.ToColor4()));
+                instancedData.Add(new InstanceData(Matrix.Translation(x, 30, 0), Colors.Yellow.ToColor4()));
 
             _instancedMeshGeometryVisual3D = new InstancedMeshGeometryVisual3D(boxGeometry3D);
             _instancedMeshGeometryVisual3D.InstancesData = instancedData.ToArray();

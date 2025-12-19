@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,8 +10,11 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Assimp;
-using SharpDX.Direct3D11;
 using AssimpMaterial = Assimp.Material;
+
+#if SHARPDX
+using SharpDX.Direct3D11;
+#endif
 
 
 namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering

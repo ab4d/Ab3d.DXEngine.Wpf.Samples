@@ -1,25 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Animation;
 using Ab3d.Common.Cameras;
 using Ab3d.Common.Models;
 using Ab3d.DirectX;
 using Ab3d.Visuals;
+using Point = System.Windows.Point;
+
+#if SHARPDX
 using SharpDX;
 using Matrix = SharpDX.Matrix;
-using Point = System.Windows.Point;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -30,7 +26,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
     {
         private struct SampleData
         {
-            public SharpDX.Matrix Matrix;
+            public Matrix Matrix;
             public string Description;
             public string MatrixText;
 
@@ -62,11 +58,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             InitializeComponent();
 
             AddSampleTransformation(
-                SharpDX.Matrix.Identity, 
+                Matrix.Identity, 
                 @"The original MeshGeometry3D is not changed when the World transformation is set to the Identity matrix (all matrix fields are zero, except diagonal fields that are 1)");
 
             AddSampleTransformation(
-                SharpDX.Matrix.Translation(-1.5f, 0.4f, 1f),
+                Matrix.Translation(-1.5f, 0.4f, 1f),
 @"To change the position of one MeshGeometry3D instance, we set the M41 (for x offset), M42 (for y offset) and M43 (for z offset) fields in the World matrix.
 
 The following offset is used here:
@@ -75,7 +71,7 @@ y offset: 0.4
 z offset: 1");
 
             AddSampleTransformation(
-                SharpDX.Matrix.Scaling(0.5f, 1.0f, 3.0f),
+                Matrix.Scaling(0.5f, 1.0f, 3.0f),
 @"To scale one MeshGeometry3D instance, we set the 3 diagonal matrix values: M11 (for x scale), M22 (for y scale) and M33 (for z scale).
 
 The following scale factors are used here:
@@ -84,11 +80,11 @@ y scale: 1.0
 z scale: 3.0");
 
             AddSampleTransformation(
-                SharpDX.Matrix.RotationAxis(new SharpDX.Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)),
+                Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)),
 @"There are many ways to rotate an instance. One way is to use WPF's RotateTransform3D and AxisAngleRotation3D to specify axis of rotation and rotation angle. Then we need to convert the rotation matrix from the WPF matrix to the SharpDX matrix.
 
 The following rotation is used for this instance:
-Matrix.RotationAxis(new SharpDX.Vector3(0, 1, 0), MathUtil.DegreesToRadians(33))
+Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(33))
 
 This is the same as the following WPF rotation would be used:
 RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 33))");
@@ -101,24 +97,24 @@ RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 1, 0), 33))");
 
 
             AddSampleTransformation(
-                SharpDX.Matrix.Scaling(0.5f, 1.0f, 3.0f) * 
-                SharpDX.Matrix.Translation(-1.5f, 0.4f, 1f),
+                Matrix.Scaling(0.5f, 1.0f, 3.0f) * 
+                Matrix.Translation(-1.5f, 0.4f, 1f),
 @"We can combine transformations with multiplying them.
 
 This sample combines scale and translation with:
 finalTransformation = scale(0.5, 1.0, 3.0) * translation(-1.5, 0.4, 1)");
 
             AddSampleTransformation(
-                SharpDX.Matrix.Scaling(0.5f, 1.0f, 3.0f) *
-                SharpDX.Matrix.RotationAxis(new SharpDX.Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)) *
-                SharpDX.Matrix.Translation(-1.5f, 0.40f, 1f),
+                Matrix.Scaling(0.5f, 1.0f, 3.0f) *
+                Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)) *
+                Matrix.Translation(-1.5f, 0.40f, 1f),
 @"We can also add rotation (as the second step in transformations):
 finalTransformation = scale * rotation * translation");
 
             AddSampleTransformation(
-                SharpDX.Matrix.Translation(-1.5f, 0.40f, 1f) *
-                SharpDX.Matrix.RotationAxis(new SharpDX.Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)) *
-                SharpDX.Matrix.Scaling(0.5f, 1.0f, 3.0f) ,
+                Matrix.Translation(-1.5f, 0.40f, 1f) *
+                Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(33)) *
+                Matrix.Scaling(0.5f, 1.0f, 3.0f) ,
 @"IMPORTANT
 \!Order in which the transformations are applied (are multiplied) is very important!\!
 The proper order is:
@@ -253,7 +249,7 @@ finalTransformation = translation * rotation * scale");
             MainViewport.Children.Add(instancedMeshGeometryVisual3D);
         }
 
-        private SharpDX.Matrix CalculateMatrixFromPositionsAndSize(Vector3 startPosition, Vector3 endPosition, Size size)
+        private Matrix CalculateMatrixFromPositionsAndSize(Vector3 startPosition, Vector3 endPosition, Size size)
         {
             // We need to offset the Mesh by 0.5 on xAxis so that the (0,0,0) will be on the left edge of the mesh (without this (0,0,0) is in the center of the mesh).
             // This way the mesh will be positioned so that it will start at startPosition.
@@ -283,7 +279,7 @@ finalTransformation = translation * rotation * scale");
                 // If the order would be reversed, then we would first transform by GetMatrixFromDirection and then translate by 0.5.
                 // 
                 // The beauty of matrices is that all such rules are embedded into 4 x 4 group of numbers.
-                matrix = SharpDX.Matrix.Translation(0.5f, 0, 0) * matrix;
+                matrix = Matrix.Translation(0.5f, 0, 0) * matrix;
             }
 
             return matrix;

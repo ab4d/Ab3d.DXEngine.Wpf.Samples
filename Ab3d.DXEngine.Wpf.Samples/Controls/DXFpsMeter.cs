@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -164,7 +162,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.Controls
             // If RenderingTime was not changed then Rendering was called multiple times in one frame - we do not want to measure
             // Based on http://stackoverflow.com/questions/5812384/why-is-frame-rate-in-wpf-irregular-and-not-limited-to-monitor-refresh
 
-            var renderingEventArgs = e as RenderingEventArgs;
+            var renderingEventArgs = e as System.Windows.Media.RenderingEventArgs;
             if (renderingEventArgs != null)
             {
                 if (renderingEventArgs.RenderingTime == _lastRenderingTime)

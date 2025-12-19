@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ab3d.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Controls;
 using Ab3d.DXEngine.Wpf.Samples.PowerToysOther;
 using Ab3d.Visuals;
 

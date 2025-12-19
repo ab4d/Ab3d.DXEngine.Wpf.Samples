@@ -93,6 +93,8 @@
                                     ZoomMode="MousePosition"
                                     MouseMoveThreshold="4"
                                     RotationCursor="Hand"
+                                    CameraSmoothing="Normal"
+                                    TargetCamera="{Binding ElementName=Camera1}"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}" />
 
         <StackPanel Orientation="Vertical" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom">

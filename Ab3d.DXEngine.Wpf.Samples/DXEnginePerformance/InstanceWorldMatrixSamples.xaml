@@ -56,7 +56,7 @@
                                     MoveCameraConditions="Disabled"
                                     ShowRotationCenterMarker="True"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <ab3d:CameraAxisPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" />
 

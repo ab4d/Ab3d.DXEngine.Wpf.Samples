@@ -81,7 +81,7 @@
     
     <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="275"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -178,7 +178,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Frame Name="ContentFrame" Grid.Row="0" Source="{Binding XPath=@Page}" NavigationUIVisibility="Hidden" Navigated="ContentFrame_OnNavigated" Focusable="false"/>
+                    <Frame Name="ContentFrame" Grid.Row="0" NavigationUIVisibility="Hidden" Navigated="ContentFrame_OnNavigated" Focusable="false"/>
 
                     <Expander Name="DescriptionExpander" Grid.Row="1"  
                               Style="{StaticResource MyExpanderNoHeaderStyle}"

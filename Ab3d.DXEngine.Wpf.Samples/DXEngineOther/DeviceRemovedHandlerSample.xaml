@@ -46,7 +46,7 @@
                                     ShowRotationCenterMarker="True"
                                     RotateAroundMousePosition="True"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <TextBlock FontWeight="Bold" FontSize="20" Foreground="#444" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" 
                    Text="Sample to demonstrate how to handle device removed event"/>

@@ -8,9 +8,7 @@
 // You may use this control free of charge and for any project you wish. Just do not blame me for any problems with the control.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;

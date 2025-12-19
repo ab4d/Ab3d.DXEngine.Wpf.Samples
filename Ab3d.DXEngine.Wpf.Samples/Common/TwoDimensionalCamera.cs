@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media.Media3D;
-using System.Windows.Threading;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
 using Ab3d.Controls;
 using Ab3d.DirectX.Common;
 using Ab3d.DirectX.Controls;
-using Ab3d.Utilities;
-using SharpDX;
 using Point = System.Windows.Point;
 
 namespace Ab3d.DirectX
@@ -66,7 +63,7 @@ namespace Ab3d.DirectX
         public DXViewportView ParentDXViewportView { get; private set; }
 
         /// <summary>
-        /// Gets a Boolean that was used create this TwoDimensionalCamera and specifies if screen space units are used.
+        /// Gets a Boolean that was set when creating this TwoDimensionalCamera and specifies if screen space units are used.
         /// When false the device independent units are used - scaled by DPI scale (the same units are used by WPF).
         /// </summary>
         public bool UseScreenPixelUnits { get; private set; }

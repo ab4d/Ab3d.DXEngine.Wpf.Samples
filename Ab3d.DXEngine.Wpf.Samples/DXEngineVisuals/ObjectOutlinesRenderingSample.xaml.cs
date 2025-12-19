@@ -1,35 +1,21 @@
-﻿//#define TEST
+//#define TEST
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Assimp;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.PostProcessing;
 using Ab3d.DXEngine.Wpf.Samples.Common;
-using Ab3d.Utilities;
-using Ab3d.Visuals;
-using SharpDX;
-using SharpDX.Direct3D11;
 using Color = System.Windows.Media.Color;
 using RenderingEventArgs = Ab3d.DirectX.RenderingEventArgs;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {

@@ -1,29 +1,13 @@
-﻿using Ab3d.Common.Cameras;
-using Ab3d.DirectX;
-using Ab3d.DirectX.Materials;
-using Ab3d.Utilities;
-using Ab3d.Visuals;
-using SharpDX.Direct3D11;
-using SharpDX;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common;
-using System.Globalization;
-using Color = SharpDX.Color;
-using LineCap = Ab3d.Common.Models.LineCap;
+using Ab3d.Common.Cameras;
+using Ab3d.DirectX;
+using Ab3d.DirectX.Materials;
+using Ab3d.Visuals;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -38,7 +22,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         private int _shadowMapSize;
         private int _shadowDepthBluringSize;
         private float _shadowThreshold;
-        private float _shadowDepthBias;
+        private float _shadowDepthBias = 0;
         private VarianceShadowRenderingProvider _varianceShadowRenderingProvider;
 
         private ReaderObj _readerObj;
@@ -70,7 +54,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     _shadowMapSize = 512;
                     _shadowDepthBluringSize = 8;
                     _shadowThreshold = 0.4f;
-                    _shadowDepthBias = 0;
 
                     _varianceShadowRenderingProvider.ShadowMapSize = _shadowMapSize;
                     _varianceShadowRenderingProvider.ShadowDepthBluringSize = _shadowDepthBluringSize;

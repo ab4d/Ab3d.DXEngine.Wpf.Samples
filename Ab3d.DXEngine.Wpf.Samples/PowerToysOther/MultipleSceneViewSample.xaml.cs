@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Resources;
-using System.Windows.Shapes;
-using Ab3d.Cameras;
 using Ab3d.DirectX;
 using Ab3d.DXEngine.Wpf.Samples.Common;
-using Ab3d.ObjFile;
-using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX.Direct3D;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 {

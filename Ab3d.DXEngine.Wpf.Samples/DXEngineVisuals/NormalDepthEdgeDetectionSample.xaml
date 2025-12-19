@@ -42,7 +42,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <TextBlock Text="Edge detection by using normal-depth texture" FontWeight="Bold" FontSize="20" Foreground="DimGray" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
 

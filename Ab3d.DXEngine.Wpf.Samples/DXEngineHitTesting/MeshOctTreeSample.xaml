@@ -33,7 +33,7 @@
 
         <cameraContoller:MouseCameraController Name="MouseCameraController1" Grid.Row="0" RotateCameraConditions="LeftMouseButtonPressed"
                                                MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
-                                               TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
+                                               CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
 
 
         <Grid Grid.Row="1" Margin="0 5 0 0">
@@ -48,8 +48,8 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 10 0">
                 <TextBlock Text="Legend:" FontWeight="Bold" />
                 <TextBlock Text="2nd node level" Foreground="Red" />
-                <TextBlock Text="3nd node level" Foreground="Green" />
-                <TextBlock Text="4nd node level" Foreground="Blue" />
+                <TextBlock Text="3rd node level" Foreground="Green" />
+                <TextBlock Text="4th node level" Foreground="Blue" />
 
                 <CheckBox Name="ActualBoundingBoxCheckBox" Content="Show actual bounding box" IsChecked="True" Margin="0 15 0 0" Checked="OnOctTreeSettingsChanged" Unchecked="OnOctTreeSettingsChanged" 
                           ToolTip="When checked then the actually used bounding boxes are shown (optimized to fit the child triangles); when false the initial bounding boxes are shown."/>

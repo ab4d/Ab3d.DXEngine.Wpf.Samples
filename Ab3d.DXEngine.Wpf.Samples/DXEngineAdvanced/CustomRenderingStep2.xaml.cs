@@ -1,25 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Windows;
+using System;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Cameras;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -136,7 +127,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
 
             // Create Constant Buffer
+#if SHARPDX
             _constantBuffer = new Buffer(device, SharpDX.Utilities.SizeOf<Matrix>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+#else
+            _constantBuffer = new Buffer(device, System.Runtime.CompilerServices.Unsafe.SizeOf<Matrix>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+#endif
         }
 
         private void SharpDXRenderingAction(RenderingContext renderingContext)
@@ -149,9 +144,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             var context = renderingContext.DXDevice.ImmediateContext;
 
             // Prepare All the stages
+#if SHARPDX
+            var vertexBufferBinding = new VertexBufferBinding(_vertices, SharpDX.Utilities.SizeOf<Vector4>() * 2, 0);
+#else
+            var vertexBufferBinding = new VertexBufferBinding(_vertices, System.Runtime.CompilerServices.Unsafe.SizeOf<Vector4>() * 2, 0);
+#endif
+
             context.InputAssembler.InputLayout = _layout;
             context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertices, SharpDX.Utilities.SizeOf<Vector4>() * 2, 0));
+            context.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
             context.VertexShader.SetConstantBuffer(0, _constantBuffer);
             context.VertexShader.Set(_vertexShader);
             context.PixelShader.Set(_pixelShader);
@@ -223,11 +224,35 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         private void Dispose()
         {
             // Dispose all resources that were created here
-            SharpDX.Utilities.Dispose(ref _constantBuffer);
-            SharpDX.Utilities.Dispose(ref _vertices);
-            SharpDX.Utilities.Dispose(ref _layout);
-            SharpDX.Utilities.Dispose(ref _vertexShader);
-            SharpDX.Utilities.Dispose(ref _pixelShader);
+            if (_constantBuffer != null)
+            {
+                _constantBuffer.Dispose();
+                _constantBuffer = null;
+            }
+            
+            if (_vertices != null)
+            {
+                _vertices.Dispose();
+                _vertices = null;
+            }
+            
+            if (_layout != null)
+            {
+                _layout.Dispose();
+                _layout = null;
+            }
+            
+            if (_vertexShader != null)
+            {
+                _vertexShader.Dispose();
+                _vertexShader = null;
+            }
+            
+            if (_pixelShader != null)
+            {
+                _pixelShader.Dispose();
+                _pixelShader = null;
+            }
 
             MainDXViewportView.Dispose();
         }

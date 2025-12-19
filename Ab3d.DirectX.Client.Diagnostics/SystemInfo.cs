@@ -6,10 +6,19 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Text;
 using Microsoft.Win32;
+
+#if SHARPDX
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.DXGI.Device;
+#else
+using Ab3d.DirectX.Common;
+using Ab3d.DXGI;
+using Ab3d.Direct3D;
+using Ab3d.Direct3D11;
+using Device = Ab3d.DXGI.Device;
+#endif
 
 namespace Ab3d.DirectX.Client.Diagnostics
 {
@@ -192,9 +201,11 @@ namespace Ab3d.DirectX.Client.Diagnostics
             try
             {
                 // Create a null device with debug layer to check if it is available
-                var tempDevice = new SharpDX.Direct3D11.Device(DriverType.Null,
-                    DeviceCreationFlags.Debug,
-                    null);
+#if SHARPDX
+                var tempDevice = new SharpDX.Direct3D11.Device(DriverType.Null, DeviceCreationFlags.Debug, null);
+#else
+                var tempDevice = Ab3d.Direct3D11.Device.Create(DriverType.Null, DeviceCreationFlags.Debug);
+#endif                
 
                 if (tempDevice != null)
                 {

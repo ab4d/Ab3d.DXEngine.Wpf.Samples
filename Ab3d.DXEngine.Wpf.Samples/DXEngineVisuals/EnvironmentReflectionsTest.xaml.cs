@@ -1,26 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Common;
-using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -78,8 +65,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
             SetEnvironmentMap(TeapotVisual2.Content, _dxCubeMap, reflectionFactor: 0.5f);
 
             // Back left Teapot:
-            // full reflection on blue color and half reflection of green and blue (reflectionFactor = new SharpDX.Color3(0.5f, 0.5f, 1.0f))
-            SetEnvironmentMap(TeapotVisual3.Content, _dxCubeMap, reflectionFactor: new SharpDX.Color3(0.5f, 0.5f, 1.0f));
+            // full reflection on blue color and half reflection of green and blue (reflectionFactor = new Color3(0.5f, 0.5f, 1.0f))
+            SetEnvironmentMap(TeapotVisual3.Content, _dxCubeMap, reflectionFactor: new Color3(0.5f, 0.5f, 1.0f));
 
             // Back right Teapot:
             // no reflection and full diffuse color (reflectionFactor = 0.0f)
@@ -101,7 +88,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
         }
 
         // reflectionFactor type can be:
-        // float, double and SharpDX.Color3
+        // float, double and Color3
         // When Color3 is used, then it is specifies the reflection factor for each color component
         private void SetEnvironmentMap(Model3D rootModel3D, DXCubeMap dxCubeMap, object reflectionFactor)
         {
@@ -137,7 +124,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                 // 0.0 specifies no reflection and full diffuse color
                 //
                 // Allowed value types are:
-                // float, double and SharpDX.Color3
+                // float, double and Color3
                 // When Color3 is used, then it is specifies the reflection factor for each color component
                 // 
                 usedMaterial.SetDXAttribute(DXAttributeType.Material_ReflectionFactor, reflectionFactor);

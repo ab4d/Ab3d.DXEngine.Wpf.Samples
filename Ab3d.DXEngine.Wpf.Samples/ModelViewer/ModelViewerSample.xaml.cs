@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,7 +14,6 @@ using Ab3d.Assimp;
 using Ab3d.Cameras;
 using Ab3d.Common;
 using Ab3d.Common.Cameras;
-using Ab3d.Common.Models;
 using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
@@ -25,8 +23,6 @@ using Ab3d.Models;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
 using Assimp;
-using SharpDX;
-using SharpDX.Direct3D11;
 using Camera = System.Windows.Media.Media3D.Camera;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
@@ -35,6 +31,11 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using LineCap = Ab3d.Common.Models.LineCap;
 using MessageBox = System.Windows.MessageBox;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.ModelViewer
 {

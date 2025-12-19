@@ -1,15 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Security;
-using System.Windows;
 using System.Windows.Data;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
-using System.Xml;
-using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace Ab3d.DXEngine.Wpf.Samples.Common
 {

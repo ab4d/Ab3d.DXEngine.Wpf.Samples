@@ -1,29 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common.Models;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Models;
 using Ab3d.DirectX.Utilities;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using Matrix = SharpDX.Matrix;
-using Path = System.IO.Path;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {

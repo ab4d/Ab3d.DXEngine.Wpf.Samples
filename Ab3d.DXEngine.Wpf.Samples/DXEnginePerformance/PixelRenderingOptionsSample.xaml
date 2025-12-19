@@ -60,7 +60,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
                                     ZoomMode="MousePosition"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <ab3d:MouseCameraControllerInfo HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}" />

@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+
+#if SHARPDX
+using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
+#else
+using Ab3d.DXGI;
+using Ab3d.Direct3D;
+using Ab3d.Direct3D11;
+using Device = Ab3d.Direct3D11.Device;
+#endif
 
 namespace Ab3d.DirectX.Client.Settings
 {

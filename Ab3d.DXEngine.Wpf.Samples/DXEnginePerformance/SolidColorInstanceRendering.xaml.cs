@@ -1,24 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.Visuals;
-using SharpDX;
 using Color = System.Windows.Media.Color;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -116,13 +110,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     {
                         float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
 
-                        instancedData[i].World = new SharpDX.Matrix(modelScaleFactor, 0, 0, 0,
+                        instancedData[i].World = new Matrix(modelScaleFactor, 0, 0, 0,
                                                                     0, modelScaleFactor, 0, 0,
                                                                     0, 0, modelScaleFactor, 0,
                                                                     xPos, yPos, zPos, 1);
 
                         // Start with yellow and move to white (multiplied by 1.4 so that white color appear before the top)
-                        instancedData[i].DiffuseColor = new SharpDX.Color4(red: 1.0f - (float)i / (float)totalCount,
+                        instancedData[i].DiffuseColor = new Color4(red: 1.0f - (float)i / (float)totalCount,
                                                                            green: 1.0f,
                                                                            blue: 1.0f - (float)x / (float)xCount,
                                                                            alpha: 1.0f);

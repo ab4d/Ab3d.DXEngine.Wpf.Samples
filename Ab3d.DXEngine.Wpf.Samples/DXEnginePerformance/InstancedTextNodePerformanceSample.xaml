@@ -49,7 +49,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <!--<ab3d:CameraAxisPanel Grid.Row="1" TargetCamera="{Binding ElementName=Camera1}" HorizontalAlignment="Left" VerticalAlignment="Bottom" />-->
 

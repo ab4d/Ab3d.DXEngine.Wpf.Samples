@@ -1,23 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
-using System.Windows.Threading;
 using Ab3d.Cameras;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX.Direct3D11;
+using Format = SharpDX.DXGI.Format;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 {
@@ -367,7 +363,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
                 System.Buffer.BlockCopy(gradientColorsArray, 0, textureBytes, 0, textureBytes.Length);
 
                 // Create a DirectX ShaderResourceView (texture) from the byte array
-                var shaderResourceView = TextureLoader.CreateShaderResourceView(MainDXViewportView.DXScene.DXDevice, textureBytes, textureWidth, 1, textureWidth * 4, SharpDX.DXGI.Format.B8G8R8A8_UNorm, generateMipMaps: false);
+                var shaderResourceView = TextureLoader.CreateShaderResourceView(MainDXViewportView.DXScene.DXDevice, textureBytes, textureWidth, 1, textureWidth * 4, Format.B8G8R8A8_UNorm, generateMipMaps: false);
 
                 // IMPORTANT:
                 // To disable texture interpolation, use the PointClampSampler (instead of the default Anisotropic filtering)

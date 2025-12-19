@@ -7,18 +7,8 @@
 // License note:
 // You may use this control free of charge and for any project you wish. Just do not blame me for any problems with the control.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Ab3d.DXEngine.Wpf.Samples.Controls
 {

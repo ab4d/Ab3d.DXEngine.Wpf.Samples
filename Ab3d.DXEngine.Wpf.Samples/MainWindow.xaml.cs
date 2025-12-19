@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Diagnostics;
@@ -28,9 +23,10 @@ namespace Ab3d.DXEngine.Wpf.Samples
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string _startupPage = "ModelViewer/ModelViewerSample.xaml";
+        //private string _startupPage = "PowerToys/AllVisualsSample.xaml";
         private string _startupPage = null;
 
+        private object _currentSampleInstance;
         private DXViewportView _lastShownDXViewportView;
 
         private string _rejectedGraphicProfilesReasons;
@@ -47,8 +43,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
         public MainWindow()
         {
             // When using the DXEngine from NuGet and when you have purchase a commercial version,
-            // then uncomment the following line to activate the license.
-            // You can get your license code from your User Account web page.
+            // then uncomment the following line to activate the license uncomment (see your User Account web page for more info):
             //Ab3d.Licensing.DXEngine.LicenseHelper.SetLicense(licenseOwner: "[CompanyName]", 
             //                                                 licenseType: "[LicenseType]", 
             //                                                 license: "[LicenseText]");
@@ -60,8 +55,11 @@ namespace Ab3d.DXEngine.Wpf.Samples
             // You can use similar code to improve your error reporting data.
             AppDomain.CurrentDomain.UnhandledException += delegate(object sender, UnhandledExceptionEventArgs e)
             {
-                if (e.ExceptionObject is DXEngineException || 
-                    e.ExceptionObject is SharpDX.SharpDXException) // SharpDXException is also related with using DirectX
+                if (e.ExceptionObject is DXEngineException
+#if SHARPDX
+                    || e.ExceptionObject is SharpDX.SharpDXException // SharpDXException is also related with using DirectX
+#endif
+                    )
                 {
                     string fullSystemInfo;
 
@@ -122,35 +120,10 @@ namespace Ab3d.DXEngine.Wpf.Samples
                     DXEngineSettings.Current.SystemCapabilities.Dispose();
             };
 
-            ContentFrame.LoadCompleted += delegate (object o, NavigationEventArgs args)
-            {
-                // When content of ContentFrame is changed, we try to find the DXViewportView control
-                // that is defined by the newly shown content.
 
-                // First unsubscribe all previously subscribed events
-                UnsubscribeLastShownDXViewportView();
-
-                // Find DXViewportView
-                var foundDXViewportView = FindDXViewportView(ContentFrame.Content);
-
-                if (foundDXViewportView != null && foundDXViewportView.MasterDXView is DXViewportView)
-                    foundDXViewportView = (DXViewportView)foundDXViewportView.MasterDXView; // Show diagnostics for MasterDXView when a child DXViewportView was found
-
-                SubscribeDXViewportView(foundDXViewportView);
-            };
-
-
-            // SelectionChanged event handler is used to start the samples with the page set with _startupPage field.
-            // SelectionChanged is used because SelectItem cannot be set from this.Loaded event.
             SampleList.SelectionChanged += delegate (object sender, SelectionChangedEventArgs args)
             {
-                if (_startupPage != null)
-                {
-                    string savedStartupPage = _startupPage;
-                    _startupPage = null;
-
-                    SelectItem(savedStartupPage);
-                }
+                ShowSelectedSample();
             };
         }
 
@@ -169,6 +142,28 @@ namespace Ab3d.DXEngine.Wpf.Samples
             {
                 // If we are running on unsupported system we can still use WPF 3D for rendering
                 DXEngineSettings.Current.GraphicsProfiles = new GraphicsProfile[] { GraphicsProfile.Wpf3D };
+            }
+        }
+
+        private void ShowSelectedSample()
+        {
+            if (_startupPage != null)
+            {
+                string savedStartupPage = _startupPage;
+                _startupPage = null;
+
+                SelectItem(savedStartupPage);
+            }
+            else
+            {
+                var xmlElement = SampleList.SelectedItem as System.Xml.XmlElement;
+                if (xmlElement != null)
+                {
+                    var pageAttribute = xmlElement.GetAttribute("Page");
+
+                    if (!string.IsNullOrEmpty(pageAttribute))
+                        SelectItem(pageAttribute);
+                }
             }
         }
 
@@ -555,6 +550,21 @@ namespace Ab3d.DXEngine.Wpf.Samples
 
         private void SelectItem(string pageName)
         {
+            var disposableSample = _currentSampleInstance as IDisposable;
+            if (disposableSample != null)
+            {
+                disposableSample.Dispose();
+            }
+            else if (_lastShownDXViewportView != null && !_lastShownDXViewportView.IsDisposed)
+            {
+                _lastShownDXViewportView.Dispose();
+            }
+            
+            UnsubscribeLastShownDXViewportView();
+
+            _currentSampleInstance = null;
+
+
             if (string.IsNullOrEmpty(pageName))
             {
                 SampleList.SelectedItem = null;
@@ -567,6 +577,38 @@ namespace Ab3d.DXEngine.Wpf.Samples
             SampleList.SelectedItem = supportPageElement;
 
             SampleList.ScrollIntoView(supportPageElement);
+
+
+            // Create an instance of the selected sample
+            var typeName = pageName.Replace('/', '.').Replace(".xaml", "");
+            var assemblyName = this.GetType().Assembly.GetName().Name;
+            typeName = string.Format("{0}.{1},{0}", assemblyName, typeName);
+
+            var sampleType = Type.GetType(typeName, throwOnError: true);
+
+            var sampleInstance = Activator.CreateInstance(sampleType);
+
+            // ...  and show it
+            ContentFrame.Navigate(sampleInstance);
+
+            _currentSampleInstance = sampleInstance;
+
+            // NOTE:
+            // Before we use the following binding in the ContentFrame control: Source="{Binding XPath=@Page}"
+            // This produced "Application identity is not set" exception in WPF code. This exception is handled by WPF, but still can stop the debugger at the exception.
+            // To prevent that we manually create an instance of the sample and set that to ContentFrame 
+
+
+            // When content of ContentFrame is changed, we try to find the DXViewportView control
+            // that is defined by the newly shown content.
+
+            // Find DXViewportView
+            var foundDXViewportView = FindDXViewportView(sampleInstance);
+
+            if (foundDXViewportView != null && foundDXViewportView.MasterDXView is DXViewportView)
+                foundDXViewportView = (DXViewportView)foundDXViewportView.MasterDXView; // Show diagnostics for MasterDXView when a child DXViewportView was found
+
+            SubscribeDXViewportView(foundDXViewportView);
         }
 
         // Searches the logical controls tree and returns the first instance of DXViewportView if found

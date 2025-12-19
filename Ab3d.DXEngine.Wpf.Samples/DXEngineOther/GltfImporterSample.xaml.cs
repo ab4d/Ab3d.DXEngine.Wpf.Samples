@@ -1,14 +1,18 @@
-﻿using Ab3d.DirectX;
+using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
 using Ab3d.DXEngine.glTF;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Visuals;
+using Ab3d.DirectX;
 using Openize.Drako;
+
+#if SHARPDX
 using SharpDX;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Controls;
+#else
+using System.Numerics;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {
@@ -85,18 +89,25 @@ To test this import a gltf file that use PBR material.";
                     _glTfImporter.LoggerCallback = null;
                 }
             }
-            
 
-            var sceneNode = _glTfImporter.Import(fileName);
 
-            var sceneNodeVisual3D = new SceneNodeVisual3D(sceneNode);
-
-            MainViewport.Children.Add(sceneNodeVisual3D);
-
-            if (sceneNode.Bounds != null)
+            try
             {
-                Camera1.Distance = sceneNode.Bounds.GetDiagonalLength() * 1.5;
-                Camera1.TargetPosition = sceneNode.Bounds.GetCenterPosition().ToWpfPoint3D();
+                var sceneNode = _glTfImporter.Import(fileName);
+
+                var sceneNodeVisual3D = new SceneNodeVisual3D(sceneNode);
+
+                MainViewport.Children.Add(sceneNodeVisual3D);
+
+                if (sceneNode.Bounds != null)
+                {
+                    Camera1.Distance = sceneNode.Bounds.GetDiagonalLength() * 1.5;
+                    Camera1.TargetPosition = sceneNode.Bounds.GetCenterPosition().ToWpfPoint3D();
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error loading file:\r\n" + fileName + "\r\n\r\n" + e.Message);
             }
         }
 

@@ -45,7 +45,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     MoveOnlyHorizontally="True" 
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" Orientation="Vertical">
             <TextBlock FontWeight="Bold" Text="Options:" />

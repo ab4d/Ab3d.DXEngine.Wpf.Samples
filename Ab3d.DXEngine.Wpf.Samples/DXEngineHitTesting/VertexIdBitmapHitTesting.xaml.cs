@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,16 +9,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using Ab3d.Visuals;
-using SharpDX;
-using Ab3d.DirectX;
 using Ab3d.Assimp;
 using Ab3d.Common;
 using Ab3d.Common.Models;
+using Ab3d.Controls;
+using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
 using Ab3d.DXEngine.Wpf.Samples.Common;
+using Ab3d.Visuals;
+using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
-using Ab3d.Controls;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
@@ -35,6 +38,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private Color4 _addedVertexIdColor;
         private byte[] _addedVertexIdColorBytes;
+        private uint _addedVertexIdColorUInt;
 
         private bool _isMeasuringDistance;
         private bool _isCameraChanging;
@@ -59,11 +63,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
         private PixelsVisual3D _pixelsVisual3D;
 
         private PixelEffect _pixelEffect;
-        private Vector3[] _pointCloudPositions;
+        private Vector3[] _pointCloudPositions;       
+        Color4[] _pointCloudColors;
+
 
         private WireCrossVisual3D _selectedVertexWireCross;
         private LineVisual3D _distanceLineVisual3D;
         private TextBlockVisual3D _distanceTextBlockVisual3D;
+        private Texture2D _gpuIdBitmap;
+        private Color _savedBgColor;
 
         public VertexIdBitmapHitTesting()
         {
@@ -123,6 +131,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             // It is very important to call Dispose method on DXSceneView after the control is not used any more (see help file for more info)
             this.Unloaded += (sender, args) =>
             {
+                if (_gpuIdBitmap != null)
+                {
+                    _gpuIdBitmap.Dispose();
+                    _gpuIdBitmap = null;
+                }
+                
                 if (_disposables != null)
                 {
                     _disposables.Dispose();
@@ -156,7 +170,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
             try
             {
-                Color4[] pointCloudColors;
                 bool swapYZCoordinates = ZUpAxisCheckBox.IsChecked ?? false;
 
                 if (_assimpWpfImporter == null)
@@ -166,7 +179,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                     _assimpWpfImporter = new AssimpWpfImporter();
                 }
 
-                _pointCloudPositions = DXEnginePerformance.PointCloudImporterSample.LoadPositions(fileName, swapYZCoordinates, _assimpWpfImporter, out pointCloudColors);
+                _pointCloudPositions = DXEnginePerformance.PointCloudImporterSample.LoadPositions(fileName, swapYZCoordinates, _assimpWpfImporter, out _pointCloudColors);
 
                 if (_pointCloudPositions == null)
                     return;
@@ -187,10 +200,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                 _disposables.Add(_pixelsVisual3D);
 
 
-                if (pointCloudColors != null)
+                if (_pointCloudColors != null)
                 {
                     _pixelsVisual3D.PixelColor = Colors.White; // When using PixelColors, PixelColor is used as a mask (multiplied with each color)
-                    _pixelsVisual3D.PixelColors = pointCloudColors;
+                    _pixelsVisual3D.PixelColors = _pointCloudColors;
                 }
                 else
                 {
@@ -260,11 +273,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             if (IsUpdatingVertexIdBitmapCheckBox.IsChecked ?? false)
                 UpdateVertexIdBitmap();
 
-            if (IsHitTestingCheckBox.IsChecked ?? false)
-            {
-                var mousePosition = Mouse.GetPosition(MainDXViewportView);
-                HitTestWithVertexIdBitmap(mousePosition);
-            }
+            var mousePosition = Mouse.GetPosition(MainDXViewportView);
+            HitTestWithVertexIdBitmap(mousePosition);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -275,11 +285,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             if (_isVertexIdBitmapDirty && (IsUpdatingVertexIdBitmapCheckBox.IsChecked ?? false))
                 UpdateVertexIdBitmap();
 
-            if (IsHitTestingCheckBox.IsChecked ?? false)
-            {
-                var mousePosition = e.GetPosition(MainDXViewportView);
-                HitTestWithVertexIdBitmap(mousePosition);
-            }
+            var mousePosition = e.GetPosition(MainDXViewportView);
+            HitTestWithVertexIdBitmap(mousePosition);
 
             base.OnMouseMove(e);
         }
@@ -357,16 +364,20 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private void EndMeasuringDistance()
         {
+            DistancePanel.Visibility = Visibility.Collapsed;
+            InfoPanel.Visibility = Visibility.Visible;
+
             _isMeasuringDistance = false;
         }
 
         private void HitTestWithVertexIdBitmap(Point mousePosition)
         {
-            if (_vertexIdBitmapBytes == null || _vertexIdBitmapWidth <= 0 || _vertexIdBitmapHeight <= 0)
+            if (mousePosition.X < 0 || mousePosition.Y < 0 || 
+                mousePosition.X > MainDXViewportView.ActualWidth || mousePosition.Y > MainDXViewportView.ActualHeight ||
+                _vertexIdBitmapWidth <= 0 || _vertexIdBitmapHeight <= 0)
+            {
                 return;
-
-            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > MainDXViewportView.ActualWidth || mousePosition.Y > MainDXViewportView.ActualHeight)
-                return;
+            }
 
             // We need to scale from WPF's coordinates to the rendered coordinates
             // The xScale and yScale are usually the same as dpi scale,
@@ -386,19 +397,45 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             int xPos = (int)Math.Round(mousePosition.X * xScele);
             int yPos = (int)Math.Round(mousePosition.Y * yScele);
 
-            // convert that position to byte array offset
-            var pixelByteOffset = GetPixelByteOffset(xPos, yPos);
+            int vertexId;
 
-            if (pixelByteOffset == -1)
+            _stopwatch.Restart();
+
+            if (_vertexIdBitmapBytes != null)
             {
-                VertexIndexTextBlock.Text = null;
-                VertexPositionTextBlock.Text = null;
-                return; // Cannot get data
+                // convert that position to byte array offset
+                var pixelByteOffset = GetPixelByteOffset(xPos, yPos);
+
+                if (pixelByteOffset == -1)
+                {
+                    VertexIndexTextBlock.Text = null;
+                    VertexPositionTextBlock.Text = null;
+                    return; // Cannot get data
+                }
+
+                // get vertex index from byte array at that offset
+                vertexId = GetVertexIndexFromColor(pixelByteOffset, _addedVertexIdColorBytes);
+            }
+            else if (_gpuIdBitmap != null)
+            {
+                _stopwatch.Restart();
+
+                var pixelUIntColor = MainDXViewportView.DXScene.DXDevice.ReadSinglePixelColor(_gpuIdBitmap, xPos, yPos);
+
+                _stopwatch.Stop();
+                
+                pixelUIntColor -= _addedVertexIdColorUInt;
+
+                vertexId = (int)pixelUIntColor;
+            }
+            else
+            {
+                vertexId = -1;
             }
 
-            // get vertex index from byte array at that offset
-            int vertexId = GetVertexIndexFromColor(pixelByteOffset, _addedVertexIdColorBytes);
+            _stopwatch.Stop();
 
+            ReadIdTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
 
             // DEBUG data (uncomment to show raw byte array values in VS output)
             //System.Diagnostics.Debug.WriteLine($"{xPos} {yPos} => ({_instanceIdBitmapBytes[pixelByteOffset + 3]}, {_instanceIdBitmapBytes[pixelByteOffset + 2]}, {_instanceIdBitmapBytes[pixelByteOffset + 1]}, {_instanceIdBitmapBytes[pixelByteOffset]}) => {instanceId}");
@@ -419,6 +456,80 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private void UpdateVertexIdBitmap()
         {
+            if (CopyWholeIDBitmapCheckBox.IsChecked ?? false)
+                UpdateSharedVertexIdBitmap();
+            else
+                UpdateGpuVertexIdBitmap();
+
+            RenderTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
+
+            InfoPanel.Visibility = Visibility.Visible;
+            DistancePanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateGpuVertexIdBitmap()
+        {
+            if (_gpuIdBitmap != null)
+            {
+                _gpuIdBitmap.Dispose();
+                _gpuIdBitmap = null;
+            }
+
+            _vertexIdBitmapBytes = null;
+
+
+            SetupVertexIdRendering();
+
+            _stopwatch.Restart();
+
+            // When the CopyWholeIDBitmapCheckBox is not checked, then we render the ID bitmap to a Texture2D objects 
+            // that stores the color data in the GPU memory. To read the pixel colors, we use DXDevice.ReadSinglePixelColor method (see HitTestWithVertexIdBitmap).
+            // We could also use DXDevice.ReadColors method to get the colors from a specified area.
+            // 
+            // An advantage of this method compared to what is done in the UpdateSharedVertexIdBitmap is that 
+            // we do not copy the whole texture from the GPU memory to CPU memory (this can take quite some time).
+            _gpuIdBitmap = MainDXViewportView.DXScene.RenderToGpuBitmap(multisampling: 1, supersamplingCount: 1);
+
+            _stopwatch.Stop();
+
+            RestoreNormalRendering();
+
+            _isVertexIdBitmapDirty = false;
+
+            _vertexIdBitmapWidth = MainDXViewportView.DXScene.BackBufferDescription.Width;
+            _vertexIdBitmapHeight = MainDXViewportView.DXScene.BackBufferDescription.Height;
+        }
+
+        private void UpdateSharedVertexIdBitmap()
+        {
+            SetupVertexIdRendering();
+
+            _stopwatch.Restart();
+
+            // Here we render the scene with ID bitmap and copy the whole rendered texture from the GPU to the CPU memory.
+            // This way we can easily and very quickly read the individual pixel colors.
+            // But, it can take quite long to copy the data from the GPU to the CPU.
+            // Therefore, it is usually better to preserve the rendered texture on the GPU
+            // and just read individual pixel colors as this is done in the UpdateGpuVertexIdBitmap.
+
+            // Render to bitmap without multi-sampling and super-sampling
+            MainDXViewportView.RenderToBitmap(OnRenderedBitmapReady,
+                                              width: MainDXViewportView.DXFinalPixelSize.Width,
+                                              height: MainDXViewportView.DXFinalPixelSize.Height,
+                                              preferedMultisampling: 1, supersamplingCount: 1,
+                                              dpiX: 96, dpiY: 96,
+                                              convertToNonPreMultipledAlpha: false);
+
+            _stopwatch.Stop();
+
+            RestoreNormalRendering();
+
+
+            _isVertexIdBitmapDirty = false;
+        }
+
+        private void SetupVertexIdRendering()
+        {
             if (_pixelEffect == null)
             {
                 // Get an instance of PixelEffect (it is used to provide the correct shaders to render specified positions as pixels)
@@ -432,12 +543,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             
 
             // When rendering vertex id bitmap we will add an Opaque black color (0, 0, 0, 255: with alpha set to 1) to the rendered bitmap. 
-            // This makes it possible for us to see the colors on the rendered image because alpha value is set to 1.
+            // This makes it possible for us to see the colors of the rendered image because alpha value is set to 1.
             // If we render more the 16.7 million instances, then we should set added color to (0, 0, 0, 0) so that 
             // the alpha value can be also used for instance id value (this is also the default color).
             
             _addedVertexIdColor = Color4.Black;
             _addedVertexIdColorBytes = _addedVertexIdColor.ToArray().Select(c => (byte)(c * 255)).ToArray(); // Convert to byte array
+            _addedVertexIdColorUInt = (uint)_addedVertexIdColorBytes[0] + 
+                                      (uint)_addedVertexIdColorBytes[1] * 256 + 
+                                      (uint)_addedVertexIdColorBytes[2] * 256 * 256 + 
+                                      (uint)_addedVertexIdColorBytes[3] * 256 * 256 * 256; // Convert to uint value
 
 
             // To render vertex id bitmap, we need to render each pixel so that its color is set by the index of the color.
@@ -446,14 +561,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             _pixelEffect.UseVertexIdColor = true;
 
             // Set BackgroundColor to black with zero alpha (0, 0, 0, 0)
-            var savedBgColor = MainDXViewportView.BackgroundColor;
-            MainDXViewportView.BackgroundColor = System.Windows.Media.Color.FromArgb(0, 0, 0, 0);
+            _savedBgColor = MainDXViewportView.BackgroundColor;
+            MainDXViewportView.BackgroundColor = System.Windows.Media.Color.FromArgb(10, 20, 30, 40);
             
             // When rendering VertexId bitmap, we must not render other 3D objects
             // (in our case the _selectedVertexWireCross, _distanceLineVisual3D and _distanceTextBlockVisual3D).
             // This is done by filtering the rendering queues that are rendered when calling RenderToBitmap.
             MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = FilterRenderingQueuesFunction;
-
+            
             // Instead of using FilterRenderingQueuesFunction (this is much faster)
             // we could also set all the objects to be hidden:
             //
@@ -463,26 +578,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             //    _distanceLineVisual3D.IsVisible = false;
             //if (_distanceTextBlockVisual3D != null)
             //    _distanceTextBlockVisual3D.IsVisible = false;
-
-
-            _stopwatch.Restart();
-
-            // Render to bitmap without multi-sampling and super-sampling
-            MainDXViewportView.RenderToBitmap(OnRenderedBitmapReady,
-                                              width: MainDXViewportView.DXFinalPixelSize.Width,
-                                              height: MainDXViewportView.DXFinalPixelSize.Height,
-                                              preferedMultisampling: 1, supersamplingCount: 1,
-                                              dpiX: 96, dpiY: 96,
-                                              convertToNonPreMultipledAlpha: false);
-
-            _stopwatch.Stop();
-
-
+        }
+        
+        private void RestoreNormalRendering()
+        {
             // Reset the setting for normal rendering
             _pixelEffect.UseVertexIdColor = false;
             _pixelEffect.PixelColor = new Color4(0, 0, 0, 0);
 
-            MainDXViewportView.BackgroundColor = savedBgColor;
+            MainDXViewportView.BackgroundColor = _savedBgColor;
 
             
             MainDXViewportView.DXScene.DefaultRenderObjectsRenderingStep.FilterRenderingQueuesFunction = null;
@@ -498,12 +602,6 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             //    _distanceTextBlockVisual3D.IsVisible = true;
 
             // Mark that the current instance id bitmap is correct (this will be set to false when camera or size is changed)
-            _isVertexIdBitmapDirty = false;
-
-            RenderTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
-
-            InfoPanel.Visibility = Visibility.Visible;
-            DistancePanel.Visibility = Visibility.Collapsed;
         }
 
         private bool FilterRenderingQueuesFunction(RenderingQueue renderingQueue)
@@ -609,7 +707,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             ClearSelectedVertex();
 
             if (hitVertexIndex < 0 || hitVertexIndex >= _pointCloudPositions.Length)
+            {
+                VertexIndexTextBlock.Visibility    = Visibility.Collapsed;
+                VertexPositionTextBlock.Visibility = Visibility.Collapsed;
+                PixelColorRectangle.Visibility     = Visibility.Collapsed;
+
                 return; // We did not find the instance index
+            }
 
 
             var vertexPosition = _pointCloudPositions[hitVertexIndex];
@@ -621,6 +725,16 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
             VertexIndexTextBlock.Text = hitVertexIndex.ToString();
             VertexPositionTextBlock.Text = vertexPosition.ToString("F2");
+
+            if (_pointCloudColors != null)
+            {
+                PixelColorRectangle.Fill = new SolidColorBrush(_pointCloudColors[hitVertexIndex].ToWpfColor());
+                PixelColorRectangle.Visibility = Visibility.Visible;
+            }
+
+            VertexIndexTextBlock.Visibility    = Visibility.Visible;
+            VertexPositionTextBlock.Visibility = Visibility.Visible;
+            
 
             _selectedVertexIndex = hitVertexIndex;
 
@@ -739,6 +853,27 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
             // Reload the data again
             LoadPointCloud(_fileName);
+        }
+
+        private void OnCopyWholeIDBitmapCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool isChecked = CopyWholeIDBitmapCheckBox.IsChecked ?? false;
+
+            if (!isChecked)
+            {
+                ShowVertexIdBitmapCheckBox.IsChecked = false;
+                SaveToDesktopBitmapCheckBox.IsChecked = false;
+            }
+            else
+            {
+                ShowVertexIdBitmapCheckBox.IsChecked = true;
+            }
+
+            ShowVertexIdBitmapCheckBox.IsEnabled = isChecked;
+            SaveToDesktopBitmapCheckBox.IsEnabled = isChecked;
+
+            _isVertexIdBitmapDirty = true;
+            UpdateVertexIdBitmap();
         }
     }
 }

@@ -38,7 +38,7 @@
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <StackPanel  Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Vertical">
             <ab3d:CameraAxisPanel TargetCamera="{Binding ElementName=Camera1}" />

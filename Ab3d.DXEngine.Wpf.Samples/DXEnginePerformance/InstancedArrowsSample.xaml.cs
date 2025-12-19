@@ -1,28 +1,23 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows.Media.Media3D;
-using Ab3d.Meshes;
-using Ab3d.Visuals;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Media.Media3D;
 using Ab3d.DirectX;
+using Ab3d.Meshes;
 using Ab3d.Utilities;
-using SharpDX;
+using Ab3d.Visuals;
 using InstanceData = Ab3d.DirectX.InstanceData;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -324,7 +319,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     //var xAxis = normalizedDirectionVector;
                     //var yAxis = CalculateUpDirection(arrowDirection);
 
-                    //var horizontalVector = SharpDX.Vector3.Cross(SharpDX.Vector3.Up, arrowDirection);
+                    //var horizontalVector = Vector3.Cross(Vector3.Up, arrowDirection);
 
                     //var horizontalVector = new Vector3(
                     //    1 * arrowDirection.Z - 0 * arrowDirection.Y,
@@ -359,9 +354,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     // First we need to check for edge case - the look direction is in the UpVector direction - the length of horizontalVector is 0 (or almost zero)
 
                     //if (horizontalVector.LengthSquared() < 0.0001) // we can use LengthSquared to avoid costly sqrt
-                    //    horizontalVector = SharpDX.Vector3.UnitZ; // Any vector on xz plane could be used
+                    //    horizontalVector = Vector3.UnitZ; // Any vector on xz plane could be used
 
-                    //yAxis = SharpDX.Vector3.Cross(arrowDirection, horizontalVector);
+                    //yAxis = Vector3.Cross(arrowDirection, horizontalVector);
 
                     //yAxis = new Vector3(
                     //    arrowDirection.Y * horizontalVector.Z - arrowDirection.Z * horizontalVector.Y, 
@@ -373,7 +368,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                                             dz * hx - dx * hz,
                                             -dy * hx);
 
-                    //var zAxis = SharpDX.Vector3.Cross(arrowDirection, yAxis);
+                    //var zAxis = Vector3.Cross(arrowDirection, yAxis);
 
                     var zAxis = new Vector3(dy * yAxis.Z - dz * yAxis.Y,
                                             dz * yAxis.X - dx * yAxis.Z,
@@ -382,7 +377,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
                     // For more info see comments in GetRotationMatrixFromDirection
                     // NOTE: The following math works only for uniform scale (scale factor for x, y and z is the same - arrowsLength in our case)
-                    instancedData[instanceIndex].World = new SharpDX.Matrix(dx * arrowsLength,               dy * arrowsLength,               dz * arrowsLength,      0,
+                    instancedData[instanceIndex].World = new Matrix(dx * arrowsLength,               dy * arrowsLength,               dz * arrowsLength,      0,
                                                                             yAxis.X * arrowsLength,          yAxis.Y * arrowsLength,          yAxis.Z * arrowsLength, 0,
                                                                             zAxis.X * arrowsLength,          zAxis.Y * arrowsLength,          zAxis.Z * arrowsLength, 0,
                                                                             x,                               0,                               y,                      1);
@@ -612,7 +607,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 
 
         // directionVector must be normalized
-        public static SharpDX.Matrix GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector)
+        public static Matrix GetMatrixFromDirection(Vector3 normalizedDirectionVector)
         {
             // The first three rows in the upper left 3x3 part of the matrix represents the axes of the coordinate system defined by the matrix.
             // For example in the identity matrix the xAxis is 1,0,0; yAxis is 0,1,0; zAxis is 0,0,1
@@ -624,9 +619,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             var yAxis = CalculateUpDirectionFromNormalizeDirection(normalizedDirectionVector);
 
             // Once we have the direction and up axis, we can get the zAxis with calculating the perpendicular axis to those two
-            var zAxis = SharpDX.Vector3.Cross(normalizedDirectionVector, yAxis);
+            var zAxis = Vector3.Cross(normalizedDirectionVector, yAxis);
 
-            var rotationMatrix = new SharpDX.Matrix(normalizedDirectionVector.X, normalizedDirectionVector.Y, normalizedDirectionVector.Z, 0,
+            var rotationMatrix = new Matrix(normalizedDirectionVector.X, normalizedDirectionVector.Y, normalizedDirectionVector.Z, 0,
                                                     yAxis.X, yAxis.Y, yAxis.Z, 0,
                                                     zAxis.X, zAxis.Y, zAxis.Z, 0,
                                                     0, 0, 0, 1);
@@ -634,58 +629,58 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             return rotationMatrix;
         }
 
-        public static SharpDX.Matrix GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector, SharpDX.Vector3 position, SharpDX.Vector3 scale)
+        public static Matrix GetMatrixFromDirection(Vector3 normalizedDirectionVector, Vector3 position, Vector3 scale)
         {
-            SharpDX.Matrix orientationMatrix;
+            Matrix orientationMatrix;
             GetMatrixFromDirection(normalizedDirectionVector, position, scale, out orientationMatrix);
             return orientationMatrix;
         }
 
-        public static void GetMatrixFromDirection(SharpDX.Vector3 normalizedDirectionVector, SharpDX.Vector3 position, SharpDX.Vector3 scale, out SharpDX.Matrix orientationMatrix)
+        public static void GetMatrixFromDirection(Vector3 normalizedDirectionVector, Vector3 position, Vector3 scale, out Matrix orientationMatrix)
         {
             //var xAxis = normalizedDirectionVector;
             var yAxis = CalculateUpDirection(normalizedDirectionVector);
-            var zAxis = SharpDX.Vector3.Cross(normalizedDirectionVector, yAxis);
+            var zAxis = Vector3.Cross(normalizedDirectionVector, yAxis);
 
             // For more info see comments in GetRotationMatrixFromDirection
-            orientationMatrix = new SharpDX.Matrix(normalizedDirectionVector.X * scale.X, normalizedDirectionVector.Y * scale.Y, normalizedDirectionVector.Z * scale.Z, 0,
+            orientationMatrix = new Matrix(normalizedDirectionVector.X * scale.X, normalizedDirectionVector.Y * scale.Y, normalizedDirectionVector.Z * scale.Z, 0,
                                                    yAxis.X * scale.X, yAxis.Y * scale.Y, yAxis.Z * scale.Z, 0,
                                                    zAxis.X * scale.X, zAxis.Y * scale.Y, zAxis.Z * scale.Z, 0,
                                                    position.X, position.Y, position.Z, 1);
         }
 
-        public static SharpDX.Vector3 CalculateUpDirectionFromNormalizeDirection(SharpDX.Vector3 normalizedLookDirection)
+        public static Vector3 CalculateUpDirectionFromNormalizeDirection(Vector3 normalizedLookDirection)
         {
             // To get the up direction we need to find a vector that lies on the xz plane (horizontal plane) and is perpendicular to Up vector and lookDirection.
             // Than we just create a perpendicular vector to lookDirection and the found vector on xz plane.
 
-            var horizontalVector = SharpDX.Vector3.Cross(SharpDX.Vector3.Up, normalizedLookDirection);
+            var horizontalVector = Vector3.Cross(Vector3.Up, normalizedLookDirection);
 
             // First we need to check for edge case - the look direction is in the UpVector direction - the length of horizontalVector is 0 (or almost zero)
 
             if (horizontalVector.LengthSquared() < 0.0001) // we can use LengthSquared to avoid costly sqrt
-                return SharpDX.Vector3.UnitZ;              // Any vector on xz plane could be used
+                return Vector3.UnitZ;              // Any vector on xz plane could be used
 
 
-            var upDirection = SharpDX.Vector3.Cross(normalizedLookDirection, horizontalVector);
+            var upDirection = Vector3.Cross(normalizedLookDirection, horizontalVector);
 
             return upDirection;
         }
 
-        public static SharpDX.Vector3 CalculateUpDirection(SharpDX.Vector3 lookDirection)
+        public static Vector3 CalculateUpDirection(Vector3 lookDirection)
         {
             // To get the up direction we need to find a vector that lies on the xz plane (horizontal plane) and is perpendicular to Up vector and lookDirection.
             // Than we just create a perpendicular vector to lookDirection and the found vector on xz plane.
 
-            var horizontalVector = SharpDX.Vector3.Cross(SharpDX.Vector3.Up, lookDirection);
+            var horizontalVector = Vector3.Cross(Vector3.Up, lookDirection);
 
             // First we need to check for edge case - the look direction is in the UpVector direction - the length of horizontalVector is 0 (or almost zero)
 
             if (horizontalVector.LengthSquared() < 0.0001) // we can use LengthSquared to avoid costly sqrt
-                return SharpDX.Vector3.UnitZ;              // Any vector on xz plane could be used
+                return Vector3.UnitZ;              // Any vector on xz plane could be used
 
 
-            var upDirection = SharpDX.Vector3.Cross(lookDirection, horizontalVector);
+            var upDirection = Vector3.Cross(lookDirection, horizontalVector);
             upDirection.Normalize();
 
             return upDirection;

@@ -1,31 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Common.EventManager3D;
 using Ab3d.Visuals;
-using SharpDX;
-using Ab3d.DirectX;
-using Ab3d.DirectX.Utilities;
-using Ab3d.Meshes;
-using Ab3d.Utilities;
 using InstanceData = Ab3d.DirectX.InstanceData;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
@@ -68,11 +59,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 
         private Stopwatch _stopwatch;
 
+        private Texture2D _gpuIdBitmap;
+        private System.Windows.Media.Color _savedBgColor;
+
         private int _selectedInstanceIndex = -1;
 
         private Color4 _addedInstanceIdColor;
         private byte[] _addedInstanceIdColorBytes;
-        
+        private uint _addedVertexIdColorUInt;
+
         private bool _isCameraChanging;
         private bool _isInstanceIdBitmapDirty;
 
@@ -122,7 +117,16 @@ this significantly reduces the time to get the bitmap.";
 
             // IMPORTANT:
             // It is very important to call Dispose method on DXSceneView after the control is not used any more (see help file for more info)
-            this.Unloaded += (sender, args) => MainDXViewportView.Dispose();
+            this.Unloaded += (sender, args) =>
+            {
+                if (_gpuIdBitmap != null)
+                {
+                    _gpuIdBitmap.Dispose();
+                    _gpuIdBitmap = null;
+                }
+
+                MainDXViewportView.Dispose();
+            };
         }
 
         private void SubscribeCameraAndMouseEvents()
@@ -164,11 +168,8 @@ this significantly reduces the time to get the bitmap.";
             if (IsUpdatingInstanceIdBitmapCheckBox.IsChecked ?? false)
                 UpdateInstanceIdBitmap();
 
-            if (IsHitTestingCheckBox.IsChecked ?? false)
-            {
-                var mousePosition = Mouse.GetPosition(MainDXViewportView);
-                HitTestWithInstanceIdBitmap(mousePosition);
-            }
+            var mousePosition = Mouse.GetPosition(MainDXViewportView);
+            HitTestWithInstanceIdBitmap(mousePosition);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -179,11 +180,8 @@ this significantly reduces the time to get the bitmap.";
             if (_isInstanceIdBitmapDirty && (IsUpdatingInstanceIdBitmapCheckBox.IsChecked ?? false))
                 UpdateInstanceIdBitmap();
 
-            if (IsHitTestingCheckBox.IsChecked ?? false)
-            {
-                var mousePosition = e.GetPosition(MainDXViewportView);
-                HitTestWithInstanceIdBitmap(mousePosition);
-            }
+            var mousePosition = e.GetPosition(MainDXViewportView);
+            HitTestWithInstanceIdBitmap(mousePosition);
 
             base.OnMouseMove(e);
         }
@@ -193,11 +191,12 @@ this significantly reduces the time to get the bitmap.";
             if (IsUpdatingInstanceIdBitmapCheckBox.IsChecked ?? false)
                 UpdateInstanceIdBitmap();
 
-            if (_instanceIdBitmapBytes == null || _instanceIdBitmapWidth <= 0 || _instanceIdBitmapHeight <= 0)
+            if (mousePosition.X < 0 || mousePosition.Y < 0 || 
+                mousePosition.X > MainDXViewportView.ActualWidth || mousePosition.Y > MainDXViewportView.ActualHeight ||
+                _instanceIdBitmapWidth <= 0 || _instanceIdBitmapHeight <= 0)
+            {
                 return;
-
-            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > MainDXViewportView.ActualWidth || mousePosition.Y > MainDXViewportView.ActualHeight)
-                return;
+            }
 
             // We need to scale from WPF's coordinates to the rendered coordinates
             // The xScale and yScale are usually the same as dpi scale,
@@ -217,18 +216,45 @@ this significantly reduces the time to get the bitmap.";
             int xPos = (int)Math.Round(mousePosition.X * xScele);
             int yPos = (int)Math.Round(mousePosition.Y * yScele);
 
-            // convert that position to byte array offset
-            var pixelByteOffset = GetPixelByteOffset(xPos, yPos);
+            
+            int instanceId;
 
-            if (pixelByteOffset == -1)
+            _stopwatch.Restart();
+
+            if (_instanceIdBitmapBytes != null)
             {
-                InstanceIdTextBlock.Text = null;
-                return; // Cannot get data
+                // convert that position to byte array offset
+                var pixelByteOffset = GetPixelByteOffset(xPos, yPos);
+
+                if (pixelByteOffset == -1)
+                {
+                    InstanceIdTextBlock.Text = null;
+                    return; // Cannot get data
+                }
+
+                // get instance if from byte array at that offset
+                instanceId = GetInstanceIdFromColor(pixelByteOffset, _addedInstanceIdColorBytes);
+            }
+            else if (_gpuIdBitmap != null)
+            {
+                _stopwatch.Restart();
+
+                var pixelUIntColor = MainDXViewportView.DXScene.DXDevice.ReadSinglePixelColor(_gpuIdBitmap, xPos, yPos);
+
+                _stopwatch.Stop();
+                
+                pixelUIntColor -= _addedVertexIdColorUInt;
+
+                instanceId = (int)pixelUIntColor;
+            }
+            else
+            {
+                instanceId = -1;
             }
 
-            // get instance if from byte array at that offset
-            int instanceId = GetInstanceIdFromColor(pixelByteOffset, _addedInstanceIdColorBytes);
+            _stopwatch.Stop();
 
+            ReadIdTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
 
             // DEBUG data (uncomment to show raw byte array values in VS output)
             //System.Diagnostics.Debug.WriteLine($"{xPos} {yPos} => ({_instanceIdBitmapBytes[pixelByteOffset + 3]}, {_instanceIdBitmapBytes[pixelByteOffset + 2]}, {_instanceIdBitmapBytes[pixelByteOffset + 1]}, {_instanceIdBitmapBytes[pixelByteOffset]}) => {instanceId}");
@@ -254,6 +280,76 @@ this significantly reduces the time to get the bitmap.";
             if (!_isInstanceIdBitmapDirty) 
                 return;
 
+            if (CopyWholeIDBitmapCheckBox.IsChecked ?? false)
+                UpdateSharedInstanceIdBitmap();
+            else
+                UpdateGpuInstanceIdBitmap();
+
+            RenderTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
+        }
+
+        private void UpdateGpuInstanceIdBitmap()
+        {
+            if (_gpuIdBitmap != null)
+            {
+                _gpuIdBitmap.Dispose();
+                _gpuIdBitmap = null;
+            }
+
+            _instanceIdBitmapBytes = null;
+
+
+            SetupInstanceIdRendering();
+
+            _stopwatch.Restart();
+
+            // When the CopyWholeIDBitmapCheckBox is not checked, then we render the ID bitmap to a Texture2D objects 
+            // that stores the color data in the GPU memory. To read the pixel colors, we use DXDevice.ReadSinglePixelColor method (see HitTestWithVertexIdBitmap).
+            // We could also use DXDevice.ReadColors method to get the colors from a specified area.
+            // 
+            // An advantage of this method compared to what is done in the UpdateSharedVertexIdBitmap is that 
+            // we do not copy the whole texture from the GPU memory to CPU memory (this can take quite some time).
+            _gpuIdBitmap = MainDXViewportView.DXScene.RenderToGpuBitmap(multisampling: 1, supersamplingCount: 1);
+
+            _stopwatch.Stop();
+
+            RestoreNormalRendering();
+
+            _isInstanceIdBitmapDirty = false;
+
+            _instanceIdBitmapWidth = MainDXViewportView.DXScene.BackBufferDescription.Width;
+            _instanceIdBitmapHeight = MainDXViewportView.DXScene.BackBufferDescription.Height;
+        }
+
+        private void UpdateSharedInstanceIdBitmap()
+        {
+            SetupInstanceIdRendering();
+
+            int width  = (int)(MainDXViewportView.DXFinalPixelSize.Width * _renderedBitmapScale);   // To get the bitmap size use DXFinalPixelSize as it is not increased when using super-sampling
+            int height = (int)(MainDXViewportView.DXFinalPixelSize.Height * _renderedBitmapScale);
+
+            _stopwatch.Restart();
+
+            // Here we render the scene with ID bitmap and copy the whole rendered texture from the GPU to the CPU memory.
+            // This way we can easily and very quickly read the individual pixel colors.
+            // But, it can take quite long to copy the data from the GPU to the CPU.
+            // Therefore, it is usually better to preserve the rendered texture on the GPU
+            // and just read individual pixel colors as this is done in the UpdateGpuVertexIdBitmap.
+
+            // Render to bitmap with the specified size but without multi-sampling and super-sampling
+            MainDXViewportView.RenderToBitmap(OnRenderedBitmapReady, width, height, preferedMultisampling: 1, supersamplingCount: 1, dpiX: 96, dpiY: 96, convertToNonPreMultipledAlpha: false);
+
+            _stopwatch.Stop();
+
+            RestoreNormalRendering();
+
+            // Mark that the current instance id bitmap is correct (this will be set to false when camera or size is changed)
+            _isInstanceIdBitmapDirty = false;
+        }
+
+
+        private void SetupInstanceIdRendering()
+        {
             // When rendering instance id bitmap we will add an Opaque black color (0, 0, 0, 255: with alpha set to 1) to the rendered bitmap. 
             // This makes it possible for us to see the colors on the rendered image because alpha value is set to 1.
             // If we render more the 16.7 million instances, then we should set added color to (0, 0, 0, 0) so that 
@@ -261,6 +357,10 @@ this significantly reduces the time to get the bitmap.";
             
             _addedInstanceIdColor = Color4.Black;
             _addedInstanceIdColorBytes = _addedInstanceIdColor.ToArray().Select(c => (byte)(c * 255)).ToArray(); // Convert to byte array
+            _addedVertexIdColorUInt = (uint)_addedInstanceIdColorBytes[0] + 
+                                      (uint)_addedInstanceIdColorBytes[1] * 256 + 
+                                      (uint)_addedInstanceIdColorBytes[2] * 256 * 256 + 
+                                      (uint)_addedInstanceIdColorBytes[3] * 256 * 256 * 256; // Convert to uint value
 
             MainDXViewportView.Update();
 
@@ -274,36 +374,23 @@ this significantly reduces the time to get the bitmap.";
             _instancedMeshGeometryVisual3D.UseInstanceIdColor(_addedInstanceIdColor);
 
             // Set BackgroundColor to black with zero alpha (0, 0, 0, 0)
-            var savedBgColor = MainDXViewportView.BackgroundColor;
+            _savedBgColor = MainDXViewportView.BackgroundColor;
             MainDXViewportView.BackgroundColor = System.Windows.Media.Color.FromArgb(0, 0, 0, 0);
 
             // Here we could also set other 3D objects to hidden (to prevent them from rendering)
             SelectedInstanceWireBox.IsVisible = false;
-
-
-            int width  = (int)(MainDXViewportView.DXFinalPixelSize.Width * _renderedBitmapScale);   // To get the bitmap size use DXFinalPixelSize as it is not increased when using super-sampling
-            int height = (int)(MainDXViewportView.DXFinalPixelSize.Height * _renderedBitmapScale);
-
-            _stopwatch.Restart();
-
-            // Render to bitmap with the specified size but without multi-sampling and super-sampling
-            MainDXViewportView.RenderToBitmap(OnRenderedBitmapReady, width, height, preferedMultisampling: 1, supersamplingCount: 1, dpiX: 96, dpiY: 96, convertToNonPreMultipledAlpha: false);
-
-            _stopwatch.Stop();
-
-
+        }
+        
+        private void RestoreNormalRendering()
+        {
             // Reset the setting for normal rendering
             _instancedMeshGeometryVisual3D.UseInstanceObjectColor();
-            MainDXViewportView.BackgroundColor = savedBgColor;
+            MainDXViewportView.BackgroundColor = _savedBgColor;
 
             if (_selectedInstanceIndex != -1)
                 SelectedInstanceWireBox.IsVisible = true;
-
-            // Mark that the current instance id bitmap is correct (this will be set to false when camera or size is changed)
-            _isInstanceIdBitmapDirty = false;
-
-            RenderTimeTextBlock.Text = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} ms", _stopwatch.Elapsed.TotalMilliseconds);
         }
+
 
         public int GetPixelByteOffset(int xPos, int yPos)
         {
@@ -446,6 +533,30 @@ this significantly reduces the time to get the bitmap.";
                 SelectedInstanceWireBox.IsVisible = false;
                 _selectedInstanceIndex = -1;
             }
+        }
+
+        private void OnCopyWholeIDBitmapCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool isChecked = CopyWholeIDBitmapCheckBox.IsChecked ?? false;
+
+            if (!isChecked)
+            {
+                ShowInstanceIdBitmapCheckBox.IsChecked = false;
+                SaveToDesktopBitmapCheckBox.IsChecked = false;
+
+                BitmapScalePanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                ShowInstanceIdBitmapCheckBox.IsChecked = true;
+                BitmapScalePanel.Visibility = Visibility.Visible;
+            }
+
+            ShowInstanceIdBitmapCheckBox.IsEnabled = isChecked;
+            SaveToDesktopBitmapCheckBox.IsEnabled = isChecked;
+
+            _isInstanceIdBitmapDirty = true;
+            UpdateInstanceIdBitmap();
         }
 
         private void BitmapScaleComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

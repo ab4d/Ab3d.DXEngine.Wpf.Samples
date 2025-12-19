@@ -37,7 +37,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     MoveOnlyHorizontally="True" 
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <TextBlock Name="TitleTextBlock" Text="Improving initialization with creating DirectX buffers for height map in the background" 
                    FontWeight="Bold" FontSize="16" Foreground="#333" Margin="0 0 10 0" VerticalAlignment="Top" HorizontalAlignment="Left"/>

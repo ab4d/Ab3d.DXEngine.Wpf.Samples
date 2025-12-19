@@ -1,31 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
-using Ab3d.Common.Models;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
-using SharpDX;
 using Color = System.Windows.Media.Color;
-using Matrix = SharpDX.Matrix;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 // NOTE:
 // This sample is the similar to the LinesSelector sample in the Ab3d.PowerToys samples project.
@@ -299,7 +292,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
             // if you do not know the transformation of the parent line objects, then you can use the following:
             //bool isVisualConnected;
             //var lineTransform = Ab3d.Utilities.TransformationsHelper.GetVisual3DTotalTransform(lineVisual3D, true, out isVisualConnected);
-            //SharpDX.Matrix positionsTransformMatrix = lineTransform.Value.ToMatrix();
+            //Matrix positionsTransformMatrix = lineTransform.Value.ToMatrix();
             //var lineSelectorData = new DXLineSelectorData(linePositions, lineThickness, isLineStrip: true, ref positionsTransformMatrix);
 
 

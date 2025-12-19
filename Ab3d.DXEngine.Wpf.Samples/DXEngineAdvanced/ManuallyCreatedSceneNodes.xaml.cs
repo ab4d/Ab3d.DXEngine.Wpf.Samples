@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
-using SharpDX.Direct3D11;
-using Buffer = System.Buffer;
+using Buffer = SharpDX.Direct3D11.Buffer;
 using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -665,7 +657,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             // Copy float array into byte array
             byteVertexBuffer = new byte[floatVertexBuffer.Length * 4];
-            Buffer.BlockCopy(floatVertexBuffer, 0, byteVertexBuffer, 0, byteVertexBuffer.Length);
+            System.Buffer.BlockCopy(floatVertexBuffer, 0, byteVertexBuffer, 0, byteVertexBuffer.Length);
         }
 
         // This methods generates the arrays text

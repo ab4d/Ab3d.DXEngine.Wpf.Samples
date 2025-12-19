@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Assimp;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
@@ -20,7 +11,6 @@ using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Effects;
-using Ab3d.Visuals;
 
 // This sample shows how to define a master DXViewportView that contains the 3D scene and
 // then add child DXViewportView objects that show the same 3D scene but provide its own cameras
@@ -37,7 +27,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
     /// <summary>
     /// Interaction logic for MultiDXViewportViewsSample.xaml
     /// </summary>
-    public partial class MultiDXViewportViewsSample : Page
+    public partial class MultiDXViewportViewsSample : Page, IDisposable
     {
         private const int ColumnsCount = 2;
         private const int RowsCount = 2;
@@ -69,6 +59,23 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             CreateInitialScene();
 
             this.Unloaded += OnUnloaded;
+        }
+
+        public void Dispose()
+        {
+            // First dispose child DXViewportView objects ...
+            if (_dxViewportViews != null)
+            {
+                foreach (var dxViewportView in _dxViewportViews)
+                {
+                    if (dxViewportView != _masterDXViewportView)
+                        dxViewportView.Dispose();
+                }
+            }
+
+            // ... and finally _masterDXViewportView
+            if (_masterDXViewportView != null)
+                _masterDXViewportView.Dispose();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)

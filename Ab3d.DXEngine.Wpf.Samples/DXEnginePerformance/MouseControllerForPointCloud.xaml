@@ -50,7 +50,7 @@
                                                 MoveCameraConditions="LeftMouseButtonPressed"
                                                 QuickZoomConditions="LeftMouseButtonPressed, RightMouseButtonPressed"
                                                 EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                                TargetCamera="{Binding ElementName=Camera1}"/>
+                                                CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <ab3d:MouseCameraControllerInfo Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                                        FontSize="18" FontWeight="Bold"

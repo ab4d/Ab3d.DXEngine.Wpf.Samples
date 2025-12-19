@@ -1,32 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Cameras;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Materials;
-using Ab3d.DirectX.Models;
 using Ab3d.Visuals;
-using SharpDX;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
 using BaseCamera = Ab3d.Cameras.BaseCamera;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
 using Buffer = SharpDX.Direct3D11.Buffer;
+#endif
 
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
@@ -66,7 +58,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private Random _rnd = new Random();
 
-        private SharpDX.Direct3D11.Buffer[] _indexBuffers;
+        private Buffer[] _indexBuffers;
 
         private List<OptimizedPointMesh<PositionNormal>> _optimizedPointMeshes;
 
@@ -322,7 +314,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 throw new Exception("Cannot create OptimizedPointMesh without know DXScene Size");
 
             // Use size from DXScene, because this also takes DPI settings into account and gives us the most accurate amount of available pixels (better then DXViewportView.ActualWidth / Height)
-            optimizedPointMesh.Optimize(new SharpDX.Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), selectedPointSize);
+            optimizedPointMesh.Optimize(new Size2(MainDXViewportView.DXScene.Width, MainDXViewportView.DXScene.Height), selectedPointSize);
 
             optimizedPointMesh.InitializeResources(MainDXViewportView.DXScene.DXDevice);
 
@@ -352,7 +344,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private void RenderAction(RenderingContext renderingContext, CustomRenderableNode customRenderableNode, object objectToRender)
         {
-            SharpDX.Matrix worldViewProjectionMatrix = renderingContext.UsedCamera.GetViewProjection();
+            Matrix worldViewProjectionMatrix = renderingContext.UsedCamera.GetViewProjection();
 
             if (customRenderableNode.Transform != null && !customRenderableNode.Transform.IsIdentity)
                 worldViewProjectionMatrix = customRenderableNode.Transform.Value * worldViewProjectionMatrix;

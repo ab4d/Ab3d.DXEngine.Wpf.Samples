@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Assimp;
 using Ab3d.Common;
-using Ab3d.Common.Cameras;
 using Ab3d.Common.EventManager3D;
 using Ab3d.Controls;
 using Ab3d.DirectX;
@@ -38,7 +29,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
 
         private Ab3d.Utilities.EventManager3D _eventManager3D;
 
-        private Plane _movementPlane;
+        private Ab3d.Utilities.Plane _movementPlane;
         private Point3D _startMousePlaneIntersection;
         private Point3D _startDuckPosition;
 
@@ -51,7 +42,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToys
             // Define a 3D plane where we will move the 3D objects (used for git testing of a ray from a mouse to the plane).
             // Here we define the plane by its normal (vector perpendicular to the plane) and a position on a plane.
             // Plane can be also defined by 3 positions or normal and a d value (x, y, z, d).
-            _movementPlane = new Plane(normal: new Vector3D(0, 1, 0), positionOnPlane: new Point3D(0, 0, 0));
+            _movementPlane = new Ab3d.Utilities.Plane(normal: new Vector3D(0, 1, 0), positionOnPlane: new Point3D(0, 0, 0));
 
             _eventManager3D = new Ab3d.Utilities.EventManager3D(MainViewport);
             _eventManager3D.CustomEventsSourceElement = ViewportBorder;

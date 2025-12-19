@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Materials;
-using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 {
@@ -42,7 +34,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
     /// </summary>
     public partial class VisualBrushTest : Page
     {
-        private SharpDX.Size2 _currentBigPlaneBitmapSize;
+        private Size2 _currentBigPlaneBitmapSize;
 
         public VisualBrushTest()
         {
@@ -55,13 +47,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             // The easiest way to do that is used to SetDXAttribute extension method and specify the bitmap size with setting the value of the CachedBitmapSize attribute.
 
             // SmallPlane is farther away from the camera and small, so 64 x 32 bitmap will be enough.
-            SmallPlane.Material.SetDXAttribute(DXAttributeType.CachedBitmapSize, new SharpDX.Size2(64, 32));
+            SmallPlane.Material.SetDXAttribute(DXAttributeType.CachedBitmapSize, new Size2(64, 32));
 
             // BigPlane is close to the camera and big and therefore we want to render it to a high detailed bitmap.
-            _currentBigPlaneBitmapSize = new SharpDX.Size2(512, 256);
+            _currentBigPlaneBitmapSize = new Size2(512, 256);
             BigPlane.Material.SetDXAttribute(DXAttributeType.CachedBitmapSize, _currentBigPlaneBitmapSize);
 
-            // The value of the CachedBitmapSize attribute can be set to SharpDX.Size2 or System.Windows.Size type;
+            // The value of the CachedBitmapSize attribute can be set to Size2 or System.Windows.Size type;
             // or to Int32, double or float - in this case the value specify both width and height of the bitmap.
 
             // You can also change the value of CachedBitmapSize after the scene has been rendered.
@@ -193,14 +185,14 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
 
         private void ChangeRenderSizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var currentSize = BigPlane.Material.GetDXAttributeOrDefault<SharpDX.Size2>(DXAttributeType.CachedBitmapSize);
+            var currentSize = BigPlane.Material.GetDXAttributeOrDefault<Size2>(DXAttributeType.CachedBitmapSize);
 
-            SharpDX.Size2 newSize;
+            Size2 newSize;
 
             if (currentSize.Width == 512)
-                newSize = new SharpDX.Size2(64, 32);
+                newSize = new Size2(64, 32);
             else
-                newSize = new SharpDX.Size2(512, 256);
+                newSize = new Size2(512, 256);
 
             _currentBigPlaneBitmapSize = newSize;
             BigPlane.Material.SetDXAttribute(DXAttributeType.CachedBitmapSize, newSize);
@@ -261,7 +253,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
             }
         }
 
-        public static SharpDX.Size2 GetPositionsSizeOnScreen(Point3DCollection positions, Transform3D transform, Ab3d.Cameras.BaseCamera camera)
+        public static Size2 GetPositionsSizeOnScreen(Point3DCollection positions, Transform3D transform, Ab3d.Cameras.BaseCamera camera)
         {
             double minX = double.MaxValue;
             double maxX = double.MinValue;
@@ -287,15 +279,15 @@ namespace Ab3d.DXEngine.Wpf.Samples.PowerToysOther
                 if (pointOnScreen.Y > maxY) maxY = pointOnScreen.Y;
             }
 
-            var sizeOnScreen = new SharpDX.Size2((int)(maxX - minX), (int)(maxY - minY));
+            var sizeOnScreen = new Size2((int)(maxX - minX), (int)(maxY - minY));
 
             return sizeOnScreen;
         }
 
         // Round Size2 value to power of 2 where the returned Size2 is bigger than the Size2 in parameter.
-        public static SharpDX.Size2 RoundToPowerOf2(SharpDX.Size2 size)
+        public static Size2 RoundToPowerOf2(Size2 size)
         {
-            return new SharpDX.Size2(RoundToPowerOf2(size.Width), RoundToPowerOf2(size.Height));
+            return new Size2(RoundToPowerOf2(size.Width), RoundToPowerOf2(size.Height));
         }
 
         // Round int value to power of 2 where the returned value is bigger than the value in parameter.

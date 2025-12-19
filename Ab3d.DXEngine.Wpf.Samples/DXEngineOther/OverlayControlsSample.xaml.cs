@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ab3d.DirectX;
-using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Materials;
-using Ab3d.DirectX.PostProcessing;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 
 // Using DirectXOverlay PresentationType has a big performance advantage because in this
 // presentation mode the drivers and graphics card can render in the background and when

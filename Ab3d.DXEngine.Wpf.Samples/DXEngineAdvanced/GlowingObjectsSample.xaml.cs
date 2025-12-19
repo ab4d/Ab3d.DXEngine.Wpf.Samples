@@ -1,30 +1,23 @@
-﻿using Ab3d.DirectX;
-using Ab3d.DirectX.Models;
-using Ab3d.Meshes;
-using Ab3d.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Ab3d.DirectX;
 using Ab3d.DirectX.Effects;
-using SharpDX.Direct3D11;
-using SharpDX.Direct3D;
-using SharpDX.DXGI;
-using SharpDX;
 using Ab3d.DirectX.PostProcessing;
+using Ab3d.Meshes;
+using Ab3d.Utilities;
 using Ab3d.Visuals;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+#endif
 
 // This sample shows how to render glowing objects to a different texture, expand and blur it and the use additive blending to add that to the 3D scene.
 // NOTE that this is an approximation of the glow and cannot simulate that glowing object actually emits light and illuminates other objects.

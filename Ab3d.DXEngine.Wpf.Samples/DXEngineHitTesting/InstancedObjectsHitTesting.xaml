@@ -52,7 +52,7 @@
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 5">
             <StackPanel.LayoutTransform>

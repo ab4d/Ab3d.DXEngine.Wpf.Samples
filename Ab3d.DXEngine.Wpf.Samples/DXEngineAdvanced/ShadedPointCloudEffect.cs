@@ -1,20 +1,16 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Cameras;
 using Ab3d.DirectX.Lights;
-using Ab3d.DirectX.Materials;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using Buffer = SharpDX.Direct3D11.Buffer;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -434,4 +430,3 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
         #endregion
     }
 }
-

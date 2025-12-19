@@ -58,7 +58,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
         
         <TextBlock Grid.Column="0" VerticalAlignment="Top" TextWrapping="Wrap" FontSize="18" FontWeight="Bold" Margin="15 10" Foreground="Silver"
                    Text="Viewport2DVisual3D is fully interactive when rendered with WPF 3D (no DXEngine)" />
@@ -109,7 +109,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera2}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera2}"/>
 
         <TextBlock Grid.Column="1" VerticalAlignment="Top" TextWrapping="Wrap" FontSize="18" FontWeight="Bold" Margin="15 10" Foreground="Silver"
                    Text="Viewport2DVisual3D is not interactive when rendered with DXEngine" />

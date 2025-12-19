@@ -39,7 +39,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <Border Name="OptionsBorder" BorderThickness="2" BorderBrush="#444" Background="#AAFFFFFF" VerticalAlignment="Bottom" Margin="5 5 0 5">
             <Grid>

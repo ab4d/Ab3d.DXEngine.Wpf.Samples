@@ -1,34 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Ab3d.Assimp;
 using Ab3d.Common;
 using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
-using Assimp;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using Material = System.Windows.Media.Media3D.Material;
-using AssimpMaterial = Assimp.Material;
 using Ab3d.DXEngine.Wpf.Samples.Common;
+using Assimp;
+using AssimpMaterial = Assimp.Material;
+
+#if SHARPDX
+using SharpDX.Direct3D11;
+#endif
 
 
 // Robot model license:

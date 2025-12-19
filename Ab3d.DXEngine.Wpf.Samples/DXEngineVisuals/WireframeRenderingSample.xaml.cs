@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
 using Ab3d.Controls;
@@ -22,9 +13,7 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Settings;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Effects;
-using Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance;
 using Ab3d.Models;
-using Ab3d.Utilities;
 using Ab3d.Visuals;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals

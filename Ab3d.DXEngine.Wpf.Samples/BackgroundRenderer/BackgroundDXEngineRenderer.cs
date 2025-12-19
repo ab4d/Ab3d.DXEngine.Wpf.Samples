@@ -1,18 +1,16 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Windows.Threading;
-using Ab3d.Cameras;
-using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Controls;
-using Ab3d.Visuals;
-using SharpDX;
+
+#if SHARPDX
 using SharpDX.Direct3D;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
 {

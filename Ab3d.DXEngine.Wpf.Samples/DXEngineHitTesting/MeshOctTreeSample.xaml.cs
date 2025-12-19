@@ -1,45 +1,27 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
 using Ab3d.Common.Models;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Common.EventManager3D;
-using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Models;
-using Ab3d.DirectX.Utilities;
-using Ab3d.Utilities;
-using Ab3d.Visuals;
-using SharpDX;
-using Material = System.Windows.Media.Media3D.Material;
 using Point = System.Windows.Point;
 
-// OctTree is a data structure that organizes the triangles in 3D space into multiple levels of
-// OctTreeNode objects so that the search of a triangle or a check for triangle ray intersection is very efficient.
-// Each OctTreeNodes divide its space into 8 child OctTreeNodes.
+// MeshOctTree is a data structure that organizes the triangles in 3D space into multiple levels of
+// MeshOctTreeNode objects so that the search of a triangle or a check for triangle ray intersection is very efficient.
+// Each OctTreeNodes divide its space into 8 child MeshOctTreeNode.
 // See also: https://en.wikipedia.org/wiki/Octree
 //
-// OctTrees are used in DXEngine for very efficient hit testing of complex MeshGeometry3D objects.
+// MeshOctTrees are used in DXEngine for very efficient hit testing of complex MeshGeometry3D objects.
 //
-// OctTree generation for hit testing (when calling DXScene.GetClosestHitObject or DXScene.GetAllHitObjects methods) 
+// MeshOctTree generation for hit testing (when calling DXScene.GetClosestHitObject or DXScene.GetAllHitObjects methods) 
 // is controlled by DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration property.
 // This property gets or sets an integer value that specifies number of positions in a mesh (DXMeshGeometry3D)
 // at which a OctTree is generated to speed up hit testing (e.g. if mesh has more positions then a value specified with this property,
-// then OctTree will be generated for the mesh). Default value is 512.
+// then MeshOctTree will be generated for the mesh). Default value is 512.
 //
-// This sample shows how to manually create OctTree (this can be also done in background thread).
+// This sample shows how to manually create MeshOctTree (this can be also done in background thread).
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {

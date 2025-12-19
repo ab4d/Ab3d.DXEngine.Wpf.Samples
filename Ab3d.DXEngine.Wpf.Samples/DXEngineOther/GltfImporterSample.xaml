@@ -35,7 +35,7 @@
                                     ShowRotationCenterMarker="True"
                                     RotateAroundMousePosition="True"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#BBFFFFFF" Margin="5">
             <StackPanel Orientation="Vertical" Margin="10 5">

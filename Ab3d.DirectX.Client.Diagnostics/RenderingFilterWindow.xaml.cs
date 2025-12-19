@@ -13,7 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
+#if SHARPDX
 using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DirectX.Client.Diagnostics
 {

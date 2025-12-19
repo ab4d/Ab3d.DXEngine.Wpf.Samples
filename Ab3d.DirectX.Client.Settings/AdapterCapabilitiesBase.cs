@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+#if SHARPDX
 using SharpDX.DXGI;
+#else
+using Ab3d.DXGI;
+#endif
 
 namespace Ab3d.DirectX.Client.Settings
 {

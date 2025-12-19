@@ -52,7 +52,7 @@
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=MainDXViewportView}"
-                                    TargetCamera="{Binding ElementName=Camera1}"/>
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}"/>
 
         <ab3d:MouseCameraControllerInfo Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                         MouseCameraController="{Binding ElementName=MouseCameraController1}" />
@@ -70,13 +70,19 @@
 
             <WrapPanel Grid.Column="0" Orientation="Horizontal" Margin="0 6 0 5">
 
-                <CheckBox Name="IsHitTestingCheckBox" Content="Is Hit testing" IsChecked="True" VerticalAlignment="Center"/>
-                <CheckBox Name="IsUpdatingInstanceIdBitmapCheckBox" Content="Update InstanceIdBitmap" IsChecked="True" Margin="10 0 0 0" VerticalAlignment="Center"/>
-                <CheckBox Name="ShowInstanceIdBitmapCheckBox" Content="Show InstanceIdBitmap" IsChecked="True" Margin="10 0 0 0" VerticalAlignment="Center"/>
-                <CheckBox Name="SaveToDesktopBitmapCheckBox" Content="Save bitmap to desktop" IsChecked="False" Margin="10 0 10 0" VerticalAlignment="Center"
+                <CheckBox Name="IsUpdatingInstanceIdBitmapCheckBox" Content="Update InstanceIdBitmap" IsChecked="True" Margin="0 0 0 0" VerticalAlignment="Center"
+                          ToolTip="When checked then the ID bitmap is updated after each camera change."/>
+
+                <CheckBox Name="CopyWholeIDBitmapCheckBox" Content="Copy whole ID bitmap (?)" IsChecked="False" Margin="10 0 0 0" VerticalAlignment="Center" Checked="OnCopyWholeIDBitmapCheckedChanged" Unchecked="OnCopyWholeIDBitmapCheckedChanged"
+                          ToolTip="When checked then the whole ID bitmap is copied from the GPU memory to the CPU memory.&#x0a;This can take some time, especially when using big screen sizes.&#x0a;But after that reading individual ID from pixel color is instantaneous.&#x0a;On the other side (when unchecked), we can preserve the ID bitmap in the GPU memory&#x0a;and only read a single pixel color to the CPU memory."/>
+
+                <CheckBox Name="ShowInstanceIdBitmapCheckBox" Content="Show InstanceIdBitmap" IsEnabled="False" IsChecked="False" Margin="10 0 0 0" VerticalAlignment="Center"
+                          ToolTip="This CheckBox is enabled only when we copy the whole ID bitmap from the GPU to the CPU memory."/>
+
+                <CheckBox Name="SaveToDesktopBitmapCheckBox" Content="Save bitmap to desktop" IsEnabled="False" IsChecked="False" Margin="10 0 10 0" VerticalAlignment="Center"
                           ToolTip="When checked each rendered instance id bitmap is saved to 'InstanceIdBitmap.png' file that is saved to desktop"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0 3 0 0">
+                <StackPanel Name="BitmapScalePanel" Visibility="Hidden" Orientation="Horizontal" Margin="0 3 0 0">
                     <TextBlock Text="InstanceIdBitmap scale:" VerticalAlignment="Center" />
                     <ComboBox Name="BitmapScaleComboBox" Width="60" SelectedIndex="0" Margin="3 0 0 0" SelectionChanged="BitmapScaleComboBox_OnSelectionChanged" >
                         <ComboBoxItem>100%</ComboBoxItem>
@@ -96,6 +102,10 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="InstanceIdBitmap render time:" Margin="0 0 3 0" />
                     <TextBlock Name="RenderTimeTextBlock" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Read pixel ID time:" Margin="0 0 3 0" />
+                    <TextBlock Name="ReadIdTimeTextBlock" />
                 </StackPanel>
             </StackPanel>
         </Grid>

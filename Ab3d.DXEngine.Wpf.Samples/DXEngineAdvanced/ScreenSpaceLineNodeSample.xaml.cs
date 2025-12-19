@@ -1,23 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.Visuals;
-using SharpDX;
 using Color = System.Windows.Media.Color;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -135,7 +132,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             var linePositionsCopy = linePositions.ToArray(); // make a copy so that when changing the positions we change the positions on each individual LineNode
 
             var screenSpaceLineNode = new ScreenSpaceLineNode(linePositionsCopy, isLineStrip, isLineClosed, lineMaterial);
-            screenSpaceLineNode.Transform = new Transformation(SharpDX.Matrix.Translation(xOffset, 0, 0));
+            screenSpaceLineNode.Transform = new Transformation(Matrix.Translation(xOffset, 0, 0));
 
             // To show ScreenSpaceLineNode in DXViewportView we need to put it inside a SceneNodeVisual3D
             var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
@@ -172,7 +169,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             // Use ScreenSpaceLineNode that takes ICollection<Vector3[]> as first parameter
             var screenSpaceLineNode = new ScreenSpaceLineNode(allPolylines, isLineStrip, isLineClosed, lineMaterial);
-            screenSpaceLineNode.Transform = new Transformation(SharpDX.Matrix.Translation(xOffset, 0, 0));
+            screenSpaceLineNode.Transform = new Transformation(Matrix.Translation(xOffset, 0, 0));
 
             // To show ScreenSpaceLineNode in DXViewportView we need to put it inside a SceneNodeVisual3D
             var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
@@ -220,7 +217,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             var lineMaterial = CreateLineMaterial(isPolyLine, lineColor);
 
             var screenSpaceLineNode = new ScreenSpaceLineNode(screenSpaceLineMesh, lineMaterial);
-            screenSpaceLineNode.Transform = new Transformation(SharpDX.Matrix.Translation(xOffset, 0, 0));
+            screenSpaceLineNode.Transform = new Transformation(Matrix.Translation(xOffset, 0, 0));
 
             // To show ScreenSpaceLineNode in DXViewportView we need to put it inside a SceneNodeVisual3D
             var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
@@ -325,8 +322,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
 
             // Update bounds of the mesh and SceneNode.
-            BoundingBox boundingBox;
-            BoundingBox.FromPoints(screenSpaceLineMesh.Positions, out boundingBox); // We could set boundingBox manually, but for demonstration purpose we calculate it from the positions
+            var boundingBox = BoundingBox.FromPoints(screenSpaceLineMesh.Positions); // We could set boundingBox manually, but for demonstration purpose we calculate it from the positions
 
             screenSpaceLineMesh.Bounds.SetBoundingBox(ref boundingBox);
 

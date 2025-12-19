@@ -1,34 +1,22 @@
-﻿using System;
-using System.CodeDom;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
-using Ab3d.Common.Models;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Common.EventManager3D;
-using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
-using Ab3d.DirectX.Utilities;
-using Ab3d.Utilities;
 using Ab3d.Visuals;
-using SharpDX;
 using LineCap = Ab3d.Common.Models.LineCap;
-using Material = System.Windows.Media.Media3D.Material;
-using Matrix = SharpDX.Matrix;
 using MeshUtils = Ab3d.Utilities.MeshUtils;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {

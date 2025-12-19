@@ -1,29 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
 using Ab3d.Controls;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Client.Settings;
 using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Effects;
-using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.DXEngine.Wpf.Samples.Controls;
 using Ab3d.Visuals;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -383,10 +375,10 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
                     MajorLinesFrequency = 5,
                     IsClosed = true,
                     MajorLineThickness = 1.5,
-                    MajorLineColor = Color.FromRgb(0, 0, 0),
+                    MajorLineColor = System.Windows.Media.Color.FromRgb(0, 0, 0),
 
                     LineThickness = 0.8,
-                    LineColor = Color.FromRgb(30, 30, 30),
+                    LineColor = System.Windows.Media.Color.FromRgb(30, 30, 30),
                 };
 
                 modelVisual3D.Children.Add(wireGridVisual3D);
@@ -411,7 +403,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
                 for (int a = 0; a < 360; a += 40)
                 {
-                    double rad = SharpDX.MathUtil.DegreesToRadians(a);
+                    double rad = MathUtil.DegreesToRadians(a);
                     double x = Math.Sin(rad) * 100 + centerX;
                     double z = Math.Cos(rad) * 100 + centerZ;
 

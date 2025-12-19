@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Common.Models;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
 using Ab3d.Visuals;
-using SharpDX;
 using Color = System.Windows.Media.Color;
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
@@ -399,7 +389,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 
             string shadowDepthBiasText = GetSelectedText(ShadowDepthBiasComboBox);
             
-            if (shadowDepthBiasText.Contains(' '))
+            if (shadowDepthBiasText.Contains(" "))
                 shadowDepthBiasText = shadowDepthBiasText.Substring(0, shadowDepthBiasText.IndexOf(' ') - 1); // Removed " (default)"
 
             _shadowDepthBias = Single.Parse(shadowDepthBiasText, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);

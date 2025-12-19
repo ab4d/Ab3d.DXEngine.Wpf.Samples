@@ -1,7 +1,10 @@
-﻿using SharpDX;
-using System.IO;
 using System;
+using System.IO;
 using System.Text;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.Common
 {

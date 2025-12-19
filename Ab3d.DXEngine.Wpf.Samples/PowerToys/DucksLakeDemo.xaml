@@ -62,7 +62,7 @@
                                     ZoomMode="MousePosition"
                                     RotateAroundMousePosition="True"
                                     ShowRotationCenterMarker="True"
-                                    TargetCamera="{Binding ElementName=Camera1}" 
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" 
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
 
 

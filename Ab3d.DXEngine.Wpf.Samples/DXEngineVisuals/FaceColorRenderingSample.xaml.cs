@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using Ab3d.Common.Cameras;
-using Ab3d.Controls;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
-using Ab3d.DirectX.Models;
-using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {

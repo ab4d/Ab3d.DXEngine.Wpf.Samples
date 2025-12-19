@@ -52,6 +52,7 @@
                 
                 <Separator />
                 <MenuItem Name="GetCameraDetailsMenuItem" Header="Get camera details" Click="GetCameraDetailsMenuItem_OnClick"/>
+                <MenuItem Name="ResetCameraOffsetMenuItem" Header="Reset camera Offset" ToolTip="Sets Camera's Offset to (0,0,0) and adjust TargetPosition accordingly" Click="ResetCameraOffsetMenuItem_OnClick"/>
                 <MenuItem Name="GetSceneXamlMenuItem" Header="Get scene XAML" Click="GetSceneXamlMenuItem_OnClick"/>
                 <MenuItem Name="ShowWpfPreviewMenuItem" Header="Show WPF preview" Click="ShowWpfPreviewMenuItem_OnClick"/>
                 <MenuItem Name="SaveToBitmapMenuItem" Header="Save frame to bitmap" Click="SaveToBitmapMenuItem_OnClick"/>

@@ -1,27 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Cameras;
-using Ab3d.Common;
-using Ab3d.DirectX;
 using Ab3d.DirectX.Models;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
-using SharpDX;
 using Color = System.Windows.Media.Color;
 
 

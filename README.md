@@ -12,26 +12,34 @@ The samples are using [Ab3d.PowerToys](https://www.ab4d.com/PowerToys.aspx) libr
 
 Both Ab3d.DXEngine and Ab3d.PowerToys are commercial libraries. You can start a 60-day trial when they are first used.
 
+> NOTE:
+> Ab3d.DXEngine v7 and v8 have the same features. The difference is that v7 requires the third-party SharpDX library, but v8 has all the DirectX 11 interop built into the library and does not require any third-party dependencies.
+
+
 ## Repository solutions
 
 The Ab3d.DXEngine.Wpf.Samples repository contains the following Visual Studio solutions:
-* Ab3d.DXEngine WPF Samples net48.sln (**.NET Framework 4.8**)
-* Ab3d.DXEngine WPF Samples net60.sln (**.NET 6.0**)
-* Ab3d.DXEngine WPF Samples net80.sln (**.NET 8.0**)
+* Ab3d.DXEngine WPF Samples net48.sln (for .Net Framework 4.8; uses Ab3d.DXEngine v7 and requires SharpDX library)
+* Ab3d.DXEngine WPF Samples net8.sln (for .Net 8; uses Ab3d.DXEngine v7 and requires SharpDX library)
+* Ab3d.DXEngine WPF Samples net10.sln (for .Net 10; uses Ab3d.DXEngine v7 and requires SharpDX library)
+* Ab3d.DXEngine WPF Samples net10.0 no SharpDX.sln (for .Net 10; uses Ab3d.DXEngine v8 and does not require SharpDX library)
 
 ## Dependencies
 
 The projects uses the following dependencies:
 * Ab3d.DXEngine - Core Ab3d.DXEngine assembly - https://www.nuget.org/packages/Ab3d.DXEngine
 * Ab3d.DXEngine.Wpf - WPF support for Ab3d.DXEngine - https://www.nuget.org/packages/Ab3d.DXEngine.Wpf
+* Ab3d.DXEngine.glTF - glTF importer for DXEngine - https://www.nuget.org/packages/Ab3d.DXEngine.glTF
 * Ab3d.PowerToys - The ultimate WPF 3D helper library - https://www.nuget.org/packages/Ab3d.PowerToys
+* Assimp - Assimp 3D files importer (native library) - 32 and 64-bit dlls available in lib folder
+* Assimp.Net - Managed wrapper for native assimp importer - available in lib folder
+* Ab3d.PowerToys.Assimp - Assimp wrapper for WPF 3D objects - available in lib folder
+
+Ab3d.DXEngine v7 also require the following SharpDX libraries (this is not required for v8):
 * SharpDX - core assembly for DirectX managed wrapper - https://www.nuget.org/packages/SharpDX
 * SharpDX.DXGI - DirectX - DXGI managed API - https://www.nuget.org/packages/SharpDX
 * SharpDX.Direct3D11 - Direct3D11 managed API - https://www.nuget.org/packages/SharpDX
 * SharpDX.Mathematics - DirectX - Mathematics managed API - https://www.nuget.org/packages/SharpDX
-* Assimp - Assimp 3D files importer (native library) - 32 and 64-bit dlls available in lib folder
-* Assimp.Net - Managed wrapper for native assimp importer - available in lib folder
-* Ab3d.PowerToys.Assimp - Assimp wrapper for WPF 3D objects - available in lib folder
 
 ## Support
 

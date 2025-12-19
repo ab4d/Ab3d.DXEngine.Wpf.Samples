@@ -1,15 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
@@ -17,13 +13,15 @@ using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Client.Diagnostics;
 using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Materials;
 using Ab3d.DirectX.Models;
 using Ab3d.Meshes;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
-using Color = SharpDX.Color;
+using Matrix = SharpDX.Matrix;
+#endif
 
 // NOTE:
 // This sample shows many 3D boxes that are defined by MeshObjectNode objects.
@@ -543,7 +541,7 @@ WPF FPS: shows number of frames per second in this WPF application (WPF has a ca
                     {
                         float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
 
-                        var matrix = new SharpDX.Matrix(modelScaleFactor, 0, 0, 0,
+                        var matrix = new Matrix(modelScaleFactor, 0, 0, 0,
                                                         0, modelScaleFactor, 0, 0,
                                                         0, 0, modelScaleFactor, 0,
                                                         xPos, yPos, zPos, 1);

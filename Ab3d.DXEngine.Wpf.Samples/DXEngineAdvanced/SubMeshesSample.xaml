@@ -33,7 +33,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <!--<TextBlock FontWeight="Bold" FontSize="20" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
                    Text="Using MeshObjectNode and SubMeshes to change material on part of the objects"/>-->

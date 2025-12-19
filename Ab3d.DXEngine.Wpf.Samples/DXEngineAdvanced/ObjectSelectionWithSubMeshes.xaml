@@ -33,7 +33,7 @@
                                     RotateCameraConditions="RightMouseButtonPressed"
                                     MoveCameraConditions="RightMouseButtonPressed, ControlKey"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <TextBlock FontWeight="Bold" Grid.Row="0" FontSize="20" Foreground="#333" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"
                    Text="Object selection with SubMeshes"/>

@@ -51,7 +51,7 @@
                                     RotateCameraConditions="LeftMouseButtonPressed"
                                     MoveCameraConditions="Disabled"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <Rectangle Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Fill="White" Margin="0 1 0 0" SnapsToDevicePixels="True" />
         <Rectangle Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="1" Fill="Black" SnapsToDevicePixels="True" />

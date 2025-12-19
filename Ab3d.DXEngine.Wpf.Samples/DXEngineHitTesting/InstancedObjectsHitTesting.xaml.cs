@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.Common.EventManager3D;
-using Ab3d.Visuals;
-using SharpDX;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Utilities;
-using Ab3d.Meshes;
-using Ab3d.Utilities;
+using Ab3d.Visuals;
 using InstanceData = Ab3d.DirectX.InstanceData;
+
+#if SHARPDX
+using SharpDX;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
 {
@@ -328,19 +322,19 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting
                     {
                         float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
 
-                        instancedData[i].World = SharpDX.Matrix.Translation(xPos, yPos, zPos);
+                        instancedData[i].World = Matrix.Translation(xPos, yPos, zPos);
 
                         // If we would also need to scale the mesh, we could create the matrix with the following code:
-                        //instancedData[i].World = new SharpDX.Matrix(xScale, 0, 0, 0,
+                        //instancedData[i].World = new Matrix(xScale, 0, 0, 0,
                         //                                            0, yScale, 0, 0,
                         //                                            0, 0, zScale, 0,
                         //                                            xPos, yPos, zPos, 1);
 
-                        //instancedData[i].DiffuseColor = new SharpDX.Color4(new SharpDX.Color3(0.3f + ((float)x / (float)xCount) * 0.7f, 
+                        //instancedData[i].DiffuseColor = new Color4(new Color3(0.3f + ((float)x / (float)xCount) * 0.7f, 
                         //                                                                      0.3f + ((float)y / (float)yCount) * 0.7f,
                         //                                                                      0.3f + ((float)y / (float)yCount) * 0.7f));
 
-                        instancedData[i].DiffuseColor = new SharpDX.Color4(new SharpDX.Color3(0.1f + ((float)y / (float)yCount) * 0.9f,
+                        instancedData[i].DiffuseColor = new Color4(new Color3(0.1f + ((float)y / (float)yCount) * 0.9f,
                                                                                               (float)Math.Abs(0.5 - ((float)x / (float)xCount)) * 2.0f,
                                                                                               0.1f + ((float)(yCount - y) / (float)yCount) * 0.9f));
 

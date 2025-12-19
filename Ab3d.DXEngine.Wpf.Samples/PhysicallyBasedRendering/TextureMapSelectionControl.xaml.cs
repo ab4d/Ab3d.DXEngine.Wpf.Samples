@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -8,8 +8,11 @@ using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Assimp;
-using SharpDX.Direct3D11;
 using UserControl = System.Windows.Controls.UserControl;
+
+#if SHARPDX
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.PhysicallyBasedRendering
 {

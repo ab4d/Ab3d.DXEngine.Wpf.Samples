@@ -1,4 +1,7 @@
-﻿using SharpDX;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {

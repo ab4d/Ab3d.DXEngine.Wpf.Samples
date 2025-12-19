@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Windows;
+using System;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Cameras;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -197,20 +188,51 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             var vertexBuffer = CustomRenderingStep1.GetSharpDXBoxVertexBuffer();
             _vertices = Buffer.Create(device, BindFlags.VertexBuffer, vertexBuffer);
 
+#if SHARPDX
             _vertexBufferBinding = new VertexBufferBinding(_vertices, SharpDX.Utilities.SizeOf<Vector4>() * 2, 0);
 
             // Create Constant Buffer
             _constantBuffer = new Buffer(device, SharpDX.Utilities.SizeOf<Matrix>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+#else
+            _vertexBufferBinding = new VertexBufferBinding(_vertices, System.Runtime.CompilerServices.Unsafe.SizeOf<Vector4>() * 2, 0);
+
+            // Create Constant Buffer
+            _constantBuffer = new Buffer(device, System.Runtime.CompilerServices.Unsafe.SizeOf<Matrix>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+#endif
         }
 
         private void Dispose()
         {
             // Dispose all resources that were created here
-            SharpDX.Utilities.Dispose(ref _constantBuffer);
-            SharpDX.Utilities.Dispose(ref _vertices);
-            SharpDX.Utilities.Dispose(ref _layout);
-            SharpDX.Utilities.Dispose(ref _vertexShader);
-            SharpDX.Utilities.Dispose(ref _pixelShader);
+            if (_constantBuffer != null)
+            {
+                _constantBuffer.Dispose();
+                _constantBuffer = null;
+            }
+            
+            if (_vertices != null)
+            {
+                _vertices.Dispose();
+                _vertices = null;
+            }
+            
+            if (_layout != null)
+            {
+                _layout.Dispose();
+                _layout = null;
+            }
+            
+            if (_vertexShader != null)
+            {
+                _vertexShader.Dispose();
+                _vertexShader = null;
+            }
+            
+            if (_pixelShader != null)
+            {
+                _pixelShader.Dispose();
+                _pixelShader = null;
+            }
 
             MainDXViewportView.Dispose();
         }

@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
-using Ab3d.DirectX.Controls;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {
@@ -433,7 +427,7 @@ at the center of the scene - look directions of human eyes cross at the point of
 
             for (int a = 0; a < 360; a += 36)
             {
-                double rad = SharpDX.MathUtil.DegreesToRadians(a);
+                double rad = MathUtil.DegreesToRadians(a);
                 double x = Math.Sin(rad) * circleRadius + centerX;
                 double z = Math.Cos(rad) * circleRadius + centerZ;
 

@@ -1,28 +1,17 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Cameras;
 using Ab3d.Common;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Models;
-using Ab3d.Utilities;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
-using Color = System.Windows.Media.Color;
+using Matrix = SharpDX.Matrix;
+#endif
 
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
@@ -260,8 +249,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
             
             // Create new WorldMatrix
 
-            // Use SharpDX.Matrix.RotationAxis to create new rotation matrix without creating new objects (as below in the commented code)
-            var rotationAxis = SharpDX.Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(_rotationsCount * 30));
+            // Use Matrix.RotationAxis to create new rotation matrix without creating new objects (as below in the commented code)
+            var rotationAxis = Matrix.RotationAxis(new Vector3(0, 1, 0), MathUtil.DegreesToRadians(_rotationsCount * 30));
 
             // Multiply the rotation by the initial WorldMatrix for this text
             var newWorldMatrix = rotationAxis.ToWpfMatrix3D() * _instancedTextInitialWorldMatrix;

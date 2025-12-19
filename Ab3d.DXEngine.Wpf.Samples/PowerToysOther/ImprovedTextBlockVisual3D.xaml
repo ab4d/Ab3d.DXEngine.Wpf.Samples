@@ -41,7 +41,7 @@
                                         RotateCameraConditions="LeftMouseButtonPressed"
                                         MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                         EventsSourceElement="{Binding ElementName=WpfViewportBorder}"
-                                        TargetCamera="{Binding ElementName=WpfCamera}"/>
+                                        CameraSmoothing="Normal" TargetCamera="{Binding ElementName=WpfCamera}"/>
 
         <StackPanel Grid.Column="0" Margin="10 5 10 0" HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
             <TextBlock Text="WPF 3D rendering" FontSize="20" Foreground="Silver" FontWeight="Bold" />
@@ -86,7 +86,7 @@
                                         RotateCameraConditions="LeftMouseButtonPressed"
                                         MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                         EventsSourceElement="{Binding ElementName=DXViewportBorder}"
-                                        TargetCamera="{Binding ElementName=DXCamera}"/>
+                                        CameraSmoothing="Normal" TargetCamera="{Binding ElementName=DXCamera}"/>
 
         <StackPanel Grid.Column="1" Margin="15 5 10 0" HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
             <TextBlock Text="Ab3d.DXEngine rendering" FontSize="20" Foreground="Silver" FontWeight="Bold" />

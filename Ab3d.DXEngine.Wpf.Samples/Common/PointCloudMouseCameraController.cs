@@ -1,8 +1,11 @@
-﻿using System.Windows.Media.Media3D;
+using System.Windows.Media.Media3D;
 using Ab3d.Controls;
 using Ab3d.DirectX;
-using SharpDX;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.Common
 {

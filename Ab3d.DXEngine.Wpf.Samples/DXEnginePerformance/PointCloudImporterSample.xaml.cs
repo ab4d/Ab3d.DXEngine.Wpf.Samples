@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,7 +11,10 @@ using Ab3d.DirectX;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.DXEngine.Wpf.Samples.DXEngineHitTesting;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -702,4 +704,3 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
         }
     }
 }
-

@@ -1,26 +1,19 @@
-﻿using Ab3d.Common.Cameras;
+using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using Ab3d.Common.Cameras;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
 using Ab3d.Utilities;
 using Ab3d.Visuals;
-using SharpDX.Direct3D11;
+
+#if SHARPDX
 using SharpDX;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using SharpDX.DXGI;
+using SharpDX.Direct3D11;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineVisuals
 {

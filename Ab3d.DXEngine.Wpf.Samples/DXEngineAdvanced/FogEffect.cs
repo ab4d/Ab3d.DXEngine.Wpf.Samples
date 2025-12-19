@@ -1,13 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Lights;
 using Ab3d.DirectX.Materials;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D11;
 using Buffer = SharpDX.Direct3D11.Buffer;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -311,7 +314,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             }
             else
             {
-                newDiffuseColor = Color.Black;
+                newDiffuseColor = Color4.Black;
             }
 
             if (_perObjectConstantsBufferData.DiffuseColor != newDiffuseColor)
@@ -345,7 +348,11 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                     _perObjectConstantsBufferData.World = world;
 
                     Matrix invertedWorldMatrix;
+#if SHARPDX                
                     Matrix.Invert(ref world, out invertedWorldMatrix);
+#else
+                    Matrix.Invert(world, out invertedWorldMatrix);
+#endif
                     invertedWorldMatrix = Matrix.Transpose(invertedWorldMatrix);
 
                     _perObjectConstantsBufferData.WorldInverseTranspose = invertedWorldMatrix;

@@ -1,28 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
-using Ab3d.Meshes;
 using Ab3d.Visuals;
-using SharpDX;
 using Material = Ab3d.DirectX.Material;
-using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -31,6 +21,22 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
     // The sample first generates a very simple mesh that can be shown immediately,
     // then a background worked is started that generates the big height map and the required DirectX objects in the background thread.
     // When the data are prepared, then the new SceneNodes are created in the main UI thread.
+    //
+    // Additional optimization possibilities:
+    // - When you do not need to show texture on the height map, then you can replace all occurrences of PositionNormalTexture with PositionNormal in this file.
+    //   This will generate smaller vertex buffer and will also be faster to render.
+    //
+    // - If you do not need hit-testing of height map, then you can set IsHitTestVisible property of the SceneNodeVisual3D to false.
+    //
+    // - By default the DXEngine will generate the OctTree on first hit test.
+    //   If height map hit testing is enabled, then this will speed up hit-testing of the height map.
+    //   But generating the OctTree for big meshes can take some time. 
+    //   You can disable that by using the following line in DXSceneInitialized event handler: 
+    //   MainDXViewportView.DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration = int.MaxValue; // Prevent generating oct-tree
+    //
+    // - When creating the heightMapMesh, manually set the Bounds property of the mesh. This will prevent calculating the bounds from the vertex buffer. (requires DXEngine v7.2+)
+    //
+    // - Note that max array size in .Net is 2 GB. PositionNormalTexture.SizeInBytes is 32 bytes (PositionNormal.SizeInBytes is 24 bytes). This determines the may vertex buffer array size.
 
     /// <summary>
     /// Interaction logic for OptimizedHeightMapGeneration.xaml
@@ -97,6 +103,13 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
             {
                 if (MainDXViewportView.DXScene == null)
                     return; // WPF 3D rendering
+
+                // We can globally prevent oct-tree generation if hit testing of height map is not required.
+                // Generating oct-tree for big meshes can take some time.
+                // It is also possible to disable hit testing on MeshObjectNode (set IsHitTestVisible to false).
+                // This will also prevent generating oct-tree for that mesh.
+                //MainDXViewportView.DXScene.DXHitTestOptions.MeshPositionsCountForOctTreeGeneration = int.MaxValue;
+
 
                 MeshBase heightMapMesh = null;
                 _dxMaterial = null;
@@ -302,6 +315,9 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                                                                       inputLayoutType: InputLayoutType.Position | InputLayoutType.Normal | InputLayoutType.TextureCoordinate,
                                                                       name: "HeightSimpleMesh");
 
+            // Manually set the Bounds of the mesh. This will prevent calculating the bounds from the vertex buffer. (requires DXEngine v7.2+)
+            heightMapMesh.Bounds = new Bounds(new Vector3(-500, 0, -500), new Vector3(500, MaxHeightMapHeight, 500));
+
             if (_backgroundWorker != null && _backgroundWorker.CancellationPending)
                 return null;
 
@@ -372,6 +388,12 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
             meshObjectNode = new Ab3d.DirectX.MeshObjectNode(heightMapMesh, backDXMaterial);
             meshObjectNode.IsBackFaceMaterial = true;
+
+            // If hit testing is not required, then we should disable that
+            // This will also prevent generating oct-tree for the mesh (long initialization time for big meshes)
+            // Without oct-tree the hit testing on big meshes can be very slow.
+            //meshObjectNode.IsHitTestVisible = false;
+            
             meshObjectNode.Name = "HeightBackMeshObjectNode";
 
             _disposables.Add(meshObjectNode);

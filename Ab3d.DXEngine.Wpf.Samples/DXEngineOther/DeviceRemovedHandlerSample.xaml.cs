@@ -1,26 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Ab3d.DirectX.Common;
-using Ab3d.Meshes;
 using Ab3d.Visuals;
-using SharpDX;
-using SharpDX.DXGI;
 using Color = System.Windows.Media.Color;
 using RenderingEventArgs = Ab3d.DirectX.RenderingEventArgs;
+
+#if SHARPDX
+using SharpDX;
+using SharpDX.DXGI;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {

@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Visuals;
-using SharpDX;
 using Ab3d.DirectX;
-using Ab3d.Meshes;
+using Ab3d.Visuals;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {
@@ -208,7 +200,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                     {
                         float xPos = (float)(center.X - (size.X / 2.0) + (x * xStep));
 
-                        instancedData[i].World = new SharpDX.Matrix(modelScaleFactor, 0, 0, 0,
+                        instancedData[i].World = new Matrix(modelScaleFactor, 0, 0, 0,
                                                                     0, modelScaleFactor, 0, 0,
                                                                     0, 0, modelScaleFactor, 0,
                                                                     xPos, yPos, zPos, 1);
@@ -216,17 +208,17 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
                         if (useTransparency)
                         {
                             // When we use transparency, we set alpha color to 0.2 (we also need to set InstancedMeshGeometryVisual3D.UseAlphaBlend to true)
-                            instancedData[i].DiffuseColor = new SharpDX.Color4(1.0f, 1.0f, 1.0f, 1.0f - yPercent); // White with variable transparency - top objects fully transparent, bottom objects solid
+                            instancedData[i].DiffuseColor = new Color4(1.0f, 1.0f, 1.0f, 1.0f - yPercent); // White with variable transparency - top objects fully transparent, bottom objects solid
                         }
                         else
                         {
                             // Start with yellow and move to white (multiplied by 1.4 so that white color appear before the top)
-                            instancedData[i].DiffuseColor = new SharpDX.Color4(red: 1.0f,
+                            instancedData[i].DiffuseColor = new Color4(red: 1.0f,
                                                                                green: 1.0f,
                                                                                blue: yPercent * 1.4f,
                                                                                alpha: 1.0f);
 
-                            //instancedData[i].DiffuseColor = new SharpDX.Color4(red: 0.3f + ((float)x / (float)xCount) * 0.7f, 
+                            //instancedData[i].DiffuseColor = new Color4(red: 0.3f + ((float)x / (float)xCount) * 0.7f, 
                             //                                                   green: 0.3f + yPercent * 0.7f, 
                             //                                                   blue: 0.3f + yPercent * 0.7f, 
                             //                                                   alpha: 1.0f);

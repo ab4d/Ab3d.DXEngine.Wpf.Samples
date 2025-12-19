@@ -53,6 +53,6 @@
         <cameraContoller:CameraControlPanel Width="120" Height="60" VerticalAlignment="Bottom" HorizontalAlignment="Left" TargetCamera="{Binding ElementName=Camera1}"/>
         <cameraContoller:MouseCameraController RotateCameraConditions="RightMouseButtonPressed"
                                                MoveCameraConditions="RightMouseButtonPressed, ControlKey"
-                                               TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
+                                               CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" EventsSourceElement="{Binding ElementName=ViewportBorder}"/>
     </Grid>
 </Page>

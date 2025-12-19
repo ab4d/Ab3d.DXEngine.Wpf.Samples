@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Controls;
-using Ab3d.DirectX.Materials;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {
@@ -203,7 +205,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             UpdateSpriteBatch(spriteBatch, shaderResourceView, destination);
         }
 
-        private void UpdateSpriteBatch(SpriteBatch spriteBatch, ShaderResourceView shaderResourceView, SharpDX.RectangleF destination)
+        private void UpdateSpriteBatch(SpriteBatch spriteBatch, ShaderResourceView shaderResourceView, RectangleF destination)
         {
             // Use non-premultiplied alpha blend
             spriteBatch.Begin(_mainDXViewportView.DXScene.DXDevice.CommonStates.NonPremultipliedAlphaBlend);

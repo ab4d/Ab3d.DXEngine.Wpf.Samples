@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ab3d.Common.Cameras;
 using Ab3d.Controls;
 using Ab3d.DirectX;
 using Ab3d.DXEngine.Wpf.Samples.Common;
 using Ab3d.Visuals;
-using SharpDX;
-using Color = SharpDX.Color;
 using Point = System.Windows.Point;
+
+#if SHARPDX
+using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEnginePerformance
 {

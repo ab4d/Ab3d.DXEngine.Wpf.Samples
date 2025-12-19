@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.DirectX.Materials;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D11;
-using Matrix = System.Windows.Media.Matrix;
-using Point = System.Windows.Point;
+using Point = SharpDX.Point;
+using Matrix = SharpDX.Matrix;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 {
@@ -32,7 +26,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
         private ShaderResourceView _backgroundSpriteShaderResourceView;
 
         private DateTime _animationStartTime;
-        private SharpDX.Point _animatedSpritePosition;
+        private Point _animatedSpritePosition;
         private float _animatedRotationAngle;
         private SpriteBatch _bottomRightSpriteBatch;
         private ShaderResourceView _logoShaderResourceView;
@@ -213,7 +207,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
 
             _disposables.Add(_animatedSpriteShaderResourceView);
 
-            _animatedSpritePosition = new SharpDX.Point(100, 180);
+            _animatedSpritePosition = new Point(100, 180);
             UpdateAnimatedSprite();
 
 
@@ -230,8 +224,8 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineOther
             // To rotate the sprite around its center, make sure to define its destination rectangle so that the center of the sprite is at 0.5, 0.5
             // Then you will be able to move the sprite after rotating it with using Matrix.Translation.
             // Note that rotation is done in relative coordinates: x is in range from 0 to +2 (0 is left, 2 is right); y is in range from 0 to -2 (0 is top, -2 is bottom)
-            _animatedSpriteBatch.SetTransform(SharpDX.Matrix.RotationZ(MathUtil.DegreesToRadians(_animatedRotationAngle)) *
-                                              SharpDX.Matrix.Translation(0.1f, 0.85f, 0.0f));
+            _animatedSpriteBatch.SetTransform(Matrix.RotationZ(MathUtil.DegreesToRadians(_animatedRotationAngle)) *
+                                              Matrix.Translation(0.1f, 0.85f, 0.0f));
 
             // Use red color mask
             // To rotate the sprite, make sure that its center is positioned at (0, 0):

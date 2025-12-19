@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -18,11 +19,20 @@ using System.Xml;
 using Ab3d.DirectX.Controls;
 using Ab3d.DirectX.Effects;
 using Ab3d.DirectX.Lights;
+using Color = System.Windows.Media.Color;
+using Exception = System.Exception;
+
+#if SHARPDX
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using Color = System.Windows.Media.Color;
-using Exception = System.Exception;
+using Matrix = SharpDX.Matrix;
+#else
+using Ab3d.DirectX.Common;
+using Ab3d.DXGI;
+using Ab3d.Direct3D11;
+using Matrix = System.Numerics.Matrix4x4;
+#endif
 
 namespace Ab3d.DirectX.Client.Diagnostics
 {
@@ -1465,9 +1475,11 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
         // With moving code into another method, we can try...catch the call to this method. If the code is in DumpResources, the the call to DumpResources fails
         private void AppendSharpDXResources(StringBuilder sb)
         {
+#if SHARPDX            
             string sharpDxReport = SharpDX.Diagnostics.ObjectTracker.ReportActiveObjects();
             if (!string.IsNullOrEmpty(sharpDxReport) && sharpDxReport != "\r\nCount per Type:\r\n")
                 sb.Append("\r\nSharpDX report:\r\n").Append(sharpDxReport).AppendLine();
+#endif
         }
 
         // Note: The code in this method is moved from DumpResources so that in case when there are any incompatibilities in SharpDX assemblies
@@ -2975,7 +2987,70 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
                 sb.AppendLine(GetDXSceneCameraMatricesString(dxViewport3D.DXScene.Camera));
             }           
         }
+        
+        private void ResetCameraOffsetMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            object powerToysCamera;
 
+            try
+            {
+                powerToysCamera = GetPowerToysCamera(this.DXView);
+            }
+            catch (InvalidOperationException)
+            {
+                // This can happen when called from another thread
+                powerToysCamera = null;
+            }
+
+            if (powerToysCamera == null)
+                return;
+
+            var cameraType = powerToysCamera.GetType();
+
+            var offsetPropertyInfo = cameraType.GetProperty("Offset", BindingFlags.Instance | BindingFlags.Public);
+            if (offsetPropertyInfo == null)
+                return;
+            
+            var targetPositionPropertyInfo = cameraType.GetProperty("TargetPosition", BindingFlags.Instance | BindingFlags.Public);
+            if (targetPositionPropertyInfo == null)
+                return;
+
+            var offsetValue = offsetPropertyInfo.GetValue(powerToysCamera);
+            var targetPositionValue = targetPositionPropertyInfo.GetValue(powerToysCamera);
+
+
+            var offsetX = GetPropertyValue(offsetValue, "X");
+            var offsetY = GetPropertyValue(offsetValue, "Y");
+            var offsetZ = GetPropertyValue(offsetValue, "Z");
+            
+            var targetPositionX = GetPropertyValue(targetPositionValue, "X");
+            var targetPositionY = GetPropertyValue(targetPositionValue, "Y");
+            var targetPositionZ = GetPropertyValue(targetPositionValue, "Z");
+
+
+            var newOffsetValues = new object[] { 0.0, 0.0, 0.0 };
+            object newOffset = Activator.CreateInstance(offsetPropertyInfo.PropertyType, newOffsetValues);
+            offsetPropertyInfo.SetValue(powerToysCamera, newOffset);
+            
+
+            var newTargetPositionValues = new object[]
+            {
+                targetPositionX + offsetX, 
+                targetPositionY + offsetY, 
+                targetPositionZ + offsetZ, 
+            };
+
+            object newTargetPosition = Activator.CreateInstance(targetPositionPropertyInfo.PropertyType, newTargetPositionValues);
+            targetPositionPropertyInfo.SetValue(powerToysCamera, newTargetPosition);
+        }
+
+        private double GetPropertyValue(object valueObject, string fieldName)
+        {
+            var type = valueObject.GetType();
+            var propertyInfo = type.GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public);
+
+            return (double)propertyInfo.GetValue(valueObject);
+        }
 
         private void SetDXEngineResourceTracking(bool newValue)
         {
@@ -2984,6 +3059,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 
         private void SetSharpDXObjectTracking(bool newValue)
         {
+#if SHARPDX            
             // In SharpDX v3.0+ the call stack is get with throwing an exception and then getting the CallStack from it
             // The reason for this is that this is the only way to get call stack in PCL.
             // This kill performance totally (displaying exceptions in VS output) and can also break you into VS when break on exceptions is enabled.
@@ -2991,6 +3067,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
             SharpDX.Diagnostics.ObjectTracker.StackTraceProvider = new Func<string>(() => "");
 
             SharpDX.Configuration.EnableObjectTracking = newValue;
+#endif
         }
 
         // formatString = "    {0}=\"{1:0.##}\"\r\n"
@@ -3127,7 +3204,7 @@ MeshBytesUploaded: {18:#,##0}{19}{20}",
 #region GetMatrix3DText, FormatTable
         // This code is taken from Ab3d.PowerToys Ab3d.Utilities.Dumper.GetMatrix3DText
 
-        private static string GetMatrix3DText(SharpDX.Matrix matrix)
+        private static string GetMatrix3DText(Matrix matrix)
         {
             return FormatTable(new[] {
                 new string[] { matrix.M11.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),

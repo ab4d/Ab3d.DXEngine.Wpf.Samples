@@ -1,11 +1,14 @@
-﻿using System;
+using System;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using Ab3d.Cameras;
 using Ab3d.Common.Cameras;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
 {
@@ -242,7 +245,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.BackgroundRenderer
 
                 for (int a = 0; a < 360; a += (int) (Math.Ceiling(360.0 / circleElementsCount)))
                 {
-                    double rad = SharpDX.MathUtil.DegreesToRadians(a);
+                    double rad = MathUtil.DegreesToRadians(a);
                     double sin = Math.Sin(rad);
                     double cos = Math.Cos(rad);
 

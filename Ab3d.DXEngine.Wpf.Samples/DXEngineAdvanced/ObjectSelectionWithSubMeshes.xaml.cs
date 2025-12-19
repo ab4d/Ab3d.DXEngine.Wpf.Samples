@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab3d.DirectX;
 using Ab3d.Visuals;
+
+#if SHARPDX
 using SharpDX;
+using Point = SharpDX.Point;
+#endif
 
 namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 {
@@ -32,7 +26,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
 
         private DisposeList _disposables;
 
-        private SharpDX.Point _lastMousePosition;
+        private Point _lastMousePosition;
         private int _lastSelectedSphereIndex;
         private MeshOctTree _octTree;
 
@@ -179,7 +173,7 @@ namespace Ab3d.DXEngine.Wpf.Samples.DXEngineAdvanced
                 return;
 
 
-            _lastMousePosition = new SharpDX.Point(xPos, yPos);
+            _lastMousePosition = new Point(xPos, yPos);
 
             var mouseRay = dxScene.GetRayFromCamera(xPos, yPos);
 

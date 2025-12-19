@@ -43,7 +43,7 @@
                                     MoveCameraConditions="LeftMouseButtonPressed, ControlKey"
                                     ZoomMode="MousePosition"
                                     EventsSourceElement="{Binding ElementName=ViewportBorder}"
-                                    TargetCamera="{Binding ElementName=Camera1}" />
+                                    CameraSmoothing="Normal" TargetCamera="{Binding ElementName=Camera1}" />
 
         <ab3d:CameraAxisPanel x:Name="CameraAxisPanel1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Height="100" Margin="10 0 0 10" 
                               TargetCamera="{Binding ElementName=Camera1}" />
