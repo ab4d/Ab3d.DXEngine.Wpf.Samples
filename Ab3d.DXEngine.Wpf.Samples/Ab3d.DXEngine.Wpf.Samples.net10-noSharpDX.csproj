@@ -24,8 +24,8 @@
   
   <ItemGroup>
     <PackageReference Include="Ab3d.DXEngine" Version="8.0.9484" />
-    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="8.0.9484" />
     <PackageReference Include="Ab3d.DXEngine.glTF" Version="8.0.9484" />
+    <PackageReference Include="Ab3d.DXEngine.Wpf" Version="8.0.9484" />
     <PackageReference Include="Ab3d.PowerToys" Version="12.0.9484" />  
 	<PackageReference Include="Openize.Drako" version="1.4.3" />
 	

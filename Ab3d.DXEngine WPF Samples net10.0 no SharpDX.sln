@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab3d.DXEngine.Wpf.Samples",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab3d.DirectX.Client.Settings", "Ab3d.DirectX.Client.Settings\Ab3d.DirectX.Client.Settings.net10-noSharpDX.csproj", "{39512D68-5AD7-4933-81FB-FD603EF611B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab3d.DirectX.Client.Diagnostics", "Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net10-noSharpDX.csproj", "{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab3d.DirectX.Client.Diagnostics", "Ab3d.DirectX.Client.Diagnostics\Ab3d.DirectX.Client.Diagnostics.net10-noSharpDX.csproj", "{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,16 +29,17 @@ Global
 		{39512D68-5AD7-4933-81FB-FD603EF611B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39512D68-5AD7-4933-81FB-FD603EF611B7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39512D68-5AD7-4933-81FB-FD603EF611B7}.Release|x86.ActiveCfg = Release|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Debug|x86.Build.0 = Debug|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Release|x86.ActiveCfg = Release|Any CPU
-		{5BA6EE80-876B-4D7E-A931-A3CDA13C45B0}.Release|x86.Build.0 = Release|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6275D6B-DF4A-4B13-AB88-C3C84955AC5E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
+
