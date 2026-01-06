@@ -5335,12 +5335,18 @@
             The rotation of this key.
             </summary>
         </member>
-        <member name="M:Assimp.QuaternionKey.#ctor(System.Double,Assimp.Quaternion)">
+        <member name="F:Assimp.QuaternionKey.Interpolation">
+            <summary>
+            The interpolation setting of this key.
+            </summary>
+        </member>
+        <member name="M:Assimp.QuaternionKey.#ctor(System.Double,Assimp.Quaternion,Assimp.AnimInterpolation)">
             <summary>
             Constructs a new QuaternionKey.
             </summary>
             <param name="time">Time of the key.</param>
             <param name="rot">Quaternion rotation at the time frame.</param>
+            <param name="interpolation">The interpolation setting of this key.</param>
         </member>
         <member name="M:Assimp.QuaternionKey.op_Equality(Assimp.QuaternionKey,Assimp.QuaternionKey)">
             <summary>
@@ -8254,12 +8260,18 @@
             The 3D vector value of this key.
             </summary>
         </member>
-        <member name="M:Assimp.VectorKey.#ctor(System.Double,Assimp.Vector3D)">
+        <member name="F:Assimp.VectorKey.Interpolation">
+            <summary>
+            The interpolation setting of this key.
+            </summary>
+        </member>
+        <member name="M:Assimp.VectorKey.#ctor(System.Double,Assimp.Vector3D,Assimp.AnimInterpolation)">
             <summary>
             Constructs a new VectorKey.
             </summary>
             <param name="time">The time of this key.</param>
             <param name="vector">The 3D vector value of this key.</param>
+            <param name="interpolation">The interpolation setting of this key.</param>
         </member>
         <member name="M:Assimp.VectorKey.op_Equality(Assimp.VectorKey,Assimp.VectorKey)">
             <summary>

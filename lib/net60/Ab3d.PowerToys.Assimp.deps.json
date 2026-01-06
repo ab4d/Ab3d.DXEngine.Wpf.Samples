@@ -6,31 +6,31 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "Ab3d.PowerToys.Assimp/12.0.9484": {
+      "Ab3d.PowerToys.Assimp/12.0.9502": {
         "dependencies": {
-          "AssimpNet": "5.3.1.0"
+          "AssimpNet": "6.0.2.0"
         },
         "runtime": {
           "Ab3d.PowerToys.Assimp.dll": {}
         }
       },
-      "AssimpNet/5.3.1.0": {
+      "AssimpNet/6.0.2.0": {
         "runtime": {
           "AssimpNet.dll": {
-            "assemblyVersion": "5.3.1.0",
-            "fileVersion": "5.3.1.0"
+            "assemblyVersion": "6.0.2.0",
+            "fileVersion": "6.0.2.0"
           }
         }
       }
     }
   },
   "libraries": {
-    "Ab3d.PowerToys.Assimp/12.0.9484": {
+    "Ab3d.PowerToys.Assimp/12.0.9502": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "AssimpNet/5.3.1.0": {
+    "AssimpNet/6.0.2.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
