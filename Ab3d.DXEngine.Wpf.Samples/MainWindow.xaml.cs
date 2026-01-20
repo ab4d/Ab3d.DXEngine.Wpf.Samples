@@ -201,8 +201,7 @@ namespace Ab3d.DXEngine.Wpf.Samples
             // If selectedGraphicsProfiles is hardware GraphicProfile, than we will also add software and WPF 3D rendering as fallback to the array
             DXEngineSettings.Current.GraphicsProfiles = DXEngineSettings.Current.SystemCapabilities.CreateArrayOfRecommendedGraphicsProfiles(selectedGraphicsProfile);
 
-            if (ContentFrame.Content != null)
-                ContentFrame.Refresh(); // This will reload the current sample with the new graphics settings
+            ReloadCurrentSample();
         }
 
         private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
